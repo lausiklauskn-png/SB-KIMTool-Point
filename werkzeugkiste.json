@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "2026-05-29",
+  "hinweis": "Quelle der Werkzeugkiste-Kacheln. sage_status = Reife im Sage-Protokol (verifiziert aus Sage/status.json, 2026-05-29). point_status = Stand hier im Tool-Point. 'vorgebaut-schlummert' heisst: bereits gebaut, springt bei Bedarf an (z.B. Angriff) — NICHT leer.",
+  "stufen": {
+    "basic": "Pflicht — bringt den Point/SBKIM ueberhaupt zum Laufen.",
+    "pro": "Kann rein — erweitert Komfort, Sicht und Schutz.",
+    "profi": "Das Plus — fortgeschritten/abhaertend, Platz fuer selbstgebaute Community-Tools."
+  },
+  "module": [
+    {
+      "id": "02", "name": "Spore", "stufe": "basic",
+      "sage_status": "code-stub", "point_status": "modell-prototyp",
+      "was": "Kryptografische Identitaet eines Knotens (Ed25519-Schluesselpaar, node_id = SHA-256 des oeffentlichen Schluessels).",
+      "nutzen": "Ohne Identitaet keine Teilnahme — jede Aussage/Stimme ist signiert und nachpruefbar.",
+      "verwendung": "Einmal pro Knoten erzeugen; oeffentliche Spore-JSON teilen, privaten Schluessel geheim halten.",
+      "einbau": "Modul importieren, beim Start eine Spore anlegen und im Storage (Modul 01) ablegen.",
+      "aktiviert_durch": "Immer aktiv (Grundbaustein)."
+    },
+    {
+      "id": "01", "name": "Storage", "stufe": "basic",
+      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "was": "Speicher-Wrapper (im Browser IndexedDB, headless ein Node-Mock) fuer alle sbkim_* Daten.",
+      "nutzen": "Identitaet, Nachbarn und Zustand ueberleben einen Neustart.",
+      "verwendung": "Schluessel/Wert ablegen und lesen; andere Module nutzen es als Persistenz-Schicht.",
+      "einbau": "Als erste Abhaengigkeit laden; Spore und Adressbuch hineinschreiben.",
+      "aktiviert_durch": "Immer aktiv (Grundbaustein)."
+    },
+    {
+      "id": "19", "name": "Andock-Wizard (Witstart)", "stufe": "basic",
+      "sage_status": "vorgebaut-kopierbar", "point_status": "noch-nicht-kopiert",
+      "was": "Kopierbares Onboarding-Modul: fuehrt eine fremde PWA Schritt fuer Schritt ins Protokoll.",
+      "nutzen": "Sporen-Erzeugung und Erst-Andockung ohne Vorwissen — der Eingang fuer neue Knoten.",
+      "verwendung": "Wizard einbinden; er erstellt die Spore, fragt 'das kann meine PWA' ab und meldet am Marktplatz an.",
+      "einbau": "Ein Skript-Tag / Copy-Paste-Block; ruft Spore (02) und Einbau-PWA (09) auf.",
+      "aktiviert_durch": "Erstkontakt eines neuen Knotens."
+    },
+    {
+      "id": "03", "name": "Embedding", "stufe": "basic",
+      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "was": "Wandelt 'das kann ich'-Texte in 384-dim Vektoren (Xenova/multilingual-e5-small).",
+      "nutzen": "Maschinell vergleichbar machen, was eine PWA anbietet/sucht — Grundlage des Findens.",
+      "verwendung": "Text rein, Vektor raus; Vektor an Match (04) geben.",
+      "einbau": "Browser-Modul (laeuft im Browser, nicht im Node-Modell); im Modell deterministisch gestubt.",
+      "aktiviert_durch": "Immer aktiv (Live-Beweis Sage 2026-05-16)."
+    },
+    {
+      "id": "04", "name": "Match", "stufe": "basic",
+      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "was": "Cosine-Aehnlichkeit ueber Embedding-Vektoren (Schwelle PROVIDER_MIN_MATCH = 0.80).",
+      "nutzen": "Findet passende Anbieter zu einer Anfrage, ohne zentrale Suche.",
+      "verwendung": "Zwei Vektoren vergleichen; ab 0.80 gilt es als Treffer.",
+      "einbau": "Nimmt Embedding (03) entgegen; speist Handshake (05).",
+      "aktiviert_durch": "Immer aktiv (Sichttest 5/5 gruen)."
+    },
+    {
+      "id": "05", "name": "Anastomose (Handshake)", "stufe": "basic",
+      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "was": "Verbindungsaufbau zwischen zwei Knoten (Hyphen-Verschmelzung).",
+      "nutzen": "Aus einem Treffer wird eine echte, beidseitig bestaetigte Verbindung.",
+      "verwendung": "Nach einem Match anstossen; beide Seiten signieren den Handschlag.",
+      "einbau": "Setzt Spore (02) und Match (04) voraus.",
+      "aktiviert_durch": "Bestaetigter Match (Cross-Node-Beweis Sage 2026-05-16)."
+    },
+    {
+      "id": "09", "name": "Einbau-PWA", "stufe": "basic",
+      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "was": "Der Mechanismus, der das Protokoll in eine bestehende PWA einsetzt.",
+      "nutzen": "Jede PWA wird zum Knoten, ohne neu gebaut zu werden.",
+      "verwendung": "Init-Skript + Service-Worker einbinden; Rest laeuft automatisch.",
+      "einbau": "sbkim-init.js / sbkim-sw.js einhaengen (live an 2 Endknoten seit 2026-05-16).",
+      "aktiviert_durch": "Einbindung in eine PWA."
+    },
+
+    {
+      "id": "00", "name": "Doku-Fenster", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "was": "Verstecktes Status-Panel (5-Klick) in einer Endpunkt-PWA.",
+      "nutzen": "Zeigt ehrlich, was lebt / was tot ist — die Lampen-Sicht direkt am Knoten.",
+      "verwendung": "Fuenfmal tippen oeffnet das Panel; zeigt Modul-Status und Identitaet.",
+      "einbau": "Optionales UI-Modul; liest status.json und Spore.",
+      "aktiviert_durch": "5-Klick-Geste."
+    },
+    {
+      "id": "06", "name": "Heterokaryose", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "was": "Daten-Austausch zwischen Geschwister-Knoten (opt-in).",
+      "nutzen": "Wissen teilen, ohne Identitaeten zu vermischen — freiwillig und kontrolliert.",
+      "verwendung": "Austausch pro Datentyp freischalten; nur mit bestaetigten Nachbarn.",
+      "einbau": "Setzt Handshake (05) voraus; UI ueber Modul 08.",
+      "aktiviert_durch": "Opt-in des Nutzers."
+    },
+    {
+      "id": "07", "name": "Apoptose", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "modell-prototyp",
+      "was": "Geordneter Selbst-Tod eines Knotens mit signiertem Vermaechtnis.",
+      "nutzen": "Kranke/boese Knoten verschwinden nicht stumm — Geschwister erfahren signiert, WARUM.",
+      "verwendung": "Bei Ueberlast (Homoeostase) oder kollektivem Misstrauen ausloesen; Vermaechtnis verbreiten.",
+      "einbau": "Wird von Reputation (10) angestossen; nutzt Spore (02) zum Signieren.",
+      "aktiviert_durch": "Homoeostase-Ueberlast ODER kollektives Misstrauen."
+    },
+    {
+      "id": "08", "name": "UI-Demo", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "was": "Wartungs-/Konfigurations-UI (u.a. fuer Heterokaryose).",
+      "nutzen": "Macht die unsichtbaren Module fuer Menschen bedienbar.",
+      "verwendung": "Einstellungen vornehmen, Status sichten.",
+      "einbau": "Optionales UI; liest/schreibt ueber Storage (01).",
+      "aktiviert_durch": "Nutzer oeffnet die Wartungs-UI."
+    },
+    {
+      "id": "15", "name": "Membran", "stufe": "pro",
+      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "was": "Aussenhuelle zwischen PWA-Zelle und Browser (Sub a + b spezifiziert).",
+      "nutzen": "Schuetzt den Knoten gegen die Aussenwelt — wirkt erst, wenn ein Angriff kommt.",
+      "verwendung": "Einmal einbinden; arbeitet im Hintergrund, schlummert bis zum Angriff.",
+      "einbau": "Umschliesst die PWA-Zelle; keine laufende Bedienung noetig.",
+      "aktiviert_durch": "Direkter Angriff von aussen (sonst schlummernd — fertig 2026-05-25)."
+    },
+    {
+      "id": "16", "name": "SBKIM-Siegel", "stufe": "pro",
+      "sage_status": "stub", "point_status": "modell-prototyp",
+      "was": "Selbst-einschreibendes Zertifikat einer bezeugten Bau-Tat ('Tun statt Sein').",
+      "nutzen": "Nur wer etwas Bezeugtes gebaut hat, bekommt Stimmrecht — Sybils bleiben gewichtslos.",
+      "verwendung": "Gate/Arzt vergibt das Siegel nach bestandener Pruefung; Reputation (10) liest das Gewicht.",
+      "einbau": "An die Pruef-Rolle koppeln; Siegel signiert vom Zeugen.",
+      "aktiviert_durch": "Bestandene Artefakt-Pruefung (Sichttest 4/4 gruen)."
+    },
+    {
+      "id": "17", "name": "Floating-Widget", "stufe": "pro",
+      "sage_status": "stub", "point_status": "noch-nicht-kopiert",
+      "was": "Schwebendes Bedien-Widget mit Event-Bus (fuenf Custom-Events).",
+      "nutzen": "Ein leichter, einheitlicher Andock-Punkt fuer die Bedienung in jeder PWA.",
+      "verwendung": "Widget einhaengen; auf die fuenf Events reagieren.",
+      "einbau": "Ein Skript-Tag; kommuniziert ueber den Event-Bus.",
+      "aktiviert_durch": "Immer aktiv, sobald eingebunden (headless-smoke 19/19 gruen)."
+    },
+
+    {
+      "id": "10", "name": "Reputation", "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert", "point_status": "modell-prototyp",
+      "was": "Misstrauens-/Reputationswert je Knoten (Sybil-Abwehr).",
+      "nutzen": "Wehrt Sybil-Angriffe ab, ohne legitime Knoten zu behindern.",
+      "verwendung": "Andere Module fragen den Wert ab, bevor sie einer Stimme/Spore vertrauen; Stimmgewicht = bezeugte Bau-Taten.",
+      "einbau": "An Spore-/Siegel-Events andocken; speist Blocklist (12) und Apoptose (07).",
+      "aktiviert_durch": "Sybil-Effekt (viele Identitaeten ohne bezeugte Bau-Tat)."
+    },
+    {
+      "id": "11", "name": "Rate-Limit & TTL", "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert", "point_status": "noch-nicht-kopiert",
+      "was": "Begrenzt Anfrage-Rate und Lebensdauer (Time-To-Live) von Nachrichten/Sporen.",
+      "nutzen": "Schuetzt vor Fluten und haelt alte Daten nicht ewig am Leben.",
+      "verwendung": "Schwellen setzen; ueberzaehlige Anfragen werden gebremst/verworfen.",
+      "einbau": "Vor die Nachrichten-Eingaenge schalten.",
+      "aktiviert_durch": "Flooding (zu viele Anfragen in kurzer Zeit)."
+    },
+    {
+      "id": "12", "name": "Blocklist", "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert", "point_status": "modell-prototyp",
+      "was": "Liste geflaggter Angreifer (manuell oder durch Reputation gefuellt).",
+      "nutzen": "Bekannte boese Knoten werden gemieden.",
+      "verwendung": "Vor jeder Interaktion pruefen, ob die Gegenseite gelistet ist.",
+      "einbau": "Wird von Reputation (10) befuellt; vor Handshake (05) abfragen.",
+      "aktiviert_durch": "Geflaggter Angreifer (Schwelle ueberschritten)."
+    },
+    {
+      "id": "14", "name": "Diffusion", "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert", "point_status": "modell-prototyp",
+      "was": "Verbreitet Spore-/Vermaechtnis-Konsens unter Nachbarn.",
+      "nutzen": "Wissen (z.B. eine Apoptose-Anklage) erreicht das Netz, ohne zentrale Stelle.",
+      "verwendung": "Signierte Vermaechtnisse weiterreichen; doppelt Empfangenes verwerfen.",
+      "einbau": "An Apoptose (07) und Reputation (10) koppeln.",
+      "aktiviert_durch": "Konsens-Bedarf (z.B. verbreitetes Misstrauens-Vermaechtnis)."
+    },
+    {
+      "id": "18", "name": "Tool-PWA-Container", "stufe": "profi",
+      "sage_status": "teil-fertig", "point_status": "noch-nicht-kopiert",
+      "was": "Container, der ein Werkzeug als eigenstaendige PWA kapselt (Sub a 17/17 gruen, Rest offen).",
+      "nutzen": "Selbstgebaute Tools laufen sicher gekapselt und sind teilbar.",
+      "verwendung": "Werkzeug in den Container legen; als PWA ausliefern/kopieren.",
+      "einbau": "Umschliesst ein Tool; nutzt Membran (15) als Aussenhuelle.",
+      "aktiviert_durch": "Auslieferung eines selbstgebauten Tools."
+    }
+  ]
+}

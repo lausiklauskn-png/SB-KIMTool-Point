@@ -1,0 +1,12 @@
+{
+  "name": "sb-kimtool-point",
+  "version": "0.1.0",
+  "description": "Tool-Point: Werkzeugkiste + agenten-basiertes Modell (headless) fuer das SBKIM-Protokoll",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "demo": "node sandbox/loop.js",
+    "test": "node --test"
+  },
+  "license": "UNLICENSED"
+}

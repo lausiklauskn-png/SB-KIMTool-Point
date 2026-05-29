@@ -1,0 +1,135 @@
+/* SB·KIMTool·Point — Optik an Sage angelehnt (dunkel, Karten, Mono-Akzente,
+   Lampen-Status-Leiste), re-geskinnt fuer eine eigene, neutrale Identitaet.
+   Akzent: kuehles Teal statt Sage-Look. Aehnlichkeit ja, Verwechslung nein. */
+
+:root {
+  --bg: #0c0f12;
+  --bg-soft: #12171c;
+  --card: #161c22;
+  --card-2: #1b232b;
+  --line: #283139;
+  --text: #d7dee5;
+  --muted: #8a97a3;
+  --accent: #36d6c3;       /* neutral teal */
+  --accent-dim: #1f7a72;
+  --lamp-live: #3fd06b;    /* lebt */
+  --lamp-dorm: #e0a93a;    /* schlummert */
+  --lamp-dead: #d65a5a;    /* tot / verworfen */
+  --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
+a { color: var(--accent); }
+
+/* --- Status-Leiste (Schicht 0) --- */
+.statusbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+  padding: 0.7rem 1.1rem;
+  background: linear-gradient(180deg, #0e1419, #0c0f12);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-family: var(--mono); font-weight: 700; letter-spacing: 0.12em;
+  color: var(--text);
+}
+.brand .dot { color: var(--accent); }
+.lamps { display: flex; gap: 1rem; flex-wrap: wrap; }
+.lamp { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); font-family: var(--mono); }
+.lamp::before {
+  content: ""; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--lamp-live); box-shadow: 0 0 8px var(--lamp-live);
+}
+.lamp.dorm::before { background: var(--lamp-dorm); box-shadow: 0 0 8px var(--lamp-dorm); }
+.version { margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
+
+/* --- Schichten --- */
+main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
+.layer { margin: 1.6rem 0; }
+.layer > h2 {
+  font-family: var(--mono); font-size: 0.95rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent);
+  border-left: 3px solid var(--accent-dim); padding-left: 0.6rem; margin-bottom: 0.2rem;
+}
+.layer > .sub { color: var(--muted); font-size: 0.88rem; margin: 0.1rem 0 0.9rem 0.7rem; }
+
+.panel {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 1rem;
+}
+
+/* --- Schicht 1: Agenten-Board --- */
+.board { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.agent {
+  flex: 1 1 180px; background: var(--card-2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 0.8rem; min-width: 160px;
+}
+.agent h3 { margin: 0 0 0.3rem; font-family: var(--mono); font-size: 0.92rem; }
+.agent .task { color: var(--muted); font-size: 0.82rem; min-height: 2.4em; }
+.agent .lamp { margin-top: 0.4rem; }
+.edge { color: var(--accent); }
+.arrow { color: var(--accent-dim); font-size: 1.4rem; }
+.agent.sybil { opacity: 0.45; border-style: dashed; }
+.agent.sybil h3::after { content: " ✗"; color: var(--lamp-dead); }
+
+.ticker {
+  margin-top: 0.9rem; font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px;
+  padding: 0.6rem 0.8rem; max-height: 180px; overflow: auto;
+}
+.ticker .ok { color: var(--lamp-live); }
+.ticker .bad { color: var(--lamp-dead); }
+.ticker .flag { color: var(--lamp-dorm); }
+
+/* --- Schicht 2: Werkzeugkiste --- */
+.tabs { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; }
+.tab {
+  font-family: var(--mono); font-size: 0.85rem; cursor: pointer;
+  background: var(--card); border: 1px solid var(--line); color: var(--muted);
+  padding: 0.4rem 0.9rem; border-radius: 999px;
+}
+.tab.active { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 700; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
+.tool {
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem;
+}
+.tool .head { display: flex; align-items: baseline; gap: 0.5rem; }
+.tool .id { font-family: var(--mono); color: var(--accent); font-size: 0.8rem; }
+.tool .name { font-weight: 700; }
+.tool .badges { margin: 0.4rem 0; display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.badge {
+  font-family: var(--mono); font-size: 0.68rem; padding: 0.12rem 0.45rem; border-radius: 4px;
+  border: 1px solid var(--line); color: var(--muted);
+}
+.badge.fertig { color: var(--lamp-live); border-color: var(--lamp-live); }
+.badge.schlummert { color: var(--lamp-dorm); border-color: var(--lamp-dorm); }
+.badge.stub, .badge.teil { color: var(--accent); border-color: var(--accent-dim); }
+.tool dl { margin: 0.4rem 0 0; font-size: 0.8rem; }
+.tool dt { color: var(--accent); font-family: var(--mono); font-size: 0.72rem; margin-top: 0.35rem; }
+.tool dd { margin: 0 0 0.1rem; color: var(--text); }
+.tool .copy {
+  margin-top: 0.6rem; font-family: var(--mono); font-size: 0.75rem; cursor: pointer;
+  background: transparent; border: 1px solid var(--accent-dim); color: var(--accent);
+  border-radius: 6px; padding: 0.3rem 0.6rem;
+}
+
+/* --- Schicht 3: Marktplatz --- */
+.market { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
+.pwa { background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem; }
+.pwa .name { font-weight: 700; }
+.pwa .nodeid { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.pwa .can { color: var(--text); font-size: 0.85rem; margin: 0.4rem 0; }
+.pwa .dock { font-family: var(--mono); font-size: 0.78rem; }
+.note { color: var(--muted); font-size: 0.8rem; margin-top: 0.6rem; }
+
+footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); }

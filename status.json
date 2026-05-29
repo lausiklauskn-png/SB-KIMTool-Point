@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "2026-05-29",
+  "repo": "SB-KIMTool-Point",
+  "protocolVersion": "0.1",
+  "prinzip": "Ehrlicher Real-Anteil (analog Sage 'X % real'). Trennt klar, was echt browser-tauglich ist, was nur Modell/Demo ist und was in Sage reif aber hier noch nicht eingebaut wurde.",
+  "seiten_ehrlichkeit": "Die statische Seite ZEIGT einen aufgezeichneten Node-Lauf (web/data/run.json). Sie fuehrt das Modell NICHT live im Browser aus. Der Beweis ist der headless Smoke-Test (npm test).",
+  "kategorien": {
+    "real-browser-tauglich": "Laeuft echt im Browser.",
+    "modell": "Headless-Prototyp im Node-Modell (Demo der Logik).",
+    "reif-in-sage": "Im Sage-Protokol fertig getestet, hier noch nicht kopiert.",
+    "vorgebaut-schlummert": "Gebaut und schlummernd, springt bei Bedarf an.",
+    "im-test": "WIRD GETESTET — im Labor, noch nicht feldbewiesen.",
+    "noch-nicht-gebaut": "Benannt, aber noch nicht gebaut."
+  },
+  "komponenten": [
+    { "name": "Modell: 3-Rollen-Schleife (Bauer/Gate-Arzt/Beobachter)", "status": "modell", "echt": true, "beleg": "npm test 5/5 gruen" },
+    { "name": "Modell: Ed25519-Identitaet/Spore (node:crypto)", "status": "modell", "echt": true, "browser_tauglich": true },
+    { "name": "Modell: Immun-Prototyp (Reputation 10 / Blocklist 12 / Apoptose 07 / Diffusion 14)", "status": "modell", "echt": true, "hinweis": "prototypt die in Sage schlummernden Module" },
+    { "name": "Werkzeugkiste: Basic (02,01,19,03,04,05,09)", "status": "reif-in-sage", "hinweis": "03/04/05/09 in Sage fertig; im Point noch nicht kopiert" },
+    { "name": "Werkzeugkiste: Pro (00,06,07,08,15,16,17)", "status": "vorgebaut-schlummert", "hinweis": "15 Membran fertig; springt bei Angriff an" },
+    { "name": "Werkzeugkiste: Profi (10,11,12,14,18)", "status": "vorgebaut-schlummert", "hinweis": "Sybil-Abwehr-Module, schlummern bis Angriff" },
+    { "name": "Statische Seite (3 Schichten, Playback von run.json)", "status": "real-browser-tauglich", "hinweis": "zeigt das Modell, fuehrt es nicht live aus" },
+    { "name": "Marktplatz Schicht 3 (Saat = echte Live-Endknoten)", "status": "real-browser-tauglich", "hinweis": "Suche bewusst noch NICHT gebaut" },
+    { "name": "Reife Module tatsaechlich aus Sage kopieren", "status": "noch-nicht-gebaut" },
+    { "name": "Browser-Transport / Server-Zeh-Entscheidung", "status": "noch-nicht-gebaut", "hinweis": "offene Wand, bewusst vertagt" }
+  ],
+  "real_anteil_geschaetzt": "ca. 20% (lauffaehiges, getestetes Modell + statische Seite; Werkzeugkiste verlinkt reife Sage-Module, die hier noch nicht kopiert sind)"
+}
