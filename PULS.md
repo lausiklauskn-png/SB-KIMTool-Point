@@ -2,6 +2,17 @@
 
 Stand: 2026-05-29 · Branch `claude/sbkimtool-founding-TXRdc`
 
+## Nachtrag 2026-05-29 — Drei Schichten auf je eine eigene Seite
+
+Auf Klaus' Wunsch die eine gedrängte Seite in **vier Seiten** aufgeteilt:
+`index.html` (Startseite mit drei Knöpfen) + `modell.html` / `werkzeuge.html` /
+`markt.html`. Gemeinsame Kopf-Navigation (Start · Modell · Werkzeuge · Markt,
+aktive Seite hervorgehoben). Ein `assets/app.js` lädt pro Seite nur den passenden
+Teil (Element-Erkennung), `assets/style.css` um Nav + Startseiten-Karten erweitert.
+Version v0.2. So hat jede Schicht Platz; in `werkzeuge.html` können einzelne Tools
+heranwachsen. `npm test` weiterhin 6/6 grün (Modell-Logik unberührt).
+**Browser-Lauf der neuen Struktur: ungeprüft, wartet auf Klaus.**
+
 ## Nachtrag 2026-05-29 — Erprobte Regeln übernommen
 
 Nach Gründung gezielt geprüft, welche bewährten Regeln aus Sage und den Live-PWAs

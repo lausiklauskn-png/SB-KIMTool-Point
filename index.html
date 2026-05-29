@@ -3,70 +3,67 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SB·KIMTool·Point</title>
+  <title>SB·KIMTool·Point — Start</title>
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <!-- Schicht 0 · Status-Leiste (Sage-Lampen-Stil, re-geskinnt) -->
+  <!-- Schicht 0 · Status-Leiste + Seiten-Navigation -->
   <header class="statusbar">
-    <span class="brand">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</span>
-    <span class="lamps">
-      <span class="lamp" id="lamp-modell">MODELL</span>
-      <span class="lamp dorm" id="lamp-werkzeuge">WERKZEUGE</span>
-      <span class="lamp" id="lamp-markt">MARKT</span>
-    </span>
-    <span class="version">v0.1</span>
+    <a class="brand" href="index.html">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</a>
+    <nav class="nav">
+      <a href="index.html" class="active">Start</a>
+      <a href="modell.html">Modell</a>
+      <a href="werkzeuge.html">Werkzeuge</a>
+      <a href="markt.html">Markt</a>
+    </nav>
+    <span class="version">v0.2</span>
   </header>
 
   <main>
-    <!-- Schicht 1 · MODELL (zuschauen) -->
-    <section class="layer" id="schicht-modell">
-      <h2>Schicht 1 · Modell (zuschauen)</h2>
-      <p class="sub">
-        Aufgezeichneter, headless Node-Lauf. Diese Seite <strong>spielt ihn ab</strong> —
-        sie führt das Modell <strong>nicht live</strong> aus. Der Beweis ist <code>npm test</code>.
+    <div class="hero">
+      <h1>SB·KIMTool·Point</h1>
+      <p>
+        Drei Schichten, drei Seiten. Wähle eine — du kannst jederzeit oben
+        wieder wechseln. Optik an Sage angelehnt, eigene neutrale Identität.
       </p>
-      <div class="panel">
-        <div class="board">
-          <div class="agent" id="ag-bauer"><h3>Bauer</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
-          <span class="arrow">→</span>
-          <div class="agent" id="ag-gate"><h3>Gate/Arzt</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
-          <span class="arrow">→</span>
-          <div class="agent" id="ag-beob"><h3>Beobachter</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
-          <span class="arrow">⟂</span>
-          <div class="agent sybil" id="ag-sybil"><h3>Sybil</h3><div class="task">flutet mit gefälschten Artefakten</div><span class="lamp dorm">0 Gewicht</span></div>
-        </div>
-        <div class="ticker" id="ticker">Lade aufgezeichneten Lauf…</div>
-      </div>
-    </section>
+    </div>
 
-    <!-- Schicht 2 · WERKZEUGKISTE (herunterladen) -->
-    <section class="layer" id="schicht-werkzeuge">
-      <h2>Schicht 2 · Werkzeugkiste (herunterladen)</h2>
-      <p class="sub">
-        Drei Stufen. Jede Kachel trägt Doppel-Status (Sage / Point) und eine Erklärung.
-        „Schlummert" = vorgebaut, springt bei Bedarf an — nicht leer.
-      </p>
-      <div class="panel">
-        <div class="tabs" id="tabs"></div>
-        <div class="grid" id="tools"></div>
-      </div>
-    </section>
+    <div class="entries">
+      <a class="entry" href="modell.html">
+        <span class="step">Schicht 1</span>
+        <h2>Modell</h2>
+        <p>
+          Aufgezeichneter, headless Node-Lauf als Agenten-Board. Die Seite
+          <strong>spielt</strong> ihn ab — sie führt das Modell nicht live aus.
+        </p>
+        <span class="go">→ ansehen</span>
+      </a>
 
-    <!-- Schicht 3 · PWA-MARKTPLATZ (präsentieren) -->
-    <section class="layer" id="schicht-markt">
-      <h2>Schicht 3 · PWA-Marktplatz (präsentieren)</h2>
-      <p class="sub">Schaufenster. Saat = echte Live-Endknoten. Suche bewusst noch nicht gebaut.</p>
-      <div class="panel">
-        <div class="market" id="market"></div>
-        <p class="note" id="market-note"></p>
-      </div>
-    </section>
+      <a class="entry" href="werkzeuge.html">
+        <span class="step">Schicht 2</span>
+        <h2>Werkzeugkiste</h2>
+        <p>
+          Drei Stufen (Basic · Pro · Profi). Jede Kachel mit Doppel-Status und
+          Erklärung. Hier wachsen einzelne Tools heran.
+        </p>
+        <span class="go">→ öffnen</span>
+      </a>
+
+      <a class="entry" href="markt.html">
+        <span class="step">Schicht 3</span>
+        <h2>Markt</h2>
+        <p>
+          PWA-Tool-Vermittlung. Schaufenster der Live-Endknoten zum Andocken.
+          Suche bewusst noch nicht gebaut.
+        </p>
+        <span class="go">→ stöbern</span>
+      </a>
+    </div>
   </main>
 
   <footer>
-    SB·KIMTool·Point — Werkzeugkiste + Modell. Optik an Sage angelehnt, eigene
-    neutrale Identität. Ehrlicher Real-Anteil: siehe <code>status.json</code>.
+    SB·KIMTool·Point — Werkzeugkiste + Modell. Ehrlicher Real-Anteil: siehe
+    <code>status.json</code>. Beweis der Modell-Logik: <code>npm test</code>.
   </footer>
 
   <script src="assets/app.js"></script>
