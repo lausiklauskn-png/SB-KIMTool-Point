@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SB·KIMTool·Point — Modell</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="statusbar">
+    <a class="brand" href="index.html">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</a>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="modell.html" class="active">Modell</a>
+      <a href="werkzeuge.html">Werkzeuge</a>
+      <a href="markt.html">Markt</a>
+    </nav>
+    <span class="version">v0.2</span>
+  </header>
+
+  <main>
+    <!-- Schicht 1 · MODELL (zuschauen) -->
+    <section class="layer" id="schicht-modell">
+      <h2>Schicht 1 · Modell (zuschauen)</h2>
+      <p class="sub">
+        Aufgezeichneter, headless Node-Lauf. Diese Seite <strong>spielt ihn ab</strong> —
+        sie führt das Modell <strong>nicht live</strong> aus. Der Beweis ist <code>npm test</code>.
+      </p>
+      <div class="panel">
+        <div class="board">
+          <div class="agent" id="ag-bauer"><h3>Bauer</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
+          <span class="arrow">→</span>
+          <div class="agent" id="ag-gate"><h3>Gate/Arzt</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
+          <span class="arrow">→</span>
+          <div class="agent" id="ag-beob"><h3>Beobachter</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
+          <span class="arrow">⟂</span>
+          <div class="agent sybil" id="ag-sybil"><h3>Sybil</h3><div class="task">flutet mit gefälschten Artefakten</div><span class="lamp dorm">0 Gewicht</span></div>
+        </div>
+        <div class="ticker" id="ticker">Lade aufgezeichneten Lauf…</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Schicht 1 von 3 · <a href="index.html">zurück zur Startseite</a>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

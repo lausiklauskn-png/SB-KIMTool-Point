@@ -23,14 +23,20 @@ npm test       # headless Smoke-Test (Beweis) — 5 Prüfungen
 
 Keine Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto`, `node --test`).
 
-## Die drei Schichten der Seite
+## Die drei Schichten — je eine eigene Seite
 
-- **Schicht 1 · Modell** — Agenten-Board (Bauer → Gate/Arzt → Beobachter), spielt
-  `web/data/run.json` ab; Sybil-Knoten werden ausgegraut/apoptosiert.
-- **Schicht 2 · Werkzeugkiste** — Reiter Basic/Pro/Profi aus `werkzeugkiste.json`,
-  jede Kachel mit Erklärung und Status.
-- **Schicht 3 · PWA-Marktplatz** — Schaufenster aus `web/data/marktplatz.json`
+Eine Startseite (`index.html`) führt mit drei Knöpfen auf je eine eigene Seite.
+Oben auf jeder Seite eine Navigationsleiste, die zwischen allen Seiten wechselt.
+
+- **Schicht 1 · Modell** (`modell.html`) — Agenten-Board (Bauer → Gate/Arzt →
+  Beobachter), spielt `web/data/run.json` ab; Sybil-Knoten werden ausgegraut/apoptosiert.
+- **Schicht 2 · Werkzeugkiste** (`werkzeuge.html`) — Reiter Basic/Pro/Profi aus
+  `werkzeugkiste.json`, jede Kachel mit Erklärung und Status. Hier wachsen einzelne Tools.
+- **Schicht 3 · PWA-Markt** (`markt.html`) — Schaufenster aus `web/data/marktplatz.json`
   (Saat = echte Live-Endknoten). Suche bewusst noch nicht gebaut.
+
+Ein gemeinsames `assets/app.js` lädt pro Seite nur den passenden Teil
+(per Element-Erkennung), ein gemeinsames `assets/style.css` für die Optik.
 
 ## Aufbau
 
@@ -39,8 +45,11 @@ sandbox/        # das headless Modell (reiner Node, keine Deps)
 test/           # Smoke-Test (der Beweis)
 docs/           # HERKUNFT, IMMUNSCHICHT, BAUTRUPP, WERKZEUGE, STUFEN, MODELL
 web/data/       # run.json (aufgezeichneter Lauf), marktplatz.json, nodes.json
-index.html      # statische Drei-Schichten-Seite (Playback, kein Live-Node)
-assets/         # Optik (an Sage angelehnt, eigene neutrale Identität)
+index.html      # Startseite mit drei Knöpfen
+modell.html     # Schicht 1 (Playback, kein Live-Node)
+werkzeuge.html  # Schicht 2 (Werkzeugkiste)
+markt.html      # Schicht 3 (PWA-Markt)
+assets/         # gemeinsame Optik + app.js (an Sage angelehnt, eigene Identität)
 status.json     # ehrlicher Real-Anteil
 werkzeugkiste.json  # Quelle der Werkzeug-Kacheln
 ```

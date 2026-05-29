@@ -52,6 +52,33 @@ a { color: var(--accent); }
 }
 .lamp.dorm::before { background: var(--lamp-dorm); box-shadow: 0 0 8px var(--lamp-dorm); }
 .version { margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
+a.brand { text-decoration: none; }
+
+/* --- Seiten-Navigation (Knoepfe zwischen den drei Seiten) --- */
+.nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.nav a {
+  font-family: var(--mono); font-size: 0.8rem; text-decoration: none;
+  background: var(--card); border: 1px solid var(--line); color: var(--muted);
+  padding: 0.35rem 0.8rem; border-radius: 999px;
+}
+.nav a:hover { color: var(--text); border-color: var(--accent-dim); }
+.nav a.active { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 700; }
+
+/* --- Startseite: drei grosse Eingangs-Knoepfe --- */
+.hero { text-align: center; margin: 1.4rem 0 0.4rem; }
+.hero h1 { font-family: var(--mono); letter-spacing: 0.06em; font-size: 1.4rem; margin: 0 0 0.3rem; }
+.hero p { color: var(--muted); margin: 0 auto; max-width: 640px; font-size: 0.9rem; }
+.entries { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.6rem 0; }
+.entry {
+  display: block; text-decoration: none; color: inherit;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 1.3rem; transition: border-color 0.15s, transform 0.15s;
+}
+.entry:hover { border-color: var(--accent); transform: translateY(-2px); }
+.entry .step { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); letter-spacing: 0.08em; }
+.entry h2 { margin: 0.3rem 0 0.4rem; font-size: 1.15rem; color: var(--text); border: 0; padding: 0; text-transform: none; }
+.entry p { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.8rem; }
+.entry .go { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); }
 
 /* --- Schichten --- */
 main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }

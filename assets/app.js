@@ -170,6 +170,9 @@ async function renderMarkt() {
   $("#market-note").textContent = data.hinweis;
 }
 
-renderModell();
-renderWerkzeuge();
-renderMarkt();
+// --- Dispatch: each page only loads what it shows -------------------------
+// One shared app.js for all pages. We render a section only if its anchor
+// element exists on the current page (Startseite has none → nothing runs).
+if ($("#ticker")) renderModell();
+if ($("#tabs")) renderWerkzeuge();
+if ($("#market")) renderMarkt();
