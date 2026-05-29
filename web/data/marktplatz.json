@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "2026-05-29",
+  "hinweis": "Schicht 3 — PWA-Marktplatz. Saat = echte Live-Endknoten aus dem Sage-Protokol (verifiziert 2026-05-29). Die Suche ist bewusst noch NICHT gebaut; die Daten sind aber bereits durchsuchbar strukturiert.",
+  "eintraege": [
+    {
+      "name": "Rezeptbuch",
+      "nodeId": "BSWxXmXvxF8F…",
+      "kannDas": "Rezepte anbieten und passende Zutaten/Gerichte finden.",
+      "andockLink": "#andock/rezeptbuch",
+      "status": "live-direct",
+      "echt": true
+    },
+    {
+      "name": "Mixarium",
+      "nodeId": "JOlHK31XEiyl…",
+      "kannDas": "Getraenke/Cocktails anbieten und passende Mixturen finden.",
+      "andockLink": "#andock/mixarium",
+      "status": "live-direct",
+      "echt": true
+    },
+    {
+      "name": "Sage",
+      "nodeId": "nysOZE3VuKqZ…",
+      "kannDas": "Hub: Knoten verbinden, Protokoll bereitstellen.",
+      "andockLink": "#andock/sage",
+      "status": "integriert-2026-05-21",
+      "echt": true
+    }
+  ]
+}

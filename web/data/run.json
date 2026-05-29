@@ -1,0 +1,232 @@
+{
+  "protocolVersion": "0.1",
+  "recordedAt": "2026-05-29",
+  "note": "Aufgezeichneter Modell-Lauf (headless). Die Seite spielt dies ab, fuehrt es NICHT live aus.",
+  "summary": {
+    "graduated": 9,
+    "sybilNodes": 2,
+    "sybilFlagged": 2,
+    "blocklist": [
+      "oAx-f4ZrW-gg…",
+      "ZDUmd1AvQDi6…"
+    ]
+  },
+  "edgeCases": [
+    {
+      "kind": "repariert-dann-tauglich",
+      "artefactId": "art-1",
+      "note": "Nur nach Reparatur tauglich — Grenzfall fuer Meta-Bewertung."
+    },
+    {
+      "kind": "repariert-dann-tauglich",
+      "artefactId": "art-3",
+      "note": "Nur nach Reparatur tauglich — Grenzfall fuer Meta-Bewertung."
+    },
+    {
+      "kind": "repariert-dann-tauglich",
+      "artefactId": "art-7",
+      "note": "Nur nach Reparatur tauglich — Grenzfall fuer Meta-Bewertung."
+    },
+    {
+      "kind": "repariert-dann-tauglich",
+      "artefactId": "art-8",
+      "note": "Nur nach Reparatur tauglich — Grenzfall fuer Meta-Bewertung."
+    }
+  ],
+  "events": [
+    {
+      "phase": "build",
+      "round": 0,
+      "builder": "bauer-1",
+      "builderId": "SIQDsSrBUSNR…",
+      "artefactId": "art-1",
+      "verdict": "taugt",
+      "repaired": true,
+      "reason": "trivialer Fehler repariert, dann tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 0,
+      "builder": "bauer-2",
+      "builderId": "NLKFEWc9taYz…",
+      "artefactId": "art-2",
+      "verdict": "taugt",
+      "repaired": false,
+      "reason": "tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 0,
+      "builder": "bauer-3",
+      "builderId": "CaDi-Duy4gbP…",
+      "artefactId": "art-3",
+      "verdict": "taugt",
+      "repaired": true,
+      "reason": "trivialer Fehler repariert, dann tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 1,
+      "builder": "bauer-1",
+      "builderId": "SIQDsSrBUSNR…",
+      "artefactId": "art-4",
+      "verdict": "taugt",
+      "repaired": false,
+      "reason": "tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 1,
+      "builder": "bauer-2",
+      "builderId": "NLKFEWc9taYz…",
+      "artefactId": "art-5",
+      "verdict": "taugt",
+      "repaired": false,
+      "reason": "tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 1,
+      "builder": "bauer-3",
+      "builderId": "CaDi-Duy4gbP…",
+      "artefactId": "art-6",
+      "verdict": "taugt",
+      "repaired": false,
+      "reason": "tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 2,
+      "builder": "bauer-1",
+      "builderId": "SIQDsSrBUSNR…",
+      "artefactId": "art-7",
+      "verdict": "taugt",
+      "repaired": true,
+      "reason": "trivialer Fehler repariert, dann tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 2,
+      "builder": "bauer-2",
+      "builderId": "NLKFEWc9taYz…",
+      "artefactId": "art-8",
+      "verdict": "taugt",
+      "repaired": true,
+      "reason": "trivialer Fehler repariert, dann tauglich"
+    },
+    {
+      "phase": "build",
+      "round": 2,
+      "builder": "bauer-3",
+      "builderId": "CaDi-Duy4gbP…",
+      "artefactId": "art-9",
+      "verdict": "taugt",
+      "repaired": false,
+      "reason": "tauglich"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-1",
+      "builderId": "oAx-f4ZrW-gg…",
+      "artefactId": "art-10",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-1",
+      "builderId": "zAZ5GaUp9gpw…",
+      "artefactId": "art-11",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-1",
+      "builderId": "nhAPtyJ9LBPz…",
+      "artefactId": "art-12",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-1",
+      "builderId": "prEhBbeGyO29…",
+      "artefactId": "art-13",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-1",
+      "builderId": "TEHxwAUie7yF…",
+      "artefactId": "art-14",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "verdict",
+      "node": "sybil-1",
+      "nodeId": "oAx-f4ZrW-gg…",
+      "votingWeight": 0,
+      "distrust": "3/1",
+      "flagged": true,
+      "apoptose": {
+        "reason": "collective-distrust",
+        "signed": true
+      }
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-2",
+      "builderId": "ZDUmd1AvQDi6…",
+      "artefactId": "art-15",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-2",
+      "builderId": "AcjFtFpgF6di…",
+      "artefactId": "art-16",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-2",
+      "builderId": "n-As2UUdMklD…",
+      "artefactId": "art-17",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-2",
+      "builderId": "fDJCmbgOjzd_…",
+      "artefactId": "art-18",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "sybil",
+      "node": "sybil-2",
+      "builderId": "umQYk0d5qGWZ…",
+      "artefactId": "art-19",
+      "verdict": "verwerfen",
+      "reason": "Signatur ungueltig"
+    },
+    {
+      "phase": "verdict",
+      "node": "sybil-2",
+      "nodeId": "ZDUmd1AvQDi6…",
+      "votingWeight": 0,
+      "distrust": "3/1",
+      "flagged": true,
+      "apoptose": {
+        "reason": "collective-distrust",
+        "signed": true
+      }
+    }
+  ]
+}

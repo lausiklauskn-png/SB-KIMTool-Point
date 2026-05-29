@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SB·KIMTool·Point</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <!-- Schicht 0 · Status-Leiste (Sage-Lampen-Stil, re-geskinnt) -->
+  <header class="statusbar">
+    <span class="brand">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</span>
+    <span class="lamps">
+      <span class="lamp" id="lamp-modell">MODELL</span>
+      <span class="lamp dorm" id="lamp-werkzeuge">WERKZEUGE</span>
+      <span class="lamp" id="lamp-markt">MARKT</span>
+    </span>
+    <span class="version">v0.1</span>
+  </header>
+
+  <main>
+    <!-- Schicht 1 · MODELL (zuschauen) -->
+    <section class="layer" id="schicht-modell">
+      <h2>Schicht 1 · Modell (zuschauen)</h2>
+      <p class="sub">
+        Aufgezeichneter, headless Node-Lauf. Diese Seite <strong>spielt ihn ab</strong> —
+        sie führt das Modell <strong>nicht live</strong> aus. Der Beweis ist <code>npm test</code>.
+      </p>
+      <div class="panel">
+        <div class="board">
+          <div class="agent" id="ag-bauer"><h3>Bauer</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
+          <span class="arrow">→</span>
+          <div class="agent" id="ag-gate"><h3>Gate/Arzt</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
+          <span class="arrow">→</span>
+          <div class="agent" id="ag-beob"><h3>Beobachter</h3><div class="task">—</div><span class="lamp">aktiv</span></div>
+          <span class="arrow">⟂</span>
+          <div class="agent sybil" id="ag-sybil"><h3>Sybil</h3><div class="task">flutet mit gefälschten Artefakten</div><span class="lamp dorm">0 Gewicht</span></div>
+        </div>
+        <div class="ticker" id="ticker">Lade aufgezeichneten Lauf…</div>
+      </div>
+    </section>
+
+    <!-- Schicht 2 · WERKZEUGKISTE (herunterladen) -->
+    <section class="layer" id="schicht-werkzeuge">
+      <h2>Schicht 2 · Werkzeugkiste (herunterladen)</h2>
+      <p class="sub">
+        Drei Stufen. Jede Kachel trägt Doppel-Status (Sage / Point) und eine Erklärung.
+        „Schlummert" = vorgebaut, springt bei Bedarf an — nicht leer.
+      </p>
+      <div class="panel">
+        <div class="tabs" id="tabs"></div>
+        <div class="grid" id="tools"></div>
+      </div>
+    </section>
+
+    <!-- Schicht 3 · PWA-MARKTPLATZ (präsentieren) -->
+    <section class="layer" id="schicht-markt">
+      <h2>Schicht 3 · PWA-Marktplatz (präsentieren)</h2>
+      <p class="sub">Schaufenster. Saat = echte Live-Endknoten. Suche bewusst noch nicht gebaut.</p>
+      <div class="panel">
+        <div class="market" id="market"></div>
+        <p class="note" id="market-note"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    SB·KIMTool·Point — Werkzeugkiste + Modell. Optik an Sage angelehnt, eigene
+    neutrale Identität. Ehrlicher Real-Anteil: siehe <code>status.json</code>.
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
