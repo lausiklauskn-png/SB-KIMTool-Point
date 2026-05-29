@@ -5,7 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { Spore, verifyWith } from "../sandbox/02_spore.js";
-import { SiegelRegistry } from "../sandbox/16_siegel.js";
+import { SiegelRegistry, ZERTIFIKAT_ASPEKTE } from "../sandbox/16_siegel.js";
 import { GateArzt } from "../sandbox/roles/gate_arzt.js";
 import { Bauer } from "../sandbox/roles/bauer.js";
 import { runModel } from "../sandbox/loop.js";
@@ -35,6 +35,18 @@ test("Gate/Arzt: forged Sybil artefact is rejected, no Siegel granted", () => {
   const result = gate.inspect(sybil.build());
   assert.equal(result.verdict, "verwerfen");
   assert.equal(siegel.hasDeed(sybil.spore.nodeId), false);
+});
+
+test("Security obligation: every touched protection module has a ZERTIFIKAT_ASPEKTE entry", () => {
+  assert.ok(ZERTIFIKAT_ASPEKTE.length >= 1, "log is not empty");
+  for (const e of ZERTIFIKAT_ASPEKTE) {
+    assert.match(e.date, /^\d{4}-\d{2}-\d{2}$/, "date is YYYY-MM-DD");
+    assert.ok(e.modul && e.text, "entry names a module and a description");
+  }
+  // the protection modules prototyped in the model must be represented
+  for (const id of ["10", "12", "07", "14"]) {
+    assert.ok(ZERTIFIKAT_ASPEKTE.some((e) => e.modul === id), `module ${id} logged`);
+  }
 });
 
 test('"Tun statt Sein": a node without a witnessed deed has 0 voting weight', () => {
