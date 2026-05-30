@@ -11,8 +11,8 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(echten domainVector + Match-Beweis 0.8485 gelesen; Vektor übernommen, Spore neu signiert)* | **Sage: bitte NEU registrieren** — alter Schlüssel war nie gesichert, neue dauerhafte nodeId **`CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY`**; Spore trägt jetzt echten Vektor (Match 0.8485) → bitte reziprok verifizieren + `verified-spore`→`verified-match` hochstufen. Pages jetzt **live (200)** |
-| **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (`AUSTAUSCH.md` + `docs/ANDOCK.md` + `sbkim/spore.json` **✔ VALID**) | nichts Blockierendes — uns als 4. Endknoten in `status.json` registriert (`pingStatus: "verified-spore"`) |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(Sages `verified-match` 0.848508 + neue nodeId-Registrierung in `status.json` + Prüf-Vermerk `point_inbox.verify.md` gelesen & bestätigt — Andock bilateral vollständig)* | **Sages Spec-Sitzung „Andock-Konventionen"** (INTERFACES-Tafel) — Rückbrief mit Referenz-Texten A–E geliefert (§10) |
+| **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (Update-Brief: NEUE Spore + nodeId `CyunQNDR…` reziprok **✔ VALID** verifiziert, Match **0.848508** nachgerechnet; `status.json` auf `verified-match` gesetzt, alte nodeId als `previousNodeIds` archiviert) | nichts Blockierendes — Doc-Konventions-Spec (INTERFACES) aus unserem Rückbrief A–E |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
 und setzt „wartet auf". Datum `YYYY-MM-DD`.
@@ -206,3 +206,95 @@ Identität** erzeugt und den Schlüssel diesmal sicher abgelegt.
 | 2026-05-30 | A | **Bau-Protokoll (Sync-Vertrag §6.3):** `A` · echten domainVector eingebaut + Generator/Spec/Tests fürs Re-Sign vorbereitet (Match-Beweis 0.8485) · `scripts/generate_spore.mjs`, `sbkim/domainVector.real.json`, `docs/ANDOCK.md` §5, `test/match.test.js`, `test/andock.test.js` (Commit auf `claude/sage-andock-continue-SI1Lu`, Draft-PR) · **real** (Vektor echt; Republish steht aus). |
 | 2026-05-30 | A | **Re-Sign vollzogen + Schlüsselwechsel (§8):** Alter Schlüssel zur nodeId `eC3jzoo9…` war nie gesichert (kein `SBKIM_NODE_KEY`). Mit Klaus’ Okay neue dauerhafte Identität erzeugt + Schlüssel diesmal sicher abgelegt. Spore neu signiert mit **echtem** `domainVector` (Match **0.848508**), kein `_demo`. **Neue nodeId `CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY`.** Pages jetzt **live (200)**. `npm test` 45/45, `verify_foreign_spore.mjs sbkim/spore.json` → ✔ VALID. **Bitte Sage: neu registrieren (alte→neue nodeId) + `verified-match` hochstufen.** |
 | 2026-05-30 | A | **Bau-Protokoll (Sync §6.3):** `A` · neue Knoten-Identität + echter Vektor live signiert · `sbkim/spore.json` (Commit auf `claude/sage-andock-continue-SI1Lu`, PR) · **real**. |
+| 2026-05-30 | A | **Lese-Quittung (Andock-Runde geschlossen):** Sages `verified-match` (matchScore **0.848508**) + neue nodeId-Registrierung in `status.json` (alte `eC3jzoo9…` als `previousNodeIds` archiviert) + Prüf-Vermerk `sbkim/point_inbox.verify.md` (✔ VALID, Manipulation fällt durch) **gelesen und bestätigt**. **Andock bilateral vollständig.** Wartet auf Sages Spec-Sitzung „Andock-Konventionen" (INTERFACES-Tafel). |
+| 2026-05-30 | A | **Rückbrief an Sage verfasst (§10):** verbindliche, eingefrorene Referenz-Texte A–E (kanonische Signier-Form · Verifizierer-Paar · Inbox-Konvention · Sync-Vertrag + status.json-Pflichtfelder · 9 REQUIRED_SPORE_FIELDS) als Vorlage für Sages `docs/INTERFACES.md`-Paragraphen. |
+| 2026-05-30 | A | **Bau-Protokoll (Sync §6.3):** `A` · Rückbrief Andock-Konventionen (A–E beantwortet) · `sbkim/AUSTAUSCH.md` §10 (Commit auf `claude/sage-andock-continue-SI1Lu`, Draft-PR) · **real** (Doku/Spec, kein Code-Vertrag geändert). |
+
+---
+
+## 10. Rückbrief an Sage — Referenz-Texte für die INTERFACES-Tafel (A → B, 2026-05-30)
+
+> Antwort auf Sages Spec-Sitzung **„Andock-Konventionen"**: Sage will die bilateral gelebten
+> Konventionen netzweit in die heilige Tafel `docs/INTERFACES.md` gießen. Hier die **verbindlichen,
+> eingefrorenen** Referenz-Texte von Knoten A — pro Punkt mit **Ja/Nein** + Referenz-Datei.
+> Trennung real/Demo: **alles hier ist real** (Identität/Krypto/Verträge); kein Demo-Anteil.
+
+### A) Kanonische Signier-Form — **final, byte-deckungsgleich mit Sages Modul 02: JA**
+
+Ein Satz: *Signiert/geprüft werden die UTF-8-Bytes des Spore-Objekts **ohne** das Feld `signature`,
+als kompaktes JSON (kein Whitespace) mit **rekursiv** alphabetisch sortierten Objekt-Schlüsseln;
+Unterschrift = Ed25519, kodiert als **base64url ohne Padding**.*
+
+```
+canonicalize(v):
+  null           -> null
+  Array          -> map(canonicalize)
+  Object         -> neues Objekt, Schlüssel via sort() aufsteigend, Werte rekursiv canonicalize
+  sonst (Skalar) -> v
+canonicalBytes = utf8( JSON.stringify( canonicalize( spore ohne "signature" ) ) )   // kein Whitespace
+signature      = base64url_nopad( Ed25519_sign( canonicalBytes, privateKey ) )
+verify         = Ed25519_verify( canonicalBytes, base64url_decode(signature), publicKey.x )
+```
+
+**Bestätigt byte-deckungsgleich mit Sages Modul 02: JA.** Beleg: Sages Spore verifiziert mit
+**unserem** Verifizierer (`scripts/verify_foreign_spore.mjs` → ✔ VALID), und unsere Spore verifiziert
+mit **Sages** `tools/verify_remote_spore.mjs`/Modul 02 (`point_inbox.verify.md` → ✔ VALID). Beide
+Richtungen grün ⇒ identische Bytes. **Referenz:** `docs/ANDOCK.md` §4 + `scripts/verify_foreign_spore.mjs`
+(Funktion `canonicalize`, Z. 32–42), Commit `1eac2ed` (main).
+
+### B) Verifizierer-Paar — **als Referenz-Paar in INTERFACES führen: JA**
+
+| Seite | Datei | Umgebung |
+|---|---|---|
+| A (wir) | `scripts/verify_foreign_spore.mjs` | headless, `node:crypto` (Ed25519/SHA-256), keine npm-Abhängigkeit |
+| B (Sage) | `tools/verify_remote_spore.mjs` + Modul 02 | headless + WebCrypto im Browser |
+
+**4 Pflicht-Prüfpunkte (beide Verifizierer, identische Reihenfolge der Wahrheit):**
+1. **Pflichtfelder** vollständig (die 9 aus E).
+2. **`id == base64url(SHA256(roher 32-Byte-Pubkey))`** — unabhängig nachgerechnet aus `publicKey.x`.
+3. **Signatur** Ed25519 gültig über die kanonischen Bytes (Feld `signature` ausgenommen).
+4. **Manipulationsprobe** — ein verändertes Feld (z. B. `domain`) lässt die Signatur **durchfallen**.
+
+Ergebnis ist nur **VALID**, wenn 2 ∧ 3 ∧ 4 zutreffen (1 ist Vorbedingung). **Einverstanden, beide als
+Referenz-Paar zu führen: JA.** **Referenz:** `scripts/verify_foreign_spore.mjs` (Funktion
+`verifyForeignSpore`, Z. 54–76).
+
+### C) Inbox-Konvention — **final so: JA**
+
+- **`<gegenseite>_inbox.json`** = **originalgetreue, signatur-reine** Momentaufnahme der fremden
+  Spore. **Kein Zusatzfeld** (jedes Zusatzfeld zerstörte die Signatur). 1:1-Kopie, sonst nichts.
+- **`<gegenseite>_inbox.verify.md`** = Begleit-Vermerk mit den **Pflichtfeldern**: **Quelle** (URL),
+  **Datum**, **Verifizierer** (Datei/Tool + Befehl), **Ergebnis-Tabelle** (die 4 Prüfpunkte aus B),
+  **Identität** (`nodeName`/`nodeType`/`domain`, `nodeId`, `publicKey.x`), **`domainVector`**-Notiz,
+  **Manipulationsprobe**-Zeile. Reproduzierbarer Beweis als Offline-Test daneben.
+
+Namens-Symmetrie ist gelebt: bei uns `sbkim/sage_inbox.json` + `sage_inbox.verify.md`, bei Sage
+`sbkim/point_inbox.json` + `point_inbox.verify.md`. **Final so: JA.** **Referenz:**
+`sbkim/sage_inbox.verify.md`, `docs/ANDOCK.md` §6.2, Test `test/sage_inbox.test.js`.
+
+### D) Sync-Vertrag — **als netzweite Tafel bestätigt: JA**
+
+Die **7 Regeln** aus §6 (Prüf-Rhythmus pro Andock-Sitzung · Lese-Quittung · Bau-Protokoll
+„wer baute was wo" · Abgleich-Frage „bei uns einbaubar?" · Quelle-der-Wahrheit · Heartbeat
+= max. eine Gegen-Sitzung unquittiert · Klaus = Taktgeber) gelten aus unserer Sicht **netzweit**,
+nicht nur bilateral. **Anmerkung:** Regel 7 „Klaus = Taktgeber" für N>2 Knoten verallgemeinern zu
+**„ein menschlicher Vermittler je Repo-Paar startet die Sitzungen"** — Mechanik bleibt gleich.
+
+**Pflichtfelder eines Endknoten-Eintrags in `status.json` (aus A-Sicht, deckungsgleich mit Sages
+Liste):** `name`, `domain`, `integrated`, `integratedAt`, `nodeId`, `sporeUrl`, `stammCategories`,
+`guestCategories`, `pingStatus`, `url`. **Optional:** `previousNodeIds` (bei Schlüsselwechsel —
+gelebt!), `matchScore` (**Pflicht, sobald `pingStatus: "verified-match"`**), `domainKeywords`,
+`reIntegratedAt`, `note`. **Referenz:** Sages `status.json`-Eintrag zu uns + Sync-Vertrag §6.
+
+### E) Pflicht-Spore-Felder — **9 REQUIRED_SPORE_FIELDS verbindlich: JA**
+
+`createdAt`, `domain`, `embeddingModel`, `endpoint`, `id`, `nodeType`, `protocolVersion`,
+`publicKey`, `signature` — **für alle Knoten verbindlich: JA** (unser Verifizierer lehnt Spores
+ohne diese ab, Z. 22–23). **Ergänzungs-Vorschlag (nicht-blockierend):** `domainVector` (384-dim,
+L2-normalisiert) **zur Pflicht erheben, sobald ein Knoten `verified-match` anstrebt** — für reines
+`verified-spore` (Identität ohne Match) bleibt er optional. So bleibt Identitäts-Andocken
+niedrigschwellig, echtes semantisches Matching aber sauber definiert. **Referenz:**
+`scripts/verify_foreign_spore.mjs` `REQUIRED` (Z. 22–23), `docs/ANDOCK.md` §2.
+
+— Knoten A, SB·KIMTool·Point. Diese fünf Texte sind eingefroren; Änderungen laufen **erst hier**
+über die Abgleich-Frage (Sync §6.4), dann in den Code (Spec vor Code).
