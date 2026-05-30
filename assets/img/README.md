@@ -43,6 +43,18 @@ premium, empty space in the upper-center for a headline, no text, no logo, 1600x
 hexagonal tiles / building blocks with soft teal edge-glow, a few tiles brighter
 (ready) and some dim (dormant), clean isometric feel, no text, no logo, 1200x400.`
 
+### Die Werkzeug-Truhe — Mitte (Werkzeugkiste-Knopf)
+
+Gleicher Stil wie Modell/Markt (restrained Steampunk, Teal + warmes Gold), vollständig
+ausformuliert. Ablegen als `truhe.png` → ist der mittlere Startseiten-Knopf. Quadratisch
+oder leicht quer, **transparenter oder sehr dunkler Hintergrund**, damit die Truhe frei steht.
+
+**truhe.png**  *(mittlerer Knopf — „Werkzeugkiste")*
+
+```text
+Ultra-detailed cinematic product illustration of a single ornate steampunk treasure chest, centered, in a refined and restrained steampunk style — leaning toward steampunk but not fully, kept clean, modern and elegant. The closed-but-glowing chest is made of dark weathered oak bound with aged brass and oxidized copper fittings, riveted corner braces, a domed lid, and a large ornate central lock; a single glowing teal-cyan key (primary accent color #36d6c3) sits in the keyhole, casting bright cyan light, while a warm golden glow seeps from the seams of the lid as if treasure inside is shining out. Materials and surfaces: rich grain on aged wood, brass and copper with realistic patina, brushed and hammered metal, tiny rivets, fine scratches and honest wear, all rendered with physically based materials and micro-detail. Lighting: a cool teal-cyan glow as the primary living energy light radiating from the key and lock, plus a secondary warm golden inner glow from the chest seams; crisp specular highlights and mirror-like reflections across metal, bright rim lighting along the edges, subtle ray-traced reflections, soft volumetric light rays and god-rays drifting through faint mist, gentle lens bloom, glints and light caustics on the brass. Depth and dimensionality: a strong three-dimensional effect, the chest in sharp focus with shallow depth of field, realistic soft cast shadow grounding it, gentle ambient occlusion, atmospheric haze for added depth. Background: deep dark cosmic charcoal (#0c0f12) with a faint teal nebula and a sparse scatter of tiny glowing particles and dust motes, or transparent — the chest floats free with generous negative space around it. Mood: premium, mysterious, inviting, like a vault of tools waiting to be opened. Render quality: hyper-detailed, 8k, octane and unreal-engine style cinematic render, high dynamic range, crisp, photoreal-stylized. Negative: no text, no letters, no numbers, no logos, no watermark, no signature, no people, no faces, no frame, no border.
+```
+
 ### Links & rechts der Truhe — Modell (links) + Markt (rechts), Steampunk-Richtung
 
 Beide im **gleichen** Stil, **angelehnt an Steampunk — aber nur in die Richtung**, nicht voll;
