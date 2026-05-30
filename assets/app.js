@@ -1,6 +1,7 @@
-// app.js — static page logic. Pure browser, no dependencies.
-// It PLAYS BACK a recorded model run (web/data/run.json); it does not run the
-// Node model. Toolbox and marketplace are rendered from JSON data files.
+// app.js — static page logic for the Toolbox and Marketplace pages.
+// Pure browser, no dependencies. The Model page (modell.html) plays back the
+// recorded run via its own assets/model.js; this file renders the JSON-driven
+// toolbox and marketplace.
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -8,71 +9,6 @@ async function loadJSON(path) {
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`${path}: ${res.status}`);
   return res.json();
-}
-
-// --- Schicht 1: play back the recorded run as an animated board ------------
-async function renderModell() {
-  const ticker = $("#ticker");
-  let run;
-  try {
-    run = await loadJSON("web/data/run.json");
-  } catch (e) {
-    ticker.textContent =
-      "run.json nicht gefunden. Lokal erzeugen mit: npm run demo (schreibt web/data/run.json).";
-    return;
-  }
-
-  const tasks = {
-    bauer: $("#ag-bauer .task"),
-    gate: $("#ag-gate .task"),
-    beob: $("#ag-beob .task"),
-  };
-  ticker.innerHTML = "";
-
-  const lines = [];
-  const verdictClass = (v) =>
-    v === "taugt" ? "ok" : v === "verwerfen" ? "bad" : "flag";
-
-  let i = 0;
-  function step() {
-    if (i >= run.events.length) {
-      const s = run.summary;
-      addLine(
-        `— fertig: ${s.graduated} graduiert · ${s.sybilFlagged}/${s.sybilNodes} Sybil geflaggt · Blocklist: ${s.blocklist.join(", ") || "—"}`,
-      );
-      tasks.beob.textContent = `${run.edgeCases.length} Grenzfälle für Klaus`;
-      return;
-    }
-    const e = run.events[i++];
-    if (e.phase === "build") {
-      tasks.bauer.textContent = `baut ${e.artefactId}`;
-      tasks.gate.textContent = `${e.verdict}${e.repaired ? " (repariert)" : ""}`;
-      addLine(
-        `[bau] ${e.builder} → ${e.artefactId}: <span class="${verdictClass(e.verdict)}">${e.verdict}</span>${e.repaired ? " (repariert)" : ""}`,
-      );
-    } else if (e.phase === "sybil") {
-      tasks.gate.textContent = `prüft Sybil-Artefakt: ${e.verdict}`;
-      addLine(
-        `[sybil] ${e.node} ${e.artefactId}: <span class="${verdictClass(e.verdict)}">${e.verdict}</span> — ${e.reason}`,
-      );
-    } else if (e.phase === "verdict") {
-      const tail = e.flagged
-        ? `<span class="flag">GEFLAGGT → Apoptose</span>`
-        : "unter Schwelle";
-      addLine(
-        `[urteil] ${e.node} · Stimmgewicht ${e.votingWeight} · Misstrauen ${e.distrust} · ${tail}`,
-      );
-    }
-    setTimeout(step, 420);
-  }
-
-  function addLine(html) {
-    lines.push(html);
-    ticker.innerHTML = lines.map((l) => `<div>${l}</div>`).join("");
-    ticker.scrollTop = ticker.scrollHeight;
-  }
-
-  step();
 }
 
 // --- Schicht 2: toolbox with three tiers -----------------------------------
@@ -171,8 +107,7 @@ async function renderMarkt() {
 }
 
 // --- Dispatch: each page only loads what it shows -------------------------
-// One shared app.js for all pages. We render a section only if its anchor
-// element exists on the current page (Startseite has none → nothing runs).
-if ($("#ticker")) renderModell();
+// Render a section only if its anchor element exists on the current page
+// (Startseite has none → nothing runs; Modell page uses model.js instead).
 if ($("#tabs")) renderWerkzeuge();
 if ($("#market")) renderMarkt();
