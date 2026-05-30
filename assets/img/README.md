@@ -11,7 +11,7 @@ Offline — Dateien liegen lokal im Repo, keine externen Links.
 
 | Datei | Wo | Format / Größe | Zweck |
 |---|---|---|---|
-| `truhe.png` | **Startseite — mittlere Karte „Werkzeugkiste"** (= der Knopf selbst, klickbar → Werkzeuge) | quer/quadr., dunkel | **vorhanden** — die von Klaus gelieferte Werkzeug-Truhe; wächst sanft beim Drüberfahren |
+| `truhe.png` | **Startseite — mittlere Karte „Werkzeugkiste"** (= der Knopf selbst, als `<img>`, klickbar → Werkzeuge) | ~760px, web-optimiert (~190 KB) | **vorhanden** — Klaus' Werkzeug-Truhe; fürs schnelle Laden verkleinert; wächst sanft beim Drüberfahren |
 | `ambient.png` | alle Seiten (fixer Hintergrund) | quer, ~2000×1400, dunkel | ruhige Tiefen-Textur hinter allem |
 | `hero.png` | Startseite (Hero-Backdrop) | quer, ~1600×900 | optionaler Hintergrund hinter dem Titel (Fallback: nur Glow) |
 | `banner-modell.png` | Modell-Kopf + Start-Karte 1 (links) | quer, ~1200×400 | Motiv „Pipeline / Knotenkette" |
