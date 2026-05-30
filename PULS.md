@@ -2,6 +2,34 @@
 
 Stand: 2026-05-30 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-30 (W) — Andock abgeschlossen + Schlüssel-Tresor + Markt-Links live (grün)
+
+Abschluss des Sage-Andocks und zwei brauchbare Verbesserungen. **Manual-Check: ✅ von
+Klaus im Browser bestätigt** („alles perfekt") — der Markt ist damit grün.
+
+- **Schlüssel-Tresor (PR #40):** Der private `SBKIM_NODE_KEY` liegt jetzt verschlüsselt im
+  Repo (`sbkim/node_key.enc.json`, AES-256-GCM/PBKDF2 600k) — nur mit Klaus' Passwort zu
+  öffnen, Passwort steht nirgends im Repo. `scripts/open_node_key.mjs` öffnet ihn,
+  `docs/SCHLUESSEL.md` dokumentiert Re-Sign-Ablauf + Verlust-Fall. Damit bleibt die nodeId
+  `CyunQNDR…` dauerhaft erhalten (kein Identitätswechsel mehr nötig).
+- **Andock bilateral vollständig (PR #41 + #42):** Sage hat uns auf `verified-match`
+  (matchScore **0.848508**) gesetzt, neue nodeId registriert (alte als `previousNodeIds`).
+  Wir lieferten den **Rückbrief A–E** (Postfach §10) → Sage goss ihn in `docs/INTERFACES.md`
+  §11 „Andock-Konventionen" (§11.1–§11.5, netzweit). **Abnahme bestätigt:** §11 gegen unseren
+  Rückbrief gegengelesen — korrekt eingefangen, keine Änderungen. **Reine Abnahme, keine
+  Gegen-Quittung nötig** (Sync §11.4) → die Austausch-Runde ist sauber zu, Verbindung ruht.
+- **Markt brauchbar gemacht (PR #43):** Der „→ andocken"-Knopf zeigte auf tote `#andock/…`-
+  Anker und tat nichts. Jetzt öffnet er die **echte Live-Seite** des Knotens in neuem Tab
+  (URLs aus Sages `status.json`): Rezeptbuch→`Mein-Rezeptbuch`, Mixarium→`Mein-Mixarium`,
+  Sage→`Sage-Protokol`. Sage-Karte trägt den Chip **„✓ voller Match · 0.85"** (heutiges
+  Ergebnis). `assets/app.js renderMarkt`: externe Links `target=_blank rel=noopener` +
+  Match-Chip; `web/data/marktplatz.json` mit echten Links + `matchScore`/`matchHinweis`.
+- **Beweis:** `npm test` 45/45 grün. Markt-URLs von Klaus im Browser bestätigt (live).
+- **Offen / nächste Schritte:** (1) Nichts Blockierendes — der Andock-Auftrag ist erledigt,
+  die Verbindung ruht bis zum nächsten echten Bau (neues Modul oder dritter Knoten weckt
+  sie). (2) Optional: Markt-Suche bauen (Daten in `nodes.json` vorbereitet). (3) Optional:
+  weitere reife Sage-Module Datei für Datei kopieren.
+
 ## 2026-05-30 (V) — Re-Sign vollzogen + Schlüsselwechsel + Pages live
 
 - **Schlüsselwechsel (ehrlich):** Der private Schlüssel zur alten nodeId `eC3jzoo9…` war nie
