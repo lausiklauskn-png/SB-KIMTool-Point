@@ -23,13 +23,23 @@ import "../web/tools/sbkim-spore.js";
 import "../web/tools/sbkim-embedding.js";
 import "../web/tools/sbkim-match.js";
 import "../web/tools/sbkim-anastomose.js";
+import "../web/tools/sbkim-heterokaryose.js";
+import "../web/tools/sbkim-apoptose.js";
+import "../web/tools/sbkim-ui-demo.js";
+import "../web/tools/sbkim-membran.js";
+import "../web/tools/sbkim-siegel.js";
 
-test("alle fünf Module registrieren ihre API auf window", () => {
+test("alle zehn Module registrieren ihre API auf window", () => {
   assert.equal(typeof globalThis.SbkimStorage, "object", "01 Storage");
   assert.equal(typeof globalThis.SbkimSpore, "object", "02 Spore");
   assert.equal(typeof globalThis.SbkimEmbedding, "object", "03 Embedding");
   assert.equal(typeof globalThis.SbkimMatch, "object", "04 Match");
   assert.equal(typeof globalThis.SbkimAnastomose, "object", "05 Anastomose");
+  assert.equal(typeof globalThis.SbkimHeterokaryose, "object", "06 Heterokaryose");
+  assert.equal(typeof globalThis.SbkimApoptose, "object", "07 Apoptose");
+  assert.equal(typeof globalThis.SbkimUiDemo, "object", "08 UI-Demo");
+  assert.equal(typeof globalThis.SbkimMembrane, "object", "15 Membran");
+  assert.equal(typeof globalThis.SbkimSiegel, "object", "16 Siegel");
 });
 
 test("01 Storage zeigt seine erwartete Oberfläche", () => {
@@ -83,4 +93,43 @@ test("04 Match: matchDimensions liefert drei orthogonale Schichten", () => {
   for (const lane of ["fachlich", "prozess", "skalierung"]) {
     assert.ok(lane in r, `Schicht ${lane} vorhanden`);
   }
+});
+
+// ---- weitere reife Module: Laden + Oberfläche (Sage 1:1) -------------------
+
+test("06 Heterokaryose zeigt seine Geschwister-Austausch-Oberfläche", () => {
+  const h = globalThis.SbkimHeterokaryose;
+  for (const fn of ["init", "requestHeterokaryosis", "receiveHeterokaryosis", "listHeterokaryosis"]) {
+    assert.equal(typeof h[fn], "function", `Heterokaryose.${fn}`);
+  }
+});
+
+test("07 Apoptose zeigt seine Selbstlöschung-+-Vermächtnis-Oberfläche", () => {
+  const a = globalThis.SbkimApoptose;
+  for (const fn of ["init", "prepareSelfApoptose", "confirmSelfApoptose", "receiveLegacy", "listLegacy"]) {
+    assert.equal(typeof a[fn], "function", `Apoptose.${fn}`);
+  }
+});
+
+test("08 UI-Demo zeigt seine Outbox-Pflege-Oberfläche", () => {
+  const u = globalThis.SbkimUiDemo;
+  for (const fn of ["init", "listOutbox", "addOutboxAnchor", "removeOutboxAnchor", "setSiblingHeteroOptIn"]) {
+    assert.equal(typeof u[fn], "function", `UiDemo.${fn}`);
+  }
+});
+
+test("15 Membran zeigt seine Read-API (Außenhülle)", () => {
+  const m = globalThis.SbkimMembrane;
+  assert.equal(typeof m.init, "function", "Membran.init");
+  assert.equal(typeof m.read, "function", "Membran.read");
+});
+
+test("16 Siegel: Selbst-Bezeugungs-Oberfläche + Aspekte-Liste (offline)", () => {
+  const s = globalThis.SbkimSiegel;
+  for (const fn of ["init", "isCertified", "getExplanation", "getCertifiedModules", "getAspects"]) {
+    assert.equal(typeof s[fn], "function", `Siegel.${fn}`);
+  }
+  // getAspects ist eine reine Lese-Funktion -> offline prüfbar
+  const aspects = s.getAspects();
+  assert.ok(Array.isArray(aspects), "getAspects liefert eine Liste");
 });

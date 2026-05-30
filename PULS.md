@@ -2,6 +2,24 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (K) — Fünf weitere Sage-Module 1:1 kopiert (Werkzeugkiste = zehn Module)
+
+Freibrief für den Bau. Nach 01–05 nun **06 Heterokaryose, 07 Apoptose, 08 UI-Demo,
+15 Membran, 16 Siegel** 1:1 aus `Sage-Protokol/src/modules/` nach `web/tools/` kopiert
+(unverändert, IIFE auf `window.Sbkim*`).
+
+- **Test:** `test/modules.test.js` erweitert — alle **zehn** Module laden headless + API;
+  16 Siegel `getAspects()` offline gelesen. **`npm test` 21/21 grün**.
+- **Werkzeugkiste:** `TOOL_FILES` (app.js) um 06/07/08/15/16; `werkzeugkiste.json` mit
+  `point_status`/`point_hinweis`/`datei` (ehrliche Netz-/Browser-Hinweise).
+- **Schutz-Modul-Pflicht:** Modul 15 (Membran) ist ein Schutz-Modul → `ZERTIFIKAT_ASPEKTE`
+  in `sandbox/16_siegel.js` um 15-Eintrag ergänzt.
+- **16 Siegel** ist das **Markt-Zertifikat** (Geprüft-Nachweis, Anti-Greenwashing) — Grundlage
+  für die geplante Markt-Prüfpflicht.
+- **status.json:** Real-Anteil ~45 %; README/Doku nachgezogen.
+- **PR #24** (01–05) gemergt. **Offen:** 17/18 (in Sage Schablone), Schutz-Backlog 10/11/12/14.
+- **Manual-Check:** Browser-Pfade ungeprüft (03/05/06 netzgebunden) — wartet auf Klaus.
+
 ## 2026-05-30 (J) — Fünf echte SBKIM-Module 1:1 aus dem Sage-Protokol kopiert
 
 Klaus' Klarstellung: echte, getestete Sage-Module **direkt 1:1 kopieren** (keine

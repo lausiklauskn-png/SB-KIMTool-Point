@@ -43,6 +43,11 @@ const TOOL_FILES = {
   "03": "web/tools/sbkim-embedding.js",
   "04": "web/tools/sbkim-match.js",
   "05": "web/tools/sbkim-anastomose.js",
+  "06": "web/tools/sbkim-heterokaryose.js",
+  "07": "web/tools/sbkim-apoptose.js",
+  "08": "web/tools/sbkim-ui-demo.js",
+  "15": "web/tools/sbkim-membran.js",
+  "16": "web/tools/sbkim-siegel.js",
 };
 
 async function renderWerkzeuge() {
