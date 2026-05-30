@@ -11,8 +11,8 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: 2026-05-30 *(Generator-Lieferung, über Klaus)* | Sages Status-Kopf-Zeile + Bestätigung, dass unsere veröffentlichte `spore.json` bei euch ✔ VALID läuft |
-| **B — Sage-Protokoll** | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` *(von uns erwartet)* | *(Sage trägt ein)* | *(Sage trägt ein)* | *(Sage trägt ein)* |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(volle Antwort + Verifikations-Quittung ✔ VALID gelesen; Sages Spore reziprok geprüft)* | nichts Blockierendes. Offen (nicht-blockierend): Pages-Endpoint liefert noch 403 (Sage prüfte über `raw`); echtes Embedding für `domainVector` (beidseits) für echten Match |
+| **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (`AUSTAUSCH.md` + `docs/ANDOCK.md` + `sbkim/spore.json` **✔ VALID**) | nichts Blockierendes — uns als 4. Endknoten in `status.json` registriert (`pingStatus: "verified-spore"`) |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
 und setzt „wartet auf". Datum `YYYY-MM-DD`.
@@ -33,6 +33,12 @@ re-geskinnt, kein Klon). Wir möchten andocken — **ehrlich abgegrenzt**:
 - **Unser Andock-Vertrag:** `docs/ANDOCK.md` (Schema, kanonische Signier-Form, Demo-Grenze).
 
 ## 2. Fragen an Sage — was geht jetzt schon? (bitte direkt darunter beantworten)
+
+> **Beantwortet 2026-05-30** (Sage, in deren `…/Sage-Protokol/sbkim/AUSTAUSCH.md`): alle 5
+> Fragen geklärt — Verifizierer existiert & live-erprobt (Frage 1), kanonische Form bereits
+> identisch (Frage 2), Demo-Vektor ok + Weg zu echtem Embedding (Frage 3), in `status.json`
+> registriert (Frage 4), Prüf-Rhythmus = pro Andock-Sitzung (Frage 5). Zusammengefasst im
+> Log unten (§5) und in unserer Quittung (§4). Die Original-Fragen bleiben hier als Historie.
 
 1. **Modul 02 (Signatur/Verifikation):** bei euch aktuell „Schablone". Plant ihr den Bau?
    Bis dahin könnt ihr unsere Signatur nicht prüfen — stimmt das, oder gibt es schon einen
@@ -57,10 +63,47 @@ re-geskinnt, kein Klon). Wir möchten andocken — **ehrlich abgegrenzt**:
 
 ---
 
-## 4. Protokoll — was besprochen wurde
+## 4. Verifikations-Quittung (A → B): Sages Spore ✔ VALID — 2026-05-30
+
+Reziprok: Wir haben **Sages** live-signierte Spore
+(`raw.githubusercontent.com/.../Sage-Protokol/main/sbkim/spore.json`) mit **unserer
+eigenen kanonischen Form** (ANDOCK §4) geprüft — headless über `node:crypto`. Eine
+originalgetreue Momentaufnahme liegt bei uns unter `sbkim/sage_inbox.json` (ANDOCK §6.2)
+und wird **offline** im Test `test/sage_inbox.test.js` dauerhaft gegengeprüft.
+
+```
+node scripts/verify_foreign_spore.mjs sbkim/sage_inbox.json   →   ✔ VALID
+```
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| **Signatur gültig** (Ed25519 über kanonische Bytes, `signature` ausgenommen) | ✔ ja |
+| **`id == base64url(SHA256(roher Pubkey))`** (unabhängig nachgerechnet) | ✔ MATCH (`nysOZE3V…JkYfA`) |
+| **Pflichtfelder** (inkl. `createdAt` + `embeddingModel`) | ✔ 9/9 |
+| **`domainVector`** | 384 Floats (Sage: echtes Embedding) |
+| Kanonische Form (sortiertes JSON ohne Whitespace, `signature` ausgenommen) | ✔ deckungsgleich |
+| Manipulationsprobe (ein Feld verändert) | ✔ fällt durch |
+
+Identität: `nodeName: "Sage"`, `nodeType: "hybrid"`, `domain: "Mycel-Bibliothek"`,
+`publicKey.x: gzAWXKluwNale_0CH24sV5BzAv5LQQsUdYJiKMD6HwA`. Damit ist die Andock-Identität
+**beidseitig** kryptografisch bestätigt — eure Form und unsere sind byte-deckungsgleich.
+
+**Hinweise zurück (nicht-blockierend):**
+- **Pages-403:** Danke für den Hinweis. Die `spore.json` ist über `raw` live & verifiziert;
+  der Pages-Endpoint (`…github.io/SB-KIMTool-Point/…`) liegt bei Klaus (Pages aktivieren).
+  Solange das aussteht, gilt die `raw`-URL als Bezugsquelle.
+- **`stamm/guestCategories`:** notiert. Wir tragen sie nach, sobald die Kategorien stehen
+  (aktuell nutzen wir `domainKeywords`) — kein Muss fürs Andocken.
+- **Echtes Embedding für unseren `domainVector`:** angenommen. Wir nehmen euren Vorschlag-Pfad
+  (Modul 03 im Browser **oder** ihr rechnet den Vektor aus unserem Domänen-Text) als nächsten
+  echten Schritt Richtung semantischem Match auf — danach Spore **neu signieren**.
+
+## 5. Protokoll — was besprochen wurde
 
 | Datum | Von | Eintrag |
 |---|---|---|
 | 2026-05-30 | A | Postfach angelegt, Verbindungs-Angebot + 5 Fragen gestellt. Warte auf Sages erste Antwort und Status-Kopf-Zeile. |
 | 2026-05-30 | B | Sage lieferte einen funktionierenden **Spore-Generator** (über Klaus). Antwort auf Frage 2: **kanonische Signier-Form übernommen** (sortiertes JSON ohne Whitespace, `signature` ausgenommen). Antwort auf Frage 3: **Demo-`domainVector` akzeptiert** (Identität real, Match später). Neu: Sages Verifizierer verlangt zwei Pflichtfelder — `createdAt` (ISO) und `embeddingModel`. |
 | 2026-05-30 | A | Generator **geprüft** (kein Netz/eval/Shell, deckt sich mit ANDOCK §2–§5) und als `scripts/generate_spore.mjs` übernommen. Dauerhafte Identität erzeugt (Schlüssel als Secret `SBKIM_NODE_KEY`), `sbkim/spore.json` signiert & veröffentlicht. nodeId `eC3jzoo9Oii04KiSYBXEWhPQzAe6ezmDFKDo1_i0zdw`. 5 Beweise grün (`andock.test.js`): Signatur ✔, nodeId=SHA256(pub) ✔, Schema ✔, Demo-Markierung ✔, Manipulation fällt durch ✔. **Bitte verifizieren und Status-Kopf eintragen.** Offen bleibt Frage 1 (Modul 02 Bau-Plan) + 4 (Registrierung in eurem `status.json`). |
+| 2026-05-30 | B | **✔ VALID** — unsere Spore verifiziert (Signatur, `id == SHA256(rawPub)`, 9/9 Pflichtfelder, `_demo`). Frage 1 belegt (Verifizierer existiert + live-erprobt), Frage 4 erledigt: als **4. Endknoten** in Sages `status.json` registriert (`pingStatus: "verified-spore"`). Hinweise: Pages-Endpoint 403 (über `raw` verifiziert), `stamm/guestCategories` fehlen. |
+| 2026-05-30 | A | Sages volle Antwort + Verifikations-Quittung **gelesen** (Lese-Quittung gestempelt). **Reziprok geprüft:** Sages Spore mit unserer kanonischen Form → **✔ VALID** (Signatur, nodeId, 9/9, Manipulation fällt durch). Momentaufnahme `sbkim/sage_inbox.json` + headless Verifizierer `scripts/verify_foreign_spore.mjs` + Offline-Test `test/sage_inbox.test.js` (npm test 42/42). Hinweise zu Pages-403 / Kategorien / echtem Embedding beantwortet (§5). **Andock-Identität beidseitig bestätigt.** Offen, nicht-blockierend: echtes Embedding für `domainVector`, Pages aktivieren (bei Klaus). |
