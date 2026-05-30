@@ -33,6 +33,13 @@ ein **ehrliches Modell/Playback** (kein Live-Bau); **`npm test` grün**; **keine
 personenbezogenen Daten**; **Offline-Tauglichkeit** (Libs lokal vendorn, kein CDN-Zwang);
 **Merge entscheidet Klaus**. `prefers-reduced-motion` bleibt respektiert.
 
+**Geltung (begrenzt, kein Dauerrecht):** Der Freibrief gilt **nur für diese Aufgabe/Sitzung**,
+für die Klaus ihn ausdrücklich gegeben hat. Er ist **nicht automatisch** auf spätere Sitzungen
+übertragbar und **läuft mit Abschluss der Aufgabe aus** — eine neue Sitzung braucht eine **neue,
+ausdrückliche Freigabe** von Klaus. **Aber:** Sobald Klaus ihn gibt, ist er **bindend und wird
+umgesetzt** (keine Rückfragen zur Gestaltung). Ohne ausdrücklichen Freibrief gilt wieder die
+normale „Plan-an-Klaus-zeigen"-Pflicht aus `CLAUDE.md`.
+
 ---
 
 ## Pflichtlektüre vor Start (vor allem anderen) — erst lesen, planen, dann bauen
@@ -43,8 +50,10 @@ Siehe `CLAUDE.md` → „Dokumentations- & Lesepflicht". In dieser Reihenfolge l
 5. `docs/BAUTRUPP.md` + `docs/MODELL.md` + der Code in `sandbox/` und `assets/app.js`.
 
 **Nicht sofort bauen:** erst Gesamtüberblick (Code lesen + Plan). Offene PRs vorher sichten.
-Für **Datenverträge/Modell-Logik/Sicherheit** den Plan kurz an Klaus zeigen; für **reine
-Design-/UX-Gestaltung** gilt der Gestaltungs-Freibrief — **ohne Rückfrage** loslegen.
+Der **Datenvertrag (Teil 3) ist hier bereits vorgegeben** → du darfst **eigenständig** umsetzen.
+Entscheidungen zu Datenvertrag/Modell-Logik im **PR/PULS kurz begründen** (statt zu blockieren);
+für reine Design-/UX-Gestaltung gilt der Gestaltungs-Freibrief. **Nur innehalten und Klaus fragen,
+wenn etwas den Leitplanken/Invarianten (Teil 0) widerspräche** — sonst intelligent selbst entscheiden.
 
 ---
 
@@ -217,7 +226,8 @@ aufnehmen (z. B. `modell-erklaert.html`):
    bis zur Apoptose.
 3. Status-Leiste nennt in Klartext **Art + Titel** des aktuellen Objekts; Detail-Karte
    beschreibt es genauer; `prefers-reduced-motion` wird respektiert.
-4. Optik ansprechend, zero-dependency, eigene Identität (nicht 1:1 geklont).
+4. Optik herausragend, **offline-tauglich** (Libs ggf. lokal vendorn, kein CDN-Zwang),
+   eigene Identität (nicht 1:1 geklont).
 5. Doku nachgezogen (`BAUTRUPP.md`, `MODELL.md`, `README`, `PULS.md`, `status.json`).
 6. Ehrliche Schließung: **„ungeprüft, wartet auf Klaus' Browser-Lauf"** bis Klaus es ansieht.
 

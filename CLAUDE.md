@@ -131,6 +131,14 @@ Erst lesen, dann erst denken — **kein** Code, **kein** Bau, bevor das durch is
   starten. Erst wenn der Überblick steht, wird Code geschrieben.
 - Offene/ungemergte PRs vorher sichten (siehe „PR-Workflow").
 
+**Freibrief-Klausel (befristet):** Gibt Klaus für eine Aufgabe ausdrücklich einen *Freibrief*
+(z. B. volle Gestaltungs-Freiheit), entfällt die „Plan-an-Klaus-zeigen"-Pflicht **im
+freigegebenen Umfang** — dann **ohne Rückfrage umsetzen**. Ein Freibrief gilt **nur für die
+benannte Aufgabe/Sitzung**, ist **nicht** auf spätere übertragbar und **läuft mit deren
+Abschluss aus**; eine neue Sitzung braucht eine **neue ausdrückliche Freigabe**. Ohne Freibrief
+gilt die normale Plan-vor-Code-Pflicht. Die Leitplanken (Ehrlichkeit, `npm test`, Kein-PII,
+Offline, „Merge entscheidet Klaus") bleiben **immer** unberührt.
+
 ### Dokumentationspflicht **am** Abschluss — Befehl: nächsten Brief schreiben
 
 Jede Sitzung schließt mit einem **neuen Brief** für die Folge-Sitzung. Das ist Pflicht,
