@@ -55,6 +55,49 @@ technische Mittel: selbst-einschreibendes Zertifikat, das nur entsteht, wenn die
 Selbstprüfung erfüllt ist. Das Live-Modell ist der Ort, an dem diese Prüfung
 durch die Gate/Arzt-Rolle stattfindet, bevor ein Eintrag im Markt sichtbar wird.
 
+## Echter Browser-Beweis (neu) — `npm run verify`
+
+Seit 2026-05-30 gibt es einen **echten Browser-Lauf** (Playwright/Chromium,
+`scripts/browser-verify.mjs`): Er lädt die Werkzeuge-Seite in einem echten Browser
+und prüft die Pfade, die headless nicht beweisbar sind:
+
+- **01 Storage** — echtes IndexedDB `put`/`get` ✅
+- **02 Spore** — echte Ed25519-Identität über WebCrypto ✅
+- **Werkstatt** — Knopf rendert 2 grüne (offline) + 3 gelbe (netz-bereit) Proben ✅
+
+Damit ist ein Teil von „wartet auf Klaus' Browser-Lauf" durch einen **automatischen
+Beweis** ersetzt. `npm test` (headless, window-Shim) bleibt der schnelle Logik-Beweis;
+`npm run verify` ist der Browser-Beweis. Beide grün.
+
+## Live-Verbindung zu echten Endknoten — offener Pfad (für Agenten-Lösungen)
+
+**Status (2026-05-30): nicht möglich in dieser Umgebung.** Die echten Endknoten-
+Sporen (`https://lausiklauskn-png.github.io/Mein-Rezeptbuch|Mein-Mixarium|Sage-Protokol/
+sbkim/spore.json`) antworten aus dem Container mit **403 „Host not in allowlist"** —
+die Netz-Policy lässt nur GitHub/raw zu, nicht die `github.io`-Live-Seiten.
+
+Ein **echter** Cross-Knoten-Handshake (05 Anastomose / 06 Heterokaryose) zwischen
+laufenden Knoten ist daher hier **nicht** herstellbar. Bewusst **offen gelassen**,
+damit eine spätere Sitzung / ein Agent eine Lösung findet, z. B.:
+
+1. **Netz-Policy erweitern** — `github.io` (bzw. die drei Endknoten-Origins) in die
+   Allowlist der Umgebung aufnehmen; dann kann `npm run verify` einen echten
+   Spore-Abruf + Handshake gegen die Live-Knoten zeigen.
+2. **Lokaler 2-Knoten-Handshake** — **gebaut** (`npm run verify`): zwei echte
+   Browser-Kontexte (Knoten A + B), jeder mit eigener Ed25519-Identität. A erzeugt
+   per `generateOwnSpore` eine **echt signierte** öffentliche Spore; B prüft sie per
+   `verifyForeignSpore` → akzeptiert die echte, **lehnt eine manipulierte ab**
+   (kein Greenwashing). Echte Krypto, Endknoten lokal — beweist die Vertrauens-
+   Mechanik, nicht die Live-Knoten.
+3. **Klaus' Browser** — der Mensch-Knoten: auf dem Tablet sind die Live-Seiten
+   erreichbar; ein Sichttest dort zeigt den echten Cross-Knoten-Pfad. (SBKIM ist
+   ausdrücklich Mensch+Agent — dieser Pfad ist kein Notbehelf, sondern vorgesehen.)
+
+> Wichtig (Empfangsmodus-Prinzip, aus Sage): das Mycel ist **Empfangsmodus mit
+> Antwortrecht** — kein Crawler, keine Eigenanfragen ins offene Netz. Ein Agent darf
+> NICHT ungefragt in fremde Browser oder Knoten greifen. Verbindungen entstehen
+> beidseitig-bestätigt (Anastomose) oder per Opt-in (Heterokaryose).
+
 ## Was als Nächstes zu bauen ist (für die Folge-Sitzung)
 
 - Eine kleine Browser-Brücke `web/tools/` ↔ Modell-Seite, die ein Werkzeug auf

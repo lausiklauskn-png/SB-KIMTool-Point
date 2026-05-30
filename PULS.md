@@ -2,6 +2,28 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (O) — Echter Browser-Beweis + lokaler 2-Knoten-Handshake (npm run verify)
+
+Klaus' Frage: können die Tests im echten Browser laufen / über SBKIM verbinden? Befund &
+Umsetzung:
+
+- **Echter Browser da:** Playwright/Chromium läuft im Container. Neuer `scripts/browser-verify.mjs`
+  (`npm run verify`) startet einen lokalen HTTP-Server, lädt `werkzeuge.html` in echtem
+  Chromium und beweist die bisher nur „wartet auf Klaus"-Pfade **automatisch**:
+  01 Storage (echtes IndexedDB), 02 Spore (echtes Ed25519/WebCrypto), Werkstatt-Knopf
+  (2 grün + 3 netz-bereit). **8/8 grün.**
+- **Lokaler 2-Knoten-Handshake (echt):** zwei Browser-Kontexte = Knoten A + B mit je eigener
+  Identität. A `generateOwnSpore` (echt signiert) → B `verifyForeignSpore`: akzeptiert die
+  echte, **lehnt manipulierte ab**. Beweist die Cross-Knoten-Vertrauensmechanik echt.
+- **Live-Endknoten (github.io) bleiben offen:** Netz-Policy gibt 403 „Host not in allowlist".
+  Ehrlich in `docs/LIVE-MODELL.md` als offener Pfad dokumentiert (3 Lösungswege für spätere
+  Agenten: Policy erweitern / lokal simulieren [gebaut] / Klaus' Browser). **Kein** Zugriff
+  auf Klaus' privaten Browser — bewusste Sicherheitsgrenze (Empfangsmodus-Prinzip).
+- `node --test` greift `test/*` → Browser-Verify liegt daher in `scripts/` (nicht im test-Glob).
+  `npm test` headless weiterhin **29/29 grün**. README/Doc nachgezogen.
+- **Manual-Check:** automatischer Browser-Beweis ersetzt einen Teil; Klaus' Tablet-Sicht (Live-
+  Knoten, Optik) bleibt der nicht-ersetzbare Rest.
+
 ## 2026-05-30 (N) — Werkstatt erweitert: netzgebundene Module ehrlich als „bereit · braucht Netz"
 
 - **`assets/werkstatt.js` v0.2:** generische `probeReady()` + Proben für **03 Embedding,

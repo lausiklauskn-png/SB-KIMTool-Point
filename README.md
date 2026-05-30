@@ -19,10 +19,13 @@ Der **Tool-Point** für das SBKIM-Protokoll: eine eigenständige, neutrale Heima
 ```bash
 npm run demo   # spielt das Modell einmal durch, druckt den Bericht, schreibt web/data/run.json
 npm test       # headless Smoke-Test (Beweis) — 29 Prüfungen (Modell + Module 01–18 + Werkstatt offline+netz)
+npm run verify # ECHTER Browser-Beweis (Playwright/Chromium): IndexedDB + WebCrypto +
+               # lokaler 2-Knoten-Spore-Handshake — 8/8 grün (siehe docs/LIVE-MODELL.md)
 ```
 
-Keine Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto` bzw. WebCrypto,
-`node --test`).
+Kern ohne Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto` bzw. WebCrypto,
+`node --test`). `npm run verify` nutzt zusätzlich Playwright/Chromium (optional; fehlt es,
+endet der Lauf ehrlich mit Hinweis statt Fehlschlag).
 
 ## Die drei Schichten — je eine eigene Seite
 
