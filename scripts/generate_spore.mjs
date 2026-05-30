@@ -12,7 +12,7 @@
  *   Ohne Secret: flüchtige Test-Identität (nodeId wechselt, klar markiert).
  *   Node >= 18. Keine npm-Abhängigkeiten.
  */
-import { writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir, readFile } from "node:fs/promises";
 import { dirname, resolve, isAbsolute } from "node:path";
 import { createPrivateKey, createPublicKey, generateKeyPairSync, sign as edSign, createHash } from "node:crypto";
 
@@ -29,6 +29,9 @@ const CONFIG = {
   endpoint: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",  // mit Schrägstrich!
   embeddingModel: "Xenova/multilingual-e5-small",
   protocolVersion: "0.1",
+  // Echter 384-dim domainVector (von Sage im Browser erzeugt, Modul 03, e5 passage-Präfix).
+  // Liegt versioniert daneben; fehlt er, fällt der Generator ehrlich auf den Demo-Stub zurück.
+  realVectorPath: "sbkim/domainVector.real.json",
   outPath: "sbkim/spore.json",
 };
 /* ========================================================================= */
@@ -61,6 +64,23 @@ function demoVector(seed) {  // deterministischer Stub, KEIN echtes Embedding (A
   return v.map((x) => x / norm);
 }
 
+// Lädt den echten domainVector (ANDOCK §5). Rückgabe {vector, real}. Fehlt/ungültig die
+// Datei, ehrlich Demo-Stub. Prüft 384 Floats + L2≈1, sonst Fehler (kein stilles Falschmaß).
+async function loadDomainVector() {
+  const p = resolve(process.cwd(), CONFIG.realVectorPath);
+  try {
+    const v = JSON.parse(await readFile(p, "utf8"));
+    if (!Array.isArray(v) || v.length !== 384 || !v.every((x) => Number.isFinite(x)))
+      throw new Error(`${CONFIG.realVectorPath}: erwartet 384 endliche Floats`);
+    const l2 = Math.sqrt(v.reduce((a, x) => a + x * x, 0));
+    if (Math.abs(l2 - 1) > 1e-3) throw new Error(`${CONFIG.realVectorPath}: nicht L2-normalisiert (L2=${l2})`);
+    return { vector: v, real: true };
+  } catch (e) {
+    if (e.code === "ENOENT") return { vector: demoVector(CONFIG.nodeName), real: false };
+    throw e;  // vorhandene, aber kaputte Datei: laut scheitern statt heimlich Demo
+  }
+}
+
 function loadKeyPair() {  // ANDOCK §3
   const raw = process.env.SBKIM_NODE_KEY;
   if (raw && raw.trim()) {
@@ -83,12 +103,14 @@ async function main() {
   const rawPub = base64urlToBuf(jwk.x);
   const id = base64url(createHash("sha256").update(rawPub).digest());
 
+  const { vector, real } = await loadDomainVector();
+
   const unsigned = {
     createdAt: new Date().toISOString(),          // von Sage verlangt
     domain: CONFIG.domain,
     domainDescription: CONFIG.domainDescription,
     domainKeywords: CONFIG.domainKeywords,
-    domainVector: demoVector(CONFIG.nodeName),
+    domainVector: vector,                          // echt (Modul 03) oder Demo-Stub, s. loadDomainVector
     embeddingModel: CONFIG.embeddingModel,        // von Sage verlangt
     endpoint: CONFIG.endpoint,
     guestCategories: CONFIG.guestCategories,      // Sage-Hinweis B (ANDOCK §2)
@@ -98,8 +120,9 @@ async function main() {
     nodeType: CONFIG.nodeType,
     protocolVersion: CONFIG.protocolVersion,
     publicKey: publicKeyJwk,
-    _demo: ["domainVector"],                      // ehrliche Demo-Markierung (ANDOCK §5)
   };
+  // _demo nur, wenn der Vektor wirklich Stub ist — kein vorgetäuschtes Wissen, keine Falsch-Markierung.
+  if (!real) unsigned._demo = ["domainVector"];
 
   const signature = base64url(edSign(null, canonicalBytes(unsigned), privateKey));  // ANDOCK §4
   const spore = canonicalize(unsigned);
@@ -110,6 +133,7 @@ async function main() {
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, JSON.stringify(spore, null, 2) + "\n", "utf8");
   console.log("spore.json geschrieben:", outPath, "\n  nodeId:", id);
+  console.log(real ? "  ✓ echter domainVector (Modul 03) — kein _demo." : "  ⚠ Demo-domainVector (Stub) — _demo gesetzt.");
   if (ephemeral) console.warn("  ⚠ UNGESICHERT / NUR TEST — kein SBKIM_NODE_KEY gesetzt (nodeId wechselt pro Lauf).");
   else console.log("  ✓ bleibende Identität aus SBKIM_NODE_KEY.");
 }

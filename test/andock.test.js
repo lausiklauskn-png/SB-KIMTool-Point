@@ -73,12 +73,16 @@ test("Spore: stamm/guestCategories vorhanden (Sage-Hinweis B, ANDOCK §2)", () =
   assert.equal(edVerify(null, Buffer.from(JSON.stringify(canon(rest)), "utf8"), pub, b64uToBuf(signature)), true);
 });
 
-test("Spore: domainVector ehrlich als Demo markiert + L2-normalisiert (ANDOCK §5)", () => {
+test("Spore: domainVector = echtes 384-dim-Embedding, L2-normalisiert, KEIN _demo (ANDOCK §5)", () => {
   const sp = makeSpore();
   assert.equal(sp.domainVector.length, 384);
-  assert.deepEqual(sp._demo, ["domainVector"]);
+  // Echter Vektor (Modul 03) liegt versioniert vor -> _demo darf NICHT gesetzt sein.
+  assert.equal(sp._demo, undefined, "_demo darf bei echtem Vektor nicht gesetzt sein");
   const l2 = Math.sqrt(sp.domainVector.reduce((a, x) => a + x * x, 0));
-  assert.ok(Math.abs(l2 - 1) < 1e-6, `L2=${l2}`);
+  assert.ok(Math.abs(l2 - 1) < 1e-3, `L2=${l2}`);
+  // Der Vektor muss exakt Sages gelieferter Datei entsprechen (reproduzierbar).
+  const real = JSON.parse(readFileSync(resolve(ROOT, "sbkim/domainVector.real.json"), "utf8"));
+  assert.deepEqual(sp.domainVector, real, "domainVector weicht von domainVector.real.json ab");
 });
 
 test("Spore: Manipulation zerstört die Signatur", () => {

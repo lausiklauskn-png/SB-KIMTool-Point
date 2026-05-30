@@ -2,6 +2,29 @@
 
 Stand: 2026-05-30 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-30 (U) — Erster echter semantischer Match (0.8485) + Re-Sign vorbereitet
+
+**Meilenstein:** der erste echte semantische Match im SBKIM-Netz steht rechnerisch.
+
+- **Sage lieferte unseren echten `domainVector`** (im Browser erzeugt, Modul 03,
+  `multilingual-e5-small`, e5 `passage:`-Präfix). Abgelegt als `sbkim/domainVector.real.json`
+  (+ Beleg `domainVector.real.README.md`). Geprüft: 384 Floats, L2 ≈ 1.0000.
+- **Cross-Knoten-Match Sage ⟷ SB·KIMTool = 0.848508 ≥ 0.80** — offline reproduziert in
+  `test/match.test.js` (+2 Beweise). `npm test` **45/45**, `npm run verify` **16/16**.
+- **Generator umgestellt:** `scripts/generate_spore.mjs` zieht den echten Vektor fest in die
+  signierten Bytes; `_demo` entfällt bei echtem Vektor (Fallback auf Stub bleibt ehrlich +
+  scheitert laut bei kaputter Datei). `docs/ANDOCK.md` §5/§2/§7 von „Demo" auf „echt"
+  umgeschrieben. `andock.test.js` angepasst (kein `_demo`, Vektor == Lieferung).
+- **STOPP vor Re-Sign (ehrlich):** `SBKIM_NODE_KEY` ist in dieser Umgebung **nicht gesetzt**.
+  Re-Sign ohne Secret würde die nodeId von `eC3jzoo9…` wegdrehen und Sages Registrierung
+  zerstören → laut Auftrag gestoppt. **Live-`spore.json` bewusst unverändert** (trägt noch
+  den Demo-Vektor). Alles fürs Re-Sign vorbereitet: sobald Klaus das Secret stellt, ist es
+  **ein** Lauf (`node scripts/generate_spore.mjs`) + Republish.
+- **Postfach:** Lese-Quittung + Match-Quittung (§7) + Bau-Protokoll-Zeile (Sync §6.3) +
+  Bitte an Sage, nach Republish auf `verified-match (0.8485)` hochzustufen.
+- **Offen, priorisiert:** (1) Klaus setzt `SBKIM_NODE_KEY` → Re-Sign + Republish; (2) Sage
+  stuft hoch; (3) GitHub Pages aktivieren (403). **Manual-Check:** rein headless/statisch.
+
 ## 2026-05-30 (T) — Sage-Andock: Antwort gelesen + Sages Spore reziprok ✔ VALID
 
 Andock-Identität ist jetzt **beidseitig** kryptografisch bestätigt. Diese Sitzung startete
