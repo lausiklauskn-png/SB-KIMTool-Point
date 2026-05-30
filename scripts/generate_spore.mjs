@@ -23,6 +23,9 @@ const CONFIG = {
   domain: "SBKIM-Werkzeug-Point",
   domainDescription: "Werkzeugkiste + headless Modell-Lauf für das SBKIM-Protokoll.",
   domainKeywords: ["Werkzeugkiste", "SBKIM-Module", "Modell", "Markt", "Endknoten"],
+  // Stamm = unser Kern-Angebot, Gast = was Forker/Gäste hier tun (Sage-Hinweis B, ANDOCK §2)
+  stammCategories: ["Werkzeugkiste", "SBKIM-Module", "Headless-Modell-Lauf", "Markt-Siegel"],
+  guestCategories: ["Werkzeug-Kopie", "Modul-Andock", "Spore-Verifikation"],
   endpoint: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",  // mit Schrägstrich!
   embeddingModel: "Xenova/multilingual-e5-small",
   protocolVersion: "0.1",
@@ -88,6 +91,8 @@ async function main() {
     domainVector: demoVector(CONFIG.nodeName),
     embeddingModel: CONFIG.embeddingModel,        // von Sage verlangt
     endpoint: CONFIG.endpoint,
+    guestCategories: CONFIG.guestCategories,      // Sage-Hinweis B (ANDOCK §2)
+    stammCategories: CONFIG.stammCategories,       // Sage-Hinweis B (ANDOCK §2)
     id,
     nodeName: CONFIG.nodeName,
     nodeType: CONFIG.nodeType,

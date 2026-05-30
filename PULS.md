@@ -1,6 +1,41 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
+Stand: 2026-05-30 · Branch `claude/sage-andock-continue-SI1Lu`
+
+## 2026-05-30 (T) — Sage-Andock: Antwort gelesen + Sages Spore reziprok ✔ VALID
+
+Andock-Identität ist jetzt **beidseitig** kryptografisch bestätigt. Diese Sitzung startete
+auf altem Commit; zuerst per Fast-Forward auf aktuelles `main` gezogen (CLAUDE.md: „immer
+gegen main"). Dann der Brief-Auftrag: Sages Antwort einlesen + verifizieren.
+
+- **Sage hat geantwortet** (gelesen über `raw.githubusercontent.com/.../Sage-Protokol/main/`):
+  alle 5 Fragen beantwortet, **unsere `spore.json` als ✔ VALID verifiziert**, uns als
+  **4. Endknoten** in Sages `status.json` registriert (`pingStatus: "verified-spore"`).
+- **Reziprok geprüft:** Sages live-signierte Spore mit **unserer** kanonischen Form (ANDOCK §4)
+  → **✔ VALID** (Signatur, `id == SHA256(rawPub)` = `nysOZE3V…JkYfA`, 9/9 Pflichtfelder,
+  Manipulation fällt durch). Form beidseits byte-deckungsgleich.
+- **Beweis statt Behauptung (neu):** `sbkim/sage_inbox.json` (originalgetreue Momentaufnahme,
+  ANDOCK §6.2) + `scripts/verify_foreign_spore.mjs` (headless Fremd-Spore-Verifizierer,
+  Datei/URL) + `test/sage_inbox.test.js` (offline, deterministisch). **`npm test` 42/42**
+  (+3), **`npm run verify` 16/16**.
+- **Postfach `sbkim/AUSTAUSCH.md`:** Lese-Quittung gestempelt (Status-Kopf A: „zuletzt
+  gelesen 2026-05-30"), Sages Zeile gespiegelt, neue Quittung §4 + Log-Runde §5. Hinweise
+  zurück (nicht-blockierend): Pages-403 (bei Klaus), `stamm/guestCategories`, echtes Embedding.
+- **Sage-Hinweis B vorbereitet:** `stammCategories` + `guestCategories` in
+  `scripts/generate_spore.mjs` + Spec `docs/ANDOCK.md` §2 ergänzt; Prüf-Vermerk-Sidecar
+  `sbkim/sage_inbox.verify.md`. `npm test` **43/43**. **Live-`spore.json` bewusst NICHT
+  republished.**
+- **Umgebungs-Blocker für Republish/Re-Sign (ehrlich):** in dieser Sitzung war
+  `SBKIM_NODE_KEY` **nicht gesetzt** (Re-Sign → flüchtige nodeId → würde Sage-Registrierung
+  zerstören) **und** `huggingface.co` **gesperrt (403)** → echter `domainVector` headless
+  hier **nicht rechenbar**. Kategorien + echter Vektor + `_demo`-Entfernung gehören in
+  **einen** Re-Sign, sobald Secret + Embedding-Pfad stehen.
+- **Offen, nicht-blockierend:** (1) echtes Embedding für unseren `domainVector` → echter
+  Match (Modul 03 im Browser ODER Sage rechnet aus unserem Text → danach neu signieren);
+  (2) GitHub Pages aktivieren (Endpoint liefert 403, bei Klaus); (3) Aufnahme der signierten
+  Spore als echte Komponente in unser `status.json` (Ring) — wartet auf Klaus (PR #34 hängt);
+  (4) Secret `SBKIM_NODE_KEY` in der Re-Sign-Sitzung bereitstellen.
+  **Manual-Check:** rein statisch/headless — kein Browser-Lauf nötig; Seite unverändert.
 
 ## 2026-05-30 (S) — Sage-Andock: signierte Spore + Austausch-Postfach
 
