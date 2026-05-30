@@ -11,11 +11,11 @@ Offline — Dateien liegen lokal im Repo, keine externen Links.
 
 | Datei | Wo | Format / Größe | Zweck |
 |---|---|---|---|
-| `truhe.png` | **Startseite Mitte** (zentraler Blickfang, klickbar → Werkzeuge) | quer/quadr., dunkel | **vorhanden** — die von Klaus gelieferte Werkzeug-Truhe; wächst sanft beim Drüberfahren |
+| `truhe.png` | **Startseite — mittlere Karte „Werkzeugkiste"** (= der Knopf selbst, klickbar → Werkzeuge) | quer/quadr., dunkel | **vorhanden** — die von Klaus gelieferte Werkzeug-Truhe; wächst sanft beim Drüberfahren |
 | `ambient.png` | alle Seiten (fixer Hintergrund) | quer, ~2000×1400, dunkel | ruhige Tiefen-Textur hinter allem |
-| `hero.png` | Startseite (Hero-Backdrop) | quer, ~1600×900 | optionaler Hintergrund hinter Titel/Truhe (Fallback: nur Glow) |
-| `banner-modell.png` | Modell-Kopf + Start-Karte 1 | quer, ~1200×400 | Motiv „Pipeline / Knotenkette" |
-| `banner-werkzeuge.png` | Werkzeuge-Kopf + Start-Karte 2 | quer, ~1200×400 | Motiv „Werkbank / Module / Truhe" |
+| `hero.png` | Startseite (Hero-Backdrop) | quer, ~1600×900 | optionaler Hintergrund hinter dem Titel (Fallback: nur Glow) |
+| `banner-modell.png` | Modell-Kopf + Start-Karte 1 (links) | quer, ~1200×400 | Motiv „Pipeline / Knotenkette" |
+| `banner-werkzeuge.png` | nur Werkzeuge-Seitenkopf (Start-Karte 2 nutzt jetzt `truhe.png`) | quer, ~1200×400 | Motiv „Werkbank / Module" |
 | `banner-markt.png` | Markt-Kopf + Start-Karte 3 | quer, ~1200×400 | Motiv „Schaufenster / Andocken" |
 | `icon-192.png` | Favicon / App-Icon (alle Seiten) | quadratisch, 192×192 (+ optional 512×512) | Marke „SB·KIMTool·Point" |
 

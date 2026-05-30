@@ -2,6 +2,24 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (G) — Truhe IST der Werkzeugkiste-Knopf + menschliche Karten-Texte
+
+Auf Klaus' Wunsch die Truhe vom Hero **runter an die Stelle des mittleren „Werkzeugkiste"-Knopfs**
+gesetzt — sie ist jetzt das Bild dieser Karte (Klick öffnet weiter `werkzeuge.html`, Funktion
+unverändert). Hero wieder kompakt (nur Titel/Untertitel). Keine Text-Dopplung (Hero-Caption
+„Werkzeug-Truhe — öffnen" entfernt; Karte trägt Titel + Erklärung + „→ öffnen").
+
+- `index.html`: `.truhe-hero` aus dem Hero entfernt; mittlere Karte `.entry--truhe` mit
+  `--art:url(truhe.png)`. Alle drei Karten-Erklärungen in **menschlicher Alltagssprache**
+  neu (kein Jargon wie „headless/Node/Endknoten"); Ehrlichkeit bleibt (Aufzeichnung statt live,
+  Suche kommt später).
+- `assets/style.css`: `.truhe-hero/.truhe-cap` raus; `.entry--truhe .entry-art` höher (150px,
+  Hover 224px) als Blickfang; `.entries { align-items: start }`; Touch (`hover:none`) +
+  `prefers-reduced-motion` halten die Standardgröße (Text drunter lesbar).
+- `assets/img/README.md`: Start-Karte 2 nutzt jetzt `truhe.png`; `banner-werkzeuge.png` nur
+  noch im Werkzeuge-Seitenkopf.
+- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf. `npm test` 27/27 (reine Optik).
+
 ## 2026-05-30 (F) — Klaus' Werkzeug-Truhe als zentraler Startseiten-Blickfang
 
 Klaus hat ein **echtes Truhe-Bild geliefert** (Truhe mit leuchtendem Teal-Schlüssel im Schloss,
