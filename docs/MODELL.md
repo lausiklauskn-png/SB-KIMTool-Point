@@ -16,10 +16,28 @@ Genau die in Sage **vorgebauten, schlummernden** Immunmodule:
 - **16 SBKIM-Siegel** — „Tun statt Sein", die Verschränkung mit der Reputation.
 - **02 Spore** — echte Ed25519-Identität als Fundament.
 
-Die 3-Rollen-Schleife (Bauer → Gate/Arzt → Beobachter, siehe `BAUTRUPP.md`) erzeugt
-Artefakte, prüft sie und vergibt Siegel. Zwei Sybil-Knoten fluten mit gefälschten
-Artefakten — und werden nachweislich aussortiert (Stimmgewicht 0 → Misstrauen über
-Schwelle → Blocklist → Apoptose).
+Die **Rollen-Kette** (Ingenieur → Bauer → Gate/Arzt → Beobachter, siehe `BAUTRUPP.md`)
+entwirft Ideen, baut Artefakte, prüft sie und vergibt Siegel. Zwei **Negativbauer**
+(Sybil) fluten mit getarnten Fälschungen — und werden nachweislich aussortiert
+(Stimmgewicht 0 → Misstrauen über Schwelle → Blocklist → Apoptose).
+
+## Der aufgezeichnete Lauf (`web/data/run.json`, Vertrag v0.2)
+
+`npm run demo` schreibt einen Lauf nach dem Datenvertrag **v0.2**. Die Seite liest nur
+dieses JSON und **erfindet nichts** — alle Titel/Arten/Beschreibungen stammen aus dem
+Modell-Lauf:
+
+- `protocolVersion: "0.2"`, `roles: [ingenieur, bauer, gate_arzt, beobachter, negativbauer]`.
+- `artefacts[]` — je Objekt `id`, `kind` (hintergrund-tool | standalone-pwa | tool |
+  webseite), `title`, `description`, `proposedBy`, `builtBy`, `status` (entwurf | gebaut
+  | geprueft | graduiert | verworfen), `repaired`, `downloadable` (nur bei `graduiert`).
+- `events[]` — geordnet über `t`; Phasen `idee` · `build` · `sybil` · `verdict`. Ein
+  `verdict` mit `flagged: true` löst die Apoptose-Animation (grün→orange→rot) aus.
+- `summary` + `edgeCases` wie bisher.
+
+`modell.html` + `assets/model.js` spielen diesen Lauf als **animierte Pipeline** ab
+(aktiver Agent leuchtet, Artefakt wandert als Lichtpunkt, Angriff stirbt sichtbar) —
+**Playback, kein Live-Lauf.** `prefers-reduced-motion` wird respektiert (Ruhe-Variante).
 
 ## Was das Modell NICHT ist
 
