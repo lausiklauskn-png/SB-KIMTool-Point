@@ -286,6 +286,76 @@ function renderWerkstatt() {
 // --- Dispatch: each page only loads what it shows -------------------------
 // Render a section only if its anchor element exists on the current page
 // (Startseite has none → nothing runs; Modell page uses model.js instead).
+
+// --- Puls: Real-Anteil-Ring + Agenten in Aktion (Startseite) --------------
+// Selbst-aktualisierend aus status.json: der grüne Bogen = echte/alle Komponenten.
+// Jede Komponente mit echt===true zählt als "lebt", sonst als Demo/schlummert.
+async function renderPuls() {
+  const ring = $("#ring-real");
+  const num = $("#ring-num");
+  const liste = $("#agenten-liste");
+  const fuss = $("#agenten-fuss");
+  if (!ring || !num || !liste) return;
+
+  let s;
+  try { s = await loadJSON("status.json"); }
+  catch (e) { num.textContent = "?"; if (fuss) fuss.textContent = "status.json nicht lesbar."; return; }
+
+  const komp = Array.isArray(s.komponenten) ? s.komponenten : [];
+  const echt = komp.filter((k) => k.echt === true);
+  const total = komp.length || 1;
+  const pct = Math.round((100 * echt.length) / total);
+
+  // Ring: grüner Bogen auf pct% des Umfangs (r=86)
+  const C = 2 * Math.PI * 86;
+  const realLen = (C * pct) / 100;
+  requestAnimationFrame(() => {
+    ring.style.strokeDasharray = `${realLen} ${C - realLen}`;
+  });
+  // Zahl hochzählen
+  let start = null;
+  const dur = 1200;
+  requestAnimationFrame(function step(t) {
+    if (start === null) start = t;
+    const p = Math.min(1, (t - start) / dur);
+    const ease = 1 - Math.pow(1 - p, 3);
+    num.textContent = Math.round(pct * ease) + "%";
+    if (p < 1) requestAnimationFrame(step);
+  });
+
+  // Agenten-Liste: jede Komponente ein "Mitarbeiter" mit Lebt/Demo-Lampe.
+  // Kurzname aus dem (oft langen) Komponenten-Namen ziehen.
+  const kurz = (name) => {
+    const vorDoppel = String(name).split(":")[0];
+    return vorDoppel.length > 52 ? vorDoppel.slice(0, 50) + "…" : vorDoppel;
+  };
+  liste.innerHTML = komp.map((k) => {
+    const lebt = k.echt === true;
+    return `<li class="agent ${lebt ? "alive" : "demo"}">
+      <span class="agent-lamp" aria-hidden="true"></span>
+      <span class="agent-name">${kurz(k.name)}</span>
+      <span class="agent-state">${lebt ? "lebt" : "Demo"}</span>
+    </li>`;
+  }).join("");
+  if (fuss) {
+    fuss.textContent = `${echt.length} von ${total} Komponenten real belegt · `
+      + `Rest schlummert/zeigt (ehrlich, kein Theater).`;
+  }
+
+  // Knoten in der Mitte: Erklär-Box auf/zu
+  const knoten = $("#ring-knoten");
+  const erkl = $("#puls-erkl");
+  if (knoten && erkl) {
+    knoten.addEventListener("click", () => {
+      const offen = !erkl.hasAttribute("hidden");
+      if (offen) erkl.setAttribute("hidden", "");
+      else erkl.removeAttribute("hidden");
+      knoten.classList.toggle("active", !offen);
+    });
+  }
+}
+
 if ($("#tabs")) renderWerkzeuge();
 if ($("#market")) renderMarkt();
 if ($("#werkstatt-run")) renderWerkstatt();
+if ($("#puls")) renderPuls();

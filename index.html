@@ -31,6 +31,69 @@
       </p>
     </div>
 
+    <!-- Real-Anteil + Agenten in Aktion — selbst-aktualisierend aus status.json -->
+    <section class="puls" id="puls" data-reveal aria-label="Was ist real, was ist Demo">
+      <div class="puls-head">
+        <span class="puls-tag">live aus status.json · ehrlicher Real-Anteil</span>
+        <h2>Was ist real, was ist Demo?</h2>
+        <p class="puls-sub">
+          Der grüne Bogen wächst mit jedem echten Beweis (Werkzeug rechnet wirklich,
+          headless oder im Browser belegt). Was nur gezeigt, aber nicht live gerechnet
+          wird, bleibt im hellen Rest. Klick auf den Knoten in der Mitte für die Erklärung.
+        </p>
+      </div>
+
+      <div class="puls-body">
+        <!-- Ring -->
+        <div class="ring-wrap" title="echte Komponenten / alle Komponenten (aus status.json)">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="ring-real-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#34D399"/>
+                <stop offset="100%" stop-color="#16A34A"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="100" cy="100" r="86" stroke-width="13"/>
+            <circle id="ring-real" class="ring-real" cx="100" cy="100" r="86" stroke-width="13"/>
+          </svg>
+          <div class="ring-center">
+            <button class="ring-knoten" type="button" id="ring-knoten" aria-label="Was bedeutet das?">
+              <!-- eigenes, re-geskinntes Knoten-Glyph (kein Pilz-Klon) -->
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                <circle cx="24" cy="24" r="7" class="kn-core"/>
+                <circle cx="24" cy="8"  r="3.2" class="kn-sat"/>
+                <circle cx="40" cy="20" r="3.2" class="kn-sat"/>
+                <circle cx="34" cy="39" r="3.2" class="kn-sat"/>
+                <circle cx="11" cy="36" r="3.2" class="kn-sat"/>
+                <circle cx="7"  cy="17" r="3.2" class="kn-sat"/>
+                <path class="kn-link" d="M24 24 L24 8 M24 24 L40 20 M24 24 L34 39 M24 24 L11 36 M24 24 L7 17"/>
+              </svg>
+            </button>
+            <div class="ring-pct"><span id="ring-num">…</span></div>
+            <div class="ring-lbl">real belegt</div>
+          </div>
+        </div>
+
+        <!-- Agenten in Aktion -->
+        <div class="agenten" id="agenten" aria-label="Agenten im SBKIM-Netzwerk in Aktion">
+          <div class="agenten-titel">Die Mitarbeiter — Agenten im Netzwerk</div>
+          <ul class="agenten-liste" id="agenten-liste"></ul>
+          <div class="agenten-fuss" id="agenten-fuss"></div>
+        </div>
+      </div>
+
+      <!-- Erklär-Box (vom Knoten in der Mitte aufgeklappt) -->
+      <div class="puls-erkl" id="puls-erkl" hidden>
+        <p><strong>Wie der Bogen rechnet:</strong> Jede Zeile in <code>status.json</code> trägt
+        ein ehrliches <code>echt</code>-Kennzeichen. Der grüne Anteil ist <em>echte ÷ alle</em>
+        Komponenten — kein Marketing, sondern gezählt. Wird ein weiteres Werkzeug nachweislich
+        live (Test grün oder Browser-Beweis), springt es von Demo auf real und der Bogen wächst.</p>
+        <p><strong>Die Mitarbeiter</strong> sind die echten Bausteine in Aktion: Module, die jetzt
+        wirklich rechnen (✓ lebt) oder vorgebaut schlummern und auf ihren Einsatz warten (◐ Demo).
+        So siehst du auf einen Blick, was das Netzwerk schon kann — und was noch Schau ist.</p>
+      </div>
+    </section>
+
     <div class="entries">
       <a class="entry" href="modell.html" data-reveal>
         <img class="entry-art" src="assets/img/banner-modell.png?v=5" alt="" aria-hidden="true"
