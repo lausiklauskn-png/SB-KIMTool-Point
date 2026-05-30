@@ -460,13 +460,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   .tool, .pwa, .tab, .copy, .dock, .entry, .entry .entry-art { transition: none; }
   .tool:hover, .pwa:hover, .entry:hover { transform: none; }
   /* Bild-Wachstum nicht animieren; Standardgroesse halten (kein Sprung). */
-  .entry:hover .entry-art { height: 150px; }
-}
-
-/* Touch-Geraete (Handys): kein echtes Hover -> Bilder bleiben handlich,
-   Text drunter gut lesbar. */
-@media (hover: none) {
-  .entry:hover .entry-art { height: 150px; }
+  .entry:hover .entry-art { height: 180px; }
 }
 
 footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); position: relative; z-index: 1; }
@@ -581,22 +575,22 @@ body::after {
 /* Eingangs-Karten: optionales Vorschaubild oben (Fallback: Glow-Streifen) */
 .entry { position: relative; overflow: hidden; }
 .entry .entry-art {
-  display: block; height: 132px; margin: -1.3rem -1.3rem 0.9rem; border-radius: 12px 12px 0 0;
+  /* <img>: GANZES Bild zeigen (contain), nicht abschneiden. */
+  display: block; width: calc(100% + 2.6rem); height: 180px;
+  margin: -1.3rem -1.3rem 0.9rem; border-radius: 12px 12px 0 0;
+  object-fit: contain; object-position: center;
   background:
-    linear-gradient(180deg, rgba(12,15,18,0) 55%, rgba(12,15,18,0.55) 100%),
-    var(--art, none) center / cover no-repeat,
-    radial-gradient(80% 120% at 80% 0%, rgba(54,214,195,0.18), transparent 60%),
+    radial-gradient(70% 90% at 50% 40%, rgba(54,214,195,0.10), transparent 70%),
     linear-gradient(135deg, #14201f, #0e1419);
   border-bottom: 1px solid var(--line);
-  /* Standard klein -> Text drunter immer lesbar (auch auf Handys ohne Hover). */
-  transition: height 0.28s ease, box-shadow 0.25s ease;
+  transition: height 0.3s ease, box-shadow 0.25s ease;
 }
 .entry:hover { box-shadow: 0 14px 34px #0008; }
-/* Maus drueber: Bild (Truhe) waechst zum Blickfang; geht weg -> wieder klein. */
-.entry:hover .entry-art { height: 190px; box-shadow: inset 0 0 30px rgba(54,214,195,0.12); }
-/* Touch-Geraete (Handys): kein echtes Hover -> Bild bleibt klein, Text lesbar. */
+/* Maus drueber: Bild waechst zum Blickfang; geht weg -> wieder normal. */
+.entry:hover .entry-art { height: 260px; box-shadow: inset 0 0 30px rgba(54,214,195,0.12); }
+/* Touch-Geraete (Handys): kein echtes Hover -> normale Hoehe, Text lesbar. */
 @media (hover: none) {
-  .entry:hover .entry-art { height: 150px; }
+  .entry:hover .entry-art { height: 180px; }
 }
 
 /* --- Scroll-Reveal (siehe assets/fx.js) ---------------------------------- */
