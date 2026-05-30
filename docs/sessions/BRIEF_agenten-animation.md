@@ -58,8 +58,9 @@ Design-/UX-Gestaltung** gilt der Gestaltungs-Freibrief — **ohne Rückfrage** l
   nur als **Download/Export** des Modell-Entwurfs anbieten (siehe Teil D). Kein
   Auto-Bau im Hintergrund.
 - **Spec vor Code:** Erst den Datenvertrag `run.json` (Teil C) festziehen, dann animieren.
-- **Zero-Dependency:** Animation mit **reinem SVG/Canvas + CSS** (keine externen Libs,
-  kein CDN) — offline- und kopier-tauglich. Eruda nur optional zum Debuggen.
+- **Offline zuerst:** **kein CDN-Zwang** — bevorzugt reines SVG/Canvas/CSS/WebGL ohne
+  Abhängigkeit; eine Lib nur, wenn sie klar hebt, dann **lokal vendorn** (offline- und
+  kopier-tauglich bleibt Pflicht). Eruda nur optional zum Debuggen.
 - **Eigene Identität:** Inspiration von modernen Agenten-Visualisierungen erlaubt, aber
   **nicht 1:1 klonen** — Teal-Akzent und Sage-angelehnte, neutrale Optik beibehalten.
 - **Sicherheits-Modul berührt?** (Sybil/Apoptose/Reputation/Blocklist) → `ZERTIFIKAT_ASPEKTE`
