@@ -2,6 +2,22 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (F) — Klaus' Werkzeug-Truhe als zentraler Startseiten-Blickfang
+
+Klaus hat ein **echtes Truhe-Bild geliefert** (Truhe mit leuchtendem Teal-Schlüssel im Schloss,
+dunkler Kosmos-Grund — passt zur Optik). Eingebaut als zentraler Blickfang in der Startseiten-Mitte:
+
+- `assets/img/truhe.png` (Klaus' Bild, 1401×1123 ~2,3 MB; **kein** Bildwerkzeug im Container →
+  unkomprimiert übernommen, ehrlich vermerkt; auf Wunsch später verkleinern).
+- `index.html`: im Hero ein **klickbarer** `.truhe-hero`-Block (`<img>` mit Alt-Text) →
+  führt zur Werkzeugkiste (`werkzeuge.html`). Caption „Werkzeug-Truhe — öffnen".
+- `assets/style.css`: Truhe **handlich** (Standard `min(360px, 78vw)` → Karten/Text drunter
+  lesbar, auch mobil); **wächst** beim Hover (`scale 1.12`) mit Teal-Glow, schrumpft zurück.
+  `@media (hover: none)` → mobil kein Wachstum (Handy-Lesbarkeit). `prefers-reduced-motion` → ruhig.
+- Meine zwischenzeitliche **SVG-Notlösung entfernt** (Klaus: „nicht selbst zeichnen") — es gilt sein PNG.
+- `assets/img/README.md`: `truhe.png` als vorhandenes Startseiten-Mittenbild dokumentiert.
+- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf. `npm test` 27/27 (reine Optik).
+
 ## 2026-05-30 (E) — Startseiten-Hero als prominenter Blickfang (Truhe-Bild)
 
 Klaus will ein Truhe-Bild auf der Startseite. Befund: **beide Bild-Slots existierten schon**
