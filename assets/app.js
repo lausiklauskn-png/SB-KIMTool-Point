@@ -18,13 +18,19 @@ const STUFEN = [
   ["profi", "Profi"],
 ];
 
-const SAGE_BADGE = {
-  fertig: ["fertig", "Sage: fertig ✅"],
-  stub: ["stub", "Sage: stub ◐"],
-  "teil-fertig": ["teil", "Sage: teil-fertig ◐"],
-  "code-stub": ["", "Sage: code-stub ○"],
-  "vorgebaut-schlummert": ["schlummert", "Sage: vorgebaut – schlummert ⏾"],
-  "vorgebaut-kopierbar": ["schlummert", "Sage: vorgebaut – kopierbar ⏾"],
+// Sage-Reife -> Spine-Farbe (Karte) + Chip + Klartext. Echo der Lampen-Farben.
+const REIFE = {
+  fertig:                 { cls: "m-fertig",     chip: "c-fertig",     label: "reif ✅" },
+  "vorgebaut-schlummert": { cls: "m-schlummert", chip: "c-schlummert", label: "schlummert ⏾" },
+  "vorgebaut-kopierbar":  { cls: "m-schlummert", chip: "c-schlummert", label: "kopierbar ⏾" },
+  "teil-fertig":          { cls: "m-teil",       chip: "c-teil",       label: "teil-fertig ◐" },
+  stub:                   { cls: "m-stub",       chip: "c-stub",       label: "stub ◐" },
+  "code-stub":            { cls: "m-stub",       chip: "c-stub",       label: "code-stub ○" },
+};
+
+const POINT = {
+  "modell-prototyp":    { chip: "c-point",         label: "im Modell" },
+  "noch-nicht-kopiert": { chip: "c-point c-cold",  label: "noch nicht kopiert" },
 };
 
 async function renderWerkzeuge() {
@@ -39,25 +45,43 @@ async function renderWerkzeuge() {
   const tabs = $("#tabs");
   const grid = $("#tools");
 
+  // Stufen-Legende aus den (bisher ungezeigten) stufen-Texten des JSON.
+  const legend = $("#tier-legend");
+  if (legend && data.stufen) {
+    legend.innerHTML = "";
+    for (const [key, label] of STUFEN) {
+      const txt = data.stufen[key];
+      if (!txt) continue;
+      const c = document.createElement("div");
+      c.className = "tier-card";
+      c.innerHTML = `<b>${label}</b><span>${txt}</span>`;
+      legend.appendChild(c);
+    }
+  }
+
   function draw(stufe) {
     grid.innerHTML = "";
     for (const m of data.module.filter((x) => x.stufe === stufe)) {
-      const [cls, label] = SAGE_BADGE[m.sage_status] || ["", `Sage: ${m.sage_status}`];
+      const r = REIFE[m.sage_status] || { cls: "m-stub", chip: "c-stub", label: m.sage_status };
+      const p = POINT[m.point_status] || { chip: "c-point c-cold", label: m.point_status };
       const el = document.createElement("div");
-      el.className = "tool";
+      el.className = `tool ${r.cls}`;
       el.innerHTML = `
-        <div class="head"><span class="id">${m.id}</span><span class="name">${m.name}</span></div>
-        <div class="badges">
-          <span class="badge ${cls}">${label}</span>
-          <span class="badge">Point: ${m.point_status}</span>
+        <div class="head"><span class="id-orb">${m.id}</span><span class="name">${m.name}</span></div>
+        <div class="status-row">
+          <span class="chip ${r.chip}"><span class="dot"></span>Sage: ${r.label}</span>
+          <span class="chip ${p.chip}"><span class="dot"></span>Point: ${p.label}</span>
         </div>
-        <dl>
-          <dt>Was</dt><dd>${m.was}</dd>
-          <dt>Nutzen</dt><dd>${m.nutzen}</dd>
-          <dt>Verwendung</dt><dd>${m.verwendung}</dd>
-          <dt>Einbau</dt><dd>${m.einbau}</dd>
-          <dt>Aktiviert durch</dt><dd>${m.aktiviert_durch}</dd>
-        </dl>
+        <p class="lead"><b>Nutzen</b>${m.nutzen}</p>
+        <details class="more">
+          <summary>Mehr — Was · Verwendung · Einbau · Aktiviert durch</summary>
+          <dl>
+            <dt>Was</dt><dd>${m.was}</dd>
+            <dt>Verwendung</dt><dd>${m.verwendung}</dd>
+            <dt>Einbau</dt><dd>${m.einbau}</dd>
+            <dt>Aktiviert durch</dt><dd>${m.aktiviert_durch}</dd>
+          </dl>
+        </details>
         <button class="copy">⧉ Kennung kopieren</button>`;
       el.querySelector(".copy").addEventListener("click", () => {
         const txt = `Modul ${m.id} ${m.name} [${m.stufe}] — ${m.was}`;
@@ -69,9 +93,10 @@ async function renderWerkzeuge() {
   }
 
   STUFEN.forEach(([key, label], idx) => {
+    const count = data.module.filter((x) => x.stufe === key).length;
     const t = document.createElement("button");
     t.className = "tab" + (idx === 0 ? " active" : "");
-    t.textContent = label;
+    t.innerHTML = `${label}<span class="cnt">${count}</span>`;
     t.addEventListener("click", () => {
       tabs.querySelectorAll(".tab").forEach((x) => x.classList.remove("active"));
       t.classList.add("active");
@@ -94,12 +119,20 @@ async function renderMarkt() {
   }
   const market = $("#market");
   for (const e of data.eintraege) {
+    const isInt = (e.status || "").startsWith("integriert");
+    const statusChip = isInt
+      ? `<span class="chip c-int"><span class="dot"></span>${e.status}</span>`
+      : `<span class="chip c-live"><span class="dot"></span>live · direkt</span>`;
+    const echtChip = e.echt
+      ? `<span class="chip c-fertig"><span class="dot"></span>✓ echt</span>` : "";
+    const monogram = (e.name || "?").trim().charAt(0).toUpperCase();
     const el = document.createElement("div");
     el.className = "pwa";
     el.innerHTML = `
-      <div class="name">${e.name}</div>
-      <div class="nodeid">${e.nodeId}</div>
+      <div class="p-head"><span class="p-mark">${monogram}</span><span class="name">${e.name}</span></div>
+      <div class="p-chips">${statusChip}${echtChip}</div>
       <div class="can">„${e.kannDas}"</div>
+      <div class="nodeid">${e.nodeId}</div>
       <a class="dock" href="${e.andockLink}">→ andocken</a>`;
     market.appendChild(el);
   }

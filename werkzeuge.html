@@ -26,7 +26,17 @@
         Drei Stufen. Jede Kachel trägt Doppel-Status (Sage / Point) und eine Erklärung.
         „Schlummert" = vorgebaut, springt bei Bedarf an — nicht leer.
       </p>
+      <!-- Stufen-Legende (aus werkzeugkiste.json befüllt) -->
+      <div class="tier-legend" id="tier-legend"></div>
+
       <div class="panel">
+        <!-- Reife-Schlüssel: was die Spine-Farbe links an jeder Kachel meint -->
+        <div class="maturity-key" aria-hidden="true">
+          <span><span class="mk-dot mk-fertig"></span>reif</span>
+          <span><span class="mk-dot mk-schlummert"></span>schlummert / kopierbar</span>
+          <span><span class="mk-dot mk-teil"></span>teil-fertig</span>
+          <span><span class="mk-dot mk-stub"></span>stub</span>
+        </div>
         <div class="tabs" id="tabs"></div>
         <div class="grid" id="tools"></div>
       </div>
