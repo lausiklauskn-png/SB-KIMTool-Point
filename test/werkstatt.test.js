@@ -11,13 +11,17 @@ globalThis.window = globalThis;
 
 import "../web/tools/sbkim-match.js";
 import "../web/tools/sbkim-siegel.js";
+import "../web/tools/sbkim-embedding.js";
+import "../web/tools/sbkim-anastomose.js";
+import "../web/tools/sbkim-heterokaryose.js";
 import "../assets/werkstatt.js";
 
 const W = globalThis.SbkimWerkstatt;
 
 test("Werkstatt registriert ihre Prüf-API", () => {
   assert.equal(typeof W, "object");
-  for (const fn of ["probeMatch", "probeSiegel", "probeAll"]) {
+  for (const fn of ["probeMatch", "probeSiegel", "probeEmbedding",
+                    "probeAnastomose", "probeHeterokaryose", "probeAll"]) {
     assert.equal(typeof W[fn], "function", `Werkstatt.${fn}`);
   }
 });
@@ -39,10 +43,19 @@ test("probeSiegel: 16 Siegel-Lesepfad besteht (offline)", () => {
   }
 });
 
-test("probeAll: beide Offline-Werkzeuge grün", () => {
+test("probeAll: trennt offline-bewiesen von netz-bereit", () => {
   const all = W.probeAll();
-  assert.equal(all.length, 2);
-  assert.ok(all.every((r) => r.ok), "alle Proben grün");
+  assert.equal(all.offline.length, 2, "zwei offline-Proben (04/16)");
+  assert.equal(all.netz.length, 3, "drei netz-Proben (03/05/06)");
+  assert.ok(all.offline.every((r) => r.ok), "offline-Proben grün");
+});
+
+test("netz-Module: ehrlich 'bereit · braucht Netz', nicht als grün-gerechnet behauptet", () => {
+  for (const r of [W.probeEmbedding(), W.probeAnastomose(), W.probeHeterokaryose()]) {
+    assert.equal(r.ok, true, `${r.name} geladen+vollständig`);
+    assert.equal(r.status, "bereit · braucht Netz", "Status ist ehrlich netzgebunden");
+    assert.match(r.fazit, /Netz|Browser/i, "Fazit nennt die Netz-/Browser-Bedingung");
+  }
 });
 
 test("ehrlich: fehlendes Modul -> ok=false, nicht grün vortäuschen", () => {
@@ -50,4 +63,9 @@ test("ehrlich: fehlendes Modul -> ok=false, nicht grün vortäuschen", () => {
   const r = W.probeMatch({});
   assert.equal(r.ok, false);
   assert.match(r.fazit, /nicht geladen/i);
+  // auch die Bereitschafts-Probe darf nicht grün lügen, wenn die API fehlt:
+  // ein Objekt OHNE die erwarteten Funktionen muss ok=false ergeben.
+  const n = W.probeAnastomose({});
+  assert.equal(n.ok, false);
+  assert.equal(n.status, "unvollständig");
 });

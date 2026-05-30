@@ -18,7 +18,7 @@ Der **Tool-Point** für das SBKIM-Protokoll: eine eigenständige, neutrale Heima
 
 ```bash
 npm run demo   # spielt das Modell einmal durch, druckt den Bericht, schreibt web/data/run.json
-npm test       # headless Smoke-Test (Beweis) — 28 Prüfungen (Modell + Module 01–18 + Werkstatt-Brücke)
+npm test       # headless Smoke-Test (Beweis) — 29 Prüfungen (Modell + Module 01–18 + Werkstatt offline+netz)
 ```
 
 Keine Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto` bzw. WebCrypto,

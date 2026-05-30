@@ -271,7 +271,11 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 .werkstatt-out { display: grid; gap: 0.7rem; margin-top: 0.8rem; }
 .probe { border: 1px solid var(--line); border-left: 4px solid var(--muted); border-radius: 8px; padding: 0.6rem 0.8rem; background: var(--bg-soft); }
 .probe.ok { border-left-color: var(--lamp-live); }
+.probe.ready { border-left-color: var(--lamp-dorm); }
 .probe.bad { border-left-color: var(--lamp-dead); }
+.probe-group { display: grid; gap: 0.6rem; }
+.probe-group + .probe-group { margin-top: 0.6rem; }
+.probe-group-titel { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
 .probe-head { font-family: var(--mono); font-size: 0.82rem; color: var(--text); font-weight: 700; }
 .probe-steps { list-style: none; padding: 0; margin: 0.4rem 0; display: grid; gap: 0.25rem; font-size: 0.8rem; }
 .probe-steps li.ok { color: var(--lamp-live); }
