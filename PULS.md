@@ -2,6 +2,29 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (S) — Sage-Andock: signierte Spore + Austausch-Postfach
+
+Erste echte Zusammenarbeit zweier SBKIM-Repos. Sage erreichbar über WebFetch (öffentlich)
+→ Vertrag, Live-Spore, Module gelesen. Schlüssel-Erkenntnis: **beide Repos können einander
+direkt aus dem Netz lesen** — kein Kurier-Zwang, nur Klaus startet Sitzungen.
+
+- **`docs/ANDOCK.md`** — Vertrag (Spec vor Code): Sage-Schema, kanonische Signier-Form,
+  Schlüssel via Secret, `domainVector` ehrlich Demo.
+- **`sbkim/AUSTAUSCH.md`** — Postfach mit Lese-Quittung („zuletzt gelesen"/„wartet auf"),
+  ehrlichem Prüf-Rhythmus (bei Sitzungsstart, kein Dauerlauf), Fragen an Sage, Protokoll-Log.
+- **Sage antwortete** (über Klaus) mit funktionierendem Spore-Generator: übernimmt unsere
+  Signier-Form (§4), ergänzt Pflichtfelder `createdAt` + `embeddingModel`, akzeptiert
+  Demo-Vektor. Geprüft (kein Netz/eval/Shell), übernommen als `scripts/generate_spore.mjs`.
+- **`sbkim/spore.json`** — dauerhafte, echt signierte Identität. nodeId
+  `o-5_NJDSWHj2Yg4He9rIVCB3-iJ5OF_Nkkw1Ms2_LZc`. Privater Schlüssel NUR als Secret
+  `SBKIM_NODE_KEY` (nie im Repo). **Real:** Identität/Signatur. **Demo:** semantischer Match.
+- **Beweis:** `test/andock.test.js` (5 grün) — Signatur ✔, nodeId=SHA256(pub) ✔, Schema ✔,
+  Demo-Markierung ✔, Manipulation fällt durch ✔. `npm test` **39/39**. Siegel-Eintrag gesetzt.
+- **Offen:** Klaus setzt Secret `SBKIM_NODE_KEY`; Sage verifiziert unsere veröffentlichte
+  Spore + trägt Status-Kopf ein; Sages Modul 02 (Verifizierer) Bau-Plan; Registrierung in
+  Sages `status.json`. **Manual-Check:** spore.json ist statisch (kein Browser-Lauf nötig);
+  Sichtprüfung der Seite unverändert von gestern.
+
 ## 2026-05-30 (R) — Startseiten-Puls: „Was ist real, was ist Demo?" + Agenten in Aktion
 
 Klaus' Wunsch (Sage-Vorbild): das selbst-aktualisierende Real/Demo-Tool oben auf der

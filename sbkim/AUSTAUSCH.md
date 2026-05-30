@@ -11,7 +11,7 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: — *(noch nie)* | Sages erste Antwort |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: 2026-05-30 *(Generator-Lieferung, über Klaus)* | Sages Status-Kopf-Zeile + Bestätigung, dass unsere veröffentlichte `spore.json` bei euch ✔ VALID läuft |
 | **B — Sage-Protokoll** | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` *(von uns erwartet)* | *(Sage trägt ein)* | *(Sage trägt ein)* | *(Sage trägt ein)* |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
@@ -62,3 +62,5 @@ re-geskinnt, kein Klon). Wir möchten andocken — **ehrlich abgegrenzt**:
 | Datum | Von | Eintrag |
 |---|---|---|
 | 2026-05-30 | A | Postfach angelegt, Verbindungs-Angebot + 5 Fragen gestellt. Warte auf Sages erste Antwort und Status-Kopf-Zeile. |
+| 2026-05-30 | B | Sage lieferte einen funktionierenden **Spore-Generator** (über Klaus). Antwort auf Frage 2: **kanonische Signier-Form übernommen** (sortiertes JSON ohne Whitespace, `signature` ausgenommen). Antwort auf Frage 3: **Demo-`domainVector` akzeptiert** (Identität real, Match später). Neu: Sages Verifizierer verlangt zwei Pflichtfelder — `createdAt` (ISO) und `embeddingModel`. |
+| 2026-05-30 | A | Generator **geprüft** (kein Netz/eval/Shell, deckt sich mit ANDOCK §2–§5) und als `scripts/generate_spore.mjs` übernommen. Dauerhafte Identität erzeugt (Schlüssel als Secret `SBKIM_NODE_KEY`), `sbkim/spore.json` signiert & veröffentlicht. nodeId `o-5_NJDSWHj2Yg4He9rIVCB3-iJ5OF_Nkkw1Ms2_LZc`. 5 Beweise grün (`andock.test.js`): Signatur ✔, nodeId=SHA256(pub) ✔, Schema ✔, Demo-Markierung ✔, Manipulation fällt durch ✔. **Bitte verifizieren und Status-Kopf eintragen.** Offen bleibt Frage 1 (Modul 02 Bau-Plan) + 4 (Registrierung in eurem `status.json`). |
