@@ -2,6 +2,21 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (H) — Truhe-Bild lädt nicht: verkleinert + als echtes <img>
+
+Klaus' Browser-Screenshot (Tablet, GitHub Pages live): mittlerer Knopf zeigte nur den
+dunklen Fallback-Glow, **das Truhe-Bild fehlte**. HTML/CSS waren neu (Texte + Kasten da),
+nur die Bilddatei lud nicht. Wahrscheinlichste Ursache: **2,3 MB PNG** ist mobil zu schwer.
+
+- `assets/img/truhe.png`: mit Pillow auf **~760px / ~190 KB** verkleinert (Palette-Quantisierung;
+  Truhe/Teal-Schlüssel/Gold-Glow sichtbar erhalten). Lädt mobil zuverlässig.
+- `index.html`: Truhe-Karte nutzt jetzt ein **echtes `<img class="truhe-img">`** (mit Alt-Text,
+  `loading="eager"`) statt CSS-`background` — lädt robuster, kein Stacking-Risiko.
+- `assets/style.css`: `.entry--truhe .truhe-img` (object-fit: contain, 230px, Hover 300px);
+  Touch/`prefers-reduced-motion` halten 230px. Alte `.entry-art`-Truhe-Regeln ersetzt.
+- **Manual-Check:** wartet auf Klaus' nächsten Browser-Lauf (Hard-Reload Strg+Shift+R nötig,
+  sonst altes Bild aus dem Cache). `npm test` 27/27.
+
 ## 2026-05-30 (G) — Truhe IST der Werkzeugkiste-Knopf + menschliche Karten-Texte
 
 Auf Klaus' Wunsch die Truhe vom Hero **runter an die Stelle des mittleren „Werkzeugkiste"-Knopfs**
