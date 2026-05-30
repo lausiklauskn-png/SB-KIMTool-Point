@@ -33,6 +33,13 @@ ein **ehrliches Modell/Playback** (kein Live-Bau); **`npm test` grün**; **keine
 personenbezogenen Daten**; **Offline-Tauglichkeit** (Libs lokal vendorn, kein CDN-Zwang);
 **Merge entscheidet Klaus**. `prefers-reduced-motion` bleibt respektiert.
 
+**Geltung (begrenzt, kein Dauerrecht):** Der Freibrief gilt **nur für diese Aufgabe/Sitzung**,
+für die Klaus ihn ausdrücklich gegeben hat. Er ist **nicht automatisch** auf spätere Sitzungen
+übertragbar und **läuft mit Abschluss der Aufgabe aus** — eine neue Sitzung braucht eine **neue,
+ausdrückliche Freigabe** von Klaus. **Aber:** Sobald Klaus ihn gibt, ist er **bindend und wird
+umgesetzt** (keine Rückfragen zur Gestaltung). Ohne ausdrücklichen Freibrief gilt wieder die
+normale „Plan-an-Klaus-zeigen"-Pflicht aus `CLAUDE.md`.
+
 ---
 
 ## Pflichtlektüre vor Start (vor allem anderen) — erst lesen, planen, dann bauen
