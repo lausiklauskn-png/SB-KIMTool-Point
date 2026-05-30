@@ -2,6 +2,21 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (I) — Truhe-Knopf zurückgebaut auf Original (Banner über dem Knopf)
+
+Klaus: die große Truhe-im-Knopf sieht nicht gut aus → **komplett zurück auf das ursprüngliche
+Design**. Alle drei Start-Karten wieder gleich: kleiner Banner oben über dem Knopf.
+
+- `index.html`: mittlere Karte ist wieder eine normale `.entry` mit `--art:banner-werkzeuge.png`
+  (kein `<img>`, keine `.entry--truhe`). Menschliche Texte bleiben.
+- `assets/style.css`: alle `.entry--truhe`/`.truhe-img`-Regeln entfernt (auch in den
+  Media-Queries) → exakt das Original-Karten-Verhalten.
+- `assets/img/truhe.png` gelöscht (nicht mehr gebraucht).
+- `assets/img/README.md`: alle drei Karten-Banner-Prompts vereint (Modell/Werkzeugkiste-Truhe/
+  Markt), je **1200×400 Querformat**, gleicher Steampunk-Stil. Werkzeugkiste-Banner zeigt die
+  Truhe als Centerpiece. Klaus generiert die drei Banner und schickt sie; dann einsetzen.
+- **Manual-Check:** wartet auf Klaus' Browser-Lauf. `npm test` 27/27.
+
 ## 2026-05-30 (H) — Truhe-Bild lädt nicht: verkleinert + als echtes <img>
 
 Klaus' Browser-Screenshot (Tablet, GitHub Pages live): mittlerer Knopf zeigte nur den
