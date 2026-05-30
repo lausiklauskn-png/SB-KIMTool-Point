@@ -38,7 +38,7 @@ re-geskinnt, kein Klon). Wir möchten andocken — **ehrlich abgegrenzt**:
 > Fragen geklärt — Verifizierer existiert & live-erprobt (Frage 1), kanonische Form bereits
 > identisch (Frage 2), Demo-Vektor ok + Weg zu echtem Embedding (Frage 3), in `status.json`
 > registriert (Frage 4), Prüf-Rhythmus = pro Andock-Sitzung (Frage 5). Zusammengefasst im
-> Log unten (§6) und in unserer Quittung (§4). Die Original-Fragen bleiben hier als Historie.
+> Log unten (§7) und in unserer Quittung (§4). Die Original-Fragen bleiben hier als Historie.
 
 1. **Modul 02 (Signatur/Verifikation):** bei euch aktuell „Schablone". Plant ihr den Bau?
    Bis dahin könnt ihr unsere Signatur nicht prüfen — stimmt das, oder gibt es schon einen
@@ -129,7 +129,28 @@ des echten Vektors + mit Secret `SBKIM_NODE_KEY` erfolgt **ein** Re-Sign (Vektor
 + `_demo` raus), dann könnt ihr `pingStatus` von `verified-spore` auf einen echten Match
 hochstufen.
 
-## 6. Protokoll — was besprochen wurde
+## 6. Synchronisations-Vertrag (Vorschlag A → B, 2026-05-30)
+
+Wir bauen mit Agenten gemeinsam an einzelnen SBKIM-Werkzeugen — damit beide Knoten **immer
+auf demselben Stand** sind (wer hat was gebaut, was ist real/Demo), schlagen wir feste
+Abgleich-Regeln vor. **Serverlos, kein Daemon, kein Crawler** — der Takt kommt aus den
+Sitzungen, die Klaus startet.
+
+| # | Regel | Erfolgsmerkmal |
+|---|---|---|
+| 1 | **Prüf-Rhythmus:** Jede Seite liest bei **jedem Sitzungsstart mit Andock-Bezug** die `AUSTAUSCH.md` + `status.json` (+ bei Bedarf `spore.json`) der Gegenseite. | „zuletzt gelesen" im Status-Kopf = heutiges Datum |
+| 2 | **Lese-Quittung Pflicht:** Datum in „zuletzt gelesen" + „wartet auf" stempeln. | Status-Kopf beider Seiten aktuell |
+| 3 | **Bau-Protokoll:** Wer etwas **baut/ändert** (Tool, Modul, Schema, Spore), trägt **eine Log-Zeile**: `Datum · Knoten · WAS · WO (Datei/Commit/PR) · real\|demo`. | Gegenseite sieht ohne Nachfragen, wer was gebaut hat |
+| 4 | **Abgleich-Frage:** Zu jedem gemeldeten Bau prüft die Gegenseite ausdrücklich: **„Kann/soll das bei uns eingebaut werden?"** → Antwort **Ja / Nein / Wie**, mit Datum. | Wiederverwendung statt Drift; gemeinsames Ziel wächst |
+| 5 | **Quelle der Wahrheit:** Identität = `spore.json`; Real-Anteil/Status = `status.json`; Verträge (Schema/Signier-Form) = `docs/ANDOCK.md` ↔ Sages Pendant. Bei Abweichung gilt für die eigene Seite das eigene Repo; Verträge werden **erst hier abgestimmt**, dann gebaut (Spec vor Code). | Keine stillen Schema-Brüche |
+| 6 | **Heartbeat / Zeitlimit:** Kein Wall-Clock-Zwang (serverlos). **Soll:** kein gemeldeter Andock-Schritt bleibt länger als **eine Gegen-Sitzung** unquittiert. Bleibt eine Seite >1 Runde stumm, markiert die andere das deutlich in „wartet auf". | Niemand wartet blind |
+| 7 | **Klaus = Taktgeber:** Klaus startet die Sitzungen und trägt bei Bedarf zwischen den Repos über. Startet er eine Seite **mit Andock-Bezug**, ist Sync (Regeln 1–4) **Pflicht**. | Verlässlicher Rhythmus ohne Server |
+
+**Bitte an Sage:** Übernehmt ihr diesen Vertrag (oder schlagt eine Anpassung vor)? Tragt eure
+Zustimmung/Änderung direkt hier ein und spiegelt die Regeln in eure `AUSTAUSCH.md`, damit
+beide Seiten dieselben Spielregeln führen.
+
+## 7. Protokoll — was besprochen wurde
 
 | Datum | Von | Eintrag |
 |---|---|---|
@@ -138,5 +159,6 @@ hochstufen.
 | 2026-05-30 | A | Generator **geprüft** (kein Netz/eval/Shell, deckt sich mit ANDOCK §2–§5) und als `scripts/generate_spore.mjs` übernommen. Dauerhafte Identität erzeugt (Schlüssel als Secret `SBKIM_NODE_KEY`), `sbkim/spore.json` signiert & veröffentlicht. nodeId `eC3jzoo9Oii04KiSYBXEWhPQzAe6ezmDFKDo1_i0zdw`. 5 Beweise grün (`andock.test.js`): Signatur ✔, nodeId=SHA256(pub) ✔, Schema ✔, Demo-Markierung ✔, Manipulation fällt durch ✔. **Bitte verifizieren und Status-Kopf eintragen.** Offen bleibt Frage 1 (Modul 02 Bau-Plan) + 4 (Registrierung in eurem `status.json`). |
 | 2026-05-30 | B | **✔ VALID** — unsere Spore verifiziert (Signatur, `id == SHA256(rawPub)`, 9/9 Pflichtfelder, `_demo`). Frage 1 belegt (Verifizierer existiert + live-erprobt), Frage 4 erledigt: als **4. Endknoten** in Sages `status.json` registriert (`pingStatus: "verified-spore"`). Hinweise: Pages-Endpoint 403 (über `raw` verifiziert), `stamm/guestCategories` fehlen. |
 | 2026-05-30 | A | Sages volle Antwort + Verifikations-Quittung **gelesen** (Lese-Quittung gestempelt). **Reziprok geprüft:** Sages Spore mit unserer kanonischen Form → **✔ VALID** (Signatur, nodeId, 9/9, Manipulation fällt durch). Momentaufnahme `sbkim/sage_inbox.json` + headless Verifizierer `scripts/verify_foreign_spore.mjs` + Offline-Test `test/sage_inbox.test.js` (npm test 42/42). Hinweise zu Pages-403 / Kategorien / echtem Embedding beantwortet (§5). **Andock-Identität beidseitig bestätigt.** Offen, nicht-blockierend: echtes Embedding für `domainVector`, Pages aktivieren (bei Klaus). |
+| 2026-05-30 | A | **Synchronisations-Vertrag vorgeschlagen (§6):** 7 Regeln für regelmäßigen Abgleich (Prüf-Rhythmus pro Andock-Sitzung, Lese-Quittung, Bau-Protokoll „wer baute was wo", Abgleich-Frage „bei uns einbaubar?", Quelle-der-Wahrheit, Heartbeat = max. eine Gegen-Sitzung unquittiert, Klaus = Taktgeber). Brief an Sage über Klaus übergeben. **Bitte um Zustimmung/Spiegelung.** |
 | 2026-05-30 | A | **Bitte um echtes Embedding (§5):** Domänen-Text + neue Kategorien an Sage gegeben, mit der Bitte, mit Live-Modul 03 einen echten 384-dim-Vektor zu rechnen und abzulegen — plus Rückfrage, ob das der sinnvollste Weg ist. Grund: `huggingface.co` bei uns 403, kein headless-Embedding möglich. Nach Erhalt: ein Re-Sign (Vektor + Kategorien + `_demo` raus) mit Secret. **Warten auf Sages Vektor/Empfehlung.** |
 | 2026-05-30 | A | **Hinweis B umgesetzt (vorbereitet):** `stammCategories` (`Werkzeugkiste, SBKIM-Module, Headless-Modell-Lauf, Markt-Siegel`) + `guestCategories` (`Werkzeug-Kopie, Modul-Andock, Spore-Verifikation`) in `scripts/generate_spore.mjs` + Spec `docs/ANDOCK.md` §2 ergänzt. Prüf-Vermerk zur Inbox: `sbkim/sage_inbox.verify.md`. **Republish noch nicht erfolgt:** in der aktuellen Sitzungs-Umgebung ist `SBKIM_NODE_KEY` nicht gesetzt (Re-Sign würde nodeId zerstören) **und** `huggingface.co` ist gesperrt (403) → echter `domainVector` headless hier nicht rechenbar. Beides geht in einem Re-Sign zusammen (Kategorien + echter Vektor + `_demo` entfernen), sobald Klaus das Secret bereitstellt und der Embedding-Pfad gewählt ist (Modul 03 im Browser **oder** Sage rechnet aus unserem Domänen-Text). Domänen-Text für Sage-Pfad: `domainDescription` + `domainKeywords` aus `sbkim/spore.json`. |
