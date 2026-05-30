@@ -149,6 +149,16 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   background: transparent; border: 1px solid var(--accent-dim); color: var(--accent);
   border-radius: 6px; padding: 0.3rem 0.6rem;
 }
+.tool .actions { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.tool .get {
+  cursor: pointer; text-decoration: none; text-align: center;
+  font-family: var(--mono); font-size: 0.75rem; font-weight: 700;
+  background: var(--accent); color: var(--bg); border: 1px solid var(--accent);
+  border-radius: 6px; padding: 0.32rem 0.7rem; flex: 1 1 auto;
+}
+.tool .get:hover { filter: brightness(1.08); }
+.tool .getnote { flex: 1 1 100%; margin: 0.1rem 0 0; font-size: 0.68rem; color: var(--muted); }
+.tool .getnote code { font-family: var(--mono); color: var(--accent); }
 
 /* --- Schicht 3: Marktplatz --- */
 .market { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }

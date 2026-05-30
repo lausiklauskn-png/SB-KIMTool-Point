@@ -22,7 +22,7 @@
     { "name": "Werkzeugkiste: Profi (10,11,12,14,18)", "status": "vorgebaut-schlummert", "hinweis": "Sybil-Abwehr-Module, schlummern bis Angriff" },
     { "name": "Statische Seite (3 Schichten, Playback von run.json)", "status": "real-browser-tauglich", "hinweis": "zeigt das Modell, fuehrt es nicht live aus" },
     { "name": "Marktplatz Schicht 3 (Saat = echte Live-Endknoten)", "status": "real-browser-tauglich", "hinweis": "Suche bewusst noch NICHT gebaut" },
-    { "name": "Werkzeug 01 Storage: echte, offline einbaubare Datei (web/tools/sbkim-storage.js)", "status": "real-browser-tauglich", "echt": true, "beleg": "npm test 16/16 gruen (In-Memory-Pfad)", "hinweis": "Point-eigene Umsetzung; IndexedDB-Pfad ungeprueft, wartet auf Klaus' Browser-Lauf. Die Seite bietet die Datei zum Kopieren/Laden an." },
+    { "name": "Werkzeug 01 Storage: echte, offline einbaubare Datei (web/tools/sbkim-storage.js)", "status": "real-browser-tauglich", "echt": true, "beleg": "test/storage.test.js prueft In-Memory-Pfad + API-Vertrag (9 Faelle, gruen); Suite gesamt 15 (6 Modell + 9 Storage). Per-Datei-Lauf belegt 6/6 und 9/9.", "hinweis": "Point-eigene Umsetzung; IndexedDB-Pfad ungeprueft, wartet auf Klaus' Browser-Lauf. Die Seite bietet die Datei zum Kopieren/Laden an." },
     { "name": "Weitere reife Module als echte Dateien kopieren/portieren", "status": "noch-nicht-gebaut", "hinweis": "Naechster Kandidat: 02 Spore (Browser-WebCrypto Ed25519). Sage-Quelldateien noch nicht beigestellt." },
     { "name": "Browser-Transport / Server-Zeh-Entscheidung", "status": "noch-nicht-gebaut", "hinweis": "offene Wand, bewusst vertagt" }
   ],

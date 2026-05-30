@@ -151,3 +151,39 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 - **Verwendung:** Werkzeug in den Container legen; als PWA ausliefern/kopieren.
 - **Einbau:** Nutzt Membran (15) als Außenhülle.
 - **Aktiviert durch:** Auslieferung eines selbstgebauten Tools.
+
+---
+
+## Echte, einbaubare Dateien (nicht nur Anzeige)
+
+Module mit dem JSON-Feld `datei` haben eine **echte, offline einbaubare Datei** in
+diesem Repo. Die Werkzeuge-Seite bietet dafür **„⧉ Code kopieren"** und **„⬇ Datei
+laden"** an (kein externer Abruf, kein Sage-Hotlink — die Datei wohnt hier). Module
+ohne `datei` zeigen bewusst **keinen** solchen Knopf — ehrlich statt leerer Versprechen.
+
+### 01 · Storage — `web/tools/sbkim-storage.js`
+
+Eine einzige, abhängigkeitsfreie Datei (klassisches `<script>`-Modul, UMD-Muster).
+**Browser:** IndexedDB (überlebt Neustart). **Headless/Node:** automatischer In-Memory-
+Fallback; `store.backend` zeigt `"indexeddb"` bzw. `"memory"`.
+
+```html
+<script src="sbkim-storage.js"></script>
+<script>
+  const store = await SBKIMStorage.open("sbkim");
+  await store.set("spore", { nodeId: "…" });
+  const spore = await store.get("spore");   // -> {nodeId:"…"} oder null
+</script>
+```
+
+**Ehrlichkeit:** In-Memory-Pfad + API sind durch `test/storage.test.js` belegt (9/9);
+der **IndexedDB-Pfad ist ungeprüft — wartet auf Klaus' Browser-Lauf**.
+
+## Truhe ↔ `werkzeugkiste.json` (Mapping-Hinweis)
+
+`werkzeugkiste.json` bleibt die **maschinenlesbare Quelle** (id/name/stufe/sage_status/
+point_status/was/nutzen/verwendung/einbau/aktiviert_durch, optional `datei`/
+`point_hinweis`). Eine evtl. reichere „Truhe"-Ansicht (offener Draft-PR #11) trägt eine
+eigene inline Tool-Liste; **wer beide zusammenführt, schreibt zuerst den Mapping-Vertrag
+hier fest, dann Code** (Spec vor Code). Tier-Namen nicht stillschweigend mischen
+(`basic/pro/profi`).

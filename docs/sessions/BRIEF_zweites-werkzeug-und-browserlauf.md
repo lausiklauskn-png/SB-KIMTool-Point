@@ -3,7 +3,7 @@
 Stand: 2026-05-30 · für eine Nachfolgesitzung · Branch-Vorschlag `claude/zweites-werkzeug`
 
 > In einem Satz: Das erste echte, offline einbaubare Werkzeug (01 Storage) steht und ist
-> headless bewiesen (`npm test` 16/16) — jetzt Klaus' Browser-Lauf bestätigen, das nächste
+> headless bewiesen (Suite 15/15: 6 Modell + 9 Storage) — jetzt Klaus' Browser-Lauf bestätigen, das nächste
 > reife Modul real liefern (Vorschlag 02 Spore als Browser-WebCrypto-Ed25519) und die
 > offene Truhe-PR #11 entscheiden.
 
@@ -43,7 +43,7 @@ prefers-reduced-motion, eigene Identität) gelten immer.
 - Auf `main` (gemerged): vier Seiten, Premium-Optik, Modell-Animation, npm test 8/8.
 - Dieser Branch `claude/truhe-doppelstatus-awegv` (Draft-PR neu):
   - **Erstes echtes Werkzeug** `web/tools/sbkim-storage.js` (Modul 01) — offline, eine
-    Datei, Browser=IndexedDB / headless=In-Memory. `npm test` **16/16 grün**.
+    Datei, Browser=IndexedDB / headless=In-Memory. Suite **15/15 grün** (6 Modell + 9 Storage).
   - Seite liefert die Datei aus: **„Code kopieren" + „Datei laden"** für Module mit Feld
     `datei` (`assets/app.js`/`style.css`). Doppel-Status (Sage/Point) unverändert sichtbar.
   - `werkzeugkiste.json`/`status.json`/`docs/WERKZEUGE.md` ehrlich nachgezogen.

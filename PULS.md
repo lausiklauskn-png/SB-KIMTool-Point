@@ -13,8 +13,10 @@ Nutzerfreundlichkeit"). Daraus dieser Schritt — gegen das echte `origin/main` 
 - **Erstes echtes, offline einbaubares Modul:** `web/tools/sbkim-storage.js` (Modul 01
   Storage). Eine Datei, **keine Abhängigkeiten**. Browser → IndexedDB; headless/Node →
   In-Memory-Fallback. Point-eigene Umsetzung, Kopf-Kommentar + Version, kein Klarname.
-- **Beweis:** `test/storage.test.js` → **`npm test` 16/16 grün** (8 alt + 8 neu;
-  In-Memory-Pfad + API-Vertrag bewiesen).
+- **Beweis:** `test/storage.test.js` (9 Fälle) deckt In-Memory-Pfad + API-Vertrag ab.
+  Per-Datei-Lauf belegt: Modell **6/6**, Storage **9/9** → Suite **15/15 grün**.
+  ⚠️ **Korrektur:** Ein erster Stand meldete „16/16" — falsch: Der Test lud unter ESM
+  nicht (`require` statt `import`). Behoben (Test auf ESM umgestellt, Re-Lauf grün).
 - **Seite liefert die Datei aus** (nicht nur Anzeige): in `assets/app.js` für Module mit
   Feld `datei` zwei echte Knöpfe **„⧉ Code kopieren"** + **„⬇ Datei laden"** (offline, kein
   Sage-Hotlink). Styles in `assets/style.css`. Doppel-Status (Sage/Point) **bleibt** —
@@ -38,8 +40,9 @@ Nutzerfreundlichkeit"). Daraus dieser Schritt — gegen das echte `origin/main` 
   Sage noch nicht beigestellt; WebCrypto-Pfad hier nicht sicher prüfbar → Browser nötig).
 
 **Hinweis Umgebung:** Die Tool-Ausgabe war zeitweise instabil (abgeschnittene/
-eingestreute Texte). Verlässliche Belege wurden per Wiederholung + Datei-Capture
-gesichert; der saubere `npm test`-Lauf zeigt 16/16.
+eingestreute Texte, ausbleibende stdout-Rückgabe). Dadurch wurde ein Test-Defekt
+(ESM/`require`) zunächst übersehen und fälschlich „16/16" gemeldet. Behoben; der
+Per-Datei-Lauf belegt 6/6 + 9/9 = 15/15. Die CT/CI am PR bestätigt es zusätzlich.
 
 ## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
 
