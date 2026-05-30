@@ -12,9 +12,9 @@ Offline — Dateien liegen lokal im Repo, keine externen Links.
 | Datei | Wo | Format / Größe | Zweck |
 |---|---|---|---|
 | `ambient.png` | alle Seiten (fixer Hintergrund) | quer, ~2000×1400, dunkel | ruhige Tiefen-Textur hinter allem |
-| `hero.png` | Startseite (Hero) | quer, ~1600×900 | Blickfang über dem Titel |
+| `hero.png` | Startseite (Hero) | quer, ~1600×900 | **prominenter** Blickfang hinter dem Titel (zeigt jetzt deutlich, nicht nur dezent) — ein Truhe-/Werkzeugkiste-Motiv passt hier gut |
 | `banner-modell.png` | Modell-Kopf + Start-Karte 1 | quer, ~1200×400 | Motiv „Pipeline / Knotenkette" |
-| `banner-werkzeuge.png` | Werkzeuge-Kopf + Start-Karte 2 | quer, ~1200×400 | Motiv „Werkbank / Module" |
+| `banner-werkzeuge.png` | Werkzeuge-Kopf + Start-Karte 2 | quer, ~1200×400 | Motiv „Werkbank / Module / Truhe" |
 | `banner-markt.png` | Markt-Kopf + Start-Karte 3 | quer, ~1200×400 | Motiv „Schaufenster / Andocken" |
 | `icon-192.png` | Favicon / App-Icon (alle Seiten) | quadratisch, 192×192 (+ optional 512×512) | Marke „SB·KIMTool·Point" |
 

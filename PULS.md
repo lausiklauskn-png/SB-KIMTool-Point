@@ -2,6 +2,23 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (E) — Startseiten-Hero als prominenter Blickfang (Truhe-Bild)
+
+Klaus will ein Truhe-Bild auf der Startseite. Befund: **beide Bild-Slots existierten schon**
+(Premium-#10, mit Gradient-Fallback) — `banner-werkzeuge.png` (Werkzeuge-Karte) und `hero.png`
+(Startseiten-Hero, per CSS verdrahtet). Der Hero zeigte das Bild aber nur als **dezenten,
+stark abgedunkelten Backdrop**. Auf Klaus' Wunsch „groß oben":
+
+- `assets/style.css`: `.hero` höher (`min-height: 248px`), `.hero::before`-Veil von einem
+  flachen 0.86-Schleier auf einen **vertikalen Verlauf** umgestellt (oben 0.28 → unten 0.82):
+  Bild oben **deutlich sichtbar**, Titel unten lesbar. Titel/Absatz mit dunklem Text-Shadow
+  für Kontrast. **Fallback bleibt** (ohne Bild nur Glow). `prefers-reduced-motion` unberührt.
+- `assets/img/README.md`: Hinweis, dass der Hero jetzt prominent zeigt und ein Truhe-Motiv passt.
+- **Drop-in, kein Code mehr nötig:** Klaus legt `assets/img/hero.png` (Truhe, ~1600×900) und/oder
+  `assets/img/banner-werkzeuge.png` (~1200×400) ab → erscheinen automatisch.
+- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf (Startseite mit/ohne hero.png).
+  `npm test` unverändert 27/27 (reine Optik, Logik unberührt).
+
 ## 2026-05-30 (D) — Zwei echte Werkzeuge (01 Storage + 02 Spore) sauber auf Premium-main integriert
 
 Diese Sitzung lieferte das **zweite** echte Werkzeug (02 Spore) und integrierte die ganze
