@@ -1,11 +1,37 @@
-# BRIEF — Lebendiges Agenten-Board + Ingenieur-Rolle (Schicht 1 „Modell")
+# BRIEF — Lebendiges Agenten-Board + Ingenieur-Rolle + Gestaltungs-Freibrief (Schicht 1 „Modell")
 
 Stand: 2026-05-30 · für eine **Nachfolgesitzung** · Branch-Vorschlag `claude/agenten-animation`
 
 > **Was diese Sitzung tun soll, in einem Satz:** Die Modell-Seite (`modell.html`) von
-> einem statischen Ticker in eine **lebendige, sofort verständliche Animation** verwandeln,
-> in der man sieht, wie Agenten Ideen liefern, bauen, prüfen, angreifen und sterben — und
-> dafür eine **neue Rolle „Ingenieur"** ins Modell aufnehmen.
+> einem statischen Ticker in eine **lebendige, sofort verständliche, herausragend
+> gestaltete Animation** verwandeln, in der man sieht, wie Agenten Ideen liefern, bauen,
+> prüfen, angreifen und sterben — und dafür eine **neue Rolle „Ingenieur"** ins Modell aufnehmen.
+
+---
+
+## Gestaltungs-Freibrief — volle Freiheit (von Klaus, 2026-05-30)
+
+Diese Sitzung hat **volle gestalterische Freiheit** und darf **ohne Nachfrage** entscheiden,
+solange die unten genannten Leitplanken (Teil 0) gewahrt bleiben:
+
+- **Keine Erlaubnis-Fragen zur Gestaltung.** Design, Layout, Farben, Bewegung, Effekte
+  entscheidet die Sitzung selbst. (Die „Plan-an-Klaus-zeigen"-Pflicht aus `CLAUDE.md`
+  entfällt **für reine Design-/UX-Entscheidungen** — sie gilt weiter für **Datenverträge,
+  Modell-Logik und Sicherheits-Module**.)
+- **Mutig gestalten erlaubt und erwünscht:** bewegte Elemente, Effekte, Hologramm-/Glow-/
+  3D-/Partikel-Optik — gern auf dem Niveau ausgezeichneter, moderner Seiten. Nicht sparen.
+- **Voller Umbau erlaubt.** Die Seite darf vollständig neu gestaltet werden; wir sind am
+  Anfang, das ist bewusst leicht änderbar. Auch die anderen Seiten dürfen mitziehen, wenn
+  es das Gesamtbild stärkt.
+- **Iterieren bis selbst zufrieden.** Die Sitzung arbeitet so lange an der Seite, bis sie
+  mit dem Ergebnis selbst zufrieden ist — kein vorzeitiges „reicht erstmal".
+- **Unter-Agenten erlaubt.** Die Sitzung darf Agenten für Teilaufgaben einsetzen (Design,
+  Bau, Recherche von Effekt-Mustern, Prüfung) und deren Ergebnisse zusammenführen.
+
+**Unverhandelbar (auch im Freibrief):** Funktion bleibt erhalten oder wird besser; es bleibt
+ein **ehrliches Modell/Playback** (kein Live-Bau); **`npm test` grün**; **keine
+personenbezogenen Daten**; **Offline-Tauglichkeit** (Libs lokal vendorn, kein CDN-Zwang);
+**Merge entscheidet Klaus**. `prefers-reduced-motion` bleibt respektiert.
 
 ---
 
@@ -16,8 +42,9 @@ Siehe `CLAUDE.md` → „Dokumentations- & Lesepflicht". In dieser Reihenfolge l
 1. `CLAUDE.md` · 2. `PULS.md` · 3. **dieser Brief** · 4. `status.json` ·
 5. `docs/BAUTRUPP.md` + `docs/MODELL.md` + der Code in `sandbox/` und `assets/app.js`.
 
-**Nicht sofort bauen:** erst Gesamtüberblick (Code lesen + Plan), Plan kurz an Klaus
-zeigen, Rückmeldung abwarten. Offene PRs vorher sichten.
+**Nicht sofort bauen:** erst Gesamtüberblick (Code lesen + Plan). Offene PRs vorher sichten.
+Für **Datenverträge/Modell-Logik/Sicherheit** den Plan kurz an Klaus zeigen; für **reine
+Design-/UX-Gestaltung** gilt der Gestaltungs-Freibrief — **ohne Rückfrage** loslegen.
 
 ---
 
@@ -99,14 +126,18 @@ Unter der Animation eine **Karte zum aktuell aktiven Objekt**: Titel, `kind`
 handelt", aktueller Status (Entwurf → gebaut → geprüft → graduiert / verworfen) und —
 falls graduiert — ein **Download/Export-Knopf** (Teil D).
 
-### 2.5 Design-Inspiration (Muster, **nicht** 1:1 kopieren)
-Moderne Agenten-/Pipeline-Visualisierungen als Vorbild, ins eigene Thema übersetzt:
+### 2.5 Design-Inspiration (Muster, **nicht** 1:1 kopieren) — siehe Gestaltungs-Freibrief
+Moderne, ausgezeichnete Agenten-/Pipeline-Visualisierungen als Vorbild, ins eigene Thema
+übersetzt. Mutig sein ist ausdrücklich erlaubt (Freibrief):
 - Knoten-Graph mit **pulsierenden Kanten** und wandernden Daten-Partikeln (Flow).
-- Sanfte **Glow/Neon-Akzente** auf dunklem Grund (unser Teal), Status-Farbverläufe.
+- **Glow/Neon-, Hologramm-, 3D-/Tiefen-Effekte** auf dunklem Grund (unser Teal),
+  Status-Farbverläufe; gern lebendig und auffällig.
 - Mikro-Animationen bei Zustandswechsel (Aufleuchten, Kollaps bei Apoptose).
-- Optional dezenter Hintergrund (Partikel/Gitter), der nicht vom Geschehen ablenkt.
-Bleibt zugänglich auf Klaus' Tablet (kein Performance-Fresser; `prefers-reduced-motion`
-respektieren — Abschalt-/Ruhe-Variante anbieten).
+- Atmosphärischer Hintergrund (Partikel/Gitter/Tiefe), der das Geschehen rahmt, nicht erschlägt.
+- Technik frei wählbar: **CSS, SVG, Canvas, WebGL** — bevorzugt ohne Abhängigkeit; eine Lib
+  nur, wenn sie das Ergebnis klar hebt, dann **lokal vendorn** (kein CDN, Offline bleibt).
+Bleibt zugänglich auf Klaus' Tablet (Performance im Blick; `prefers-reduced-motion`
+respektieren — Ruhe-/Abschalt-Variante anbieten).
 
 ---
 
