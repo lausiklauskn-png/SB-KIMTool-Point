@@ -10,8 +10,8 @@
   "module": [
     {
       "id": "02", "name": "Spore", "stufe": "basic",
-      "sage_status": "code-stub", "point_status": "kopiert · headless getestet",
-      "point_hinweis": "Echte offline-Datei web/tools/sbkim-spore.js (Point-eigene Umsetzung). Ed25519 ueber WebCrypto (crypto.subtle); Sign/Verify per npm test bewiesen. WEBCRYPTO-ANFORDERUNG: Ed25519 ist jung — aeltere Browser koennen es evtl. nicht; isSupported() meldet das ehrlich statt still zu brechen. Browser-Pfad ungeprueft (wartet auf Klaus' Browser-Lauf).",
+      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-spore.js (1:1 aus Sage-Protokol/src/modules/02_spore.js, Multi-Identitaet Bau 02.Y). Ed25519 ueber WebCrypto; persistiert ueber Modul 01 (window.SbkimStorage). Headless: Laden + API-Registrierung per npm test bewiesen; voller Browser-Pfad ungeprueft (wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-spore.js",
       "was": "Kryptografische Identitaet eines Knotens (Ed25519-Schluesselpaar, node_id = SHA-256 des oeffentlichen Schluessels).",
       "nutzen": "Ohne Identitaet keine Teilnahme — jede Aussage/Stimme ist signiert und nachpruefbar.",
@@ -21,8 +21,8 @@
     },
     {
       "id": "01", "name": "Storage", "stufe": "basic",
-      "sage_status": "code-stub", "point_status": "kopiert · headless getestet",
-      "point_hinweis": "Echte offline-Datei web/tools/sbkim-storage.js (Point-eigene Umsetzung). In-Memory-Pfad per npm test bewiesen; IndexedDB-Pfad laeuft im Browser, ungeprueft (wartet auf Klaus' Browser-Lauf).",
+      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-storage.js (1:1 aus Sage-Protokol/src/modules/01_storage.js). IndexedDB-Wrapper fuer alle sbkim_* Stores. Headless: Laden + API-Registrierung per npm test bewiesen; IndexedDB-Pfad laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-storage.js",
       "was": "Speicher-Wrapper (im Browser IndexedDB, headless ein In-Memory-Mock) fuer alle sbkim_* Daten.",
       "nutzen": "Identitaet, Nachbarn und Zustand ueberleben einen Neustart.",
@@ -41,7 +41,9 @@
     },
     {
       "id": "03", "name": "Embedding", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-embedding.js (1:1 aus Sage-Protokol/src/modules/03_embedding.js, in Sage 'fertig', Live-Beweis 2026-05-16). NETZ-ANFORDERUNG: laedt das Modell Xenova/multilingual-e5-small per CDN (transformers.js) — NICHT offline. Headless: Laden + API-Registrierung bewiesen; Vektor-Erzeugung laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
+      "datei": "web/tools/sbkim-embedding.js",
       "was": "Wandelt 'das kann ich'-Texte in 384-dim Vektoren (Xenova/multilingual-e5-small).",
       "nutzen": "Maschinell vergleichbar machen, was eine PWA anbietet/sucht — Grundlage des Findens.",
       "verwendung": "Text rein, Vektor raus; Vektor an Match (04) geben.",
@@ -50,7 +52,9 @@
     },
     {
       "id": "04", "name": "Match", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert · headless getestet",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-match.js (1:1 aus Sage-Protokol/src/modules/04_match.js, in Sage 'fertig', Sichttest 5/5 gruen). Der Kern match()/isAboveProviderThreshold/matchDimensions ist eine reine OFFLINE-Funktion und per npm test voll bewiesen (Schwellen 0.80/0.60). Optionaler explainMatchLLM-Pfad ruft die Anthropic-API (braucht Netz+Key).",
+      "datei": "web/tools/sbkim-match.js",
       "was": "Cosine-Aehnlichkeit ueber Embedding-Vektoren (Schwelle PROVIDER_MIN_MATCH = 0.80).",
       "nutzen": "Findet passende Anbieter zu einer Anfrage, ohne zentrale Suche.",
       "verwendung": "Zwei Vektoren vergleichen; ab 0.80 gilt es als Treffer.",
@@ -59,7 +63,9 @@
     },
     {
       "id": "05", "name": "Anastomose (Handshake)", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-anastomose.js (1:1 aus Sage-Protokol/src/modules/05_anastomose.js, in Sage 'fertig', Cross-Node-Beweis 2026-05-16). Signierter bidirektionaler Handshake ueber WebCrypto; Transport per HTTP oder MessageChannel. Headless: Laden + API-Registrierung bewiesen; der echte Handshake laeuft erst im Browser zwischen zwei Knoten (ungeprueft, wartet auf Klaus' Browser-Lauf).",
+      "datei": "web/tools/sbkim-anastomose.js",
       "was": "Verbindungsaufbau zwischen zwei Knoten (Hyphen-Verschmelzung).",
       "nutzen": "Aus einem Treffer wird eine echte, beidseitig bestaetigte Verbindung.",
       "verwendung": "Nach einem Match anstossen; beide Seiten signieren den Handschlag.",

@@ -40,6 +40,9 @@ const POINT = {
 const TOOL_FILES = {
   "01": "web/tools/sbkim-storage.js",
   "02": "web/tools/sbkim-spore.js",
+  "03": "web/tools/sbkim-embedding.js",
+  "04": "web/tools/sbkim-match.js",
+  "05": "web/tools/sbkim-anastomose.js",
 };
 
 async function renderWerkzeuge() {

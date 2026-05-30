@@ -18,7 +18,7 @@ Der **Tool-Point** für das SBKIM-Protokoll: eine eigenständige, neutrale Heima
 
 ```bash
 npm run demo   # spielt das Modell einmal durch, druckt den Bericht, schreibt web/data/run.json
-npm test       # headless Smoke-Test (Beweis) — 27 Prüfungen (Modell + Werkzeuge 01/02)
+npm test       # headless Smoke-Test (Beweis) — 16 Prüfungen (Modell + SBKIM-Module 01–05)
 ```
 
 Keine Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto` bzw. WebCrypto,
@@ -50,7 +50,7 @@ sandbox/        # das headless Modell (reiner Node, keine Deps)
 test/           # Smoke-Test (der Beweis)
 docs/           # HERKUNFT, IMMUNSCHICHT, BAUTRUPP, WERKZEUGE, STUFEN, MODELL
 web/data/       # run.json (aufgezeichneter Lauf), marktplatz.json, nodes.json
-web/tools/      # echte, offline einbaubare Werkzeug-Dateien (01 Storage, 02 Spore)
+web/tools/      # echte SBKIM-Module, 1:1 aus Sage kopiert (01 Storage, 02 Spore, 03 Embedding, 04 Match, 05 Anastomose)
 index.html      # Startseite mit drei Knöpfen
 modell.html     # Schicht 1 (Playback, kein Live-Node)
 werkzeuge.html  # Schicht 2 (Werkzeugkiste)
