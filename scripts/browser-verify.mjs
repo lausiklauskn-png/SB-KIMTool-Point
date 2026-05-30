@@ -96,6 +96,25 @@ async function main() {
       errors.push(t);
     });
 
+    // 0) Startseite: Puls-Ring + Agenten aus status.json (selbst-aktualisierend)
+    await page.goto(`${base}/index.html`, { waitUntil: "networkidle" });
+    await page.waitForSelector("#agenten-liste .agent", { timeout: 5000 });
+    const agenten = await page.locator("#agenten-liste .agent").count();
+    const lebt = await page.locator("#agenten-liste .agent.alive").count();
+    // Erwarteter Real-Anteil aus derselben status.json, die die Seite lädt.
+    const st = JSON.parse(await readFile(join(ROOT, "status.json"), "utf8"));
+    const erwartet = Math.round((100 * st.komponenten.filter((k) => k.echt === true).length) / st.komponenten.length);
+    // Auf das Ende der Hochzähl-Animation warten (1200ms + Puffer).
+    await page.waitForTimeout(1600);
+    const ringText = (await page.locator("#ring-num").textContent()) || "";
+    ok("Startseite: Agenten-Liste aus status.json gefüllt", agenten === st.komponenten.length, `Agenten: ${agenten}/${st.komponenten.length}`);
+    ok("Startseite: 'lebt'-Agenten = echte Komponenten", lebt === st.komponenten.filter((k) => k.echt === true).length, `lebt: ${lebt}`);
+    ok("Startseite: Ring zeigt den EHRLICHEN Real-Anteil", ringText.trim() === erwartet + "%", `Ring: ${ringText} · erwartet ${erwartet}%`);
+    // Knoten in der Mitte klappt die Erklärung auf
+    await page.click("#ring-knoten");
+    const erklOffen = await page.locator("#puls-erkl").isVisible();
+    ok("Startseite: Knoten-Symbol klappt Erklärung auf", erklOffen);
+
     // 1) Werkzeuge-Seite laden, Werkstatt-Knopf klicken
     await page.goto(`${base}/werkzeuge.html`, { waitUntil: "networkidle" });
     await page.click("#werkstatt-run");

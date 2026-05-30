@@ -2,6 +2,27 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (R) — Startseiten-Puls: „Was ist real, was ist Demo?" + Agenten in Aktion
+
+Klaus' Wunsch (Sage-Vorbild): das selbst-aktualisierende Real/Demo-Tool oben auf der
+Hauptseite, mit erklärendem Symbol in der Mitte + den Agenten/Mitarbeitern in Aktion.
+
+- **`index.html` `<section id="puls">`:** Real-Anteil-RING (grüner Bogen = echte/alle
+  Komponenten aus status.json, selbst-aktualisierend) + **eigenes re-geskinntes
+  Knoten-Glyph** in der Mitte (kein Pilz-Klon, Verfassung) das die Erklärung auf-/zuklappt
+  + **„Agenten in Aktion"**-Liste: jede status.json-Komponente ein Mitarbeiter mit
+  Lebt/Demo-Lampe (✓ lebt = echt:true, ◐ Demo = schlummert/zeigt).
+- **`app.js` `renderPuls()`:** zählt echt÷alle EHRLICH (aktuell 5/12 = 42 %), animiert Ring
+  + Zahl, baut Agenten-Liste, Klick-Toggle für Erklär-Box. Quelle = dieselbe status.json.
+- **`style.css`:** `.puls/.ring-*/.agent*` an die neutrale Identität angelehnt.
+- **Beweis:** `npm run verify` neue Startseiten-Proben — Ring 42 % == erwartet 42 % (gegen
+  status.json gegengerechnet), 12 Agenten gelistet, 5 „lebt", Knoten klappt Erklärung auf.
+  **16/16 grün.** Headless **34/34**. (Anekdote: Test las anfangs 29 % mitten in der
+  Hochzähl-Animation — abgehärtet auf Animationsende, Zahl ist korrekt 42 %.)
+- **Ehrlich-Effekt:** Der Ring wächst automatisch, sobald eine Komponente echt:true wird —
+  kein Hand-Tuning, gezählte Wahrheit.
+- **Manual-Check:** Optik im Browser ungeprüft durch Klaus; Funktion via verify belegt.
+
 ## 2026-05-30 (Q) — Protokoll-Lauf: die ganze Kette auf einmal (End-to-End)
 
 Logisch bester Schritt (Embedding-Vendoring verworfen: Modell-Host 403 + ~100 MB gehört
