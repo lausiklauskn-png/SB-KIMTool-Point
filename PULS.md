@@ -1,6 +1,45 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-29 · Branch `claude/sbkimtool-founding-TXRdc`
+Stand: 2026-05-30 · Branch `claude/truhe-doppelstatus-awegv`
+
+## 2026-05-30 (C) — Erstes echtes Werkzeug zum Einbauen: 01 Storage
+
+Klaus' Steuerung: „der Nutzer will etwas von der Seite **in sein System einbauen**, nicht
+nur schön anzusehen" + Entscheidungs-Freibrief für (b)/(c) („nach Sinn, Logik,
+Nutzerfreundlichkeit"). Daraus dieser Schritt — gegen das echte `origin/main` gearbeitet,
+**nicht** auf dem ungemergten Truhe-PR #11 aufgebaut.
+
+**Getan:**
+- **Erstes echtes, offline einbaubares Modul:** `web/tools/sbkim-storage.js` (Modul 01
+  Storage). Eine Datei, **keine Abhängigkeiten**. Browser → IndexedDB; headless/Node →
+  In-Memory-Fallback. Point-eigene Umsetzung, Kopf-Kommentar + Version, kein Klarname.
+- **Beweis:** `test/storage.test.js` → **`npm test` 16/16 grün** (8 alt + 8 neu;
+  In-Memory-Pfad + API-Vertrag bewiesen).
+- **Seite liefert die Datei aus** (nicht nur Anzeige): in `assets/app.js` für Module mit
+  Feld `datei` zwei echte Knöpfe **„⧉ Code kopieren"** + **„⬇ Datei laden"** (offline, kein
+  Sage-Hotlink). Styles in `assets/style.css`. Doppel-Status (Sage/Point) **bleibt** —
+  er war auf `main` nie weg (nur die Truhe in #11 hatte ihn entfernt).
+- **Ehrlich nachgezogen:** `werkzeugkiste.json` (01 `point_status` „kopiert · headless
+  getestet" + `point_hinweis` + `datei`), `status.json` (Real-Anteil ~22 %, neue
+  Komponente), `docs/WERKZEUGE.md` (Modul 01 dokumentiert + Truhe↔JSON-Mapping-Hinweis).
+
+**Offen / wartet:**
+- **Browser-Sichttest aller vier Seiten + die neuen Knöpfe — ungeprüft, wartet auf Klaus.**
+  Der **IndexedDB-Pfad** von 01 ist ebenfalls erst im Browser belegbar.
+- **GitHub Pages:** Klaus wünscht Aktivierung auf `main`. Lässt sich **nicht** per API
+  hier schalten → Klaus klickt: Repo → **Settings → Pages → Source: „Deploy from a
+  branch" → Branch `main` / `/ (root)` → Save**. Danach Hard-Reload (Strg+Shift+R).
+- **PR #11 (Truhe):** Draft, **HOLD — Merge entscheidet Klaus**. Überschneidung: #11
+  ersetzt `werkzeuge.html` komplett und entfernt den Doppel-Status; dieser Branch
+  verbessert die **bestehende** `werkzeuge.html`/`app.js`. Bei Merge zuerst entscheiden,
+  welche Werkzeuge-Ansicht gilt; die echte Datei + der Liefer-Mechanismus sind in beide
+  übertragbar.
+- **Nächstes echtes Modul:** 02 Spore als Browser-WebCrypto-Ed25519 (Quelldateien aus
+  Sage noch nicht beigestellt; WebCrypto-Pfad hier nicht sicher prüfbar → Browser nötig).
+
+**Hinweis Umgebung:** Die Tool-Ausgabe war zeitweise instabil (abgeschnittene/
+eingestreute Texte). Verlässliche Belege wurden per Wiederholung + Datei-Capture
+gesichert; der saubere `npm test`-Lauf zeigt 16/16.
 
 ## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
 

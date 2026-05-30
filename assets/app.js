@@ -82,6 +82,13 @@ const STUFEN = [
   ["profi", "Profi"],
 ];
 
+// Modules whose REAL, offline, copy-paste-able file already lives in this repo.
+// Only these get the "copy code / download file" actions — honest: no fake button
+// for modules that are not actually here yet.
+const TOOL_FILES = {
+  "01": "web/tools/sbkim-storage.js",
+};
+
 const SAGE_BADGE = {
   fertig: ["fertig", "Sage: fertig ✅"],
   stub: ["stub", "Sage: stub ◐"],
@@ -128,6 +135,29 @@ async function renderWerkzeuge() {
         navigator.clipboard?.writeText(txt);
         el.querySelector(".copy").textContent = "kopiert ✓";
       });
+
+      // Real, offline file present? Offer "copy code" + "download file".
+      const file = TOOL_FILES[m.id];
+      if (file) {
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        actions.innerHTML = `
+          <button class="get copy-code">⧉ Code kopieren</button>
+          <a class="get download" href="${file}" download>⬇ Datei laden</a>
+          <p class="getnote">Echte, offline einbaubare Datei aus diesem Repo (<code>${file}</code>).</p>`;
+        actions.querySelector(".copy-code").addEventListener("click", async (ev) => {
+          const btn = ev.currentTarget;
+          try {
+            const code = await (await fetch(file, { cache: "no-store" })).text();
+            await navigator.clipboard?.writeText(code);
+            btn.textContent = "Code kopiert ✓";
+          } catch {
+            btn.textContent = "Fehler — Datei laden";
+          }
+        });
+        el.appendChild(actions);
+      }
+
       grid.appendChild(el);
     }
   }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-29",
+  "lastUpdated": "2026-05-30",
   "repo": "SB-KIMTool-Point",
   "protocolVersion": "0.1",
   "prinzip": "Ehrlicher Real-Anteil (analog Sage 'X % real'). Trennt klar, was echt browser-tauglich ist, was nur Modell/Demo ist und was in Sage reif aber hier noch nicht eingebaut wurde.",
@@ -22,8 +22,9 @@
     { "name": "Werkzeugkiste: Profi (10,11,12,14,18)", "status": "vorgebaut-schlummert", "hinweis": "Sybil-Abwehr-Module, schlummern bis Angriff" },
     { "name": "Statische Seite (3 Schichten, Playback von run.json)", "status": "real-browser-tauglich", "hinweis": "zeigt das Modell, fuehrt es nicht live aus" },
     { "name": "Marktplatz Schicht 3 (Saat = echte Live-Endknoten)", "status": "real-browser-tauglich", "hinweis": "Suche bewusst noch NICHT gebaut" },
-    { "name": "Reife Module tatsaechlich aus Sage kopieren", "status": "noch-nicht-gebaut" },
+    { "name": "Werkzeug 01 Storage: echte, offline einbaubare Datei (web/tools/sbkim-storage.js)", "status": "real-browser-tauglich", "echt": true, "beleg": "npm test 16/16 gruen (In-Memory-Pfad)", "hinweis": "Point-eigene Umsetzung; IndexedDB-Pfad ungeprueft, wartet auf Klaus' Browser-Lauf. Die Seite bietet die Datei zum Kopieren/Laden an." },
+    { "name": "Weitere reife Module als echte Dateien kopieren/portieren", "status": "noch-nicht-gebaut", "hinweis": "Naechster Kandidat: 02 Spore (Browser-WebCrypto Ed25519). Sage-Quelldateien noch nicht beigestellt." },
     { "name": "Browser-Transport / Server-Zeh-Entscheidung", "status": "noch-nicht-gebaut", "hinweis": "offene Wand, bewusst vertagt" }
   ],
-  "real_anteil_geschaetzt": "ca. 20% (lauffaehiges, getestetes Modell + statische Seite; Werkzeugkiste verlinkt reife Sage-Module, die hier noch nicht kopiert sind)"
+  "real_anteil_geschaetzt": "ca. 22% (lauffaehiges, getestetes Modell + statische Seite; erstes echtes Werkzeug — 01 Storage — als offline einbaubare Datei kopiert und headless getestet; weitere reife Sage-Module hier noch nicht kopiert)"
 }
