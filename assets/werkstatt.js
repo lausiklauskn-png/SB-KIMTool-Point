@@ -121,6 +121,75 @@
       ["init", "requestHeterokaryosis", "receiveHeterokaryosis"], "tauscht Daten mit Geschwister-Knoten.");
   }
 
+  // ---- Live-Match: zwei "das kann ich"-Profile -> Treffer ------------------
+  // Der echte Pfad: 03 Embedding (Sprachmodell per CDN) wandelt Text in Vektoren,
+  // 04 Match misst die Passung. Das Modell braucht NETZ und laeuft echt erst in
+  // Klaus' Browser. Wo es nicht bereit ist (Container/offline), nutzen wir einen
+  // DETERMINISTISCHEN Demo-Vektor (klar markiert) — kein vorgetaeuschtes Embedding.
+  //
+  // Demo-Vektor: einfacher Wort-Hash auf 384 Dimensionen, L2-normalisiert. Genug,
+  // damit aehnliche Texte aehnlicher sind als verschiedene — ehrlich als Demo,
+  // NICHT als das echte multilingual-e5-small ausgegeben.
+  function demoVector(text) {
+    var v = new Float32Array(384);
+    var worte = String(text).toLowerCase().split(/[^a-zäöüß0-9]+/).filter(Boolean);
+    for (var i = 0; i < worte.length; i++) {
+      var w = worte[i];
+      // Jedes Wort auf DREI Dimensionen streuen (drei Hash-Seeds), damit gleiche
+      // Woerter echte Ueberlappung erzeugen und nicht zufaellig kollidieren.
+      var seeds = [2166136261, 16777619, 5381];
+      for (var s = 0; s < seeds.length; s++) {
+        var h = seeds[s];
+        for (var j = 0; j < w.length; j++) h = (h * 31 + w.charCodeAt(j)) >>> 0;
+        v[h % 384] += 1;
+      }
+    }
+    var norm = 0; for (var k = 0; k < 384; k++) norm += v[k] * v[k];
+    norm = Math.sqrt(norm) || 1;
+    for (var m = 0; m < 384; m++) v[m] /= norm;
+    return v;
+  }
+
+  function liveMatch(profilA, profilB, deps) {
+    deps = deps || {};
+    // "match" in deps explizit gesetzt (auch null) -> respektieren; sonst window.
+    var E = ("embedding" in deps) ? deps.embedding
+          : (typeof window !== "undefined" ? window.SbkimEmbedding : null);
+    var M = ("match" in deps) ? deps.match
+          : (typeof window !== "undefined" ? window.SbkimMatch : null);
+    if (!M || typeof M.match !== "function") {
+      return Promise.resolve({ ok: false, fazit: "Modul 04 Match nicht geladen." });
+    }
+    var echt = !!(E && typeof E.isReady === "function" && E.isReady() &&
+                  typeof E.embedQuery === "function");
+
+    var vecsP;
+    if (echt) {
+      vecsP = Promise.all([E.embedQuery(profilA), E.embedPassage(profilB)]);
+    } else {
+      vecsP = Promise.resolve([demoVector(profilA), demoVector(profilB)]);
+    }
+    return vecsP.then(function (vecs) {
+      var score = M.match(vecs[0], vecs[1]);
+      var treffer = M.isAboveProviderThreshold(score);
+      return {
+        ok: true,
+        echt: echt,
+        quelle: echt ? "echtes Embedding (multilingual-e5-small)"
+                     : "Demo-Vektor (Modell nicht geladen — braucht Netz)",
+        profilA: profilA,
+        profilB: profilB,
+        score: score,
+        treffer: treffer,
+        schwelle: M.PROVIDER_MIN_MATCH,
+        fazit: (treffer ? "Treffer" : "kein Treffer") +
+               " — Passung " + score.toFixed(3) +
+               " (Schwelle " + M.PROVIDER_MIN_MATCH + ")" +
+               (echt ? "" : " · DEMO-Vektor, echtes Ergebnis erst in Klaus' Browser"),
+      };
+    });
+  }
+
   // Voll offline-bewiesen (grün/rot) vs. nur bereitschafts-geprüft (braucht Netz).
   function probeAll() {
     return {
@@ -135,7 +204,8 @@
     probeEmbedding: probeEmbedding,
     probeAnastomose: probeAnastomose,
     probeHeterokaryose: probeHeterokaryose,
+    liveMatch: liveMatch,
     probeAll: probeAll,
-    version: "0.2.0",
+    version: "0.3.0",
   };
 });

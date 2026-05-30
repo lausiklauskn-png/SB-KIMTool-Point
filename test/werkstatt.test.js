@@ -58,6 +58,37 @@ test("netz-Module: ehrlich 'bereit · braucht Netz', nicht als grün-gerechnet b
   }
 });
 
+test("liveMatch (Demo-Pfad): mehr gemeinsame Wörter => höhere Passung", async () => {
+  // Container hat kein Embedding-Modell (Netz blockiert) -> Demo-Vektor-Pfad.
+  // EHRLICH: die Demo kann KEINE Semantik (dafür ist das echte Modell da) — sie
+  // misst nur Überlappung exakt gleicher Wörter. Daher Profile mit klarer
+  // Wort-Überlappung vs. ohne.
+  const ähnlich = await W.liveMatch(
+    "vegetarische suppe kochen rezept gemüse",
+    "vegetarische suppe kochen rezept brühe");
+  const fremd = await W.liveMatch(
+    "vegetarische suppe kochen rezept gemüse",
+    "fahrrad bremse schaltung reparatur werkstatt");
+  assert.equal(ähnlich.ok, true);
+  assert.equal(ähnlich.echt, false, "ohne Modell: ehrlich Demo-Pfad");
+  assert.match(ähnlich.quelle, /Demo/i);
+  assert.ok(ähnlich.score > fremd.score,
+    `ähnliche (${ähnlich.score}) sollten besser passen als fremde (${fremd.score})`);
+});
+
+test("liveMatch: Fazit kennzeichnet Demo ehrlich (kein vorgetäuschtes Embedding)", async () => {
+  const r = await W.liveMatch("a b c", "a b c");
+  assert.match(r.fazit, /DEMO|Demo/);
+  assert.equal(typeof r.score, "number");
+  assert.equal(typeof r.treffer, "boolean");
+});
+
+test("liveMatch: ohne Match-Modul ehrlich ok=false", async () => {
+  const r = await W.liveMatch("x", "y", { match: null });
+  assert.equal(r.ok, false);
+  assert.match(r.fazit, /nicht geladen/i);
+});
+
 test("ehrlich: fehlendes Modul -> ok=false, nicht grün vortäuschen", () => {
   // probeMatch mit einem leeren Modul: muss ehrlich scheitern
   const r = W.probeMatch({});
