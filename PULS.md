@@ -2,6 +2,43 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (F) — Klaus' Werkzeug-Truhe als zentraler Startseiten-Blickfang
+
+Klaus hat ein **echtes Truhe-Bild geliefert** (Truhe mit leuchtendem Teal-Schlüssel im Schloss,
+dunkler Kosmos-Grund — passt zur Optik). Eingebaut als zentraler Blickfang in der Startseiten-Mitte:
+
+- `assets/img/truhe.png` (Klaus' Bild, 1401×1123 ~2,3 MB; **kein** Bildwerkzeug im Container →
+  unkomprimiert übernommen, ehrlich vermerkt; auf Wunsch später verkleinern).
+- `index.html`: im Hero ein **klickbarer** `.truhe-hero`-Block (`<img>` mit Alt-Text) →
+  führt zur Werkzeugkiste (`werkzeuge.html`). Caption „Werkzeug-Truhe — öffnen".
+- `assets/style.css`: Truhe **handlich** (Standard `min(360px, 78vw)` → Karten/Text drunter
+  lesbar, auch mobil); **wächst** beim Hover (`scale 1.12`) mit Teal-Glow, schrumpft zurück.
+  `@media (hover: none)` → mobil kein Wachstum (Handy-Lesbarkeit). `prefers-reduced-motion` → ruhig.
+- Meine zwischenzeitliche **SVG-Notlösung entfernt** (Klaus: „nicht selbst zeichnen") — es gilt sein PNG.
+- `assets/img/README.md`: `truhe.png` als vorhandenes Startseiten-Mittenbild dokumentiert.
+- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf. `npm test` 27/27 (reine Optik).
+
+## 2026-05-30 (E) — Startseiten-Hero als prominenter Blickfang (Truhe-Bild)
+
+Klaus will ein Truhe-Bild auf der Startseite. Befund: **beide Bild-Slots existierten schon**
+(Premium-#10, mit Gradient-Fallback) — `banner-werkzeuge.png` (Werkzeuge-Karte) und `hero.png`
+(Startseiten-Hero, per CSS verdrahtet). Der Hero zeigte das Bild aber nur als **dezenten,
+stark abgedunkelten Backdrop**. Auf Klaus' Wunsch „groß oben":
+
+- `assets/style.css`: `.hero` höher (`min-height: 248px`), `.hero::before`-Veil von einem
+  flachen 0.86-Schleier auf einen **vertikalen Verlauf** umgestellt (oben 0.28 → unten 0.82):
+  Bild oben **deutlich sichtbar**, Titel unten lesbar. Titel/Absatz mit dunklem Text-Shadow
+  für Kontrast. **Fallback bleibt** (ohne Bild nur Glow). `prefers-reduced-motion` unberührt.
+- `assets/img/README.md`: Hinweis, dass der Hero jetzt prominent zeigt und ein Truhe-Motiv passt.
+- **Drop-in, kein Code mehr nötig:** Klaus legt `assets/img/hero.png` (Truhe, ~1600×900) und/oder
+  `assets/img/banner-werkzeuge.png` (~1200×400) ab → erscheinen automatisch.
+- **Hover-Wachstum der Eingangs-Karten:** `.entry-art` (Truhe-/Motiv-Bild) standardmäßig klein
+  (Text drunter immer lesbar), **wächst beim Drüberfahren** sanft auf 188px und schrumpft zurück.
+  Auf Touch-Geräten (`@media (hover: none)`) bleibt es klein → Handy-Lesbarkeit. `prefers-reduced-motion`:
+  kein Wachstum, Standardgröße gehalten.
+- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf (Startseite mit/ohne hero.png, Hover-Wachstum).
+  `npm test` unverändert 27/27 (reine Optik, Logik unberührt).
+
 ## 2026-05-30 (D) — Zwei echte Werkzeuge (01 Storage + 02 Spore) sauber auf Premium-main integriert
 
 Diese Sitzung lieferte das **zweite** echte Werkzeug (02 Spore) und integrierte die ganze
