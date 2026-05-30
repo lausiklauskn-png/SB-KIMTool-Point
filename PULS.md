@@ -21,7 +21,8 @@ Hauptseite, mit erklärendem Symbol in der Mitte + den Agenten/Mitarbeitern in A
   Hochzähl-Animation — abgehärtet auf Animationsende, Zahl ist korrekt 42 %.)
 - **Ehrlich-Effekt:** Der Ring wächst automatisch, sobald eine Komponente echt:true wird —
   kein Hand-Tuning, gezählte Wahrheit.
-- **Manual-Check:** Optik im Browser ungeprüft durch Klaus; Funktion via verify belegt.
+- **Manual-Check:** ✅ von Klaus im Browser bestätigt (2026-05-30): Look „sehr gut bis Top".
+  Funktion via verify belegt, Optik jetzt abgenommen — die Startseite ist grün.
 
 ## 2026-05-30 (Q) — Protokoll-Lauf: die ganze Kette auf einmal (End-to-End)
 
