@@ -2,6 +2,21 @@
 
 Stand: 2026-05-30 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-30 (V) — Re-Sign vollzogen + Schlüsselwechsel + Pages live
+
+- **Schlüsselwechsel (ehrlich):** Der private Schlüssel zur alten nodeId `eC3jzoo9…` war nie
+  dauerhaft gesichert (kein `SBKIM_NODE_KEY`). Mit Klaus’ ausdrücklichem Okay neue, dauerhafte
+  Identität erzeugt; Schlüssel diesmal sicher abgelegt (Passwort-Manager + Environment-Secret).
+- **Neue nodeId:** `CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY`. Spore live neu signiert mit
+  **echtem** `domainVector` (Match **0.848508 ≥ 0.80**), kein `_demo`. ✔ VALID.
+- **GitHub Pages aktiv:** `…github.io/SB-KIMTool-Point/sbkim/spore.json` liefert **200**
+  (von Klaus bestätigt, JSON sichtbar). Sage kann `sporeUrl` auf die Pages-URL setzen.
+- **Postfach:** §8 „Schlüsselwechsel + Bitte um Neu-Registrierung" (alte→neue nodeId,
+  `verified-spore`→`verified-match`), Status-Kopf + Bau-Protokoll-Zeile aktualisiert.
+- **Beweis:** `npm test` 45/45; `verify_foreign_spore.mjs sbkim/spore.json` → ✔ VALID.
+- **Offen:** Sage liest Postfach → verifiziert reziprok → registriert neue nodeId +
+  Match-Hochstufung. **Manual-Check:** Pages live im Browser bestätigt (Klaus).
+
 ## 2026-05-30 (U) — Erster echter semantischer Match (0.8485) + Re-Sign vorbereitet
 
 **Meilenstein:** der erste echte semantische Match im SBKIM-Netz steht rechnerisch.
