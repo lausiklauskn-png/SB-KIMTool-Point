@@ -225,6 +225,35 @@ function renderWerkstatt() {
       `<div class="probe-group"><div class="probe-group-titel">Offline — wirklich gerechnet</div>${offline}</div>` +
       `<div class="probe-group"><div class="probe-group-titel">Netzgebunden — Bereitschaft geprüft</div>${netz}</div>`;
   });
+
+  // Live-Match: zwei Profile vergleichen (echtes Embedding im Browser, sonst Demo)
+  const lmBtn = $("#lm-run");
+  const lmOut = $("#lm-out");
+  if (lmBtn && lmOut && typeof window.SbkimWerkstatt.liveMatch === "function") {
+    lmBtn.addEventListener("click", async () => {
+      const a = ($("#lm-a") || {}).value || "";
+      const b = ($("#lm-b") || {}).value || "";
+      lmOut.textContent = "… vergleiche (lädt ggf. das Sprachmodell) …";
+      try {
+        const r = await window.SbkimWerkstatt.liveMatch(a, b);
+        if (!r.ok) { lmOut.innerHTML = `<div class="probe bad"><div class="probe-head">✗ ${r.fazit}</div></div>`; return; }
+        const cls = r.treffer ? "ok" : "ready";
+        const proz = Math.round(r.score * 100);
+        lmOut.innerHTML = `
+          <div class="probe ${cls}">
+            <div class="probe-head">${r.treffer ? "✓ Treffer" : "◐ kein Treffer"} · Passung ${proz}%</div>
+            <ul class="probe-steps">
+              <li>Profil A: „${a}"</li>
+              <li>Profil B: „${b}"</li>
+              <li>Score ${r.score.toFixed(3)} · Schwelle ${r.schwelle}</li>
+            </ul>
+            <div class="probe-fazit">Quelle: ${r.quelle}</div>
+          </div>`;
+      } catch (e) {
+        lmOut.innerHTML = `<div class="probe bad"><div class="probe-head">✗ Fehler: ${String(e).slice(0, 120)}</div></div>`;
+      }
+    });
+  }
 }
 
 // --- Dispatch: each page only loads what it shows -------------------------

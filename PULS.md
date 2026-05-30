@@ -2,6 +2,21 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (P) — Live-Match: zwei Profile → echter Treffer (semantische Vermittlung)
+
+- **`assets/werkstatt.js` v0.3 `liveMatch(profilA, profilB)`:** verkettet 03 Embedding →
+  04 Match. **Echter Pfad** (Klaus' Browser, Modell geladen): `embedQuery/embedPassage` →
+  `match`. **Container/offline:** ehrlicher **Demo-Vektor** (Wort-Überlappung auf 384 Dim,
+  3 Hash-Seeds), klar als „DEMO — echtes Ergebnis erst in Klaus' Browser" gekennzeichnet.
+  Ehrliche Grenze dokumentiert: Demo kann keine Semantik, nur exakte Wort-Überlappung.
+- **Sichtbar:** Werkzeuge-Seite hat jetzt „Live-Match" mit zwei Textfeldern + Knopf
+  „Profile vergleichen" → Treffer/kein-Treffer + Passung-% + Quelle (echt/Demo).
+- **Tests:** headless `test/werkstatt.test.js` (mehr gemeinsame Wörter → höhere Passung;
+  Demo ehrlich gekennzeichnet; ohne Match-Modul ok=false). **`npm test` 32/32 grün.**
+  Browser `npm run verify`: Live-Match-Probe (ähnlich 0.80 > fremd 0.00). **9/9 grün.**
+- README nachgezogen. **Manual-Check:** echter semantischer Vergleich (mit Modell) erst in
+  Klaus' Browser sichtbar — Demo-Pfad ist hier bewiesen.
+
 ## 2026-05-30 (O) — Echter Browser-Beweis + lokaler 2-Knoten-Handshake (npm run verify)
 
 Klaus' Frage: können die Tests im echten Browser laufen / über SBKIM verbinden? Befund &

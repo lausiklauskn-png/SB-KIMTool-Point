@@ -65,6 +65,20 @@
         </p>
         <button class="ctl werkstatt-run" id="werkstatt-run">▶ Werkzeuge prüfen</button>
         <div class="werkstatt-out" id="werkstatt-out"></div>
+
+        <!-- Live-Match: zwei "das kann ich"-Profile vergleichen -->
+        <div class="livematch">
+          <h4 class="livematch-titel">Live-Match — zwei Profile vergleichen</h4>
+          <p class="livematch-sub">
+            Zwei „das kann ich / das suche ich"-Texte → Embedding (03) → Match (04). Der echte
+            semantische Vergleich läuft in deinem Browser, sobald das Sprachmodell geladen ist;
+            sonst ein klar markierter Demo-Vergleich (zählt gemeinsame Wörter).
+          </p>
+          <textarea id="lm-a" class="lm-feld" rows="2" placeholder="Profil A — z. B. „Ich koche vegetarische Suppen und Eintöpfe"">Ich koche vegetarische Suppen, Eintöpfe und Gemüsegerichte</textarea>
+          <textarea id="lm-b" class="lm-feld" rows="2" placeholder="Profil B — z. B. „Suche Rezepte für vegetarische Suppen"">Suche Rezepte für vegetarische Suppen und Gemüse</textarea>
+          <button class="ctl" id="lm-run">▶ Profile vergleichen</button>
+          <div class="lm-out" id="lm-out"></div>
+        </div>
       </div>
 
       <div class="panel" data-reveal>

@@ -105,6 +105,19 @@ async function main() {
     ok("Werkstatt: >=2 offline-Proben grün", gruen >= 2, `gefunden: ${gruen}`);
     ok("Werkstatt: >=3 netz-Proben 'bereit'", bereit >= 3, `gefunden: ${bereit}`);
 
+    // 1b) Live-Match: zwei Profile vergleichen (im Container ohne Modell -> Demo-Pfad)
+    const lmDirekt = await page.evaluate(async () => {
+      const W = window.SbkimWerkstatt;
+      const aehnlich = await W.liveMatch("vegetarische suppe kochen rezept gemüse",
+                                         "vegetarische suppe kochen rezept brühe");
+      const fremd = await W.liveMatch("vegetarische suppe kochen rezept gemüse",
+                                      "fahrrad bremse schaltung reparatur werkstatt");
+      return { aehnlich: aehnlich.score, fremd: fremd.score, echt: aehnlich.echt };
+    });
+    ok("Live-Match: ähnliche Profile passen besser als fremde",
+       lmDirekt.aehnlich > lmDirekt.fremd,
+       `ähnlich ${lmDirekt.aehnlich?.toFixed(3)} > fremd ${lmDirekt.fremd?.toFixed(3)} (echt=${lmDirekt.echt})`);
+
     // 2) 01 Storage: echtes IndexedDB im Browser
     const storageOk = await page.evaluate(async () => {
       const S = window.SbkimStorage;

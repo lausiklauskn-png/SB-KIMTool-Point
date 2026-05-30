@@ -276,6 +276,19 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 .probe-group { display: grid; gap: 0.6rem; }
 .probe-group + .probe-group { margin-top: 0.6rem; }
 .probe-group-titel { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+
+/* Live-Match: zwei Profile vergleichen */
+.livematch { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+.livematch-titel { font-family: var(--mono); font-size: 0.9rem; color: var(--accent); margin: 0 0 0.3rem; }
+.livematch-sub { font-size: 0.83rem; color: var(--muted); line-height: 1.5; margin: 0 0 0.6rem; }
+.lm-feld {
+  display: block; width: 100%; box-sizing: border-box; margin: 0 0 0.5rem;
+  background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
+  border-radius: 8px; padding: 0.5rem 0.7rem; font-family: var(--sans); font-size: 0.85rem;
+  resize: vertical;
+}
+.lm-feld:focus { outline: none; border-color: var(--accent-dim); }
+.lm-out { margin-top: 0.7rem; }
 .probe-head { font-family: var(--mono); font-size: 0.82rem; color: var(--text); font-weight: 700; }
 .probe-steps { list-style: none; padding: 0; margin: 0.4rem 0; display: grid; gap: 0.25rem; font-size: 0.8rem; }
 .probe-steps li.ok { color: var(--lamp-live); }
