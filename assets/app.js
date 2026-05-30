@@ -29,8 +29,17 @@ const REIFE = {
 };
 
 const POINT = {
-  "modell-prototyp":    { chip: "c-point",         label: "im Modell" },
-  "noch-nicht-kopiert": { chip: "c-point c-cold",  label: "noch nicht kopiert" },
+  "modell-prototyp":            { chip: "c-point",        label: "im Modell" },
+  "noch-nicht-kopiert":         { chip: "c-point c-cold", label: "noch nicht kopiert" },
+  "kopiert · headless getestet":{ chip: "c-fertig",       label: "geliefert · headless getestet ✓" },
+};
+
+// Modules whose REAL, offline, copy-paste-able file already lives in this repo.
+// Only these get the "copy code / download file" actions — honest: no fake button
+// for modules that are not actually here yet.
+const TOOL_FILES = {
+  "01": "web/tools/sbkim-storage.js",
+  "02": "web/tools/sbkim-spore.js",
 };
 
 async function renderWerkzeuge() {
@@ -88,6 +97,38 @@ async function renderWerkzeuge() {
         navigator.clipboard?.writeText(txt);
         el.querySelector(".copy").textContent = "kopiert ✓";
       });
+
+      // Honest per-module note (e.g. proven path vs. browser requirement).
+      if (m.point_hinweis) {
+        const note = document.createElement("p");
+        note.className = "pointnote";
+        note.textContent = m.point_hinweis;
+        el.appendChild(note);
+      }
+
+      // Real, offline file present? Offer "copy code" + "download file".
+      // No external fetch, no hotlink — the file lives in this repo.
+      const file = TOOL_FILES[m.id];
+      if (file) {
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        actions.innerHTML = `
+          <button class="get copy-code">⧉ Code kopieren</button>
+          <a class="get download" href="${file}" download>⬇ Datei laden</a>
+          <p class="getnote">Echte, offline einbaubare Datei aus diesem Repo (<code>${file}</code>).</p>`;
+        actions.querySelector(".copy-code").addEventListener("click", async (ev) => {
+          const btn = ev.currentTarget;
+          try {
+            const code = await (await fetch(file, { cache: "no-store" })).text();
+            await navigator.clipboard?.writeText(code);
+            btn.textContent = "Code kopiert ✓";
+          } catch {
+            btn.textContent = "Fehler — Datei laden";
+          }
+        });
+        el.appendChild(actions);
+      }
+
       grid.appendChild(el);
     }
   }

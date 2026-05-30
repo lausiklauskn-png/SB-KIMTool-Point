@@ -11,12 +11,13 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 
 ## BASIC — Pflicht
 
-### 02 · Spore  ○(Sage code-stub) · Modell-Prototyp
+### 02 · Spore  ○(Sage code-stub) · kopiert · headless getestet
 - **Was:** Kryptografische Identität eines Knotens (Ed25519, `node_id = SHA-256(pubkey)`).
 - **Nutzen:** Ohne Identität keine Teilnahme; jede Aussage/Stimme ist signiert & prüfbar.
 - **Verwendung:** Einmal pro Knoten erzeugen; öffentliche Spore-JSON teilen, privaten Schlüssel geheim halten.
 - **Einbau:** Beim Start anlegen und im Storage (01) ablegen.
 - **Aktiviert durch:** Immer aktiv (Grundbaustein).
+- **Echte Datei:** `web/tools/sbkim-spore.js` (siehe unten) — eine Datei, keine Abhängigkeiten.
 
 ### 01 · Storage  ○
 - **Was:** Speicher-Wrapper (Browser: IndexedDB; headless: Node-Mock) für alle `sbkim_*` Daten.
@@ -151,3 +152,71 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 - **Verwendung:** Werkzeug in den Container legen; als PWA ausliefern/kopieren.
 - **Einbau:** Nutzt Membran (15) als Außenhülle.
 - **Aktiviert durch:** Auslieferung eines selbstgebauten Tools.
+
+---
+
+## Echte, einbaubare Dateien (nicht nur Anzeige)
+
+Module mit dem JSON-Feld `datei` haben eine **echte, offline einbaubare Datei** in
+diesem Repo. Die Werkzeuge-Seite bietet dafür **„⧉ Code kopieren"** und **„⬇ Datei
+laden"** an (kein externer Abruf, kein Sage-Hotlink — die Datei wohnt hier). Module
+ohne `datei` zeigen bewusst **keinen** solchen Knopf — ehrlich statt leerer Versprechen.
+
+### 01 · Storage — `web/tools/sbkim-storage.js`
+
+Eine einzige, abhängigkeitsfreie Datei (klassisches `<script>`-Modul, UMD-Muster).
+**Browser:** IndexedDB (überlebt Neustart). **Headless/Node:** automatischer In-Memory-
+Fallback; `store.backend` zeigt `"indexeddb"` bzw. `"memory"`.
+
+```html
+<script src="sbkim-storage.js"></script>
+<script>
+  const store = await SBKIMStorage.open("sbkim");
+  await store.set("spore", { nodeId: "…" });
+  const spore = await store.get("spore");   // -> {nodeId:"…"} oder null
+</script>
+```
+
+**Ehrlichkeit:** In-Memory-Pfad + API sind durch `test/storage.test.js` belegt (9/9);
+der **IndexedDB-Pfad ist ungeprüft — wartet auf Klaus' Browser-Lauf**.
+
+### 02 · Spore — `web/tools/sbkim-spore.js`
+
+Eine einzige, abhängigkeitsfreie Datei (UMD-Muster wie 01). Echte Krypto:
+**Ed25519 über WebCrypto** (`crypto.subtle`). `nodeId = SHA-256(roher öffentlicher
+Schlüssel)`. Der **private Schlüssel bleibt im Modul** — nur der öffentliche Teil
+verlässt es (`exportPublic()`).
+
+```html
+<script src="sbkim-spore.js"></script>
+<script>
+  if (!(await SBKIMSpore.isSupported())) {     // ehrlicher Hinweis statt Bruch
+    alert("Dieser Browser kann Ed25519 noch nicht."); 
+  } else {
+    const spore = await SBKIMSpore.create();
+    const sig   = await spore.sign("hallo");          // Hex-Signatur
+    const ok    = await spore.verify("hallo", sig);   // true
+    const pub   = spore.exportPublic();                // {nodeId, alg, publicKey}
+    // teilbar; ohne privaten Schlüssel. Fremd prüfen:
+    await SBKIMSpore.verify(pub, "hallo", sig);        // true
+  }
+</script>
+```
+
+**WebCrypto-Anforderung (ehrlich):** Ed25519 in WebCrypto ist jung; ältere Browser
+(u. a. manche Tablet-Browser) können es noch nicht. `isSupported()` meldet das vorab
+**ehrlich** (true/false), `create()` wirft sonst eine **klare Meldung statt still zu
+brechen**.
+
+**Ehrlichkeit:** Sign/Verify + Identitäts-Bindung sind durch `test/spore.test.js`
+belegt (10/10, gegen Node-WebCrypto); der **Browser-Pfad ist ungeprüft — wartet auf
+Klaus' Browser-Lauf**.
+
+## Truhe ↔ `werkzeugkiste.json` (Mapping-Hinweis)
+
+`werkzeugkiste.json` bleibt die **maschinenlesbare Quelle** (id/name/stufe/sage_status/
+point_status/was/nutzen/verwendung/einbau/aktiviert_durch, optional `datei`/
+`point_hinweis`). Eine evtl. reichere „Truhe"-Ansicht (offener Draft-PR #11) trägt eine
+eigene inline Tool-Liste; **wer beide zusammenführt, schreibt zuerst den Mapping-Vertrag
+hier fest, dann Code** (Spec vor Code). Tier-Namen nicht stillschweigend mischen
+(`basic/pro/profi`).

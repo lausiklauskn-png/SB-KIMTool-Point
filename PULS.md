@@ -1,6 +1,38 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-30 · Branch `claude/feinschliff-erstes-modul-KOnAU`
+Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
+
+## 2026-05-30 (D) — Zwei echte Werkzeuge (01 Storage + 02 Spore) sauber auf Premium-main integriert
+
+Diese Sitzung lieferte das **zweite** echte Werkzeug (02 Spore) und integrierte die ganze
+Werkzeug-Linie **auf den aktuellen `main`-Stand mit Premium-Optik**. Hintergrund: PR #12
+(01 Storage) und der ursprüngliche 02-Branch waren auf einem Stand **vor** der Premium-Optik
+(#10) gebaut → echte Konflikte. Statt blindem Merge die Liefer-Mechanik **neu auf die
+refaktorierte `renderWerkzeuge` aufgesetzt** (Premium-UI bleibt unangetastet, additiv).
+
+- **02 Spore** — `web/tools/sbkim-spore.js`: eine abhängigkeitsfreie Datei (UMD wie 01).
+  Ed25519 über **WebCrypto** (`crypto.subtle`), `nodeId = SHA-256(roher publicKey)` (Hex).
+  Privater Schlüssel bleibt im Modul; nur der öffentliche Teil verlässt es (`exportPublic`).
+  `sign/verify`, statisches `verify(pub,…)`, `nodeId(pub)`. **Ehrliche Feature-Erkennung**
+  `isSupported()` + klare Fehlermeldung statt stillem Bruch (WebCrypto-Anforderung).
+- **01 Storage** — `web/tools/sbkim-storage.js` (aus PR #12 übernommen): IndexedDB im Browser,
+  In-Memory-Fallback headless.
+- **Liefer-Mechanismus** in die **Premium-`app.js`** integriert: `TOOL_FILES` (01+02), Knöpfe
+  „⧉ Code kopieren" / „⬇ Datei laden" (offline, nur Repo-Dateien), additiv `point_hinweis`
+  gerendert (WebCrypto-Anforderung auf der Seite sichtbar), neuer POINT-Status
+  „geliefert · headless getestet ✓". `style.css`: `.actions/.get/.getnote/.pointnote`.
+- **Tests:** `test/storage.test.js` (9) + `test/spore.test.js` (10). **`npm test` 27/27 grün**
+  (8 Modell + 9 Storage + 10 Spore).
+- **Nachgezogen:** `werkzeugkiste.json` (01+02: `point_status`/`point_hinweis`/`datei`),
+  `status.json` (Real-Anteil ~24 %), `docs/WERKZEUGE.md`, `README.md` (27 Prüfungen).
+- **Schutz-Modul-Pflicht:** 01/02 berühren **kein** Schutz-Modul → kein `ZERTIFIKAT_ASPEKTE`-Eintrag.
+- **PRs:** #12 (Storage) ist inhaltlich **in dieser integrierten Linie enthalten**; auf Klaus'
+  Ansage „#12 dann #13" werden beide Werkzeuge so nach `main` gebracht. **PR #11 (Truhe) = HOLD**
+  (nicht angetastet; kollidiert mit dieser Linie — Merge/Schließen entscheidet Klaus).
+- **Manual-Check:** **ungeprüft, wartet auf Klaus' Browser-Lauf** — vier Seiten (Premium),
+  Liefer-Knöpfe 01+02, `point_hinweis`-Block, WebCrypto-Pfad (Tablet + Desktop, Strg+Shift+R).
+- **Offen für Klaus:** GitHub Pages auf `main` aktivieren; Sage-Quelldateien für echte 1:1-Kopie;
+  nächster Werkzeug-Kandidat (19 Andock-Wizard / 09 Einbau-PWA).
 
 ## Nachtrag 2026-05-30 — Premium-Optik-Ebene über alle vier Seiten (Freibrief)
 
