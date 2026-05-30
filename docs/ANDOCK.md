@@ -36,7 +36,7 @@ Pflicht- und genutzte Felder unserer `sbkim/spore.json` — Reihenfolge wie bei 
 | `guestCategories`   | String-Array (was Gäste/Forker hier tun)       | real  | fest (Sage-Hinweis B) |
 | `endpoint`          | URL **mit** Schrägstrich am Ende               | real  | Pages-URL |
 | `publicKey`         | JWK `{kty:"OKP",crv:"Ed25519",x,key_ops,ext,alg}` | real | aus Schlüssel |
-| `domainVector`      | 384-Float-Array, L2-normalisiert               | **DEMO** | Stub, s. §5 |
+| `domainVector`      | 384-Float-Array, L2-normalisiert               | **real** | echtes Embedding, s. §5 (Match 0.8485) |
 | `signature`         | 86-Zeichen base64url Ed25519                    | real  | s. §4 |
 
 Der `publicKey` ist ein **JWK** (wie bei Sage), nicht DER. `x` = roher 32-Byte-Public-Key
@@ -47,8 +47,8 @@ base64url. Die `id` ist **nicht** gleich `x`, sondern `base64url(SHA256(roher Pu
 *Verifikation* nicht Pflicht, helfen aber späterem Stamm/Gast-Matching. Sie wandern — wie
 alle Felder — in die signierten Bytes. **Achtung:** sie kommen erst in die veröffentlichte
 `sbkim/spore.json`, wenn sie **mit dem Secret `SBKIM_NODE_KEY` neu signiert** wird (sonst
-wechselt die nodeId). Bis dahin trägt der Generator sie vor; die Live-Spore zieht beim
-nächsten Re-Sign nach (zusammen mit dem echten `domainVector`, §5).
+wechselt die nodeId). Der Generator trägt sie; die Live-Spore zieht beim Re-Sign nach
+(zusammen mit dem echten `domainVector`, §5).
 
 ## 3. Schlüssel-Haltung (dauerhafte Identität)
 
@@ -74,13 +74,26 @@ signature = base64url( Ed25519_sign( UTF-8(canonical), privateKey ) )
 **Prüfen:** `signature` entfernen → erneut kanonisieren → `Ed25519_verify` gegen `publicKey.x`.
 Jede Manipulation am Inhalt zerstört die Signatur.
 
-## 5. domainVector — ehrlich Demo
+## 5. domainVector — jetzt ECHT (Match 0.8485)
 
-`domainVector` ist ein **deterministischer Stub** (kein echtes Embedding). Er hat die
-richtige Form (384 Floats, L2-normalisiert), trägt aber **keine echte Semantik**. Klar
-gekennzeichnet über das Begleitfeld `_demo: ["domainVector"]` in der Spore **und** in
-diesem Vertrag. Ein echter Match folgt erst mit echtem Embedding — bis dahin: kein
-vorgetäuschtes Wissen.
+`domainVector` ist seit 2026-05-30 ein **echtes 384-dim-Embedding** (`Xenova/multilingual-e5-small`,
+transformers.js `@2.17.2`, `pooling:"mean"`, `normalize:true`, L2-normalisiert). Erzeugt im
+**Browser** (headless ging beidseits nicht — `huggingface.co`/`jsdelivr` 403) aus dem
+reproduzierbaren e5-Text:
+
+```
+passage: Werkzeugkiste + headless Modell-Lauf für das SBKIM-Protokoll. Werkzeugkiste, SBKIM-Module, Modell, Markt, Endknoten
+   (= domainDescription + " " + domainKeywords.join(", "))
+```
+
+Der Vektor liegt versioniert unter `sbkim/domainVector.real.json` und wird vom Generator
+fest in die signierten Bytes übernommen. **Echter Cross-Knoten-Match Sage ⟷ SB·KIMTool =
+0.848508 ≥ 0.80** (cosine; offline reproduziert in `test/match.test.js`). Damit entfällt die
+`_demo`-Markierung — kein Stub, kein vorgetäuschtes Wissen mehr.
+
+*Fallback (ehrlich):* fehlt `sbkim/domainVector.real.json`, fällt der Generator auf einen
+deterministischen Demo-Stub zurück **und** setzt dann wieder `_demo: ["domainVector"]`. Eine
+vorhandene, aber kaputte Vektor-Datei lässt den Generator laut scheitern (kein stilles Demo).
 
 ## 6. Andock-Fluss
 
@@ -97,5 +110,5 @@ vorgetäuschtes Wissen.
 - `sbkim/spore.json` validiert gegen §2 (alle Pflichtfelder, Formen, Längen).
 - `id === base64url(SHA256(roher Pubkey))`.
 - Signatur verifiziert gegen den eigenen `publicKey.x`; manipulierter Inhalt verifiziert **nicht**.
-- `domainVector` ist als Demo markiert (`_demo`).
+- `domainVector` ist ein echtes 384-dim-Embedding (kein `_demo`); Cross-Knoten-Match ≥ 0.80.
 - Headless-Test (`npm test`) und Browser-Beweis (`npm run verify`) bleiben grün.

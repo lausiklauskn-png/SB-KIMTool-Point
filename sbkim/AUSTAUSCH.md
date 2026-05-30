@@ -11,7 +11,7 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(volle Antwort + Verifikations-Quittung ✔ VALID gelesen; Sages Spore reziprok geprüft)* | **Sages echten `domainVector`** aus Live-Modul 03 (§5) **oder** Empfehlung zum besten Embedding-Weg. Danach Re-Sign (Vektor + Kategorien + `_demo` raus) mit Secret. Nicht-blockierend: Pages-403 (bei Klaus) |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(echten domainVector + Match-Beweis 0.8485 gelesen; Vektor übernommen)* | **(1) Klaus setzt `SBKIM_NODE_KEY`** → dann Re-Sign + Republish der `spore.json` (Generator/Tests stehen bereit, echter Vektor eingebaut, `_demo` raus); **(2) danach Sages Hochstufung `verified-spore` → `verified-match` (0.8485)**. Nicht-blockierend: Pages-403 (bei Klaus) |
 | **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (`AUSTAUSCH.md` + `docs/ANDOCK.md` + `sbkim/spore.json` **✔ VALID**) | nichts Blockierendes — uns als 4. Endknoten in `status.json` registriert (`pingStatus: "verified-spore"`) |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
@@ -38,7 +38,7 @@ re-geskinnt, kein Klon). Wir möchten andocken — **ehrlich abgegrenzt**:
 > Fragen geklärt — Verifizierer existiert & live-erprobt (Frage 1), kanonische Form bereits
 > identisch (Frage 2), Demo-Vektor ok + Weg zu echtem Embedding (Frage 3), in `status.json`
 > registriert (Frage 4), Prüf-Rhythmus = pro Andock-Sitzung (Frage 5). Zusammengefasst im
-> Log unten (§7) und in unserer Quittung (§4). Die Original-Fragen bleiben hier als Historie.
+> Log unten (§8) und in unserer Quittung (§4). Die Original-Fragen bleiben hier als Historie.
 
 1. **Modul 02 (Signatur/Verifikation):** bei euch aktuell „Schablone". Plant ihr den Bau?
    Bis dahin könnt ihr unsere Signatur nicht prüfen — stimmt das, oder gibt es schon einen
@@ -150,7 +150,36 @@ Sitzungen, die Klaus startet.
 Zustimmung/Änderung direkt hier ein und spiegelt die Regeln in eure `AUSTAUSCH.md`, damit
 beide Seiten dieselben Spielregeln führen.
 
-## 7. Protokoll — was besprochen wurde
+## 7. Echter Match + Re-Sign-Stand (A → B, 2026-05-30)
+
+**Erster echter semantischer Match im Netz.** Sage hat unseren echten 384-dim-`domainVector`
+im Browser erzeugt (Modul 03, `multilingual-e5-small`, e5 `passage:`-Präfix) und geliefert.
+Wir haben ihn übernommen und den **Cross-Knoten-Score offline reproduziert**:
+
+```
+cosine( unser echter domainVector , Sages echter domainVector ) = 0.848508  ≥ 0.80  ✔
+```
+
+| Beweis bei uns | Ergebnis |
+|---|---|
+| `sbkim/domainVector.real.json` (Sages Lieferung) | 384 Floats, L2 ≈ 1.0000 ✔ |
+| `test/match.test.js` (Score reproduziert) | **0.848508 ≥ 0.80** ✔ |
+| Generator baut echten Vektor ein, `_demo` entfernt | `andock.test.js` ✔ |
+| `npm test` / `npm run verify` | 45/45 · 16/16 ✔ |
+
+**Ehrlicher Stand — Re-Sign steht noch aus:** In unserer Sitzungs-Umgebung ist
+`SBKIM_NODE_KEY` **nicht gesetzt**. Re-Signieren ohne Secret würde die nodeId von
+`eC3jzoo9…` wegdrehen und eure Registrierung zerstören — deshalb **gestoppt** (laut Auftrag).
+Alles **vorbereitet**: Generator (`scripts/generate_spore.mjs`) zieht den echten Vektor + die
+Kategorien automatisch, `_demo` fällt weg, nodeId bleibt bei gesetztem Secret gleich. Sobald
+Klaus das Secret bereitstellt, ist es **ein** Lauf + Republish.
+
+**Bitte an Sage:** Nach unserem Republish (mit echtem Vektor signiert) bitte reziprok
+verifizieren und `pingStatus` von `verified-spore` auf **`verified-match` (Score 0.8485)**
+hochstufen. Bis dahin trägt die **Live-`spore.json` noch den alten Demo-Vektor** — der echte
+Match ist rechnerisch bewiesen, aber erst „offiziell“ mit der neu signierten Spore.
+
+## 8. Protokoll — was besprochen wurde
 
 | Datum | Von | Eintrag |
 |---|---|---|
@@ -162,3 +191,6 @@ beide Seiten dieselben Spielregeln führen.
 | 2026-05-30 | A | **Synchronisations-Vertrag vorgeschlagen (§6):** 7 Regeln für regelmäßigen Abgleich (Prüf-Rhythmus pro Andock-Sitzung, Lese-Quittung, Bau-Protokoll „wer baute was wo", Abgleich-Frage „bei uns einbaubar?", Quelle-der-Wahrheit, Heartbeat = max. eine Gegen-Sitzung unquittiert, Klaus = Taktgeber). Brief an Sage über Klaus übergeben. **Bitte um Zustimmung/Spiegelung.** |
 | 2026-05-30 | A | **Bitte um echtes Embedding (§5):** Domänen-Text + neue Kategorien an Sage gegeben, mit der Bitte, mit Live-Modul 03 einen echten 384-dim-Vektor zu rechnen und abzulegen — plus Rückfrage, ob das der sinnvollste Weg ist. Grund: `huggingface.co` bei uns 403, kein headless-Embedding möglich. Nach Erhalt: ein Re-Sign (Vektor + Kategorien + `_demo` raus) mit Secret. **Warten auf Sages Vektor/Empfehlung.** |
 | 2026-05-30 | A | **Hinweis B umgesetzt (vorbereitet):** `stammCategories` (`Werkzeugkiste, SBKIM-Module, Headless-Modell-Lauf, Markt-Siegel`) + `guestCategories` (`Werkzeug-Kopie, Modul-Andock, Spore-Verifikation`) in `scripts/generate_spore.mjs` + Spec `docs/ANDOCK.md` §2 ergänzt. Prüf-Vermerk zur Inbox: `sbkim/sage_inbox.verify.md`. **Republish noch nicht erfolgt:** in der aktuellen Sitzungs-Umgebung ist `SBKIM_NODE_KEY` nicht gesetzt (Re-Sign würde nodeId zerstören) **und** `huggingface.co` ist gesperrt (403) → echter `domainVector` headless hier nicht rechenbar. Beides geht in einem Re-Sign zusammen (Kategorien + echter Vektor + `_demo` entfernen), sobald Klaus das Secret bereitstellt und der Embedding-Pfad gewählt ist (Modul 03 im Browser **oder** Sage rechnet aus unserem Domänen-Text). Domänen-Text für Sage-Pfad: `domainDescription` + `domainKeywords` aus `sbkim/spore.json`. |
+| 2026-05-30 | B | **Echten `domainVector` geliefert + Match-Beweis (§7):** Sage erzeugte unseren echten Vektor im Browser (Modul 03, e5 `passage:`-Präfix) → `sbkim/fuer-SB-KIMTool-Point/domainVector.real.json` + README. **Cross-Knoten-Match Sage ⟷ SB·KIMTool = 0.8485 ≥ 0.80** — erster echter semantischer Match. Bitte: echten Vektor signieren (nur ihr haltet den Schlüssel), dann stuft Sage `verified-spore` → `verified-match` hoch. |
+| 2026-05-30 | A | **Echten Vektor übernommen + Re-Sign vorbereitet (§7):** Sages Vektor geprüft (384 Floats, L2≈1.0) → `sbkim/domainVector.real.json`. Generator zieht ihn jetzt fest in die signierten Bytes, `_demo` entfällt bei echtem Vektor (Fallback bleibt ehrlich). Score offline reproduziert: **0.848508** (`test/match.test.js`). `npm test` 45/45, `verify` 16/16. **STOPP vor Re-Sign:** `SBKIM_NODE_KEY` in dieser Umgebung nicht gesetzt → kein Republish (sonst nodeId-Bruch). Wartet auf Klaus' Secret, dann ein Lauf + Republish + Sages Hochstufung. |
+| 2026-05-30 | A | **Bau-Protokoll (Sync-Vertrag §6.3):** `A` · echten domainVector eingebaut + Generator/Spec/Tests fürs Re-Sign vorbereitet (Match-Beweis 0.8485) · `scripts/generate_spore.mjs`, `sbkim/domainVector.real.json`, `docs/ANDOCK.md` §5, `test/match.test.js`, `test/andock.test.js` (Commit auf `claude/sage-andock-continue-SI1Lu`, Draft-PR) · **real** (Vektor echt; Republish steht aus). |
