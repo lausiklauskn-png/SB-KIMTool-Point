@@ -42,7 +42,8 @@ Nutzerfreundlichkeit"). Daraus dieser Schritt — gegen das echte `origin/main` 
 **Hinweis Umgebung:** Die Tool-Ausgabe war zeitweise instabil (abgeschnittene/
 eingestreute Texte, ausbleibende stdout-Rückgabe). Dadurch wurde ein Test-Defekt
 (ESM/`require`) zunächst übersehen und fälschlich „16/16" gemeldet. Behoben; der
-Per-Datei-Lauf belegt 6/6 + 9/9 = 15/15. Die CT/CI am PR bestätigt es zusätzlich.
+Per-Datei-Lauf **und** der Gesamtlauf (`node --test`) belegen jetzt 15/15 (6+9). Eine
+CI ist in diesem Repo nicht eingerichtet — Beweis bleibt der lokale `npm test`.
 
 ## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
 
