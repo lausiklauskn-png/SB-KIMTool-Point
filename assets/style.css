@@ -461,14 +461,14 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   .tool:hover, .pwa:hover, .entry:hover { transform: none; }
   /* Bild-Wachstum nicht animieren; Standardgroesse halten (kein Sprung). */
   .entry:hover .entry-art { height: 88px; }
-  .entry--truhe:hover .entry-art { height: 150px; }
+  .entry--truhe:hover .entry-art { height: 230px; }
 }
 
 /* Touch-Geraete (Handys): kein echtes Hover -> Bilder bleiben handlich,
    Text drunter gut lesbar. */
 @media (hover: none) {
   .entry:hover .entry-art { height: 88px; }
-  .entry--truhe:hover .entry-art { height: 150px; }
+  .entry--truhe:hover .entry-art { height: 230px; }
 }
 
 footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); position: relative; z-index: 1; }
@@ -574,14 +574,6 @@ body::after {
 /* Werkzeugkiste-Karte: die Truhe IST der mittlere Knopf. Standard handlich
    (Text drunter gut lesbar, auch auf Handys); waechst beim Drueberfahren und
    schrumpft zurueck, wenn die Maus weg ist. Klick oeffnet die Werkzeuge-Seite. */
-.entry--truhe .entry-art {
-  height: 150px;
-  background-color: #0a0d11; /* dunkler Grund, falls Bild fehlt */
-}
-.entry--truhe:hover .entry-art {
-  height: 224px;
-  box-shadow: inset 0 0 36px rgba(54,214,195,0.18);
-}
 .hero h1::after { /* Akzent-Punkt-Glow unter dem Titel */
   content: ""; display: block; width: 64px; height: 3px; margin: 0.7rem auto 0;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
@@ -607,6 +599,22 @@ body::after {
 /* Touch-Geraete (Handys): kein echtes Hover -> Bild bleibt klein, Text lesbar. */
 @media (hover: none) {
   .entry:hover .entry-art { height: 88px; }
+}
+
+/* Werkzeugkiste-Karte: die Truhe IST der mittlere Knopf. Anders als die schmalen
+   Banner zeigt sie das GANZE Bild (contain) OHNE deckenden Schleier; hoeher, damit
+   die Truhe wirklich steht. Steht NACH .entry .entry-art -> gewinnt bei gleicher
+   Spezifitaet. Klick oeffnet weiter die Werkzeuge-Seite. */
+.entry--truhe .entry-art {
+  height: 230px;
+  background:
+    var(--art, none) center / contain no-repeat,
+    radial-gradient(60% 80% at 50% 38%, rgba(54,214,195,0.16), transparent 65%),
+    #0a0d11;
+}
+.entry--truhe:hover .entry-art {
+  height: 300px;
+  box-shadow: inset 0 0 40px rgba(54,214,195,0.20);
 }
 
 /* --- Scroll-Reveal (siehe assets/fx.js) ---------------------------------- */
