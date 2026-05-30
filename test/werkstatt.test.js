@@ -100,3 +100,33 @@ test("ehrlich: fehlendes Modul -> ok=false, nicht grün vortäuschen", () => {
   assert.equal(n.ok, false);
   assert.equal(n.status, "unvollständig");
 });
+
+// --- End-to-End: protocolRun verkettet die Module --------------------------
+
+test("protocolRun: ohne Browser-Spore meldet Schritt 1 ehrlich 'browser', kein grün", async () => {
+  // Headless: kein IndexedDB/WebCrypto -> Spore nicht nutzbar. Wir geben spore:null,
+  // damit Schritt 1+3 als 'braucht Browser' erscheinen (nicht grün-gelogen).
+  const r = await W.protocolRun(
+    "vegetarische suppe kochen rezept gemüse",
+    "vegetarische suppe kochen rezept brühe",
+    { spore: null });
+  const s1 = r.schritte.find((s) => s.label.startsWith("1)"));
+  assert.equal(s1.status, "browser", "Identität braucht Browser");
+  // Schritt 2 (Match) muss echt laufen (Demo-Pfad), Treffer bei viel Überlappung
+  const s2 = r.schritte.find((s) => s.label.startsWith("2)"));
+  assert.ok(["ok", "ready"].includes(s2.status), "Match-Schritt läuft");
+  // Schritt 4 (Siegel) ist offline lesbar -> ok
+  const s4 = r.schritte.find((s) => s.label.startsWith("4)"));
+  assert.equal(s4.status, "ok", "Siegel lesbar");
+  assert.match(r.zusammenfassung, /Browser/i, "Zusammenfassung nennt Browser-Bedarf");
+});
+
+test("protocolRun: kein Treffer -> Vertrauensschritt wird ehrlich übersprungen", async () => {
+  const r = await W.protocolRun(
+    "vegetarische suppe kochen rezept gemüse",
+    "fahrrad bremse schaltung reparatur werkstatt",
+    { spore: null });
+  const s3 = r.schritte.find((s) => s.label.startsWith("3)"));
+  assert.equal(s3.status, "skip");
+  assert.match(s3.info, /kein Treffer/i);
+});

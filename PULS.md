@@ -2,6 +2,22 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (Q) — Protokoll-Lauf: die ganze Kette auf einmal (End-to-End)
+
+Logisch bester Schritt (Embedding-Vendoring verworfen: Modell-Host 403 + ~100 MB gehört
+nicht ins Repo). Stattdessen die einzeln bewiesenen Bausteine erstmals als **eine Kette**.
+
+- **`werkstatt.js` v0.4 `protocolRun(A, B)`:** Identität (02) → Passung (03+04) → bei
+  Treffer Vertrauen (02 generateOwnSpore→verifyForeignSpore) → Siegel-Stand (16). Jeder
+  Schritt ehrlich beschriftet: grün / „braucht Browser" / „übersprungen (kein Treffer)".
+- **Sichtbar:** Werkzeuge-Seite, Knopf „Protokoll-Lauf starten" (nutzt dieselben zwei
+  Profil-Felder wie Live-Match), zeigt die Schrittfolge + Zusammenfassung.
+- **Tests:** headless 2 Fälle (ohne Browser-Spore → Schritt 1 ehrlich „browser"; kein
+  Treffer → Schritt 3 „skip"). **`npm test` 34/34 grün.** Browser `npm run verify`: volle
+  Kette (Schritt 1 Identität echt, 3 Vertrauen echt bei Treffer, 4 Siegel). **12/12 grün.**
+- README/LIVE-MODELL nachgezogen.
+- **Manual-Check:** Knöpfe im Browser ungeprüft durch Klaus; automatisch via verify belegt.
+
 ## 2026-05-30 (P) — Live-Match: zwei Profile → echter Treffer (semantische Vermittlung)
 
 - **`assets/werkstatt.js` v0.3 `liveMatch(profilA, profilB)`:** verkettet 03 Embedding →
