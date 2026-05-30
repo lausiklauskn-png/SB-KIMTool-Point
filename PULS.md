@@ -16,7 +16,7 @@ direkt aus dem Netz lesen** — kein Kurier-Zwang, nur Klaus startet Sitzungen.
   Signier-Form (§4), ergänzt Pflichtfelder `createdAt` + `embeddingModel`, akzeptiert
   Demo-Vektor. Geprüft (kein Netz/eval/Shell), übernommen als `scripts/generate_spore.mjs`.
 - **`sbkim/spore.json`** — dauerhafte, echt signierte Identität. nodeId
-  `o-5_NJDSWHj2Yg4He9rIVCB3-iJ5OF_Nkkw1Ms2_LZc`. Privater Schlüssel NUR als Secret
+  `eC3jzoo9Oii04KiSYBXEWhPQzAe6ezmDFKDo1_i0zdw`. Privater Schlüssel NUR als Secret
   `SBKIM_NODE_KEY` (nie im Repo). **Real:** Identität/Signatur. **Demo:** semantischer Match.
 - **Beweis:** `test/andock.test.js` (5 grün) — Signatur ✔, nodeId=SHA256(pub) ✔, Schema ✔,
   Demo-Markierung ✔, Manipulation fällt durch ✔. `npm test` **39/39**. Siegel-Eintrag gesetzt.

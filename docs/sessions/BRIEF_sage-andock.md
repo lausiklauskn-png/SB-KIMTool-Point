@@ -11,7 +11,7 @@
 - **Andock-Vertrag steht beidseitig.** Sage übernahm unsere kanonische Signier-Form
   (ANDOCK §4). Pflichtfelder: `createdAt`, `embeddingModel`.
 - **Unsere Spore ist echt, signiert, getestet, veröffentlicht** unter `sbkim/spore.json`
-  (nodeId `o-5_NJDSWHj2Yg4He9rIVCB3-iJ5OF_Nkkw1Ms2_LZc`). 5 Beweise grün, `npm test` 39/39.
+  (nodeId `eC3jzoo9Oii04KiSYBXEWhPQzAe6ezmDFKDo1_i0zdw`). 5 Beweise grün, `npm test` 39/39.
 - **Identität real, semantischer Match Demo** (`domainVector` = markierter Stub `_demo`).
 - **Postfach** `sbkim/AUSTAUSCH.md` läuft: Lese-Quittung + Prüf-Rhythmus + Log. Jeder Knoten
   hält seine Datei im eigenen Repo und liest die des anderen direkt aus dem Netz.
