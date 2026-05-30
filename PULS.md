@@ -2,6 +2,33 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (J) — Fünf echte SBKIM-Module 1:1 aus dem Sage-Protokol kopiert
+
+Klaus' Klarstellung: echte, getestete Sage-Module **direkt 1:1 kopieren** (keine
+Abwandlung — sie sind als grün befunden, auch in Kombination). Netzzugriff zu
+GitHub/raw ist erreichbar; Quelle ist `Sage-Protokol/src/modules/` auf `main`.
+
+- **Kopiert (unverändert) nach `web/tools/`:** `sbkim-storage.js` (01), `sbkim-spore.js`
+  (02), `sbkim-embedding.js` (03), `sbkim-match.js` (04), `sbkim-anastomose.js` (05) —
+  Originalheader/IIFE bleiben; registrieren auf `window.Sbkim*`.
+- **01/02 ersetzt:** meine früheren Point-Eigenbauten sind durch die echten Sage-Originale
+  ersetzt (Klaus' Ansage „Sage-Originale 1:1"). Dadurch konsistenter `SbkimStorage`/
+  `SbkimSpore`-Namespace mit 04/05.
+- **Test:** alte `storage.test.js`/`spore.test.js` (testeten die alte Eigenbau-API) entfernt;
+  neuer `test/modules.test.js` mit **window-Shim** lädt alle fünf + prüft Registrierung;
+  **04 Match voll offline bewiesen** (match identisch=1/orthogonal=0, Schwellen 0.80/0.60,
+  matchDimensions 3 Schichten). **`npm test` 16/16 grün** (6 Modell + 10 Module).
+- **Werkzeugkiste:** `TOOL_FILES` (app.js) um 03/04/05 erweitert; `werkzeugkiste.json`
+  01–05 mit `point_status`/`point_hinweis`/`datei` ehrlich nachgezogen (inkl. NETZ-Hinweis
+  für 03 Embedding/CDN, 05 HTTP-Handshake, 04 explainMatchLLM/Anthropic).
+- **status.json:** Real-Anteil ~35 %; README/Doku nachgezogen.
+- **Schutz-Modul-Pflicht:** 01–05 sind keine Schutz-Module (10/11/12/14/15) → kein
+  ZERTIFIKAT_ASPEKTE-Eintrag nötig.
+- **Manual-Check:** Browser-Pfade von 01/02/03/05 ungeprüft (03/05 brauchen Netz) —
+  wartet auf Klaus' Browser-Lauf.
+- **Offen:** 06/07/08/15/16 ebenfalls in Sage verfügbar; 03 Embedding-Modell könnte für
+  echte Offline-Tauglichkeit lokal vendort werden (derzeit CDN).
+
 ## 2026-05-30 (I) — Truhe-Knopf zurückgebaut auf Original (Banner über dem Knopf)
 
 Klaus: die große Truhe-im-Knopf sieht nicht gut aus → **komplett zurück auf das ursprüngliche
