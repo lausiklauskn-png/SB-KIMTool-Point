@@ -461,14 +461,12 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   .tool:hover, .pwa:hover, .entry:hover { transform: none; }
   /* Bild-Wachstum nicht animieren; Standardgroesse halten (kein Sprung). */
   .entry:hover .entry-art { height: 88px; }
-  .entry--truhe:hover .truhe-img { height: 230px; }
 }
 
 /* Touch-Geraete (Handys): kein echtes Hover -> Bilder bleiben handlich,
    Text drunter gut lesbar. */
 @media (hover: none) {
   .entry:hover .entry-art { height: 88px; }
-  .entry--truhe:hover .truhe-img { height: 230px; }
 }
 
 footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); position: relative; z-index: 1; }
@@ -599,24 +597,6 @@ body::after {
 /* Touch-Geraete (Handys): kein echtes Hover -> Bild bleibt klein, Text lesbar. */
 @media (hover: none) {
   .entry:hover .entry-art { height: 88px; }
-}
-
-/* Werkzeugkiste-Karte: die Truhe IST der mittlere Knopf — echtes <img> (laedt
-   zuverlaessig, mit Alt-Text). Ganze Truhe sichtbar; waechst beim Drueberfahren,
-   schrumpft zurueck. Klick oeffnet weiter die Werkzeuge-Seite. */
-.entry--truhe .truhe-img {
-  display: block; width: 100%; height: 230px; object-fit: contain;
-  margin: -1.3rem -1.3rem 0.9rem; padding: 0.4rem;
-  box-sizing: border-box; border-radius: 12px 12px 0 0;
-  border-bottom: 1px solid var(--line);
-  background:
-    radial-gradient(60% 80% at 50% 40%, rgba(54,214,195,0.16), transparent 65%),
-    #0a0d11;
-  transition: height 0.28s ease, box-shadow 0.25s ease;
-}
-.entry--truhe:hover .truhe-img {
-  height: 300px;
-  box-shadow: inset 0 0 40px rgba(54,214,195,0.20);
 }
 
 /* --- Scroll-Reveal (siehe assets/fx.js) ---------------------------------- */
