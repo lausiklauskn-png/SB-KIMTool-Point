@@ -148,7 +148,9 @@
     },
     {
       "id": "17", "name": "Floating-Widget", "stufe": "pro",
-      "sage_status": "stub", "point_status": "noch-nicht-kopiert",
+      "sage_status": "stub", "point_status": "1:1 aus Sage kopiert",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-floating-widget.js (1:1 aus Sage-Protokol/src/modules/17_floating_widget.js). Schwebendes Live-Status-Panel (LEBT/VERKEHR/FREMD/SIEGEL) + Drag + X + localStorage; buendelt Modul-15/16-Render. Headless: Laden + show/hide/minimize-API bewiesen; sichtbares Panel laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
+      "datei": "web/tools/sbkim-floating-widget.js",
       "was": "Schwebendes Bedien-Widget mit Event-Bus (fuenf Custom-Events).",
       "nutzen": "Ein leichter, einheitlicher Andock-Punkt fuer die Bedienung in jeder PWA.",
       "verwendung": "Widget einhaengen; auf die fuenf Events reagieren.",
@@ -194,7 +196,9 @@
     },
     {
       "id": "18", "name": "Tool-PWA-Container", "stufe": "profi",
-      "sage_status": "teil-fertig", "point_status": "noch-nicht-kopiert",
+      "sage_status": "teil-fertig", "point_status": "1:1 aus Sage kopiert (Sub a)",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-tool-pwa.js (1:1 aus Sage-Protokol/src/modules/18_tool_pwa.js, Sub (a) Andocken vorab). openAndockTab/close/isOpen. Headless: Laden + API bewiesen; weitere Sub-Bereiche (b-i) in Sage noch offen; Browser-Pfad ungeprueft (wartet auf Klaus' Browser-Lauf).",
+      "datei": "web/tools/sbkim-tool-pwa.js",
       "was": "Container, der ein Werkzeug als eigenstaendige PWA kapselt (Sub a 17/17 gruen, Rest offen).",
       "nutzen": "Selbstgebaute Tools laufen sicher gekapselt und sind teilbar.",
       "verwendung": "Werkzeug in den Container legen; als PWA ausliefern/kopieren.",

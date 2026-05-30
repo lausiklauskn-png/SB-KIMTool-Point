@@ -260,6 +260,8 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 /* Erklaer-Bloecke (Legende, Rollen) */
 .explain { margin: 0.5rem 0; border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 0.1rem 0.9rem; }
 .explain summary { cursor: pointer; padding: 0.6rem 0; font-family: var(--mono); font-size: 0.85rem; color: var(--accent); }
+.explain p { font-size: 0.88rem; line-height: 1.55; color: var(--text); margin: 0.7rem 0; }
+.explain p strong { color: var(--accent); }
 .legend { list-style: none; padding: 0; margin: 0.2rem 0 0.8rem; display: grid; gap: 0.45rem; font-size: 0.85rem; }
 .legend .lg { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 0.4rem; }
 .lg-active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
