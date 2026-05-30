@@ -8,7 +8,8 @@ import { Spore, verifyWith } from "../sandbox/02_spore.js";
 import { SiegelRegistry, ZERTIFIKAT_ASPEKTE } from "../sandbox/16_siegel.js";
 import { GateArzt } from "../sandbox/roles/gate_arzt.js";
 import { Bauer } from "../sandbox/roles/bauer.js";
-import { runModel } from "../sandbox/loop.js";
+import { Ingenieur } from "../sandbox/roles/ingenieur.js";
+import { runModel, RUN_ROLES } from "../sandbox/loop.js";
 
 test("Spore: signature verifies for honest data, fails when tampered", () => {
   const sp = new Spore({ label: "t" });
@@ -63,4 +64,45 @@ test("Immune layer: Sybil flood crosses distrust threshold -> flagged + apoptose
   assert.ok(run.summary.blocklist.length >= 1, "blocklist is populated");
   const flagged = run.events.find((e) => e.phase === "verdict" && e.flagged);
   assert.ok(flagged.apoptose?.signed, "flagged Sybil leaves a signed apoptose legacy");
+});
+
+test("Ingenieur: proposes titled, described, kinded ideas (deterministic order)", () => {
+  const ing = new Ingenieur();
+  const a = ing.propose();
+  const b = ing.propose();
+  for (const idea of [a, b]) {
+    assert.ok(idea.title && idea.description, "idea carries title + description");
+    assert.match(idea.kind, /^(hintergrund-tool|standalone-pwa|tool|webseite)$/);
+  }
+  // deterministic: a fresh Engineer proposes the same first idea
+  assert.deepEqual(new Ingenieur().propose(), a);
+});
+
+test("Run contract v0.2: roles, idee events and artefacts are present and consistent", () => {
+  const run = runModel({ rng: () => 1 });
+  assert.equal(run.protocolVersion, "0.2");
+  assert.deepEqual(run.roles, RUN_ROLES);
+  assert.ok(run.roles.includes("ingenieur") && run.roles.includes("negativbauer"));
+
+  // every build is preceded by an idea for the same artefact, with full metadata
+  const ideen = run.events.filter((e) => e.phase === "idee");
+  assert.ok(ideen.length >= 1, "at least one idee event");
+  for (const e of ideen) {
+    assert.equal(e.engineer, "ingenieur");
+    assert.ok(e.artefactId && e.kind && e.title && e.description, "idee is fully described");
+  }
+
+  // events carry a monotonic timeline index t for the page scheduler
+  const ts = run.events.map((e) => e.t);
+  assert.deepEqual(ts, [...ts].sort((x, y) => x - y), "t is monotonic");
+
+  // artefacts array mirrors the run; graduated ones are downloadable, rejects are not
+  assert.ok(run.artefacts.length >= 1, "artefacts array is populated");
+  for (const a of run.artefacts) {
+    assert.ok(a.id && a.kind && a.title && a.description, "artefact fully described");
+    assert.match(a.status, /^(entwurf|gebaut|geprueft|graduiert|verworfen)$/);
+    assert.equal(a.downloadable, a.status === "graduiert");
+  }
+  const graduated = run.artefacts.filter((a) => a.status === "graduiert").length;
+  assert.equal(graduated, run.summary.graduated, "artefacts and summary agree");
 });

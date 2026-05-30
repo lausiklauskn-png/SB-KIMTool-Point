@@ -95,28 +95,207 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   padding: 1rem;
 }
 
-/* --- Schicht 1: Agenten-Board --- */
-.board { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-.agent {
-  flex: 1 1 180px; background: var(--card-2); border: 1px solid var(--line);
-  border-radius: 8px; padding: 0.8rem; min-width: 160px;
+/* --- Schicht 1: animiertes Modell-Board (siehe model.js) ------------------- */
+/* Farben fuer den Angriffs-Bogen gruen->orange->rot. */
+:root {
+  --att-green: #3fd06b;
+  --att-orange: #e0a93a;
+  --att-red: #d65a5a;
 }
-.agent h3 { margin: 0 0 0.3rem; font-family: var(--mono); font-size: 0.92rem; }
-.agent .task { color: var(--muted); font-size: 0.82rem; min-height: 2.4em; }
-.agent .lamp { margin-top: 0.4rem; }
-.edge { color: var(--accent); }
-.arrow { color: var(--accent-dim); font-size: 1.4rem; }
-.agent.sybil { opacity: 0.45; border-style: dashed; }
-.agent.sybil h3::after { content: " ✗"; color: var(--lamp-dead); }
 
+/* Steuerung */
+.controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.2rem; }
+.ctl {
+  font-family: var(--mono); font-size: 0.78rem; cursor: pointer;
+  background: var(--card); border: 1px solid var(--line); color: var(--text);
+  padding: 0.4rem 0.8rem; border-radius: 999px;
+}
+.ctl:hover { border-color: var(--accent-dim); }
+
+/* Klartext-Statusleiste */
+.statusline {
+  display: flex; align-items: center; gap: 0.7rem;
+  margin: 0.5rem 0; padding: 0.7rem 1rem; border-radius: 10px;
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-left: 4px solid var(--line); font-size: 0.95rem; min-height: 2.7em;
+  transition: border-color 0.3s, background 0.3s;
+}
+.statusline .sl-icon { font-size: 1.3rem; line-height: 1; }
+.statusline b { color: var(--text); }
+.statusline code { font-family: var(--mono); font-size: 0.85em; color: var(--accent); }
+.phase-idle  { border-left-color: var(--muted); }
+.phase-idee  { border-left-color: var(--accent); }
+.phase-build { border-left-color: var(--accent); }
+.phase-test  { border-left-color: var(--lamp-live); }
+.phase-attack{ border-left-color: var(--att-orange); }
+.phase-flag  { border-left-color: var(--att-red); background: linear-gradient(90deg, #1b1012, var(--bg-soft)); }
+.phase-done  { border-left-color: var(--lamp-live); }
+.seal {
+  color: #0c0f12; background: var(--lamp-live); padding: 0 0.35rem; border-radius: 4px;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+}
+
+/* Die Buehne */
+.stage {
+  position: relative; width: 100%; aspect-ratio: 1000 / 560;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(54,214,195,0.08), transparent 60%),
+    linear-gradient(180deg, #0e141a, #0b0e12);
+  border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  margin: 0.5rem 0;
+}
+.stage::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 42px 42px; opacity: 0.10;
+}
+
+.wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+.edge { fill: none; stroke: var(--line); stroke-width: 2.5; }
+.edge.edge-attack { stroke: #4a2c2c; stroke-dasharray: 3 7; }
+.edge.flow { stroke: url(#edgeGrad); stroke-width: 3.5; stroke-dasharray: 7 9; animation: dash 0.55s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -32; } }
+.packet { opacity: 0; filter: drop-shadow(0 0 7px var(--accent)); transition: opacity 0.2s; }
+.burst { fill: none; stroke: var(--att-red); stroke-width: 3; filter: drop-shadow(0 0 7px var(--att-red)); }
+
+/* Knoten */
+.node {
+  position: absolute; transform: translate(-50%, -50%); width: 132px; text-align: center;
+  transition: filter 0.3s, opacity 0.5s, transform 0.5s; z-index: 2;
+}
+.orb {
+  width: 74px; height: 74px; margin: 0 auto; border-radius: 50%;
+  display: grid; place-items: center; font-size: 2rem;
+  background: radial-gradient(circle at 35% 30%, var(--card-2), #0e1419);
+  border: 1px solid var(--line); box-shadow: inset 0 0 12px #0008;
+  transition: border-color 0.35s, box-shadow 0.35s;
+}
+.node .ic { filter: grayscale(0.35) opacity(0.8); transition: filter 0.3s; }
+.node .nm { font-family: var(--mono); font-size: 0.8rem; margin-top: 0.35rem; color: var(--text); }
+.node .st { font-size: 0.68rem; color: var(--muted); min-height: 1.7em; line-height: 1.25; }
+
+.node.active .ic { filter: none; }
+.node.active .orb {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim), 0 0 22px var(--accent), inset 0 0 12px #0008;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--accent-dim), 0 0 16px var(--accent), inset 0 0 12px #0008; }
+  50%      { box-shadow: 0 0 0 3px var(--accent-dim), 0 0 32px var(--accent), inset 0 0 12px #0008; }
+}
+
+/* Bauer mit Siegel-Funke, Arzt-Reparatur/Verwerfen */
+.node.sealed .orb { border-color: var(--lamp-live); box-shadow: 0 0 26px var(--lamp-live), inset 0 0 12px #0008; }
+.node.repair .orb { border-color: var(--accent); box-shadow: 0 0 24px var(--accent), inset 0 0 12px #0008; }
+.node.reject .orb { border-color: var(--att-red); box-shadow: 0 0 24px var(--att-red), inset 0 0 12px #0008; }
+
+/* Angreifer: gruen -> orange -> rot -> Zerfall */
+.node.attacker .orb { border-color: #5a3030; }
+.node.att-green .orb  { border-color: var(--att-green);  box-shadow: 0 0 20px var(--att-green),  inset 0 0 12px #0008; }
+.node.att-orange .orb { border-color: var(--att-orange); box-shadow: 0 0 22px var(--att-orange), inset 0 0 12px #0008; animation: pulseWarn 0.9s ease-in-out infinite; }
+.node.att-red .orb    { border-color: var(--att-red);    box-shadow: 0 0 28px var(--att-red),    inset 0 0 12px #0008; animation: shake 0.3s ease-in-out 3; }
+@keyframes pulseWarn {
+  0%, 100% { box-shadow: 0 0 16px var(--att-orange), inset 0 0 12px #0008; }
+  50%      { box-shadow: 0 0 30px var(--att-orange), inset 0 0 12px #0008; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); } 75% { transform: translateX(4px); }
+}
+.node.dead { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(18deg); }
+
+/* "WIRD GETESTET"-Stempel beim Gate/Arzt */
+.stamp {
+  position: absolute; left: 65%; top: 15%; transform: translate(-50%, -50%) scale(0.6);
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; font-weight: 700;
+  color: #0c0f12; background: var(--lamp-live); padding: 0.2rem 0.5rem; border-radius: 6px;
+  opacity: 0; pointer-events: none; z-index: 3;
+}
+.stamp.show { animation: stamp 0.9s ease-out; }
+@keyframes stamp {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-7deg); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.12) rotate(-7deg); }
+  80%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-7deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-7deg); }
+}
+
+/* Detail-Karte */
+.detail { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin: 0.6rem 0; }
+.detail.is-fake { border-color: #5a3030; }
+.d-head { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.d-kind {
+  font-family: var(--mono); font-size: 0.68rem; padding: 0.15rem 0.55rem; border-radius: 999px;
+  border: 1px solid var(--accent-dim); color: var(--accent);
+}
+.kind-hintergrund-tool { border-color: var(--lamp-dorm); color: var(--lamp-dorm); }
+.kind-webseite { border-color: var(--muted); color: var(--muted); }
+.d-title { margin: 0; font-size: 1.05rem; border: 0; padding: 0; text-transform: none; color: var(--text); }
+.d-desc { color: var(--muted); font-size: 0.9rem; margin: 0.5rem 0 0.7rem; }
+.d-rail { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.rail-step {
+  font-family: var(--mono); font-size: 0.7rem; padding: 0.2rem 0.55rem; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--muted);
+}
+.rail-step.done { color: var(--text); border-color: var(--accent-dim); }
+.rail-step.now { color: #0c0f12; background: var(--accent); border-color: var(--accent); font-weight: 700; }
+.rail-step.reject { color: #fff; background: var(--att-red); border-color: var(--att-red); }
+.d-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.8rem; flex-wrap: wrap; }
+.d-note { color: var(--muted); font-size: 0.78rem; }
+.d-export {
+  font-family: var(--mono); font-size: 0.78rem; cursor: pointer;
+  background: transparent; border: 1px solid var(--accent); color: var(--accent);
+  border-radius: 8px; padding: 0.4rem 0.7rem;
+}
+.d-export:hover { background: var(--accent); color: #0c0f12; }
+
+/* Abschluss-Bilanz */
+.tally { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin: 0.6rem 0; }
+.tally-grid { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 0.9rem; margin: 0.6rem 0; font-size: 0.88rem; }
+.tally-grid b { font-family: var(--mono); color: var(--accent); }
+.tally-note { color: var(--muted); font-size: 0.78rem; margin: 0.3rem 0 0; }
+
+/* Erklaer-Bloecke (Legende, Rollen) */
+.explain { margin: 0.5rem 0; border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 0.1rem 0.9rem; }
+.explain summary { cursor: pointer; padding: 0.6rem 0; font-family: var(--mono); font-size: 0.85rem; color: var(--accent); }
+.legend { list-style: none; padding: 0; margin: 0.2rem 0 0.8rem; display: grid; gap: 0.45rem; font-size: 0.85rem; }
+.legend .lg { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 0.4rem; }
+.lg-active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.lg-pkt { background: #eafffb; box-shadow: 0 0 8px var(--accent); }
+.lg-green { background: var(--att-green); }
+.lg-orange { background: var(--att-orange); }
+.lg-red { background: var(--att-red); }
+.lg-seal { background: var(--lamp-live); border-radius: 3px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.7rem; margin: 0.4rem 0 0.6rem; }
+.role { background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem; }
+.role .ic { font-size: 1.3rem; }
+.role b { display: block; font-family: var(--mono); margin: 0.2rem 0; color: var(--text); }
+.role p { color: var(--muted); font-size: 0.8rem; margin: 0; }
+.role.attacker { border-color: #5a3030; }
+.why { color: var(--muted); font-size: 0.83rem; }
+.why code { font-family: var(--mono); color: var(--accent); }
+
+/* Protokoll-Ticker (im Detail-Aufklapper) */
 .ticker {
-  margin-top: 0.9rem; font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
+  font-family: var(--mono); font-size: 0.78rem; color: var(--muted);
   background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px;
-  padding: 0.6rem 0.8rem; max-height: 180px; overflow: auto;
+  padding: 0.6rem 0.8rem; max-height: 220px; overflow: auto; margin-bottom: 0.7rem;
 }
 .ticker .ok { color: var(--lamp-live); }
 .ticker .bad { color: var(--lamp-dead); }
 .ticker .flag { color: var(--lamp-dorm); }
+
+/* Ruhe-Variante: prefers-reduced-motion ODER Bewegung-aus-Knopf */
+.stage.no-motion *, .stage.no-motion *::before, .stage.no-motion *::after {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage .edge.flow { animation: none; }
+  .node.active .orb, .node.att-orange .orb, .node.att-red .orb { animation: none; }
+  .stamp.show { animation: none; opacity: 1; }
+}
 
 /* --- Schicht 2: Werkzeugkiste --- */
 .tabs { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; }
