@@ -4,6 +4,7 @@
   "repo": "SB-KIMTool-Point",
   "protocolVersion": "0.1",
   "runContractVersion": "0.2",
+  "versionen_hinweis": "Zwei bewusst VERSCHIEDENE Versionen, nicht angleichen: protocolVersion (0.1) = Sage-Protokoll-Version (Quelle der Wahrheit: Sage, gespiegelt in sandbox/00_config.js, steckt in der Spore-Identitaet). runContractVersion (0.2) = Vertrag des aufgezeichneten Laufs; web/data/run.json traegt diesen Wert historisch im Feld 'protocolVersion'. Bei Abweichung gilt Sage.",
   "prinzip": "Ehrlicher Real-Anteil (analog Sage 'X % real'). Trennt klar, was echt browser-tauglich ist, was nur Modell/Demo ist und was in Sage reif aber hier noch nicht eingebaut wurde.",
   "seiten_ehrlichkeit": "Die statische Seite ZEIGT einen aufgezeichneten Node-Lauf (web/data/run.json). Sie fuehrt das Modell NICHT live im Browser aus. Der Beweis ist der headless Smoke-Test (npm test).",
   "kategorien": {

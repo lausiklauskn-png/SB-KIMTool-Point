@@ -19,7 +19,13 @@ import { SiegelRegistry } from "./16_siegel.js";
 import { Reputation } from "./10_reputation.js";
 import { apoptose } from "./07_apoptose.js";
 
-/** Protocol version of the recorded run contract (run.json). */
+/**
+ * Version of the recorded-run CONTRACT (web/data/run.json) — NOT the Sage
+ * protocol version. run.json carries this value under the historic field name
+ * `protocolVersion`; status.json mirrors it correctly as `runContractVersion`.
+ * The Sage protocol version is the separate PROTOCOL_VERSION (0.1) from
+ * 00_config.js. The two are intentionally different; do not align them.
+ */
 export const RUN_PROTOCOL_VERSION = "0.2";
 
 /** The five roles the recorded run animates (Negativbauer = the Sybil adversary). */

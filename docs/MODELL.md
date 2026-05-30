@@ -28,6 +28,12 @@ dieses JSON und **erfindet nichts** — alle Titel/Arten/Beschreibungen stammen 
 Modell-Lauf:
 
 - `protocolVersion: "0.2"`, `roles: [ingenieur, bauer, gate_arzt, beobachter, negativbauer]`.
+  **Achtung — zwei verschiedene Versionen:** dieses Feld trägt (aus historischen Gründen
+  so benannt) die **Run-Vertrags-Version** `0.2`. Das ist **nicht** die Sage-Protokoll-Version
+  `0.1` (`PROTOCOL_VERSION` aus `00_config.js`, steckt in der Spore-Identität). In
+  `status.json` heißen sie korrekt getrennt: `protocolVersion: 0.1` (Sage) vs.
+  `runContractVersion: 0.2` (dieser Lauf). Beide sind **absichtlich verschieden** — die
+  `0.1` nicht auf `0.2` ziehen; bei Abweichung gilt Sage.
 - `artefacts[]` — je Objekt `id`, `kind` (hintergrund-tool | standalone-pwa | tool |
   webseite), `title`, `description`, `proposedBy`, `builtBy`, `status` (entwurf | gebaut
   | geprueft | graduiert | verworfen), `repaired`, `downloadable` (nur bei `graduiert`).
