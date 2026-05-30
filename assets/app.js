@@ -254,6 +254,33 @@ function renderWerkstatt() {
       }
     });
   }
+
+  // Protokoll-Lauf: die ganze Kette (Identität → Match → Vertrauen → Siegel)
+  const prBtn = $("#pr-run");
+  const prOut = $("#pr-out");
+  if (prBtn && prOut && typeof window.SbkimWerkstatt.protocolRun === "function") {
+    const stStil = { ok: "ok", ready: "ready", browser: "ready", skip: "ready", bad: "bad" };
+    const stIcon = { ok: "✓", ready: "◐", browser: "◐", skip: "·", bad: "✗" };
+    prBtn.addEventListener("click", async () => {
+      const a = ($("#lm-a") || {}).value || "";
+      const b = ($("#lm-b") || {}).value || "";
+      prOut.textContent = "… Protokoll-Lauf (lädt ggf. das Sprachmodell) …";
+      try {
+        const r = await window.SbkimWerkstatt.protocolRun(a, b);
+        const zeilen = r.schritte.map((s) =>
+          `<li class="${s.status === "ok" ? "ok" : s.status === "bad" ? "bad" : ""}">` +
+          `${stIcon[s.status] || "·"} ${s.label}${s.info ? " — " + s.info : ""}</li>`
+        ).join("");
+        prOut.innerHTML = `
+          <div class="probe ${r.ok ? "ok" : "bad"}">
+            <div class="probe-head">${r.zusammenfassung}</div>
+            <ul class="probe-steps">${zeilen}</ul>
+          </div>`;
+      } catch (e) {
+        prOut.innerHTML = `<div class="probe bad"><div class="probe-head">✗ Fehler: ${String(e).slice(0, 120)}</div></div>`;
+      }
+    });
+  }
 }
 
 // --- Dispatch: each page only loads what it shows -------------------------

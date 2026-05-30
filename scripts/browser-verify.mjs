@@ -118,6 +118,22 @@ async function main() {
        lmDirekt.aehnlich > lmDirekt.fremd,
        `ähnlich ${lmDirekt.aehnlich?.toFixed(3)} > fremd ${lmDirekt.fremd?.toFixed(3)} (echt=${lmDirekt.echt})`);
 
+    // 1c) Protokoll-Lauf — die ganze Kette im ECHTEN Browser (Identität läuft hier!)
+    //     Identische Profile -> Score 1.0 -> sicherer Treffer, damit auch der
+    //     Vertrauensschritt (3) echt durchläuft. (Demo-Score knapp an der Schwelle
+    //     wäre sonst grenzwertig — der echte Match im Browser ist davon unberührt.)
+    const proto = await page.evaluate(async () => {
+      const text = "vegetarische suppe kochen rezept gemüse brühe";
+      const r = await window.SbkimWerkstatt.protocolRun(text, text);
+      const st = (n) => (r.schritte.find((s) => s.label.startsWith(n)) || {}).status;
+      return { s1: st("1)"), s2: st("2)"), s3: st("3)"), s4: st("4)"), ok: r.ok };
+    });
+    ok("Protokoll-Lauf: Identität (Schritt 1) läuft echt im Browser", proto.s1 === "ok",
+       `Status: ${proto.s1}`);
+    ok("Protokoll-Lauf: Vertrauen (Schritt 3) grün bei Treffer", proto.s3 === "ok",
+       `Status: ${proto.s3}`);
+    ok("Protokoll-Lauf: Siegel (Schritt 4) lesbar", proto.s4 === "ok", `Status: ${proto.s4}`);
+
     // 2) 01 Storage: echtes IndexedDB im Browser
     const storageOk = await page.evaluate(async () => {
       const S = window.SbkimStorage;

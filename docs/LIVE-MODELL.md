@@ -55,7 +55,23 @@ technische Mittel: selbst-einschreibendes Zertifikat, das nur entsteht, wenn die
 Selbstprüfung erfüllt ist. Das Live-Modell ist der Ort, an dem diese Prüfung
 durch die Gate/Arzt-Rolle stattfindet, bevor ein Eintrag im Markt sichtbar wird.
 
-## Echter Browser-Beweis (neu) — `npm run verify`
+## Protokoll-Lauf (neu) — die Kette statt Einzelteile
+
+Seit 2026-05-30 verkettet `SbkimWerkstatt.protocolRun(profilA, profilB)` die Module
+erstmals zu **einem** Durchlauf — die SBKIM-Vermittlung am Stück, jeder Schritt
+ehrlich beschriftet (grün / „braucht Browser" / übersprungen):
+
+1. **Identität** (02 Spore) — Ed25519 + IndexedDB; läuft echt im Browser.
+2. **Passung** (03 Embedding + 04 Match) — Match echt; Embedding echt mit Netz, sonst Demo.
+3. **Vertrauen** (02 `generateOwnSpore` → `verifyForeignSpore`) — nur bei Treffer:
+   eigene Spore signieren + prüfen; manipulierte würde abgelehnt.
+4. **Siegel** (16) — Geprüft-Stand lesen (Aspekte-Log, Zertifikat-Flag).
+
+Sichtbar auf der Werkzeuge-Seite (Knopf „Protokoll-Lauf starten"), bewiesen headless
+(`npm test`, gemockte Spore → Schritte 1/3 ehrlich „braucht Browser") **und** im echten
+Browser (`npm run verify`: Schritte 1/3/4 grün, volle Kette).
+
+## Echter Browser-Beweis — `npm run verify`
 
 Seit 2026-05-30 gibt es einen **echten Browser-Lauf** (Playwright/Chromium,
 `scripts/browser-verify.mjs`): Er lädt die Werkzeuge-Seite in einem echten Browser

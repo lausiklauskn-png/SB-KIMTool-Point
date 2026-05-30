@@ -190,6 +190,97 @@
     });
   }
 
+  // ---- End-to-End: ein Protokoll-Lauf über mehrere Module -------------------
+  // Erstmals wirken die Bausteine als KETTE statt einzeln — die SBKIM-Vermittlung
+  // in einem Durchlauf, jeder Schritt nachvollziehbar:
+  //   1) Identität (02 Spore)         — braucht Browser (WebCrypto + IndexedDB)
+  //   2) Passung   (03 Embedding+04)  — Match offline/echt, Embedding braucht Netz
+  //   3) Vertrauen (02 verifyForeign) — bei Treffer: eigene Spore signieren+prüfen
+  //   4) Siegel    (16)               — Geprüft-Stand lesen
+  // Ehrlich abgestuft: Schritte ohne Browser-API melden "braucht Browser", nicht grün.
+  function protocolRun(profilA, profilB, deps) {
+    deps = deps || {};
+    var Sp = ("spore" in deps) ? deps.spore
+           : (typeof window !== "undefined" ? window.SbkimSpore : null);
+    var Si = ("siegel" in deps) ? deps.siegel
+           : (typeof window !== "undefined" ? window.SbkimSiegel : null);
+    var schritte = [];
+    var push = function (label, status, info) {
+      schritte.push({ label: label, status: status, info: info || "" });
+    };
+
+    // 1) Identität — nur mit echtem Browser (WebCrypto + IndexedDB)
+    var identP;
+    if (Sp && typeof Sp.getOrCreateIdentity === "function") {
+      identP = Sp.init()
+        .then(function () { return Sp.getOrCreateIdentity(); })
+        .then(function () { return Sp.getNodeId(); })
+        .then(function (nodeId) {
+          push("1) Identität (02 Spore)", "ok", "nodeId " + String(nodeId).slice(0, 12) + "…");
+          return nodeId;
+        })
+        .catch(function (e) {
+          push("1) Identität (02 Spore)", "browser",
+               "braucht Browser: " + String(e && e.name || e).slice(0, 40));
+          return null;
+        });
+    } else {
+      identP = Promise.resolve(null);
+      push("1) Identität (02 Spore)", "browser", "Modul 02 nicht geladen.");
+    }
+
+    return identP.then(function (nodeId) {
+      // 2) Passung — Match echt (offline möglich)
+      return liveMatch(profilA, profilB, deps).then(function (m) {
+        if (!m.ok) { push("2) Passung (04 Match)", "bad", m.fazit); return finish(); }
+        push("2) Passung (03+04)", m.treffer ? "ok" : "ready",
+             m.fazit + (m.echt ? " · echtes Embedding" : ""));
+
+        // 3) Vertrauen — nur bei Treffer und mit Browser-Identität
+        var vertrauenP;
+        if (m.treffer && nodeId && typeof Sp.generateOwnSpore === "function") {
+          vertrauenP = Sp.generateOwnSpore({
+            domain: "protokoll-lauf", endpoint: "https://example.test/lauf", nodeType: "hybrid",
+          }).then(function (spore) {
+            return Sp.verifyForeignSpore(spore);
+          }).then(function (r) {
+            push("3) Vertrauen (02 verify)", (r && r.valid) ? "ok" : "bad",
+                 (r && r.valid) ? "eigene Spore signiert + verifiziert"
+                                : ("abgelehnt: " + (r && r.reason)));
+          }).catch(function (e) {
+            push("3) Vertrauen (02 verify)", "browser", "braucht Browser: " + String(e && e.name || e).slice(0, 40));
+          });
+        } else {
+          vertrauenP = Promise.resolve();
+          push("3) Vertrauen (02 verify)",
+               m.treffer ? "browser" : "skip",
+               m.treffer ? "braucht Browser-Identität" : "übersprungen (kein Treffer)");
+        }
+        return vertrauenP.then(finish);
+      });
+    });
+
+    function finish() {
+      // 4) Siegel — Geprüft-Stand lesen (synchron, offline lesbar)
+      if (Si && typeof Si.getAspects === "function") {
+        var n = (Si.getAspects() || []).length;
+        var zert = (typeof Si.isCertified === "function") ? Si.isCertified() : null;
+        push("4) Siegel (16)", "ok",
+             n + " Aspekt(e) im Log" + (zert === null ? "" : (zert ? " · zertifiziert" : " · noch nicht zertifiziert")));
+      } else {
+        push("4) Siegel (16)", "browser", "Modul 16 nicht geladen.");
+      }
+      var grün = schritte.filter(function (s) { return s.status === "ok"; }).length;
+      return {
+        ok: !schritte.some(function (s) { return s.status === "bad"; }),
+        schritte: schritte,
+        zusammenfassung: grün + "/" + schritte.length + " Schritte grün" +
+          (schritte.some(function (s) { return s.status === "browser"; })
+            ? " · einige Schritte brauchen Klaus' Browser" : ""),
+      };
+    }
+  }
+
   // Voll offline-bewiesen (grün/rot) vs. nur bereitschafts-geprüft (braucht Netz).
   function probeAll() {
     return {
@@ -205,7 +296,8 @@
     probeAnastomose: probeAnastomose,
     probeHeterokaryose: probeHeterokaryose,
     liveMatch: liveMatch,
+    protocolRun: protocolRun,
     probeAll: probeAll,
-    version: "0.3.0",
+    version: "0.4.0",
   };
 });
