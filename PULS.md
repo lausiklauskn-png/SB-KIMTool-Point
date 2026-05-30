@@ -2,6 +2,38 @@
 
 Stand: 2026-05-30 · Branch `claude/feinschliff-erstes-modul-KOnAU`
 
+## Nachtrag 2026-05-30 (B) — Werkzeugkiste-Truhe + Versions-Klarstellung
+
+Sitzung auf Branch `claude/sb-kimtool-point-dev-V0MFr`. Gegen echtes `origin/main` gearbeitet
+(Branch zuerst auf main gezogen), keine offenen PRs, `npm test` durchweg **8/8 grün**.
+
+**Getan:**
+- **Versionen (vormals „Aufgabe 4"):** Befund — `protocolVersion` (0.1, Sage-Protokoll)
+  und `runContractVersion` / run.json-`protocolVersion` (0.2, Run-Vertrag) sind **bewusst
+  verschieden**, keine echte Inkonsistenz; die 0.1 auf 0.2 zu ziehen wäre falsch (bei
+  Abweichung gilt Sage). Statt blindem Angleichen **dokumentiert** in `sandbox/loop.js`,
+  `docs/MODELL.md` und `status.json` (neues Feld `versionen_hinweis`). **Keine Wertänderung.**
+- **Werkzeugkiste-Truhe:** Klaus stellte die reife Sage-Werkzeugkiste als Datei bei
+  (Entscheidung „Zieldateien beistellen"). Auf Klaus' Ansage `werkzeuge.html` **ersetzt**
+  durch die Truhe: Klick öffnet ein Werkzeug-Grid, jede Kachel ein Modal (Was/Wie/Einbau/
+  Vibe-Prompt/Kopieren/Test/Querverweise), selbst gezeichnete SVG-Symbole, Feenstaub-FX.
+  **Re-geskinnt** auf Point-Identität (Tokens `#0c0f12`/`#36d6c3`, Point-Kopf + Nav).
+  **Offline-first:** Truhen-Bild als Gradient statt Sage-Hotlink; „Modul-Code kopieren"
+  holt den Code live aus Sage und ist **ehrlich als Online-Zusatz** beschriftet.
+  `prefers-reduced-motion` respektiert, eine Datei, keine CDNs zur Anzeige.
+
+**Offen / wartet:**
+- **Browser-Sichttest** aller vier Seiten (jetzt inkl. neuer Truhe) — **ungeprüft,
+  wartet auf Klaus** (Tablet + Desktop, Hard-Reload Strg+Shift+R).
+- **Doppel-Status:** Die Truhe zeigt je Tool **eine** Reife (Sage-Stand). Der frühere
+  Sage/Point-Doppel-Status der alten `werkzeuge.html` fehlt hier noch — ehrlicher
+  Folge-Schritt (siehe Brief).
+- **Daten-Dopplung:** `werkzeugkiste.json` bleibt der maschinenlesbare Record; die Truhe
+  trägt ihre eigene (reichere) `TOOLS`-Liste inline. Spätere Vereinheitlichung möglich
+  (Truhe aus `werkzeugkiste.json` speisen — dann Vertrag zuerst).
+- **Echte Modul-Kopie** weiter offen: Die Truhe **verteilt/verweist**, kopiert aber noch
+  kein reifes Modul als Repo-Datei. Real-Anteil in `status.json` daher **unverändert ~20 %**.
+
 ## Nachtrag 2026-05-30 — Premium-Optik-Ebene über alle vier Seiten (Freibrief)
 
 Unter ausdrücklichem **Gestaltungs-Freibrief** von Klaus eine kohärente Effekt-Ebene
