@@ -262,6 +262,21 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 .explain summary { cursor: pointer; padding: 0.6rem 0; font-family: var(--mono); font-size: 0.85rem; color: var(--accent); }
 .explain p { font-size: 0.88rem; line-height: 1.55; color: var(--text); margin: 0.7rem 0; }
 .explain p strong { color: var(--accent); }
+
+/* --- Werkstatt (echte Selbst-Prüfung der Werkzeuge) ---------------------- */
+.werkstatt-titel { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); margin: 0.2rem 0 0.3rem; }
+.werkstatt-sub { font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin: 0 0 0.7rem; }
+.werkstatt-sub strong { color: var(--accent); }
+.werkstatt-run { font-size: 0.85rem; }
+.werkstatt-out { display: grid; gap: 0.7rem; margin-top: 0.8rem; }
+.probe { border: 1px solid var(--line); border-left: 4px solid var(--muted); border-radius: 8px; padding: 0.6rem 0.8rem; background: var(--bg-soft); }
+.probe.ok { border-left-color: var(--lamp-live); }
+.probe.bad { border-left-color: var(--lamp-dead); }
+.probe-head { font-family: var(--mono); font-size: 0.82rem; color: var(--text); font-weight: 700; }
+.probe-steps { list-style: none; padding: 0; margin: 0.4rem 0; display: grid; gap: 0.25rem; font-size: 0.8rem; }
+.probe-steps li.ok { color: var(--lamp-live); }
+.probe-steps li.bad { color: var(--lamp-dead); }
+.probe-fazit { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; }
 .legend { list-style: none; padding: 0; margin: 0.2rem 0 0.8rem; display: grid; gap: 0.45rem; font-size: 0.85rem; }
 .legend .lg { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 0.4rem; }
 .lg-active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }

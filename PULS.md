@@ -2,6 +2,25 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (M) — Werkstatt: erste echte Browser-Brücke zur Werkzeugkiste
+
+Erster realer Schritt vom Playback Richtung Live-Modell (docs/LIVE-MODELL.md). Ehrlich:
+nur was wirklich rechnet, wird grün gemeldet — kein vorgetäuschter Live-Lauf.
+
+- **`assets/werkstatt.js`** (IIFE, `window.SbkimWerkstatt`): lädt die echten Module und
+  führt eine NACHVOLLZIEHBARE Selbst-Prüfung aus — **offline**: 04 Match (rechnet:
+  identisch=1/quer=0, Schwelle 0.8) + 16 Siegel (Aspekte lesbar, Lese-API da). Module mit
+  Netz/DOM werden NICHT als grün behauptet. Fehlt ein Modul → ehrlich ok=false.
+- **`test/werkstatt.test.js`**: prüft die Brücke headless (window-Shim) inkl. „fehlendes
+  Modul täuscht nicht grün vor". **`npm test` 28/28 grün**.
+- **werkzeuge.html:** sichtbare „Werkstatt"-Karte mit Knopf „▶ Werkzeuge prüfen" + Ausgabe;
+  lädt `sbkim-match.js`/`sbkim-siegel.js`/`werkstatt.js`. **app.js** `renderWerkstatt()`
+  (Schritte grün/rot + Fazit). **style.css** `.werkstatt*/.probe*`.
+- **README** 28 Prüfungen.
+- **Manual-Check:** Werkstatt-Knopf im Browser ungeprüft — wartet auf Klaus.
+- **Nächster Schritt:** netzgebundene Module (03/05/06) als eigene, klar gekennzeichnete
+  Proben ergänzen; danach Schritt vom Playback zum echten Live-Lauf.
+
 ## 2026-05-30 (L) — a+b+c: 17/18 kopiert · Werkzeuge-Seite erklärt · Live-Modell-Vorbereitung · PR #11 zu
 
 Freibrief. Drei Schritte in einem:
