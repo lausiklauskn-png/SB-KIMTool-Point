@@ -38,21 +38,39 @@ interconnected nodes forming a protective lattice, like a digital immune system,
 cool teal light on deep charcoal, soft bloom and depth of field, elegant and
 premium, empty space in the upper-center for a headline, no text, no logo, 1600x900.`
 
-**banner-modell.png**
-`Slim horizontal banner, dark charcoal background, a left-to-right pipeline of
-glowing teal nodes connected by light edges (idea → build → check → observe),
-one faint red intruder node off to the side, cinematic soft glow, no text,
-no logo, 1200x400.`
-
 **banner-werkzeuge.png**
 `Slim horizontal banner, dark charcoal background, an orderly workbench of modular
 hexagonal tiles / building blocks with soft teal edge-glow, a few tiles brighter
 (ready) and some dim (dormant), clean isometric feel, no text, no logo, 1200x400.`
 
-**banner-markt.png**
-`Slim horizontal banner, dark charcoal background, a glowing storefront / marketplace
-of small app cards floating and connecting via teal docking lines, sense of live
-endpoints linking up, soft bloom, no text, no logo, 1200x400.`
+### Links & rechts der Truhe — Modell (links) + Markt (rechts), Steampunk-Richtung
+
+Beide im **gleichen** Stil, **angelehnt an Steampunk — aber nur in die Richtung**, nicht
+voll: zum gelieferten Truhe-Bild passend (verwittertes Messing/Kupfer, leuchtende
+Teal-Energieadern, warmer Gold-Schimmer, dunkler Kosmos-Grund). Restrained, modern, kein
+Zahnrad-Overkill. Beide **1200×400**, kein Text/Logo/Wasserzeichen.
+
+> **Gemeinsamer Stil-Anker (beide):** *dark cosmic charcoal background (#0c0f12) with faint
+> teal nebula, single cool teal/cyan glow accent (#36d6c3) as living energy, restrained
+> steampunk touches — weathered brass and copper, rivets, slim pipes, a few small gears —
+> leaning steampunk but NOT full, still clean and modern, warm golden inner glow as secondary
+> highlight (matching a glowing teal-keyed treasure chest), soft cyan bloom, cinematic depth,
+> no text, no logos, no watermark, 1200x400.*
+
+**banner-modell.png**  *(linke Karte — „Pipeline / Knotenkette")*
+`Slim horizontal banner in restrained steampunk style: a left-to-right arcane assembly line /
+pipeline of glowing teal energy nodes linked by light edges and slim weathered-brass pipes
+with small gears and riveted plates between the stages (idea → build → check → observe),
+one faint red intruder node off to the side, warm golden inner glow behind the teal, dark
+cosmic charcoal background with faint teal nebula, soft cyan bloom, no text, no logo,
+no watermark, 1200x400.`
+
+**banner-markt.png**  *(rechte Karte — „Schaufenster / Andocken")*
+`Slim horizontal banner in restrained steampunk style: a marketplace of small brass-framed
+display cases and glass lanterns floating and docking together via glowing teal cables and
+copper pipes, warm golden light glowing inside each behind the teal accent, a sense of live
+endpoints linking up, a few small gears and rivets, dark cosmic charcoal background with
+faint teal nebula, soft cyan bloom, no text, no logo, no watermark, 1200x400.`
 
 **icon-192.png**
 `App icon on deep charcoal rounded-square background, a single minimalist mark: a
