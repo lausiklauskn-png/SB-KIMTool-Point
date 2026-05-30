@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SB·KIMTool·Point — Werkzeugkiste</title>
+  <meta name="theme-color" content="#0c0f12" />
+  <link rel="icon" href="assets/img/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -21,6 +24,12 @@
   <main>
     <!-- Schicht 2 · WERKZEUGKISTE (herunterladen) -->
     <section class="layer" id="schicht-werkzeuge">
+      <div class="page-banner" style="--art:url('assets/img/banner-werkzeuge.png')">
+        <div class="pb-body">
+          <div class="pb-kicker">Schicht 2 · herunterladen</div>
+          <div class="pb-title">Die Werkbank — Module in drei Stufen</div>
+        </div>
+      </div>
       <h2>Schicht 2 · Werkzeugkiste (herunterladen)</h2>
       <p class="sub">
         Drei Stufen. Jede Kachel trägt Doppel-Status (Sage / Point) und eine Erklärung.
@@ -29,7 +38,7 @@
       <!-- Stufen-Legende (aus werkzeugkiste.json befüllt) -->
       <div class="tier-legend" id="tier-legend"></div>
 
-      <div class="panel">
+      <div class="panel" data-reveal>
         <!-- Reife-Schlüssel: was die Spine-Farbe links an jeder Kachel meint -->
         <div class="maturity-key" aria-hidden="true">
           <span><span class="mk-dot mk-fertig"></span>reif</span>
@@ -48,5 +57,6 @@
   </footer>
 
   <script src="assets/app.js"></script>
+  <script src="assets/fx.js"></script>
 </body>
 </html>

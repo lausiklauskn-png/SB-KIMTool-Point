@@ -2,6 +2,47 @@
 
 Stand: 2026-05-30 · Branch `claude/feinschliff-erstes-modul-KOnAU`
 
+## Nachtrag 2026-05-30 — Premium-Optik-Ebene über alle vier Seiten (Freibrief)
+
+Unter ausdrücklichem **Gestaltungs-Freibrief** von Klaus eine kohärente Effekt-Ebene
+**additiv** über alle vier Seiten gelegt (auf echtem `main`-Stand gebaut). Eigene
+Teal-Identität, **kein Klon** fremder Seiten — nur Techniken übernommen.
+
+**Gebaut (reine Optik/UX, Datenverträge + Modell-Logik unberührt):**
+- `assets/style.css`: fixer **Ambient-Hintergrund** (Glow-Blooms + optionale Textur),
+  langsame **Aurora**, **Glassmorphism** (Statusleiste/Karten), **Halo** am Hero-Titel,
+  wiederverwendbarer **Bild-Banner** (`.page-banner`), Hero als Layered-Komposition,
+  Karten-Vorschaubilder, **Scroll-Reveal** + gestaffelte Karten-Einblendung.
+- `assets/fx.js` (neu): Scroll-Reveal via IntersectionObserver, zero-dependency,
+  auf allen vier Seiten eingebunden; degradiert sauber ohne Observer.
+- `index/modell/werkzeuge/markt.html`: Banner, Reveal-Marker, Favicon/Theme-Color,
+  `fx.js`-Einbindung.
+- **Bild-Plätze** `assets/img/` als **progressive enhancement** — Seite sieht auch
+  ohne PNGs fertig aus (Gradient-Fallback, nie ein kaputtes Bild-Icon). Bedarf +
+  Generierungs-Prompts in `assets/img/README.md`. **Klaus generiert die PNGs**, sie
+  erscheinen dann automatisch.
+- **Offline**, keine CDNs; **`prefers-reduced-motion`** stellt alle neuen Bewegungen ruhig.
+  `npm test` weiterhin **8/8 grün**.
+
+**Offen / wartet:** (1) Klaus legt die generierten PNGs nach `assets/img/` (Namen siehe
+README) — bis dahin Gradient-Fallback. (2) **Browser-Sichttest aller vier Seiten:
+ungeprüft, wartet auf Klaus** (nach Pull Hard-Reload Strg+Shift+R). Auf Klaus' Ansage in
+diesen PR **ohne weitere Rückfrage gemergt**.
+
+## Nachtrag 2026-05-30 — Kurskorrektur: keine Doppelarbeit, Übergabe per Brief
+
+Eine Sitzung auf `claude/schicht23-polish-sage-S4IOC` bekam einen **veralteten Brief**
+(beschrieb die Schicht-2/3-Politur als offen) und hing zudem am alten **Gründungs-Skelett**
+statt an `main`. Befund: Die Politur (PR #8 + #9) war **längst in `main`** — `main` ist
+Wahrheit (8/8 Tests, `run.json` v0.2, alle Politur vorhanden). Die versehentlich neu gebaute
+Politur war **redundant** und hätte beim Merge reale Arbeit gelöscht → **bewusst kein PR
+darauf**; der Branch wurde **auf `main` zurückgesetzt** und trägt nur noch den neuen Brief.
+**Echte offene Punkte unverändert:** (1) Klaus' Browser-Lauf aller vier Seiten — ungeprüft;
+(2) Sage-Quelle unerreichbar (Scope nur `sb-kimtool-point`; „public" genügt nicht) → reifes
+Modul noch nicht kopierbar. Beides in `docs/sessions/BRIEF_browserlauf-und-modulquelle.md`
+übergeben. **Lehre verankert:** vor jedem Bau `git fetch origin main` und gegen `origin/main`
+arbeiten, nicht gegen den vorab gesetzten Branch-Stand.
+
 ## Nachtrag 2026-05-30 — Schicht 2/3 auf Modell-Optik-Niveau gehoben (Freibrief)
 
 Unter ausdrücklichem, befristetem **Gestaltungs-Freibrief** von Klaus. Diese Sitzung

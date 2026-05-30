@@ -442,4 +442,147 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   .tool:hover, .pwa:hover, .entry:hover { transform: none; }
 }
 
-footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); }
+footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); position: relative; z-index: 1; }
+
+/* ========================================================================
+   OPTIK-EBENE — Ambient-Hintergrund, Halo/Glow, Glas, Bilder, Einblendungen.
+   Rein additiv: Techniken preisgekroenter Seiten, original in eigener
+   Teal-Identitaet umgesetzt (kein Klon). Offline, zero-dependency.
+   PNG-Plaetze (assets/img/…) sind progressive enhancement: fehlt ein Bild,
+   bleibt der Gradient-Fallback sichtbar — die Seite sieht trotzdem fertig aus.
+   ===================================================================== */
+
+/* Grundfarbe auf <html>, damit der fixe Ambient-Layer (body::before, z-index:-1)
+   sichtbar HINTER dem Inhalt, aber VOR der Grundflaeche liegt. */
+html { background: var(--bg); }
+body { background: transparent; position: relative; }
+
+/* Ebene 1: ruhiger Ambient-Backdrop (Glow-Blooms + optionale Textur-PNG) */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 18% 0%, rgba(54,214,195,0.10), transparent 60%),
+    radial-gradient(55% 45% at 88% 8%, rgba(31,122,114,0.12), transparent 60%),
+    radial-gradient(70% 60% at 50% 110%, rgba(54,214,195,0.06), transparent 60%),
+    var(--ambient-img, none) center / cover no-repeat,
+    var(--bg);
+  background-blend-mode: screen, screen, screen, normal, normal;
+}
+/* Ambient-Textur wird gesetzt, sobald das PNG existiert (Fallback: nur Glows) */
+:root { --ambient-img: url("img/ambient.png"); }
+
+/* Ebene 2: sehr langsame Aurora — nur Bewegung, dezent; reduced-motion aus */
+body::after {
+  content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(40% 30% at 30% 30%, rgba(54,214,195,0.07), transparent 70%),
+    radial-gradient(35% 28% at 70% 60%, rgba(31,122,114,0.07), transparent 70%);
+  filter: blur(30px); opacity: 0.8;
+  animation: aurora 26s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0%   { transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  100% { transform: translate3d(3%, 2%, 0) scale(1.08); }
+}
+
+/* Inhalt sicher ueber den Ambient-Layern */
+.statusbar, main { position: relative; z-index: 1; }
+
+/* Glas-Effekt: Statusleiste + Karten frosten den Ambient leicht an */
+.statusbar {
+  background: linear-gradient(180deg, rgba(14,20,25,0.82), rgba(12,15,18,0.72));
+  -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
+}
+.brand:hover .dot { text-shadow: 0 0 10px var(--accent); }
+.panel, .tool, .pwa, .detail, .tally, .tier-card, .explain {
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+
+/* --- Wiederverwendbarer Bild-Banner (Seitenkopf) ------------------------- */
+/* Nutzung: <div class="page-banner" style="--art:url('img/banner-x.png')">…</div>
+   Ohne --art bleibt der Gradient-Fallback — nie ein kaputtes Bild-Icon. */
+.page-banner {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 16px;
+  min-height: 132px; margin: 0.4rem 0 1.1rem;
+  display: flex; align-items: flex-end; gap: 0.8rem;
+  padding: 1rem 1.1rem;
+  background:
+    linear-gradient(90deg, rgba(12,15,18,0.92) 0%, rgba(12,15,18,0.55) 45%, rgba(12,15,18,0.2) 100%),
+    var(--art, none) center / cover no-repeat,
+    radial-gradient(120% 140% at 0% 0%, rgba(54,214,195,0.16), transparent 55%),
+    linear-gradient(135deg, #11181e, #0b0e12);
+}
+.page-banner::after { /* Halo-Schimmer oben rechts */
+  content: ""; position: absolute; right: -10%; top: -60%;
+  width: 60%; height: 180%; pointer-events: none;
+  background: radial-gradient(circle, rgba(54,214,195,0.18), transparent 60%);
+}
+.page-banner .pb-kicker {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent);
+}
+.page-banner .pb-title { font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0.1rem 0 0; }
+.page-banner .pb-body { position: relative; z-index: 1; }
+
+/* --- Startseite: Hero als Layered-Komposition + Halo --------------------- */
+.hero { position: relative; padding: 2.2rem 1rem 1.4rem; border-radius: 18px; overflow: hidden; }
+.hero::before { /* Hero-Backdrop-Bild + Veil (Fallback: nur Glow) */
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(80% 90% at 50% 0%, rgba(12,15,18,0.2), rgba(12,15,18,0.86) 75%),
+    var(--hero-img, none) center / cover no-repeat,
+    radial-gradient(60% 80% at 50% -10%, rgba(54,214,195,0.16), transparent 60%);
+  --hero-img: url("img/hero.png");
+}
+.hero > * { position: relative; z-index: 1; }
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  text-shadow: 0 0 28px rgba(54,214,195,0.35);
+}
+.hero h1::after { /* Akzent-Punkt-Glow unter dem Titel */
+  content: ""; display: block; width: 64px; height: 3px; margin: 0.7rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 16px var(--accent); border-radius: 2px;
+}
+
+/* Eingangs-Karten: optionales Vorschaubild oben (Fallback: Glow-Streifen) */
+.entry { position: relative; overflow: hidden; }
+.entry .entry-art {
+  display: block; height: 88px; margin: -1.3rem -1.3rem 0.9rem; border-radius: 12px 12px 0 0;
+  background:
+    linear-gradient(180deg, rgba(12,15,18,0.1), rgba(22,28,34,0.95)),
+    var(--art, none) center / cover no-repeat,
+    radial-gradient(80% 120% at 80% 0%, rgba(54,214,195,0.22), transparent 60%),
+    linear-gradient(135deg, #14201f, #0e1419);
+  border-bottom: 1px solid var(--line);
+}
+.entry:hover { box-shadow: 0 14px 34px #0008; }
+.entry:hover .entry-art { box-shadow: inset 0 0 30px rgba(54,214,195,0.12); }
+
+/* --- Scroll-Reveal (siehe assets/fx.js) ---------------------------------- */
+[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-reveal].in { opacity: 1; transform: none; }
+
+/* Gestaffelte Einblendung der dynamischen Karten (Werkzeuge/Markt) */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.grid .tool, .market .pwa { animation: fadeUp 0.5s ease both; }
+.grid .tool:nth-child(2), .market .pwa:nth-child(2) { animation-delay: 0.05s; }
+.grid .tool:nth-child(3), .market .pwa:nth-child(3) { animation-delay: 0.10s; }
+.grid .tool:nth-child(4), .market .pwa:nth-child(4) { animation-delay: 0.15s; }
+.grid .tool:nth-child(5), .market .pwa:nth-child(5) { animation-delay: 0.20s; }
+.grid .tool:nth-child(6), .market .pwa:nth-child(6) { animation-delay: 0.25s; }
+.grid .tool:nth-child(n+7) { animation-delay: 0.30s; }
+
+/* --- Reduced-Motion: alle neuen Bewegungen ruhigstellen ------------------- */
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .grid .tool, .market .pwa { animation: none; }
+}
+
+/* --- Mobile/Tablet: Banner etwas flacher --------------------------------- */
+@media (max-width: 640px) {
+  .page-banner { min-height: 104px; }
+  .hero { padding: 1.6rem 0.8rem 1.1rem; }
+}
