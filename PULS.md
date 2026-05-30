@@ -43,6 +43,10 @@ Hard-Reload Ctrl+Shift+R).
   `modell.html` (weniger Navigation, alles am Ort des Geschehens). Nav unverändert.
 - ASCII-Titel ohne Umlaut-Ersatz im `sandbox/` (Codebase-Stil); „Rate-Limit-Bremse" statt „…-Waechter".
 
+**Freibrief für die Folgesitzung:** Klaus hat den **Gestaltungs-Freibrief ausdrücklich auch
+für die nächste Sitzung** erteilt (befristet, gleiche unverhandelbare Leitplanken). Er ist
+im neuen Brief `docs/sessions/BRIEF_feinschliff-und-erstes-modul.md` (eigener Abschnitt) verankert.
+
 ## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
 
 Verbindliche Konvention verankert, damit Folge-Sitzungen den Stand kennen und nicht

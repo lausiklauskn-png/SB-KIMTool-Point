@@ -9,6 +9,26 @@ Stand: 2026-05-30 · für eine **Nachfolgesitzung** · Branch-Vorschlag `claude/
 
 ---
 
+## Gestaltungs-Freibrief — ausdrücklich erteilt (von Klaus, 2026-05-30, befristet)
+
+Diese Folgesitzung hat **volle gestalterische Freiheit** und darf **ohne Nachfrage** über
+Design, Layout, Farben, Bewegung und Effekte der Schichten 2/3 (und Feinschliff der
+Modell-Seite) entscheiden — mutig gestalten ist erwünscht (Glow/Partikel/3D/WebGL),
+voller Umbau erlaubt, iterieren bis selbst zufrieden, Unter-Agenten erlaubt. Offene
+Detailpunkte und die Schritt-Reihenfolge entscheidet die Sitzung selbst (intelligent,
+logisch, nutzerfreundlich) und begründet sie im PR/PULS, statt zu blockieren.
+
+**Befristung:** Der Freibrief gilt **nur für diese Aufgabe/Sitzung**, ist nicht auf weitere
+Sitzungen übertragbar und läuft mit Abschluss aus. Solange er gilt, ist er bindend.
+
+**Unverhandelbar (auch im Freibrief):** ehrliches Modell/Playback (kein Live-Bau);
+`npm test` bleibt grün; keine personenbezogenen Daten; offline-tauglich (Libs lokal
+vendorn, kein CDN-Zwang); `prefers-reduced-motion` respektieren; **Merge entscheidet
+Klaus**. Der Freibrief deckt **nur reine Design-/UX-Gestaltung** — **Datenverträge,
+Modell-Logik und Sicherheits-Module** bleiben Plan-vor-Code **mit Klaus**.
+
+---
+
 ## 0. Pflichtlektüre vor Start **[Pflicht — erst lesen, dann planen, dann bauen]**
 
 In dieser Reihenfolge, **bevor** Code geschrieben wird:
@@ -21,10 +41,9 @@ In dieser Reihenfolge, **bevor** Code geschrieben wird:
    `assets/app.js`, `assets/style.css`, `sandbox/loop.js` + `sandbox/roles/*`.
 
 **Erst Überblick, dann bauen:** relevanten Code lesen, Plan formulieren, offene PRs
-sichten. Für **reine Design-/UX-Gestaltung gilt KEIN automatischer Freibrief mehr** —
-der war auf die Animations-Aufgabe befristet und ist ausgelaufen. Diese Sitzung zeigt
-ihren Plan kurz an Klaus (Chat) und holt für Design eine **neue ausdrückliche Freigabe**,
-falls ein größerer Umbau ansteht. Datenverträge/Sicherheit ohnehin nur mit Klaus.
+sichten. Für **reine Design-/UX-Gestaltung gilt der oben erteilte Gestaltungs-Freibrief**
+— **ohne Rückfrage** loslegen, Entscheidungen im PR/PULS begründen. Für **Datenverträge,
+Modell-Logik und Sicherheits-Module** weiterhin **Plan-vor-Code mit Klaus**.
 
 ---
 
@@ -52,7 +71,8 @@ Sage-Modul ist als echte Datei(en) im Repo, dokumentiert und — falls sinnvoll 
   - Restpunkte aus Klaus' Browser-Lauf der Modell-Seite (Performance Tablet, Lesbarkeit,
     Knopf-Beschriftungen) abarbeiten.
   - Schicht 2 (`werkzeuge.html`) und 3 (`markt.html`) optisch angleichen (gemeinsame
-    Karten/Chips/Hover aus `style.css` wiederverwenden) — **erst Plan an Klaus**.
+    Karten/Chips/Hover aus `style.css` wiederverwenden) — **unter dem Gestaltungs-Freibrief
+    ohne Rückfrage**, Funktion erhalten, Entscheidungen im PR/PULS begründen.
   - Erstes reifes Sage-Modul auswählen (Vorschlag: **09 Einbau-PWA** oder ein klar
     abgegrenztes Hintergrund-Tool) und **Datei für Datei** kopieren (kein git-clone),
     mit eigener Identität, Kopf-Kommentar + Version, **kein Klarname** (Kein-PII).
@@ -83,15 +103,15 @@ Sage-Modul ist als echte Datei(en) im Repo, dokumentiert und — falls sinnvoll 
 
 1. Offene PRs sichten/klassifizieren (merge/close/hold), Konfliktdateien markieren.
 2. Klaus' Browser-Rückmeldung zur Modell-Seite einsammeln und Restpunkte beheben.
-3. Plan für Schicht-2/3-Angleichung kurz an Klaus → nach Freigabe umsetzen.
+3. Schicht-2/3-Angleichung unter dem Gestaltungs-Freibrief umsetzen (ohne Rückfrage).
 4. Erstes reifes Modul auswählen, Datei für Datei kopieren, Doku + Test, `status.json` nachziehen.
 5. PULS + neuer Brief, Draft-PR mit Test-Plan. **Merge entscheidet Klaus.**
 
 ## 7. Offene Fragen an Klaus
 
 - Welches reife Sage-Modul zuerst (Vorschlag 09 Einbau-PWA)?
-- Schicht 2/3 nur angleichen oder auch animieren (eigener Freibrief nötig)?
 - GitHub Pages auf `main` zeigen lassen für den Live-Sichttest?
+- (Gestaltung von Schicht 2/3 ist durch den Freibrief gedeckt — keine Rückfrage nötig.)
 
 ---
 
