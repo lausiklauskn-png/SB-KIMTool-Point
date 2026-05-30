@@ -40,7 +40,7 @@ Kein-PII, Offline/keine CDNs, `prefers-reduced-motion`, eigene Identität) gelte
 
 - **Auf `main` (gemerged, Vorgänger):** Premium-Optik-Ebene über alle vier Seiten (PR #10),
   animierte Modell-Seite (PR #8), Schicht 2/3 (PR #9). `npm test` **8/8 grün**.
-- **Diese Sitzung (Branch `claude/werkzeugkiste-truhe`, Draft-PR):**
+- **Diese Sitzung (Branch `claude/sb-kimtool-point-dev-V0MFr`, Draft-PR #11):**
   - `werkzeuge.html` **ersetzt** durch die **Werkzeugkiste-Truhe** (Klick → Werkzeug-Grid,
     Modal je Tool mit Was/Wie/Einbau/Vibe-Prompt/Kopieren/Test/Querverweise, SVG-Symbole,
     Feenstaub-FX). Re-geskinnt auf Point, offline-first (Truhen-Bild = Gradient; Live-Code-
