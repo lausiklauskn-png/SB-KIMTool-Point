@@ -23,8 +23,10 @@
     { "name": "Werkzeugkiste: Profi (10,11,12,14,18)", "status": "vorgebaut-schlummert", "hinweis": "Sybil-Abwehr-Module, schlummern bis Angriff" },
     { "name": "Modell-Seite: animierte Pipeline (Playback von run.json v0.2)", "status": "real-browser-tauglich", "hinweis": "SVG/CSS-Animation der Rollen-Kette, aktiver Agent leuchtet, Angriff stirbt sichtbar; zero-dependency, prefers-reduced-motion; zeigt das Modell, fuehrt es nicht live aus; Browser-Lauf wartet auf Klaus" },
     { "name": "Marktplatz Schicht 3 (Saat = echte Live-Endknoten)", "status": "real-browser-tauglich", "hinweis": "Suche bewusst noch NICHT gebaut" },
-    { "name": "Reife Module tatsaechlich aus Sage kopieren", "status": "noch-nicht-gebaut" },
+    { "name": "Werkzeug 01 Storage: echte, offline einbaubare Datei (web/tools/sbkim-storage.js)", "status": "real-browser-tauglich", "echt": true, "beleg": "test/storage.test.js prueft In-Memory-Pfad + API-Vertrag (9 Faelle, gruen).", "hinweis": "Point-eigene Umsetzung; IndexedDB-Pfad ungeprueft, wartet auf Klaus' Browser-Lauf. Die Werkzeuge-Seite bietet die Datei zum Kopieren/Laden an." },
+    { "name": "Werkzeug 02 Spore: echte, offline einbaubare Datei (web/tools/sbkim-spore.js)", "status": "real-browser-tauglich", "echt": true, "beleg": "test/spore.test.js prueft Ed25519 sign/verify, nodeId=SHA-256(pubkey), nur-oeffentlicher Export, getrennte Identitaeten (10 Faelle, gruen, gegen Node-WebCrypto).", "hinweis": "Echte Krypto via WebCrypto (crypto.subtle). WEBCRYPTO-ANFORDERUNG ehrlich vermerkt: isSupported() meldet alte Browser statt still zu brechen. Browser-Pfad ungeprueft, wartet auf Klaus' Browser-Lauf." },
+    { "name": "Weitere reife Module als echte Dateien kopieren/portieren", "status": "noch-nicht-gebaut", "hinweis": "01 Storage + 02 Spore stehen. Naechste Kandidaten: 19 Andock-Wizard oder 09 Einbau-PWA. Sage-Quelldateien fuer 1:1-Kopie noch nicht beigestellt." },
     { "name": "Browser-Transport / Server-Zeh-Entscheidung", "status": "noch-nicht-gebaut", "hinweis": "offene Wand, bewusst vertagt" }
   ],
-  "real_anteil_geschaetzt": "ca. 20% (lauffaehiges, getestetes Modell + statische Seite; Werkzeugkiste verlinkt reife Sage-Module, die hier noch nicht kopiert sind)"
+  "real_anteil_geschaetzt": "ca. 24% (lauffaehiges, getestetes Modell + statische Seite mit Premium-Optik; zwei echte Werkzeuge — 01 Storage + 02 Spore — als offline einbaubare Dateien kopiert und headless getestet; weitere reife Sage-Module hier noch nicht kopiert)"
 }
