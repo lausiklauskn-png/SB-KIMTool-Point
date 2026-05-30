@@ -2,6 +2,25 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (L) — a+b+c: 17/18 kopiert · Werkzeuge-Seite erklärt · Live-Modell-Vorbereitung · PR #11 zu
+
+Freibrief. Drei Schritte in einem:
+
+- **(a) 17/18 kopiert:** `sbkim-floating-widget.js` (17), `sbkim-tool-pwa.js` (18) 1:1 aus
+  Sage nach `web/tools/`. Werkzeugkiste = **zwölf** echte Module. `TOOL_FILES` + `werkzeugkiste.json`
+  nachgezogen; `test/modules.test.js` erweitert → **`npm test` 23/23 grün**.
+- **(b) Werkzeuge-Seite:** menschlicher „Worum geht's?"-Erklärblock (`.explain`) oben — SBKIM als
+  Partnervermittlung für Apps + Hinweis, dass Module mit Knopf echt/1:1-aus-Sage sind, manche
+  netzgebunden. `.explain p`-Stil ergänzt.
+- **(c) Live-Modell-Vorbereitung:** `docs/LIVE-MODELL.md` (Spec vor Code) — Werkzeug-Vertrag
+  (Quelle = werkzeugkiste.json, Laden über `datei`, ehrliche Verfügbarkeit, Beurteilungs-Kriterium
+  via 16 Siegel), Bezug zum Markt-Zertifikat. **Kein** vorgetäuschter Live-Lauf — Playback bleibt
+  ehrlich; nächster Bauschritt benannt.
+- **PR #11 (Truhe) geschlossen** (Klaus' Ansage) mit Begründung: alter Stand, online-Code-Nachladen,
+  von der jetzigen Linie überholt.
+- **status.json:** Real-Anteil ~50 %; README/Doku nachgezogen.
+- **Manual-Check:** Werkzeuge-Seite (neuer Erklärblock) + Browser-Pfade ungeprüft — wartet auf Klaus.
+
 ## 2026-05-30 (K) — Fünf weitere Sage-Module 1:1 kopiert (Werkzeugkiste = zehn Module)
 
 Freibrief für den Bau. Nach 01–05 nun **06 Heterokaryose, 07 Apoptose, 08 UI-Demo,

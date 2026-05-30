@@ -48,6 +48,8 @@ const TOOL_FILES = {
   "08": "web/tools/sbkim-ui-demo.js",
   "15": "web/tools/sbkim-membran.js",
   "16": "web/tools/sbkim-siegel.js",
+  "17": "web/tools/sbkim-floating-widget.js",
+  "18": "web/tools/sbkim-tool-pwa.js",
 };
 
 async function renderWerkzeuge() {

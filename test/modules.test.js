@@ -28,6 +28,8 @@ import "../web/tools/sbkim-apoptose.js";
 import "../web/tools/sbkim-ui-demo.js";
 import "../web/tools/sbkim-membran.js";
 import "../web/tools/sbkim-siegel.js";
+import "../web/tools/sbkim-floating-widget.js";
+import "../web/tools/sbkim-tool-pwa.js";
 
 test("alle zehn Module registrieren ihre API auf window", () => {
   assert.equal(typeof globalThis.SbkimStorage, "object", "01 Storage");
@@ -40,6 +42,8 @@ test("alle zehn Module registrieren ihre API auf window", () => {
   assert.equal(typeof globalThis.SbkimUiDemo, "object", "08 UI-Demo");
   assert.equal(typeof globalThis.SbkimMembrane, "object", "15 Membran");
   assert.equal(typeof globalThis.SbkimSiegel, "object", "16 Siegel");
+  assert.equal(typeof globalThis.SbkimWidget, "object", "17 Floating-Widget");
+  assert.equal(typeof globalThis.SbkimToolPwa, "object", "18 Tool-PWA-Container");
 });
 
 test("01 Storage zeigt seine erwartete Oberfläche", () => {
@@ -132,4 +136,18 @@ test("16 Siegel: Selbst-Bezeugungs-Oberfläche + Aspekte-Liste (offline)", () =>
   // getAspects ist eine reine Lese-Funktion -> offline prüfbar
   const aspects = s.getAspects();
   assert.ok(Array.isArray(aspects), "getAspects liefert eine Liste");
+});
+
+test("17 Floating-Widget zeigt seine Panel-Oberfläche", () => {
+  const w = globalThis.SbkimWidget;
+  for (const fn of ["init", "show", "hide", "isVisible", "minimize", "maximize"]) {
+    assert.equal(typeof w[fn], "function", `Widget.${fn}`);
+  }
+});
+
+test("18 Tool-PWA-Container zeigt seine Andock-Oberfläche", () => {
+  const t = globalThis.SbkimToolPwa;
+  for (const fn of ["init", "openAndockTab", "close", "isOpen"]) {
+    assert.equal(typeof t[fn], "function", `ToolPwa.${fn}`);
+  }
 });
