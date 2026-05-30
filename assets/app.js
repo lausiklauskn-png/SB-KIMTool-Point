@@ -176,15 +176,22 @@ async function renderMarkt() {
       : `<span class="chip c-live"><span class="dot"></span>live · direkt</span>`;
     const echtChip = e.echt
       ? `<span class="chip c-fertig"><span class="dot"></span>✓ echt</span>` : "";
+    const matchChip = (typeof e.matchScore === "number")
+      ? `<span class="chip c-fertig" title="${e.matchHinweis || ""}"><span class="dot"></span>✓ voller Match · ${e.matchScore.toFixed(2)}</span>` : "";
     const monogram = (e.name || "?").trim().charAt(0).toUpperCase();
+    // "→ andocken" öffnet die echte Live-Seite des Knotens. Externe (http)-Links
+    // gehen in einem neuen Tab auf; tote #-Anker bleiben (falls je wieder genutzt) inline.
+    const extern = /^https?:\/\//.test(e.andockLink || "");
+    const dockAttr = extern ? ` target="_blank" rel="noopener noreferrer"` : "";
+    const dockLabel = extern ? "→ andocken ↗" : "→ andocken";
     const el = document.createElement("div");
     el.className = "pwa";
     el.innerHTML = `
       <div class="p-head"><span class="p-mark">${monogram}</span><span class="name">${e.name}</span></div>
-      <div class="p-chips">${statusChip}${echtChip}</div>
+      <div class="p-chips">${statusChip}${echtChip}${matchChip}</div>
       <div class="can">„${e.kannDas}"</div>
       <div class="nodeid">${e.nodeId}</div>
-      <a class="dock" href="${e.andockLink}">→ andocken</a>`;
+      <a class="dock" href="${e.andockLink}"${dockAttr}>${dockLabel}</a>`;
     market.appendChild(el);
   }
   $("#market-note").textContent = data.hinweis;
