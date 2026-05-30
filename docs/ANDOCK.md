@@ -32,6 +32,8 @@ Pflicht- und genutzte Felder unserer `sbkim/spore.json` — Reihenfolge wie bei 
 | `domain`            | kurzer Domänen-Bezeichner                      | real  | fest |
 | `domainDescription` | ein Satz                                       | real  | fest |
 | `domainKeywords`    | String-Array                                   | real  | fest |
+| `stammCategories`   | String-Array (eigener Stamm / Kern-Angebot)    | real  | fest (Sage-Hinweis B) |
+| `guestCategories`   | String-Array (was Gäste/Forker hier tun)       | real  | fest (Sage-Hinweis B) |
 | `endpoint`          | URL **mit** Schrägstrich am Ende               | real  | Pages-URL |
 | `publicKey`         | JWK `{kty:"OKP",crv:"Ed25519",x,key_ops,ext,alg}` | real | aus Schlüssel |
 | `domainVector`      | 384-Float-Array, L2-normalisiert               | **DEMO** | Stub, s. §5 |
@@ -40,6 +42,13 @@ Pflicht- und genutzte Felder unserer `sbkim/spore.json` — Reihenfolge wie bei 
 Der `publicKey` ist ein **JWK** (wie bei Sage), nicht DER. `x` = roher 32-Byte-Public-Key
 base64url. Die `id` ist **nicht** gleich `x`, sondern `base64url(SHA256(roher Pubkey))`
 — bestätigt durch Nachrechnen an Sages eigener Spore.
+
+`stammCategories` / `guestCategories` (Sage-Hinweis B, 2026-05-30) sind für die
+*Verifikation* nicht Pflicht, helfen aber späterem Stamm/Gast-Matching. Sie wandern — wie
+alle Felder — in die signierten Bytes. **Achtung:** sie kommen erst in die veröffentlichte
+`sbkim/spore.json`, wenn sie **mit dem Secret `SBKIM_NODE_KEY` neu signiert** wird (sonst
+wechselt die nodeId). Bis dahin trägt der Generator sie vor; die Live-Spore zieht beim
+nächsten Re-Sign nach (zusammen mit dem echten `domainVector`, §5).
 
 ## 3. Schlüssel-Haltung (dauerhafte Identität)
 

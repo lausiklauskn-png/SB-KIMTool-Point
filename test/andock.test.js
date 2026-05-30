@@ -63,6 +63,16 @@ test("Spore: Sage-Pflichtfelder + Schema vollständig", () => {
   assert.equal(sp.publicKey.crv, "Ed25519");
 });
 
+test("Spore: stamm/guestCategories vorhanden (Sage-Hinweis B, ANDOCK §2)", () => {
+  const sp = makeSpore();
+  assert.ok(Array.isArray(sp.stammCategories) && sp.stammCategories.length > 0, "stammCategories fehlt");
+  assert.ok(Array.isArray(sp.guestCategories) && sp.guestCategories.length > 0, "guestCategories fehlt");
+  // Kategorien wandern in die signierten Bytes -> Signatur muss weiterhin gültig sein.
+  const { signature, ...rest } = sp;
+  const pub = createPublicKey({ key: { kty: "OKP", crv: "Ed25519", x: sp.publicKey.x }, format: "jwk" });
+  assert.equal(edVerify(null, Buffer.from(JSON.stringify(canon(rest)), "utf8"), pub, b64uToBuf(signature)), true);
+});
+
 test("Spore: domainVector ehrlich als Demo markiert + L2-normalisiert (ANDOCK §5)", () => {
   const sp = makeSpore();
   assert.equal(sp.domainVector.length, 384);

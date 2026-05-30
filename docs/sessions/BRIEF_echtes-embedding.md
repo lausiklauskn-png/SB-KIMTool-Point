@@ -43,6 +43,12 @@ Wissen und ohne das Modell headless zu erzwingen.
 
 ## 3. Was gebaut / gepflegt / getestet werden soll [Pflicht]
 
+- **Bereits vorbereitet (nur noch Re-Sign nötig):** `stammCategories` + `guestCategories`
+  stehen schon im Generator (`scripts/generate_spore.mjs`) + Spec (ANDOCK §2). Sie kommen mit
+  dem nächsten Re-Sign automatisch in die Live-Spore.
+- **Umgebungs-Hinweis:** Re-Sign braucht `SBKIM_NODE_KEY` (sonst wechselt die nodeId und
+  zerstört Sages Registrierung). Echtes Embedding braucht Netz zu `huggingface.co` (in der
+  letzten Container-Umgebung 403-gesperrt) **oder** den Browser-Pfad **oder** Sage rechnet.
 - **Bauen/Entscheiden:** einen der zwei von Sage genannten Wege (AUSTAUSCH §Frage 3) umsetzen:
   1. **Browser-Pfad:** Modul 03 (`web/tools/sbkim-embedding.js`) im Browser laden, einmalig
      `await SbkimEmbedding.embed("<domainDescription + keywords>")`, das 384-Float-Array
