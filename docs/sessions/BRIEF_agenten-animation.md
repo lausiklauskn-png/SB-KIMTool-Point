@@ -9,6 +9,18 @@ Stand: 2026-05-30 · für eine **Nachfolgesitzung** · Branch-Vorschlag `claude/
 
 ---
 
+## Pflichtlektüre vor Start (vor allem anderen) — erst lesen, planen, dann bauen
+
+Siehe `CLAUDE.md` → „Dokumentations- & Lesepflicht". In dieser Reihenfolge lesen,
+**bevor** Code geschrieben wird:
+1. `CLAUDE.md` · 2. `PULS.md` · 3. **dieser Brief** · 4. `status.json` ·
+5. `docs/BAUTRUPP.md` + `docs/MODELL.md` + der Code in `sandbox/` und `assets/app.js`.
+
+**Nicht sofort bauen:** erst Gesamtüberblick (Code lesen + Plan), Plan kurz an Klaus
+zeigen, Rückmeldung abwarten. Offene PRs vorher sichten.
+
+---
+
 ## 0. Leitplanken (gelten unverändert, siehe `CLAUDE.md`)
 
 - **Es bleibt ein Modell / ein Playback.** Die Seite **spielt** einen aufgezeichneten,
@@ -197,3 +209,14 @@ aufnehmen (z. B. `modell-erklaert.html`):
   oder lieber **zwei** getrennte Ingenieur-Figuren? (Brief geht von **einem** aus.)
 - Export-Knopf: reicht eine **Spezifikations-Datei** (JSON/README) als Download, oder
   soll es ein sichtbarer **Platzhalter** „kommt im eigenen Repo" sein?
+
+---
+
+## 9. Abschluss-Befehl (Pflicht — die Brief-Kette darf nie abreißen)
+
+Am Ende dieser Sitzung (siehe `CLAUDE.md` → „Dokumentations- & Lesepflicht"):
+1. `PULS.md` fortschreiben (getan / offen / nächste Schritte + Manual-Check-Status).
+2. **Neuen** Brief `docs/sessions/BRIEF_<naechstes-thema>.md` nach
+   `docs/sessions/VORLAGE_BRIEF.md` anlegen — inkl. Pflichtlektüre und diesem Abschluss-Befehl.
+3. Den neuen Brief **vollständig als Codeblock im Chat** ausgeben.
+4. Commit + Push, Draft-PR mit Test-Plan. **Merge entscheidet Klaus.**
