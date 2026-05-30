@@ -234,13 +234,20 @@ aufnehmen (z. B. `modell-erklaert.html`):
 
 ---
 
-## 8. Offene Fragen an Klaus (vor/zu Beginn klären)
+## 8. Offene Punkte — die Sitzung entscheidet selbst (Klaus, 2026-05-30)
 
-- **„Zivilaktion"** im Auftrag = die **Sybil-/Angriffs-Aktion** des Negativbauers? (So gedeutet.)
-- **Ein Ingenieur** mit zwei Sorten Vorschlägen (Hintergrund-Tool **und** Standalone-PWA),
-  oder lieber **zwei** getrennte Ingenieur-Figuren? (Brief geht von **einem** aus.)
-- Export-Knopf: reicht eine **Spezifikations-Datei** (JSON/README) als Download, oder
-  soll es ein sichtbarer **Platzhalter** „kommt im eigenen Repo" sein?
+Klaus überlässt diese Punkte der Sitzung. **Selbst entscheiden** — Maßstab:
+**intelligent, logisch, nutzerfreundlich**. Nicht nachfragen, sinnvolle Vorgabe wählen
+und im PR/PULS kurz begründen. Empfohlene Defaults:
+
+- **„Zivilaktion"** = die **Sybil-/Angriffs-Aktion** des Negativbauers. (So deuten.)
+- **Ein Ingenieur**, der beide Sorten vorschlägt (Hintergrund-Tool **und** Standalone-PWA);
+  nur in zwei Figuren splitten, wenn es die Verständlichkeit klar verbessert.
+- Export-Knopf: eine **Spezifikations-Datei** (JSON/README) als Download genügt; sonst ein
+  ehrlicher Platzhalter „kommt im eigenen Repo". Was für den Nutzer klarer ist, gewinnt.
+
+Gleiches gilt für die **Schritt-Reihenfolge** und alle weiteren Detailfragen: eigenständig,
+intelligent und nutzerfreundlich entscheiden, statt zu blockieren.
 
 ---
 
