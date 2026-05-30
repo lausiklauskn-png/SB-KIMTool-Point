@@ -69,6 +69,9 @@ dokumentiert, getestet, `status.json`-Real-Anteil ehrlich nachgezogen.
   - **Doppel-Status in der Truhe:** je Tool zusätzlich den `point_status` zeigen (z. B.
     zweiter Chip „Point: …"), Quelle = `werkzeugkiste.json`. So bleibt die Honesty-Regel
     „was ist hier echt vs in Sage reif" sichtbar.
+    **⚠️ Klaus' Steuerung (2026-05-30): Der Truhen-Inhalt (Beschreibungen + Funktionen)
+    ist gut und darf NICHT groß verändert werden. Doppel-Status nur ADDITIV (ein kleiner
+    Chip), ohne die Tool-Texte, das Modal oder die Funktionen anzutasten; im Zweifel weglassen.**
   - Sobald Sage-Zieldateien da: erstes reifes Modul (Vorschlag **09 Einbau-PWA** als reine
     Anleitung, oder **01 Storage** als kleinstes Code-Modul) **Datei für Datei** kopieren
     (kein git-clone), eigene Identität, Kopf-Kommentar + Version, **kein Klarname**.

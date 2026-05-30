@@ -27,7 +27,9 @@ Sitzung auf Branch `claude/sb-kimtool-point-dev-V0MFr`. Gegen echtes `origin/mai
   wartet auf Klaus** (Tablet + Desktop, Hard-Reload Strg+Shift+R).
 - **Doppel-Status:** Die Truhe zeigt je Tool **eine** Reife (Sage-Stand). Der frühere
   Sage/Point-Doppel-Status der alten `werkzeuge.html` fehlt hier noch — ehrlicher
-  Folge-Schritt (siehe Brief).
+  Folge-Schritt (siehe Brief). **Klaus 2026-05-30: Truhen-Inhalt (Beschreibungen +
+  Funktionen) ist gut, nicht groß verändern — Doppel-Status nur additiv (kleiner Chip),
+  im Zweifel lassen.**
 - **Daten-Dopplung:** `werkzeugkiste.json` bleibt der maschinenlesbare Record; die Truhe
   trägt ihre eigene (reichere) `TOOLS`-Liste inline. Spätere Vereinheitlichung möglich
   (Truhe aus `werkzeugkiste.json` speisen — dann Vertrag zuerst).
