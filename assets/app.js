@@ -202,19 +202,28 @@ function renderWerkstatt() {
     out.textContent = "Werkstatt-Brücke nicht geladen.";
     return;
   }
+  const renderProbe = (p, badge) => {
+    const schritte = p.schritte.map((s) =>
+      `<li class="${s.ok ? "ok" : "bad"}">${s.ok ? "✓" : "✗"} ${s.label}</li>`
+    ).join("");
+    const cls = p.ok ? (badge === "netz" ? "ready" : "ok") : "bad";
+    const kopf = p.ok
+      ? (badge === "netz" ? "◐ bereit · braucht Netz" : "✓ grün")
+      : "✗ rot";
+    return `
+      <div class="probe ${cls}">
+        <div class="probe-head">${kopf} · ${p.name}</div>
+        <ul class="probe-steps">${schritte}</ul>
+        <div class="probe-fazit">${p.fazit}</div>
+      </div>`;
+  };
   btn.addEventListener("click", () => {
-    const proben = window.SbkimWerkstatt.probeAll();
-    out.innerHTML = proben.map((p) => {
-      const schritte = p.schritte.map((s) =>
-        `<li class="${s.ok ? "ok" : "bad"}">${s.ok ? "✓" : "✗"} ${s.label}</li>`
-      ).join("");
-      return `
-        <div class="probe ${p.ok ? "ok" : "bad"}">
-          <div class="probe-head">${p.ok ? "✓ grün" : "✗ rot"} · ${p.name}</div>
-          <ul class="probe-steps">${schritte}</ul>
-          <div class="probe-fazit">${p.fazit}</div>
-        </div>`;
-    }).join("");
+    const r = window.SbkimWerkstatt.probeAll();
+    const offline = r.offline.map((p) => renderProbe(p, "offline")).join("");
+    const netz = r.netz.map((p) => renderProbe(p, "netz")).join("");
+    out.innerHTML =
+      `<div class="probe-group"><div class="probe-group-titel">Offline — wirklich gerechnet</div>${offline}</div>` +
+      `<div class="probe-group"><div class="probe-group-titel">Netzgebunden — Bereitschaft geprüft</div>${netz}</div>`;
   });
 }
 

@@ -80,9 +80,62 @@
     };
   }
 
-  function probeAll() {
-    return [probeMatch(), probeSiegel()];
+  // ---- Netzgebundene Module: EHRLICHE Bereitschafts-Probe ------------------
+  // Diese Module brauchen Netz (Modell/CDN bzw. Handshake zwischen zwei Knoten).
+  // Offline koennen wir NICHT "grün" behaupten — wir pruefen wahrheitsgemaess nur
+  // die Bereitschaft: Modul geladen + erwartete Funktionen registriert. Status
+  // bleibt "bereit · braucht Netz", der volle Lauf gilt als ungeprueft (Browser).
+  function probeReady(mod, name, fns, netzNote) {
+    if (!mod) {
+      return { ok: false, status: "fehlt", name: name, schritte: [],
+               fazit: "Modul nicht geladen." };
+    }
+    var schritte = fns.map(function (fn) {
+      return step("API vorhanden: " + fn + "()", typeof mod[fn] === "function", true);
+    });
+    var bereit = schritte.every(function (s) { return s.ok; });
+    return {
+      ok: bereit,
+      status: bereit ? "bereit · braucht Netz" : "unvollständig",
+      name: name,
+      schritte: schritte,
+      fazit: bereit
+        ? ("Geladen und vollständig — " + netzNote + " Voller Lauf erst im Browser (ungeprüft).")
+        : "Erwartete API unvollständig.",
+    };
   }
 
-  return { probeMatch: probeMatch, probeSiegel: probeSiegel, probeAll: probeAll, version: "0.1.0" };
+  function probeEmbedding(E) {
+    E = E || (typeof window !== "undefined" ? window.SbkimEmbedding : null);
+    return probeReady(E, "03 Embedding — Text verstehen (braucht Netz)",
+      ["embedQuery"], "lädt das Sprachmodell per CDN.");
+  }
+  function probeAnastomose(A) {
+    A = A || (typeof window !== "undefined" ? window.SbkimAnastomose : null);
+    return probeReady(A, "05 Anastomose — Handschlag zwischen zwei Apps (braucht Netz)",
+      ["init", "handshake", "receiveHandshake"], "verbindet zwei Knoten über HTTP/Channel.");
+  }
+  function probeHeterokaryose(H) {
+    H = H || (typeof window !== "undefined" ? window.SbkimHeterokaryose : null);
+    return probeReady(H, "06 Heterokaryose — Wissen teilen (braucht Netz)",
+      ["init", "requestHeterokaryosis", "receiveHeterokaryosis"], "tauscht Daten mit Geschwister-Knoten.");
+  }
+
+  // Voll offline-bewiesen (grün/rot) vs. nur bereitschafts-geprüft (braucht Netz).
+  function probeAll() {
+    return {
+      offline: [probeMatch(), probeSiegel()],
+      netz: [probeEmbedding(), probeAnastomose(), probeHeterokaryose()],
+    };
+  }
+
+  return {
+    probeMatch: probeMatch,
+    probeSiegel: probeSiegel,
+    probeEmbedding: probeEmbedding,
+    probeAnastomose: probeAnastomose,
+    probeHeterokaryose: probeHeterokaryose,
+    probeAll: probeAll,
+    version: "0.2.0",
+  };
 });

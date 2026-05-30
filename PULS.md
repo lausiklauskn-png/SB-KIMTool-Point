@@ -2,6 +2,21 @@
 
 Stand: 2026-05-30 · Branch `claude/zweites-werkzeug-spore-4T97H`
 
+## 2026-05-30 (N) — Werkstatt erweitert: netzgebundene Module ehrlich als „bereit · braucht Netz"
+
+- **`assets/werkstatt.js` v0.2:** generische `probeReady()` + Proben für **03 Embedding,
+  05 Anastomose, 06 Heterokaryose**. Ehrlich: offline NICHT als „grün" behauptet — geprüft
+  wird nur Bereitschaft (geladen + erwartete API), Status `bereit · braucht Netz`, voller
+  Lauf ungeprüft (Browser). `probeAll()` liefert jetzt `{offline:[04,16], netz:[03,05,06]}`.
+- **`test/werkstatt.test.js`:** trennt offline-bewiesen von netz-bereit; ein Test sichert,
+  dass netz-Module **nicht** grün-gerechnet behauptet werden und fehlende API ok=false ergibt.
+  **`npm test` 29/29 grün**.
+- **werkzeuge.html:** lädt 01/02/03/05/06 + match/siegel als `<script>` (Reihenfolge: 01
+  zuerst). **app.js** rendert zwei Gruppen (Offline grün / Netzgebunden gelb „◐ bereit").
+  **style.css** `.probe.ready`/`.probe-group`.
+- **README** 29 Prüfungen.
+- **Manual-Check:** Werkstatt-Knopf im Browser ungeprüft — wartet auf Klaus.
+
 ## 2026-05-30 (M) — Werkstatt: erste echte Browser-Brücke zur Werkzeugkiste
 
 Erster realer Schritt vom Playback Richtung Live-Modell (docs/LIVE-MODELL.md). Ehrlich:
