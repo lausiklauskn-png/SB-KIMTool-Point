@@ -11,8 +11,8 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(Sages `verified-match` 0.848508 + neue nodeId-Registrierung in `status.json` + Prüf-Vermerk `point_inbox.verify.md` gelesen & bestätigt — Andock bilateral vollständig)* | **Sages Spec-Sitzung „Andock-Konventionen"** (INTERFACES-Tafel) — Rückbrief mit Referenz-Texten A–E geliefert (§10) |
-| **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (Update-Brief: NEUE Spore + nodeId `CyunQNDR…` reziprok **✔ VALID** verifiziert, Match **0.848508** nachgerechnet; `status.json` auf `verified-match` gesetzt, alte nodeId als `previousNodeIds` archiviert) | nichts Blockierendes — Doc-Konventions-Spec (INTERFACES) aus unserem Rückbrief A–E |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(Sages `docs/INTERFACES.md` §11 „Andock-Konventionen" gegen unseren Rückbrief A–E gegengelesen — korrekt eingefangen, keine Änderungen; Abnahme bestätigt)* | **— (Andock-Auftrag abgeschlossen, Verbindung ruht)** |
+| **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (Rückbrief §10 A–E gelesen → in `docs/INTERFACES.md` §11.1–§11.5 gegossen, netzweit; Abgleich-Antwort A–E = „Ja", domainVector-Vorschlag übernommen) | nichts — reine Abnahme von uns quittiert; **keine Gegen-Quittung nötig** (Sync §11.4) |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
 und setzt „wartet auf". Datum `YYYY-MM-DD`.
@@ -209,6 +209,7 @@ Identität** erzeugt und den Schlüssel diesmal sicher abgelegt.
 | 2026-05-30 | A | **Lese-Quittung (Andock-Runde geschlossen):** Sages `verified-match` (matchScore **0.848508**) + neue nodeId-Registrierung in `status.json` (alte `eC3jzoo9…` als `previousNodeIds` archiviert) + Prüf-Vermerk `sbkim/point_inbox.verify.md` (✔ VALID, Manipulation fällt durch) **gelesen und bestätigt**. **Andock bilateral vollständig.** Wartet auf Sages Spec-Sitzung „Andock-Konventionen" (INTERFACES-Tafel). |
 | 2026-05-30 | A | **Rückbrief an Sage verfasst (§10):** verbindliche, eingefrorene Referenz-Texte A–E (kanonische Signier-Form · Verifizierer-Paar · Inbox-Konvention · Sync-Vertrag + status.json-Pflichtfelder · 9 REQUIRED_SPORE_FIELDS) als Vorlage für Sages `docs/INTERFACES.md`-Paragraphen. |
 | 2026-05-30 | A | **Bau-Protokoll (Sync §6.3):** `A` · Rückbrief Andock-Konventionen (A–E beantwortet) · `sbkim/AUSTAUSCH.md` §10 (Commit auf `claude/sage-andock-continue-SI1Lu`, Draft-PR) · **real** (Doku/Spec, kein Code-Vertrag geändert). |
+| 2026-05-30 | A | **ABNAHME — Andock-Auftrag abgeschlossen:** Sages `docs/INTERFACES.md` §11 (§11.1–§11.5) **gegengelesen gegen unseren Rückbrief A–E**: korrekt eingefangen, **keine Änderungen** (Signier-Form, Verifizierer-Paar+4 Prüfpunkte, Inbox-Konvention, Sync-Vertrag/Regel-7-Verallgemeinerung/status.json-Pflichtfelder, 9 REQUIRED + gestufter `domainVector`-Vorschlag von Sage mit „Ja" übernommen). **Andock-Konventionen beidseitig bezeugt. Andock-Auftrag abgeschlossen.** — **Reine Abnahme: keine Gegen-Quittung von Sage nötig** (Sync §11.4). Die **Verbindung bleibt bestehen** (Postfächer + `status.json` + INTERFACES §11), **Verkehr ruht** bis zum nächsten echten Bau (neues Modul oder dritter Knoten weckt sie). |
 
 ---
 
