@@ -2,6 +2,18 @@
 
 Stand: 2026-05-29 · Branch `claude/sbkimtool-founding-TXRdc`
 
+## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
+
+Verbindliche Konvention verankert, damit Folge-Sitzungen den Stand kennen und nicht
+blind bauen:
+- `CLAUDE.md`: neue Section „Dokumentations- & Lesepflicht (Brief-Kette)" — Pflichtlektüre
+  vor Start (CLAUDE → PULS → neuester Brief → status.json → Scheiben-Code), „erst
+  Überblick/Plan, dann bauen", und der **Abschluss-Befehl**: jede Sitzung schreibt einen
+  neuen Brief.
+- `docs/sessions/VORLAGE_BRIEF.md`: Brief-Vorlage (Stand · geplant · bauen/pflegen/testen ·
+  Datenverträge · Akzeptanz · Reihenfolge · offene Fragen · Abschluss-Befehl).
+- `BRIEF_agenten-animation.md`: um Pflichtlektüre (Anfang) + Abschluss-Befehl (Ende) ergänzt.
+
 ## Nachtrag 2026-05-29 — Drei Schichten auf je eine eigene Seite
 
 Auf Klaus' Wunsch die eine gedrängte Seite in **vier Seiten** aufgeteilt:

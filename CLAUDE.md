@@ -106,6 +106,44 @@ Sicherheits-Updates im Siegel sichtbar, ohne dass ein Forker neu andocken muss.
    Klaus' Browser-Lauf"). Klaus liest zuerst den Chat, nicht den Dateibrowser.
 5. Erstellst du einen Folge-Brief, gib ihn **vollständig als Codeblock im Chat** aus.
 
+## Dokumentations- & Lesepflicht (Brief-Kette) — verbindlich
+
+Damit jede Folge-Sitzung den Stand kennt und nicht blind drauflosbaut, gilt eine
+**durchgehende Brief-Kette**. Sie hat zwei Hälften: Pflicht beim **Start** (lesen,
+planen) und Pflicht beim **Abschluss** (dokumentieren, nächsten Brief schreiben).
+
+### Pflichtlektüre **vor** jeder Arbeit (in dieser Reihenfolge)
+
+Erst lesen, dann erst denken — **kein** Code, **kein** Bau, bevor das durch ist:
+
+1. `CLAUDE.md` — diese Verfassung.
+2. `PULS.md` — aktueller Stand: was getan, was offen, nächste Schritte.
+3. **Neuester Brief** in `docs/sessions/BRIEF_*.md` — die geplante Aufgabe + Datenverträge.
+4. `status.json` — ehrlicher Real-Anteil / Modul-Status.
+5. Die **Doku + den Code der zugewiesenen Scheibe** (relevante `docs/*.md`, `sandbox/…`).
+
+### Erst Überblick, dann bauen (Plan-vor-Code)
+
+- **Nicht sofort bauen.** Zuerst Gesamtüberblick gewinnen: Pflichtlektüre + relevanten
+  **Code lesen** + **Plan** formulieren (was wird gebaut / gepflegt / getestet, in welcher
+  Reihenfolge, welche Verträge betroffen).
+- Den Plan **kurz an Klaus** zeigen (Chat) und Rückmeldung abwarten, bevor größere Bauten
+  starten. Erst wenn der Überblick steht, wird Code geschrieben.
+- Offene/ungemergte PRs vorher sichten (siehe „PR-Workflow").
+
+### Dokumentationspflicht **am** Abschluss — Befehl: nächsten Brief schreiben
+
+Jede Sitzung schließt mit einem **neuen Brief** für die Folge-Sitzung. Das ist Pflicht,
+nicht Kür:
+
+1. `PULS.md` fortschreiben (Stand: getan / offen / nächste Schritte).
+2. **Neuen Brief anlegen** `docs/sessions/BRIEF_<thema>.md` nach `docs/sessions/VORLAGE_BRIEF.md`:
+   **Stand · Was geplant · Was gebaut/gepflegt/getestet werden soll · Datenverträge ·
+   Akzeptanzkriterien · Reihenfolge · offene Fragen an Klaus.**
+3. Im Brief **die Pflichtlektüre + den Abschluss-Befehl wiederholen** (die Kette reißt nie ab).
+4. Den vollständigen Brief **als Codeblock im Chat** ausgeben (Klaus liest zuerst den Chat).
+5. Alte Briefe bleiben als Historie liegen; der **neueste** gilt.
+
 ## Kommunikations-Disziplin
 
 - **Einzelschritte, nicht Block-Anweisungen**: ein konkreter Schritt pro Antwort mit
