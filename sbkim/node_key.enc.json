@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "zweck": "Verschluesselter SBKIM_NODE_KEY (privater Knoten-Schluessel). Nur mit Klaus-Passwort zu oeffnen. Inhalt = base64(PKCS8-PEM).",
+  "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
+  "kdf": {
+    "algorithm": "PBKDF2",
+    "hash": "SHA-256",
+    "iterations": 600000,
+    "salt": "06w/j0LBWcuMZUaQ/wTnow=="
+  },
+  "cipher": {
+    "algorithm": "AES-256-GCM",
+    "iv": "oUTkaksl945HnWDB",
+    "tag": "BnzBFajoHcJ7CDNGLyWlEg=="
+  },
+  "ciphertext": "s+LiBwxNmKaDhtGM0D2HxmPeskurIHP54jw79df3gXw3kr0/Y2KdvPTsESDfiXK9DWD9yqaxHJidqddzuEmY1H73kPmV7Pun3v6YznGQbKzGvsAgP0Kose7zT2hxETUESzGw5uXD/4Kb07dEJinbE66ntpF/I0aiFBN+XyUf/dnKHeC0InPrDCQS0aS7zfKedooEwbTXJ95oAff3ML02SQ=="
+}
