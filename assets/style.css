@@ -457,8 +457,10 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 
 /* Schicht 2/3 Hover-Bewegung bei Reduced-Motion abschalten */
 @media (prefers-reduced-motion: reduce) {
-  .tool, .pwa, .tab, .copy, .dock, .entry { transition: none; }
+  .tool, .pwa, .tab, .copy, .dock, .entry, .entry .entry-art { transition: none; }
   .tool:hover, .pwa:hover, .entry:hover { transform: none; }
+  /* Bild-Wachstum nicht animieren; Standardgroesse halten (kein Sprung). */
+  .entry:hover .entry-art { height: 88px; }
 }
 
 footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); position: relative; z-index: 1; }
@@ -576,9 +578,16 @@ body::after {
     radial-gradient(80% 120% at 80% 0%, rgba(54,214,195,0.22), transparent 60%),
     linear-gradient(135deg, #14201f, #0e1419);
   border-bottom: 1px solid var(--line);
+  /* Standard klein -> Text drunter immer lesbar (auch auf Handys ohne Hover). */
+  transition: height 0.28s ease, box-shadow 0.25s ease;
 }
 .entry:hover { box-shadow: 0 14px 34px #0008; }
-.entry:hover .entry-art { box-shadow: inset 0 0 30px rgba(54,214,195,0.12); }
+/* Maus drueber: Bild (Truhe) waechst zum Blickfang; geht weg -> wieder klein. */
+.entry:hover .entry-art { height: 188px; box-shadow: inset 0 0 30px rgba(54,214,195,0.12); }
+/* Touch-Geraete (Handys): kein echtes Hover -> Bild bleibt klein, Text lesbar. */
+@media (hover: none) {
+  .entry:hover .entry-art { height: 88px; }
+}
 
 /* --- Scroll-Reveal (siehe assets/fx.js) ---------------------------------- */
 [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }

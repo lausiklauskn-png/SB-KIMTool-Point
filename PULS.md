@@ -16,7 +16,11 @@ stark abgedunkelten Backdrop**. Auf Klaus' Wunsch „groß oben":
 - `assets/img/README.md`: Hinweis, dass der Hero jetzt prominent zeigt und ein Truhe-Motiv passt.
 - **Drop-in, kein Code mehr nötig:** Klaus legt `assets/img/hero.png` (Truhe, ~1600×900) und/oder
   `assets/img/banner-werkzeuge.png` (~1200×400) ab → erscheinen automatisch.
-- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf (Startseite mit/ohne hero.png).
+- **Hover-Wachstum der Eingangs-Karten:** `.entry-art` (Truhe-/Motiv-Bild) standardmäßig klein
+  (Text drunter immer lesbar), **wächst beim Drüberfahren** sanft auf 188px und schrumpft zurück.
+  Auf Touch-Geräten (`@media (hover: none)`) bleibt es klein → Handy-Lesbarkeit. `prefers-reduced-motion`:
+  kein Wachstum, Standardgröße gehalten.
+- **Manual-Check:** ungeprüft, wartet auf Klaus' Browser-Lauf (Startseite mit/ohne hero.png, Hover-Wachstum).
   `npm test` unverändert 27/27 (reine Optik, Logik unberührt).
 
 ## 2026-05-30 (D) — Zwei echte Werkzeuge (01 Storage + 02 Spore) sauber auf Premium-main integriert
