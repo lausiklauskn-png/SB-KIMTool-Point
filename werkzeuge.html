@@ -55,6 +55,18 @@
       <!-- Stufen-Legende (aus werkzeugkiste.json befüllt) -->
       <div class="tier-legend" id="tier-legend"></div>
 
+      <!-- Werkstatt: echte Selbst-Prüfung der offline-Werkzeuge (siehe docs/LIVE-MODELL.md) -->
+      <div class="panel werkstatt" data-reveal>
+        <h3 class="werkstatt-titel">Werkstatt — Werkzeuge wirklich prüfen</h3>
+        <p class="werkstatt-sub">
+          Erster echter Schritt Richtung Live-Modell: Klick lädt die echten Module und lässt
+          sie eine kleine Selbst-Prüfung rechnen. Hier laufen die <strong>offline</strong>-Werkzeuge
+          (04 Match, 16 Siegel) — was grün wird, rechnet wirklich.
+        </p>
+        <button class="ctl werkstatt-run" id="werkstatt-run">▶ Werkzeuge prüfen</button>
+        <div class="werkstatt-out" id="werkstatt-out"></div>
+      </div>
+
       <div class="panel" data-reveal>
         <!-- Reife-Schlüssel: was die Spine-Farbe links an jeder Kachel meint -->
         <div class="maturity-key" aria-hidden="true">
@@ -73,6 +85,10 @@
     Schicht 2 von 3 · <a href="index.html">zurück zur Startseite</a>
   </footer>
 
+  <!-- Werkzeuge laden sich selbst auf window.Sbkim* (IIFE), dann die Werkstatt-Brücke -->
+  <script src="web/tools/sbkim-match.js"></script>
+  <script src="web/tools/sbkim-siegel.js"></script>
+  <script src="assets/werkstatt.js"></script>
   <script src="assets/app.js"></script>
   <script src="assets/fx.js"></script>
 </body>

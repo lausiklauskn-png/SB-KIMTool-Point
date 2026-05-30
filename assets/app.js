@@ -190,8 +190,37 @@ async function renderMarkt() {
   $("#market-note").textContent = data.hinweis;
 }
 
+// --- Werkstatt: echte Selbst-Prüfung der offline-Werkzeuge ----------------
+// Nutzt window.SbkimWerkstatt (assets/werkstatt.js), das die echten Module
+// window.SbkimMatch / window.SbkimSiegel prüft. Was grün wird, rechnet wirklich.
+function renderWerkstatt() {
+  const btn = $("#werkstatt-run");
+  const out = $("#werkstatt-out");
+  if (!btn || !out) return;
+  if (typeof window.SbkimWerkstatt === "undefined") {
+    btn.disabled = true;
+    out.textContent = "Werkstatt-Brücke nicht geladen.";
+    return;
+  }
+  btn.addEventListener("click", () => {
+    const proben = window.SbkimWerkstatt.probeAll();
+    out.innerHTML = proben.map((p) => {
+      const schritte = p.schritte.map((s) =>
+        `<li class="${s.ok ? "ok" : "bad"}">${s.ok ? "✓" : "✗"} ${s.label}</li>`
+      ).join("");
+      return `
+        <div class="probe ${p.ok ? "ok" : "bad"}">
+          <div class="probe-head">${p.ok ? "✓ grün" : "✗ rot"} · ${p.name}</div>
+          <ul class="probe-steps">${schritte}</ul>
+          <div class="probe-fazit">${p.fazit}</div>
+        </div>`;
+    }).join("");
+  });
+}
+
 // --- Dispatch: each page only loads what it shows -------------------------
 // Render a section only if its anchor element exists on the current page
 // (Startseite has none → nothing runs; Modell page uses model.js instead).
 if ($("#tabs")) renderWerkzeuge();
 if ($("#market")) renderMarkt();
+if ($("#werkstatt-run")) renderWerkstatt();
