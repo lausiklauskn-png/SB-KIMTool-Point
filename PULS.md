@@ -1,6 +1,48 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-30 · Branch `claude/agenten-animation-r4i7f`
+Stand: 2026-05-30 · Branch `claude/feinschliff-erstes-modul-KOnAU`
+
+## Nachtrag 2026-05-30 — Schicht 2/3 auf Modell-Optik-Niveau gehoben (Freibrief)
+
+Unter ausdrücklichem, befristetem **Gestaltungs-Freibrief** von Klaus. Diese Sitzung
+hängt auf der Animations-Arbeit aus **PR #8** auf (dort in den Arbeitsbranch gemerged,
+damit die neue Optik als Fundament da ist) und baut Schicht 2/3 darauf an.
+
+**Zwei Befunde gleich zu Beginn offengelegt (statt blind zu bauen):**
+1. Die Modell-Animation (`assets/model.js`, Rolle Ingenieur, `run.json` v0.2, Test 8/8)
+   ist **noch nicht in `main`** — sie lebt im offenen Draft-**PR #8**
+   (`claude/agenten-animation-r4i7f`). Dieser Branch wurde daher auf #8 gestapelt.
+   **Merge-Reihenfolge: erst #8, dann dieser PR.**
+2. Die **Sage-Quelle ist in dieser Umgebung nicht erreichbar** (kein `Sage-Protokol/`,
+   Repo-Zugriff auf `sb-kimtool-point` beschränkt, kein Netz zu anderen Repos). Ein
+   reifes Modul „Datei für Datei" zu kopieren ist **ehrlich nicht möglich** —
+   Modul-Kopie daher **bewusst NICHT gemacht** (kein erfundenes Modul → „kein
+   vorgetäuschtes Wissen"). Bleibt offene Aufgabe, sobald die Quelle bereitsteht.
+
+**Gebaut (reine Design-/UX-Gestaltung, Datenverträge unberührt):**
+- `assets/style.css`: Schicht 2 (Werkbank) + 3 (Schaufenster) neu — Reife-Spine in
+  Lampen-Farben, Mono-Orb mit Modul-Nummer, Status-Chips mit Glow-Punkt, Hover-Lift,
+  Stufen-Legende, Reife-Schlüssel; Markt-Karten mit Monogramm, Status-/Echt-Chip,
+  Andock-Knopf. **`prefers-reduced-motion`** für die neuen Hover-Effekte respektiert.
+- `assets/app.js`: reichere Render-Logik (Reife→Spine/Chip-Mapping, Point-Status-Chip,
+  Stufen-Zähler an den Tabs, Stufen-Legende aus den bisher ungezeigten `stufen`-Texten,
+  „Nutzen" als Lead + Rest in `<details>`-Aufklapper gegen die Textwand; Markt mit
+  Monogramm/Status/Echt-Chip).
+- `werkzeuge.html`: Container für Stufen-Legende + Reife-Schlüssel.
+- Funktion unberührt: Stufen-Tabs, Kennung-kopieren, Andock-Links, Daten aus denselben
+  JSON-Quellen. `run.json` **nicht** angefasst (Demo-Regen zurückgesetzt: nur zufällige
+  Schlüssel-Churn).
+
+**Bewusst NICHT angefasst:** `modell.html`/`model.js` (Referenz, unter Review in #8;
+Klaus' Browser-Lauf steht noch aus → keine erfundenen „Restpunkte"). `status.json`
+real_anteil bleibt ehrlich ~20 % (kein Modul real kopiert).
+
+**Verifiziert:** `npm test` **8/8 grün**; JS-Syntax (`node --check`) ok; Headless-
+DOM-Stub-Smoke-Test: 3 Stufen-Tabs mit Zählern, 7 Basic-Kacheln, Stufen-Legende (3),
+Markt (3) rendern fehlerfrei. **Browser-Sichttest Schicht 2/3 + Modell-Seite:
+ungeprüft, wartet auf Klaus** (Hard-Reload Ctrl+Shift+R nach Pull).
+
+---
 
 ## Nachtrag 2026-05-30 — Lebendiges Agenten-Board + Ingenieur-Rolle (Schicht 1)
 
