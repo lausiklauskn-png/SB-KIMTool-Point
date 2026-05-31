@@ -2,6 +2,25 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (AB) — Lücke geschlossen: Schlüssel-Tresor ANLEGEN (make_node_key.mjs)
+
+Die erste Jasons-Tresor-Sitzung meldete (zu Recht) eine Blockade: es gab nur
+`open_node_key.mjs` (öffnen), aber **kein Werkzeug zum Anlegen** des Tresors, und
+`docs/SCHLUESSEL.md` Schritt 1 war vage. In **diesem** Repo behoben, damit jeder Knoten
+das **getestete** Werkzeug 1:1 kopiert.
+
+- **`scripts/make_node_key.mjs`** (neu): einmalig frischer Ed25519-Schlüssel → dauerhafte
+  `nodeId` (Ableitung identisch zu `generate_spore.mjs`) → **verschlüsselt** als
+  `sbkim/node_key.enc.json` (AES-256-GCM / PBKDF2 600k, Format wie `open_node_key.mjs` liest).
+  Passwort nur über `SBKIM_KEY_PW`; privater Schlüssel/Passwort **nie** auf stdout/ins Repo;
+  vorhandener Tresor wird nicht überschrieben (außer `SBKIM_KEY_FORCE=1`).
+- **`test/make_node_key.test.js`** (+5): Roundtrip, nodeId stabil + ableitbar, Umschlag-Format,
+  zu kurzes/falsches Passwort scheitert. **`npm test` 68/68 grün.**
+- `docs/SCHLUESSEL.md`: Abschnitt „Tresor ANLEGEN" + Verlust-Fall auf `make_node_key`.
+  Andock-Brief §3: Identität = **ein Lauf** make_node_key, dann open→generate_spore.
+- Empfehlung für Jason-Frage 1/3: **Option 1 (Frischer Schlüssel + Tresor)**; Jason kopiert
+  dieses getestete Werkzeug. Echter Tresor dieses Repos (`CyunQNDR…`) unangetastet.
+
 ## 2026-05-31 (AA) — Jasons-Bibliothek Scheibe 3: SBKIM-Identität im Tresor + Sicherheits-Fix
 
 Klaus: „Option 3 umsetzen". Umgesetzt der belastbare Kern — die App ist jetzt ein eigener

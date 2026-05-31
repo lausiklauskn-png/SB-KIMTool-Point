@@ -49,16 +49,21 @@ Kopiere **1:1** aus SB-KIMTool-Point:
 ## 3. Eigene Identität geben (Modul 02 + Spore) — **so wird der Tresor ein Knoten**
 
 Kopiere **1:1**: `web/tools/sbkim-spore.js` (Modul 02, hat `exportBackup`/`importBackup`),
-`scripts/generate_spore.mjs`, `scripts/verify_foreign_spore.mjs`, `scripts/open_node_key.mjs`.
+`scripts/make_node_key.mjs` (Tresor ANLEGEN), `scripts/open_node_key.mjs` (Tresor öffnen),
+`scripts/generate_spore.mjs`, `scripts/verify_foreign_spore.mjs`.
 
 Dann **eine** eigene, dauerhafte Identität erzeugen (Ed25519, `nodeId = base64url(SHA-256(pubKey))`):
-1. `node scripts/generate_spore.mjs` **ohne** Secret → erzeugt einen flüchtigen Schlüssel +
-   `sbkim/spore.json`. Notiere die ausgegebene `nodeId`.
-2. **Schlüssel sofort sichern** (sonst ist die nodeId beim nächsten Lauf weg — genau der Fehler,
-   den SB-KIMTool-Point einmal hatte): privaten Schlüssel als Umgebungs-Secret `SBKIM_NODE_KEY`
-   **und** als Passwort-Tresor `sbkim/node_key.enc.json` ablegen (Rezept: `docs/SCHLUESSEL.md`;
-   der Tresor darf ins Repo, das Passwort **nie**).
-3. Re-Sign ab dann **mit** Secret/Tresor → nodeId bleibt stabil.
+1. **Schlüssel + Tresor in EINEM Lauf** (kein vages „sichern" mehr):
+   `SBKIM_KEY_PW='<dein-Passwort>' node scripts/make_node_key.mjs`
+   → legt `sbkim/node_key.enc.json` an und druckt die **dauerhafte nodeId**. Privater
+   Schlüssel/Passwort kommen **nie** ins Repo/auf stdout; ein vorhandener Tresor wird nicht
+   überschrieben (sonst `SBKIM_KEY_FORCE=1`).
+2. Spore signieren — Tresor öffnen und an `generate_spore.mjs` reichen:
+   `SBKIM_NODE_KEY="$(SBKIM_KEY_PW='<Passwort>' node scripts/open_node_key.mjs)" node scripts/generate_spore.mjs`
+   → schreibt `sbkim/spore.json` mit **derselben nodeId** (Kontrolle: stimmt sie überein?).
+3. Optional zusätzlich `SBKIM_NODE_KEY` als Umgebungs-Secret hinterlegen (bequemer Re-Sign).
+   nodeId bleibt ab jetzt stabil. Anpassen: `CONFIG` in `generate_spore.mjs` (nodeName/domain/
+   endpoint/Kategorien) auf Jasons-Tresor umstellen.
 
 **Das ist die Identifikation, mit der Klaus 1:1 mit dem Tresor kommuniziert:** die `nodeId` +
 die signierte `spore.json`. Alles, was der Tresor „sagt", ist damit prüfbar signiert.

@@ -24,6 +24,24 @@ behalten, bleibt die nodeId gleich — Sage muss uns nicht neu registrieren.
    Claude-Code-Umgebung hinterlegt. Wenn gesetzt, nutzt `scripts/generate_spore.mjs` es
    automatisch, ohne Tresor/Passwort.
 
+## Tresor ANLEGEN (einmalig, wenn noch keiner existiert)
+
+Gibt es weder Secret noch `sbkim/node_key.enc.json` (z. B. ein **neuer Knoten**), erzeugt
+`scripts/make_node_key.mjs` in **einem** Lauf einen frischen Ed25519-Schlüssel, zeigt die
+dauerhafte nodeId und legt ihn **verschlüsselt** ab (AES-256-GCM / PBKDF2 600k — dasselbe
+Format, das `open_node_key.mjs` öffnet):
+
+```
+SBKIM_KEY_PW='<dein-Passwort>' node scripts/make_node_key.mjs
+```
+
+- Schreibt `sbkim/node_key.enc.json`, druckt die **nodeId** (merken/abgleichen).
+- **Privater Schlüssel und Passwort kommen NIE im Klartext** ins Repo, in Commits oder auf
+  stdout. Passwort nur über `SBKIM_KEY_PW` (nicht als Argument → Prozessliste).
+- Überschreibt einen **vorhandenen** Tresor NICHT (Identitätsschutz); bewusst neu:
+  `SBKIM_KEY_FORCE=1` zusätzlich setzen (alte Identität geht verloren).
+- Passwort sicher merken (Passwort-Manager). Danach Spore signieren (Re-Sign-Ablauf unten).
+
 ## Re-Sign-Ablauf (wenn Vektor/Kategorien sich ändern)
 
 1. Schlüssel beschaffen (Tresor öffnen ODER Secret gesetzt).
@@ -34,10 +52,11 @@ behalten, bleibt die nodeId gleich — Sage muss uns nicht neu registrieren.
 
 ## Wenn das Passwort verloren geht
 
-Dann ist der Tresor nicht mehr zu öffnen. Lösung: **neue Identität erzeugen**
-(`generate_spore.mjs` ohne Secret/Tresor → flüchtiger Schlüssel; den neuen Schlüssel
-sichern, neuen Tresor anlegen) und Sage um **Neu-Registrierung** bitten. Genau das ist
-am 2026-05-30 einmal passiert (alter Schlüssel `eC3jzoo9…` war nie gesichert).
+Dann ist der Tresor nicht mehr zu öffnen. Lösung: **neue Identität erzeugen** mit
+`SBKIM_KEY_FORCE=1 SBKIM_KEY_PW='<neues-Passwort>' node scripts/make_node_key.mjs`
+(neuer Schlüssel + neuer Tresor in einem Lauf), dann `generate_spore.mjs` und Sage um
+**Neu-Registrierung** bitten. Genau das ist am 2026-05-30 einmal passiert (alter Schlüssel
+`eC3jzoo9…` war nie gesichert) — deshalb gibt es jetzt `make_node_key.mjs`.
 
 ## Sicherheitsregeln
 
