@@ -153,8 +153,12 @@ test("Tresor: falsches Passwort scheitert sauber", async () => {
 test("Tresor: Manipulation faellt durch (AES-GCM Auth-Tag)", async () => {
   const blob = await L.encryptTresor({ x: 1 }, "passwort123");
   const tampered = JSON.parse(JSON.stringify(blob));
+  // Erstes base64url-Zeichen kippen: trifft IMMER ein signifikantes Byte des
+  // Chiffrats. (Das LETZTE Zeichen zu kippen waere flaky — Jasons Befund 2026-05-31 —
+  // weil ueberzaehlige Bits jenseits der Byte-Grenze beim Dekodieren verworfen werden
+  // und der Klartext dann unveraendert bliebe.)
   const ch = tampered.ciphertext;
-  tampered.ciphertext = ch.slice(0, -1) + (ch.slice(-1) === "A" ? "B" : "A");
+  tampered.ciphertext = (ch[0] === "A" ? "B" : "A") + ch.slice(1);
   await assert.rejects(() => L.decryptTresor(tampered, "passwort123"));
 });
 
