@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Jesons-Bibliothek — SBKIM Tool-Point
+  Jasons-Bibliothek — SBKIM Tool-Point
   Version 0.1.0 (Scheibe 1) · 2026 · Quelle: SB-KIMTool-Point
   Eine offline-taugliche Einzeldatei: beliebige .json laden, benennen, ordnen,
   exportieren und wieder einlesen. Keine externen Abhaengigkeiten.
@@ -10,16 +10,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Jesons-Bibliothek</title>
+<title>Jasons-Bibliothek</title>
 <meta name="description" content="Deine Bibliothek fuer JSON-Dateien: laden, benennen, ordnen, exportieren, wieder einlesen. Offline." />
 <meta name="theme-color" content="#0b1416" />
 <meta name="color-scheme" content="dark" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Jesons-Bibliothek" />
+<meta name="apple-mobile-web-app-title" content="Jasons-Bibliothek" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1416'/%3E%3Cpath d='M16 18h22a6 6 0 0 1 6 6v22H22a6 6 0 0 1-6-6z' fill='none' stroke='%232dd4bf' stroke-width='3'/%3E%3Cpath d='M24 26h14M24 32h14M24 38h9' stroke='%232dd4bf' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
-<link rel="manifest" href='data:application/manifest+json,{"name":"Jesons-Bibliothek","short_name":"Jesons","start_url":".","scope":".","display":"standalone","background_color":"%230b1416","theme_color":"%230b1416","lang":"de","icons":[{"src":"data:image/svg+xml,%253Csvg xmlns=%2527http://www.w3.org/2000/svg%2527 viewBox=%25270 0 64 64%2527%253E%253Crect width=%252764%2527 height=%252764%2527 rx=%252714%2527 fill=%2527%25230b1416%2527/%253E%253Cpath d=%2527M16 18h22a6 6 0 0 1 6 6v22H22a6 6 0 0 1-6-6z%2527 fill=%2527none%2527 stroke=%2527%25232dd4bf%2527 stroke-width=%25273%2527/%253E%253C/svg%253E","sizes":"any","type":"image/svg+xml"}]}' />
+<link rel="manifest" href='data:application/manifest+json,{"name":"Jasons-Bibliothek","short_name":"Jasons","start_url":".","scope":".","display":"standalone","background_color":"%230b1416","theme_color":"%230b1416","lang":"de","icons":[{"src":"data:image/svg+xml,%253Csvg xmlns=%2527http://www.w3.org/2000/svg%2527 viewBox=%25270 0 64 64%2527%253E%253Crect width=%252764%2527 height=%252764%2527 rx=%252714%2527 fill=%2527%25230b1416%2527/%253E%253Cpath d=%2527M16 18h22a6 6 0 0 1 6 6v22H22a6 6 0 0 1-6-6z%2527 fill=%2527none%2527 stroke=%2527%25232dd4bf%2527 stroke-width=%25273%2527/%253E%253C/svg%253E","sizes":"any","type":"image/svg+xml"}]}' />
 <style>
   :root{
     --bg:#0b1416; --bg2:#0f1b1e; --card:#11252a; --card2:#0e1f23;
@@ -91,7 +91,7 @@
 </head>
 <body>
 <header>
-  <h1><span class="glyph">▤</span> Jesons-Bibliothek</h1>
+  <h1><span class="glyph">▤</span> Jasons-Bibliothek</h1>
   <p class="sub">Deine Bibliothek fuer JSON-Dateien — laden, benennen, ordnen, exportieren, wieder einlesen.</p>
   <p><span class="chip">offline</span> <span class="chip">Scheibe 2</span>
      <span class="chip">🔒 Tresor: Passwort-Schutz</span></p>
@@ -99,7 +99,7 @@
 
 <main>
   <div class="bar">
-    <button id="btn-add" class="btn-primary">＋ Jeson laden (.json)</button>
+    <button id="btn-add" class="btn-primary">＋ Jason laden (.json)</button>
     <button id="btn-export-all" class="btn-ghost">⤓ Bibliothek sichern</button>
     <button id="btn-export-enc" class="btn-ghost">🔒 Verschlüsselt sichern</button>
     <button id="btn-import-lib" class="btn-ghost">⤒ Einlesen / Tresor öffnen</button>
@@ -121,7 +121,7 @@
   <div class="count" id="count"></div>
 
   <div id="empty" class="empty hidden">
-    Noch nichts in der Bibliothek. Lade deine erste Jeson mit <b>„＋ Jeson laden"</b>.
+    Noch nichts in der Bibliothek. Lade deine erste Jason mit <b>„＋ Jason laden"</b>.
   </div>
   <ul class="list" id="list"></ul>
 </main>
@@ -138,7 +138,7 @@
 
 <!-- Bearbeiten-Dialog -->
 <dialog id="dlg-edit">
-  <h3 style="margin:0 0 6px">Jeson bearbeiten</h3>
+  <h3 style="margin:0 0 6px">Jason bearbeiten</h3>
   <label class="field"><span>Name</span><input id="e-name" type="text" /></label>
   <label class="field"><span>Kategorie</span><input id="e-cat" type="text" placeholder="z. B. Rezepte" /></label>
   <label class="field"><span>Schlagworte (mit Komma trennen)</span><input id="e-tags" type="text" placeholder="z. B. test, wichtig" /></label>
@@ -155,7 +155,7 @@
      zwischen den Markern geprueft). Keine DOM-Abhaengigkeit hier.
      ============================================================ -->
 <script>
-// JESONLIB-CORE-START
+// JASONLIB-CORE-START
 (function (root) {
   "use strict";
   var SCHEMA = 1;
@@ -192,10 +192,10 @@
 
   function makeEntry(input) {
     input = input || {};
-    var name = String(input.name || "").trim() || "Unbenannte Jeson";
+    var name = String(input.name || "").trim() || "Unbenannte Jason";
     return {
       schemaVersion: SCHEMA,
-      kind: "jeson-eintrag",
+      kind: "jason-eintrag",
       id: input.id || genId(),
       name: name,
       tags: normalizeTags(input.tags),
@@ -211,7 +211,7 @@
   function buildLibraryExport(entries) {
     return {
       schemaVersion: SCHEMA,
-      kind: "jeson-bibliothek",
+      kind: "jason-bibliothek",
       exportedAt: nowIso(),
       count: entries.length,
       eintraege: entries
@@ -219,7 +219,7 @@
   }
 
   function asEntry(obj, fallbackName) {
-    if (obj && obj.kind === "jeson-eintrag" && Object.prototype.hasOwnProperty.call(obj, "payload")) {
+    if (obj && obj.kind === "jason-eintrag" && Object.prototype.hasOwnProperty.call(obj, "payload")) {
       return makeEntry({
         id: obj.id, name: obj.name, tags: obj.tags, category: obj.category,
         origin: obj.origin, createdAt: obj.createdAt, payload: obj.payload
@@ -232,9 +232,9 @@
     var p = validateAndParse(text);
     if (!p.ok) return { ok: false, error: p.error, entries: [] };
     var v = p.value, entries = [], i;
-    if (v && v.kind === "jeson-bibliothek" && Array.isArray(v.eintraege)) {
+    if (v && v.kind === "jason-bibliothek" && Array.isArray(v.eintraege)) {
       for (i = 0; i < v.eintraege.length; i++) entries.push(asEntry(v.eintraege[i]));
-    } else if (v && v.kind === "jeson-eintrag") {
+    } else if (v && v.kind === "jason-eintrag") {
       entries.push(asEntry(v));
     } else {
       entries.push(asEntry(v, fallbackName));
@@ -335,7 +335,7 @@
     var pt = new TextEncoder().encode(JSON.stringify(plainObj));
     var ctBuf = await c.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, pt);
     return {
-      schemaVersion: SCHEMA, kind: "jeson-tresor", version: 2,
+      schemaVersion: SCHEMA, kind: "jason-tresor", version: 2,
       kdf: { algorithm: "PBKDF2", hash: "SHA-256", iterations: TRESOR_ITER, salt: b64uFromBytes(salt) },
       cipher: { algorithm: "AES-GCM-256", iv: b64uFromBytes(iv) },
       ciphertext: b64uFromBytes(new Uint8Array(ctBuf))
@@ -355,7 +355,7 @@
       v.kdf.algorithm === "PBKDF2" && /AES-GCM/.test(String(v.cipher.algorithm)));
   }
   function tresorPayloadKind(plainObj) {
-    if (plainObj && plainObj.kind === "jeson-bibliothek" && Array.isArray(plainObj.eintraege)) return "bibliothek";
+    if (plainObj && plainObj.kind === "jason-bibliothek" && Array.isArray(plainObj.eintraege)) return "bibliothek";
     if (plainObj && Array.isArray(plainObj.identities)) return "identitaeten";
     return "roh";
   }
@@ -383,10 +383,10 @@
     encryptTresor: encryptTresor, decryptTresor: decryptTresor, isTresor: isTresor,
     tresorPayloadKind: tresorPayloadKind, payloadToEntries: payloadToEntries
   };
-  root.JesonLib = api;
+  root.JasonLib = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));
-// JESONLIB-CORE-END
+// JASONLIB-CORE-END
 </script>
 
 <!-- ============================================================
@@ -395,8 +395,8 @@
 <script>
 (function () {
   "use strict";
-  var L = window.JesonLib;
-  var KEY = "jesons-bibliothek-v1";
+  var L = window.JasonLib;
+  var KEY = "jasons-bibliothek-v1";
   var entries = load();
   var editingId = null;
 
@@ -444,7 +444,7 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
   function safeName(name) {
-    return (String(name || "jeson").replace(/[^a-z0-9-_]+/gi, "_").replace(/^_+|_+$/g, "") || "jeson");
+    return (String(name || "jason").replace(/[^a-z0-9-_]+/gi, "_").replace(/^_+|_+$/g, "") || "jason");
   }
 
   function readFile(file, cb) {
@@ -564,7 +564,7 @@
         return;
       }
       var r = L.parseLibraryImport(text, base);
-      var isWrapped = p.value && (p.value.kind === "jeson-bibliothek" || p.value.kind === "jeson-eintrag");
+      var isWrapped = p.value && (p.value.kind === "jason-bibliothek" || p.value.kind === "jason-eintrag");
       if (r.entries.length === 1 && !isWrapped) r.entries[0].origin = file.name; // rohe Datei: Herkunft merken
       entries = L.mergeEntries(entries, r.entries);
       persist(); render();
@@ -577,7 +577,7 @@
     var pw = window.prompt("Passwort zum Verschluesseln (mind. 8 Zeichen):");
     if (pw == null) return;
     L.encryptTresor(L.buildLibraryExport(entries), pw).then(function (blob) {
-      download("jesons-tresor_" + new Date().toISOString().slice(0, 10) + ".json", blob);
+      download("jasons-tresor_" + new Date().toISOString().slice(0, 10) + ".json", blob);
       toast("Verschluesselt gesichert (" + entries.length + " Eintraege)");
     }).catch(function (e) { toast(String((e && e.message) || e), true); });
   }
@@ -605,7 +605,7 @@
 
   function exportAll() {
     if (entries.length === 0) { toast("Bibliothek ist leer", true); return; }
-    download("jesons-bibliothek_" + new Date().toISOString().slice(0, 10) + ".json",
+    download("jasons-bibliothek_" + new Date().toISOString().slice(0, 10) + ".json",
       L.buildLibraryExport(entries));
     toast("Bibliothek gesichert (" + entries.length + " Eintraege)");
   }
@@ -621,7 +621,7 @@
   function saveEdit() {
     var e = entries.filter(function (x) { return x.id === editingId; })[0];
     if (!e) { $("dlg-edit").close(); return; }
-    e.name = $("e-name").value.trim() || "Unbenannte Jeson";
+    e.name = $("e-name").value.trim() || "Unbenannte Jason";
     e.category = $("e-cat").value.trim();
     e.tags = L.normalizeTags($("e-tags").value);
     e.updatedAt = L.nowIso();

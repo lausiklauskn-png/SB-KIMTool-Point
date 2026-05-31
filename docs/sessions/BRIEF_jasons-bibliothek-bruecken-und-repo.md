@@ -1,4 +1,4 @@
-# BRIEF — Jesons-Bibliothek: App-Brücken + Protokoll-Andock fürs eigene Repo
+# BRIEF — Jasons-Bibliothek: App-Brücken + Protokoll-Andock fürs eigene Repo
 
 > Folge-Brief nach Scheibe 2 (Tresor). Setzt die Brief-Kette aus `CLAUDE.md` fort.
 > Stand: 2026-05-31.
@@ -11,8 +11,8 @@
 2. `PULS.md` (Stand — besonders Einträge **Y** und **X**, ganz oben)
 3. **diesen Brief**
 4. `status.json` (Real-Anteil)
-5. Doku + Code: `docs/JESONS-BIBLIOTHEK.md` · `jesons-bibliothek/index.html`
-   (Kern zwischen `JESONLIB-CORE-START/END`) · `test/jeson_lib.test.js` ·
+5. Doku + Code: `docs/JASONS-BIBLIOTHEK.md` · `jasons-bibliothek/index.html`
+   (Kern zwischen `JASONLIB-CORE-START/END`) · `test/jason_lib.test.js` ·
    **Modul 02** `web/tools/sbkim-spore.js` (`exportBackup`/`importBackup`) ·
    Andock-Bausteine: `scripts/generate_spore.mjs` · `docs/ANDOCK.md` · `sbkim/AUSTAUSCH.md` ·
    `sbkim/spore.json` · `docs/SCHLUESSEL.md`.
@@ -22,12 +22,12 @@
 
 ## 1. Stand **[Pflicht]**
 
-- Jesons-Bibliothek **Scheibe 1+2 fertig** (Branch `claude/sage-andock-continue-SI1Lu`,
+- Jasons-Bibliothek **Scheibe 1+2 fertig** (Branch `claude/sage-andock-continue-SI1Lu`,
   Draft-PR #44): laden/benennen/ordnen/suchen/exportieren/einlesen **+ Tresor** (Passwort,
   AES-256-GCM/PBKDF2 600k, WebCrypto). Tresor-Format = **Modul 02 `exportBackup`** → liest
   auch verschlüsselte SBKIM-Schlüssel/ID-Backups (MM/MR/Modul 02). `npm test` 61/61, echter
   Browser-Smoke grün. Klaus' eigener Browser-Lauf steht aus.
-- **Klaus' Ziel:** Jesons **und** Keys automatisch immer am selben Ort, egal welche App/PWA/
+- **Klaus' Ziel:** Jasons **und** Keys automatisch immer am selben Ort, egal welche App/PWA/
   Live-Page sie erstellt hat — offline. „Von außen ein Tresor, drinnen eine Bibliothek."
 - **Klaus erstellt ein eigenes Repo** für die Bibliothek; wir bauen die **Brücke ans Protokoll**.
   Grenze: meine Schreibrechte gelten **nur** für `sb-kimtool-point` → Brücke als **Kopier-Starter**.
@@ -35,7 +35,7 @@
 ## 2. Ziel dieser Aufgabe **[Pflicht]** — eine Richtung (Klaus wählt)
 
 - **(A) App-übergreifende Ablage:** **Web Share Target** (die Bibliothek-PWA wird „Teilen-Ziel"
-  → aus jeder App „Teilen → Jesons-Bibliothek") + optional **fester Ordner** (File System
+  → aus jeder App „Teilen → Jasons-Bibliothek") + optional **fester Ordner** (File System
   Access API). Macht „immer am selben Ort" so weit, wie Browser-Origin-Trennung es offline zulässt.
 - **(B) Volle Schlüssel-Wiederherstellung:** **Modul 02 in die App einbinden** (inline,
   abhängigkeitsfrei) → `importBackup(blob, pw)` stellt eine Identität echt wieder her, nicht nur
@@ -57,7 +57,7 @@
 ## 4. Datenverträge / Spec **[Pflicht]**
 
 - **Tresor-Umschlag NICHT brechen** (identisch Modul 02 / `node_key.enc.json`):
-  `{ schemaVersion, kind:"jeson-tresor", version:2, kdf:{PBKDF2,SHA-256,600000,salt}, cipher:{AES-GCM-256,iv}, ciphertext }` (base64url).
+  `{ schemaVersion, kind:"jason-tresor", version:2, kdf:{PBKDF2,SHA-256,600000,salt}, cipher:{AES-GCM-256,iv}, ciphertext }` (base64url).
 - **Share Target (A):** Manifest `share_target` (POST, `enctype multipart/form-data`,
   `files` mit `accept: ["application/json",".json"]`); eingehende Datei → `ingestFile`.
 - **Andock (C):** Schema aus `docs/ANDOCK.md` (kanonische Signier-Form, `domainVector` ehrlich).

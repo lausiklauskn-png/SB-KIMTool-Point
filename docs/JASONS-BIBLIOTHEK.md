@@ -1,8 +1,8 @@
-# Jesons-Bibliothek — deine Bibliothek für JSON-Dateien
+# Jasons-Bibliothek — deine Bibliothek für JSON-Dateien
 
-Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jesons-bibliothek/index.html`
+Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jasons-bibliothek/index.html`
 
-> „Jeson" = Klaus' Name für eine `.json`-Datei. Die Bibliothek ist ein Ort, an dem man
+> „Jason" = Klaus' Name für eine `.json`-Datei. Die Bibliothek ist ein Ort, an dem man
 > beliebige JSON-Dateien **aufhebt, benennt, ordnet, exportiert, wieder einliest** und
 > später **verschenkt** — eigene Arbeit, eigene Zeit, eigener Wert.
 
@@ -14,12 +14,12 @@ Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jesons-bibl
 - **Nutzen:** Klaus kann seine JSON-Dateien sammeln, benennen, mit Kategorie + Schlagworten
   ordnen, durchsuchen, einzeln oder als ganze Bibliothek **exportieren** (echte, mitnehmbare
   Sicherung) und wieder **einlesen** — auf jedem Gerät, ohne Konto, ohne Netz.
-- **Verwendung:** Seite öffnen → **„＋ Jeson laden"** wählt eine `.json` vom Gerät →
+- **Verwendung:** Seite öffnen → **„＋ Jason laden"** wählt eine `.json` vom Gerät →
   benennen/ordnen → **„Exportieren"** (eine Datei) oder **„Bibliothek sichern"** (alles als
   eine Datei). **„Bibliothek einlesen"** holt eine zuvor gesicherte Bibliothek (oder eine
   fremde `.json`) wieder herein.
 - **Einbau:** Reine Datei. Auf GitHub Pages erreichbar unter
-  `…github.io/SB-KIMTool-Point/jesons-bibliothek/`. Später als eigenes Repo/PWA verteilbar
+  `…github.io/SB-KIMTool-Point/jasons-bibliothek/`. Später als eigenes Repo/PWA verteilbar
   (eine Datei kopieren genügt). Kern-Logik ist browser- **und** node-tauglich → vom
   headless Test geprüft.
 - **Aktiviert durch:** Klaus' Knopfdruck. Läuft komplett im Browser, kein Server.
@@ -32,17 +32,17 @@ Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jesons-bibl
   Passwort (AES-256-GCM / PBKDF2-SHA256 600k, WebCrypto). Die normalen Exporte bleiben
   Klartext (zum schnellen Aufheben). **Passwort vergessen = Inhalt weg** (kein Hintertürchen).
   Zum Verschenken das Passwort **getrennt** mitteilen.
-- **Größenrahmen:** `localStorage` fasst grob wenige MB. Für sehr große/viele Jesons kommt
+- **Größenrahmen:** `localStorage` fasst grob wenige MB. Für sehr große/viele Jasons kommt
   in einer späteren Scheibe IndexedDB (wie Modul 01 Storage). Ehrlich vermerkt.
 
 ## Datenvertrag (Spec vor Code)
 
-**Ein Eintrag** (`kind: "jeson-eintrag"`):
+**Ein Eintrag** (`kind: "jason-eintrag"`):
 
 ```json
 {
   "schemaVersion": 1,
-  "kind": "jeson-eintrag",
+  "kind": "jason-eintrag",
   "id": "<uuid>",
   "name": "<von Klaus vergeben>",
   "tags": ["klein", "eindeutig"],
@@ -55,15 +55,15 @@ Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jesons-bibl
 }
 ```
 
-**Eine gesicherte Bibliothek** (`kind: "jeson-bibliothek"`):
+**Eine gesicherte Bibliothek** (`kind: "jason-bibliothek"`):
 
 ```json
 {
   "schemaVersion": 1,
-  "kind": "jeson-bibliothek",
+  "kind": "jason-bibliothek",
   "exportedAt": "<ISO>",
   "count": 2,
-  "eintraege": [ /* jeson-eintrag, … */ ]
+  "eintraege": [ /* jason-eintrag, … */ ]
 }
 ```
 
@@ -73,7 +73,7 @@ Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jesons-bibl
 ```json
 {
   "schemaVersion": 1,
-  "kind": "jeson-tresor",
+  "kind": "jason-tresor",
   "version": 2,
   "kdf":   { "algorithm": "PBKDF2", "hash": "SHA-256", "iterations": 600000, "salt": "<base64url>" },
   "cipher":{ "algorithm": "AES-GCM-256", "iv": "<base64url>" },
@@ -86,7 +86,7 @@ Beim Einlesen wird der Typ **strukturell** erkannt (`kdf`+`cipher`+`ciphertext` 
   - Klartext mit `eintraege[]` → eine **Bibliothek** (Einträge werden zusammengeführt),
   - Klartext mit `identities[]` → ein **SBKIM-Schlüssel/ID-Backup** (von Modul 02 / Mein-Mixarium
     / Mein-Rezeptbuch) → wird als Eintrag „SBKIM-Schluessel" sicher abgelegt.
-- sonst Klartext: `jeson-bibliothek` (viele), `jeson-eintrag` (einer), oder rohe JSON
+- sonst Klartext: `jason-bibliothek` (viele), `jason-eintrag` (einer), oder rohe JSON
   (als neuer Eintrag eingewickelt). Zusammenführen entdoppelt nach `id` (neuere `updatedAt`
   gewinnt).
 
@@ -113,12 +113,12 @@ Scheibe: Modul 02 in die App einbinden).
 
 ## Beweis
 
-- `test/jeson_lib.test.js` — schneidet die Kern-Logik **aus der ausgelieferten
+- `test/jason_lib.test.js` — schneidet die Kern-Logik **aus der ausgelieferten
   `index.html`** (zwischen Markern) und prüft sie headless (kein Duplikat): Parsen,
   Eintrag-Normalisierung, Export-/Import-Hülle, Zusammenführen, Filter/Sortierung **und den
   Tresor** (Verschlüsseln→Entschlüsseln == Original; falsches Passwort scheitert; Manipulation
   fällt durch das AES-GCM-Auth-Tag; `payloadToEntries`/`isTresor`). `npm test` grün.
-- Entwickler-Browser-Smoke (Playwright/Chromium): Seite lädt fehlerfrei, `JesonLib`
+- Entwickler-Browser-Smoke (Playwright/Chromium): Seite lädt fehlerfrei, `JasonLib`
   registriert, Leer-Zustand + Knöpfe da, echte Eintrag-Runde **und echter Tresor-Roundtrip
   mit WebCrypto** (falsches Passwort abgewiesen). **Klaus' eigener Browser-Lauf**
   (Datei-Auswahl, Download, Passwort-Eingabe, Bearbeiten-Dialog) **steht noch aus**.

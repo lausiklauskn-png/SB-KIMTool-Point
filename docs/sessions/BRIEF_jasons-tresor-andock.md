@@ -6,7 +6,7 @@
 > Stand: 2026-05-31.
 
 **Was Jasons-Tresor ist:** die herunterladbare **Bibliothek/Tresor** (von außen ein Tresor,
-drinnen eine „Jesons-Bibliothek") für beliebige `.json` + SBKIM-Schlüssel — UND ein **echter
+drinnen eine „Jasons-Bibliothek") für beliebige `.json` + SBKIM-Schlüssel — UND ein **echter
 SBKIM-Endknoten** mit eigener Identität, der wie SB-KIMTool-Point an **Sage** andockt. Ziel:
 Klaus kann 1:1 mit dem Tresor kommunizieren (gemeinsames Format + Andock-Postfach).
 
@@ -35,12 +35,12 @@ Hol dir aus SB-KIMTool-Point **1:1** und passe nur Projektname/Identität an:
 ## 2. Das Produkt holen (die App IST der Tresor)
 
 Kopiere **1:1** aus SB-KIMTool-Point:
-- `jesons-bibliothek/index.html`  → bei dir z. B. `index.html` (Wurzel, damit Pages es direkt
+- `jasons-bibliothek/index.html`  → bei dir z. B. `index.html` (Wurzel, damit Pages es direkt
   zeigt) oder `tresor/index.html`. Das ist die fertige Bibliothek **mit Tresor**
   (Scheibe 1+2: laden/benennen/ordnen/suchen/exportieren/einlesen + Passwort-Verschlüsselung
   AES-256-GCM/PBKDF2-SHA256 600k, gleicher Umschlag wie Modul 02).
-- `test/jeson_lib.test.js` → dein `test/…` (prüft den Kern aus der ausgelieferten Datei).
-- Optional Name drinnen: „Jesons-Bibliothek" behalten ODER auf „Jasons-Tresor" vereinheitlichen
+- `test/jason_lib.test.js` → dein `test/…` (prüft den Kern aus der ausgelieferten Datei).
+- Optional Name drinnen: „Jasons-Bibliothek" behalten ODER auf „Jasons-Tresor" vereinheitlichen
   (Klaus entscheidet). `npm test` muss grün sein.
 
 ## 3. Eigene Identität geben (Modul 02 + Spore) — **so wird der Tresor ein Knoten**
@@ -88,7 +88,7 @@ Es braucht **kein** neues Format — die Brücke ist die schon gebaute Mechanik:
 - **Identität/Signatur (Modul 02):** der Tresor signiert mit seinem Schlüssel; jede Aussage ist
   prüfbar. `exportBackup(pw)` sichert die Identität verschlüsselt, `importBackup(blob,pw)` stellt
   sie wieder her — auf jedem Gerät, das du besitzt.
-- **Gemeinsamer Tresor-Umschlag:** `{ kind:"jeson-tresor", version:2, kdf:PBKDF2/SHA-256/600k,
+- **Gemeinsamer Tresor-Umschlag:** `{ kind:"jason-tresor", version:2, kdf:PBKDF2/SHA-256/600k,
   cipher:AES-GCM-256, ciphertext }` (base64url) — **identisch** zu `node_key.enc.json` und Modul 02.
   Damit liest jede Stelle (Bibliothek, SB-KIMTool-Point, Jasons-Tresor) dieselben verschlüsselten
   Dateien; eine Tür für Bibliothek **und** Schlüssel-Backup.
@@ -102,9 +102,9 @@ Es braucht **kein** neues Format — die Brücke ist die schon gebaute Mechanik:
 ## 7. Datenverträge (NICHT brechen)
 
 - **Tresor-Umschlag:** s. §6 (identisch Modul 02 / `node_key.enc.json`).
-- **Bibliothek-Eintrag:** `{ schemaVersion, kind:"jeson-eintrag", id, name, tags[], category,
-  origin, createdAt, updatedAt, size, payload }`. **Export:** `{ kind:"jeson-bibliothek",
-  exportedAt, count, eintraege[] }`. Quelle: `docs/JESONS-BIBLIOTHEK.md` in SB-KIMTool-Point.
+- **Bibliothek-Eintrag:** `{ schemaVersion, kind:"jason-eintrag", id, name, tags[], category,
+  origin, createdAt, updatedAt, size, payload }`. **Export:** `{ kind:"jason-bibliothek",
+  exportedAt, count, eintraege[] }`. Quelle: `docs/JASONS-BIBLIOTHEK.md` in SB-KIMTool-Point.
 - **Spore/Andock:** kanonische Signier-Form + Pflichtfelder aus `docs/ANDOCK.md`.
 
 ## 8. Akzeptanz & Ehrlichkeit
