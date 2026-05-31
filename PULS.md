@@ -2,6 +2,21 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (AC) — Sage informiert: dritter Knoten Jasons-Tresor dockt an (Postfach)
+
+Parallel zum Aufbau von Jasons-Tresor Sage über die **Synchronisations-Brücke** (Postfach
+`sbkim/AUSTAUSCH.md`) vorgewarnt — die ruhende Verbindung wacht damit für den neuen Bau auf.
+
+- **`sbkim/AUSTAUSCH.md`**: neuer Abschnitt „§11 Ankündigung an Sage (2026-05-31)" — ein dritter
+  Endknoten **Jasons-Tresor** entsteht (gebaut 1:1 aus unseren getesteten Originalen), bekommt
+  eine eigene Ed25519-Identität via `make_node_key.mjs` und dockt nach §11-Konventionen an
+  (Registrierung, sobald seine `spore.json` 200 liefert). Hinweis auf das neue Werkzeug
+  `make_node_key.mjs`. Status-Kopf + Log-Zeile (2026-05-31) aktualisiert.
+- **Antwortweg:** Sage kann hier, über sein Postfach oder direkt gegenüber Jasons-Tresor
+  antworten; direkte Tresor ⟷ SB·KIMTool·Point-Verifizierung (Drei-Knoten) bei Bedarf.
+- Reine Doku/Kommunikation — `npm test` unberührt (68/68). Geht erst live für Sage, wenn der
+  PR auf `main` gemergt ist.
+
 ## 2026-05-31 (AB) — Lücke geschlossen: Schlüssel-Tresor ANLEGEN (make_node_key.mjs)
 
 Die erste Jasons-Tresor-Sitzung meldete (zu Recht) eine Blockade: es gab nur

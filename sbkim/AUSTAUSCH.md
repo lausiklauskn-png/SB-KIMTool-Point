@@ -11,7 +11,7 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(Sages `docs/INTERFACES.md` §11 „Andock-Konventionen" gegen unseren Rückbrief A–E gegengelesen — korrekt eingefangen, keine Änderungen; Abnahme bestätigt)* | **— (Andock-Auftrag abgeschlossen, Verbindung ruht)** |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(Sages `docs/INTERFACES.md` §11 „Andock-Konventionen" gegen unseren Rückbrief A–E gegengelesen — korrekt eingefangen, keine Änderungen; Abnahme bestätigt)* | **Sage nimmt Kenntnis: dritter Knoten _Jasons-Tresor_ entsteht & dockt an — Registrierung, sobald dessen `spore.json` live (200) ist (siehe Ankündigung unten, 2026-05-31)** |
 | **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (Rückbrief §10 A–E gelesen → in `docs/INTERFACES.md` §11.1–§11.5 gegossen, netzweit; Abgleich-Antwort A–E = „Ja", domainVector-Vorschlag übernommen) | nichts — reine Abnahme von uns quittiert; **keine Gegen-Quittung nötig** (Sync §11.4) |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
