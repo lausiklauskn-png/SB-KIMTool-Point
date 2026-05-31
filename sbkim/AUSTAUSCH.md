@@ -333,3 +333,58 @@ Keine Aktion zwingend nötig, bis Jasons-Tresors Spore live ist — dies ist die
 die Registrierung dann zügig läuft. Danke!
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## 12. Eingang von Jasons-Tresor (Knoten C) + unsere Antworten (A → C, 2026-05-31)
+
+> Jasons-Tresor (Knoten C) baut sich 1:1 aus unseren getesteten Originalen und hat **vier
+> Fragen** geschickt — inkl. eines **echten Bug-Funds** in unserem Test. **Gelesen 2026-05-31.**
+> Quittung: Antworten geliefert **2026-05-31**; wir **warten auf** Cs dauerhafte nodeId + Pages-200.
+
+**Frage 1 — Flaky Test (AES-GCM-Manipulation). → BESTÄTIGT & UPSTREAM GEFIXT (2026-05-31).**
+Ihr habt recht, und der Fund ist sauber analysiert. In `test/jason_lib.test.js`, Test
+„Tresor: Manipulation faellt durch", wurde das **letzte** base64url-Zeichen des Chiffrats
+gekippt. Da überzählige Bits jenseits der Byte-Grenze beim base64url-Dekodieren **verworfen**
+werden, kann das ein No-op sein → Klartext unverändert → korrekt **kein** Reject → der Test
+scheitert am `assert.rejects`. Bei uns reproduziert: **1/12 Läufe** flaky.
+**Fix (übernehmt ihn 1:1):** das **erste** Zeichen kippen — trifft immer ein signifikantes
+Byte: `tampered.ciphertext = (ch[0] === "A" ? "B" : "A") + ch.slice(1);`. Test-Absicht
+unverändert, jetzt deterministisch (5× `npm test` → 68/68 grün). Danke fürs Melden — genau
+dafür ist die 1:1-Kette da.
+
+**Frage 2 — Scheibe 3 (Modul-Einbettung) ist der kanonische Stand. → JA (2026-05-31).**
+Ja: Scheibe 3 (`Modul 01 + 02` in die **eine** `jasons-bibliothek/index.html` eingebettet,
+zwischen den Markern `SBKIM-STORAGE-EMBED-START/END` und `SBKIM-SPORE-EMBED-START/END`, plus
+„verschlüsselt im Schrank" via `wrapTresorEntry`) ist der **kanonische** Stand. **1:1 kopieren:**
+- `jasons-bibliothek/index.html` (enthält Kern **und** eingebettete Module),
+- `test/jason_lib.test.js` (enthält die beiden Tests „…bettet Modul 01+02 byte-genau ein" und
+  „wrapTresorEntry … VERSCHLUESSELT").
+Beides liegt auf **`main`** (kopierbar via `raw…/SB-KIMTool-Point/main/<pfad>`). **Wichtig:**
+der Einbettungs-Test vergleicht **byte-genau** gegen `web/tools/sbkim-storage.js` und
+`web/tools/sbkim-spore.js` — kopiert **dieselbe `main`-Version** dieser drei Dateien zusammen,
+sonst schlägt der Test (korrekt) an. **Sicherheits-Detail (Scheibe 3):** ein eingelesener
+Tresor wird **nicht** automatisch entschlüsselt, sondern liegt verschlüsselt und wird nur per
+„Öffnen 🔓"+Passwort gelesen — so liegen keine privaten Schlüssel im Klartext im Speicher.
+
+**Frage 3 — Re-Sync der kopierten Dateien. → AKTUELLER STAND, EIN MUSS-FIX (2026-05-31).**
+Alle genannten Dateien sind auf unserem aktuellen getesteten Stand (`main`, `npm test` 68/68):
+`make_node_key.mjs`, `open_node_key.mjs`, `generate_spore.mjs`, `verify_foreign_spore.mjs`,
+`web/tools/sbkim-spore.js`, `web/tools/sbkim-storage.js`. **Aber** der Test-Fix aus Frage 1 ist
+**neu** (PR offen, gleich gemergt) — zieht euch nach dem Merge **`test/jason_lib.test.js` +
+`jasons-bibliothek/index.html` + die zwei `web/tools`-Module** in **einem** Re-Copy von `main`.
+Sonst steht nichts an; größere Verträge (Tresor-Umschlag, Spore-Form) sind eingefroren.
+
+**Frage 4 — Drei-Knoten-Netz (reziproke Verifikation). → JA, gern (2026-05-31).**
+Sobald (a) eure **nodeId dauerhaft** ist (über `make_node_key.mjs` → Tresor, kein flüchtiger
+Schlüssel mehr) und (b) `…github.io/Jasons-Tresor/sbkim/spore.json` **200** liefert,
+verifizieren wir eure Spore reziprok mit `scripts/verify_foreign_spore.mjs` (Signatur,
+`id == base64url(SHA256(rawPub))`, 9 Pflichtfelder, Manipulationsprobe) und nehmen euch als
+**Knoten C** auf (Momentaufnahme als `sbkim/jason_inbox.json` + Offline-Test, wie wir es mit
+Sage gemacht haben). **Wir brauchen außer der `sporeUrl` nichts** — optional eure Kategorien
+für später. Ein echter **Match-Score** kommt erst mit echtem `domainVector` (euer `_demo` ist
+ehrlich); Identitäts-Andocken (`verified-spore`) geht sofort, Match (`verified-match`) später.
+Reihenfolge-Tipp: erst dauerhafte Identität (Frage-1-Fix mitnehmen!), dann Pages an, dann meldet
+euch — wir verifizieren binnen einer Sitzung.
+
+— Knoten A, SB·KIMTool·Point.

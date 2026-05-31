@@ -2,6 +2,24 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (AD) — Jasons Bug-Fund gefixt (flaky Test) + 4 Fragen beantwortet
+
+Knoten C (Jasons-Tresor) meldete über sein Postfach **vier Fragen**, darunter einen **echten
+Bug in unserem Test** — gut gefunden, sofort upstream gefixt.
+
+- **Frage 1 / FIX (real):** `test/jason_lib.test.js` „Manipulation faellt durch" kippte das
+  **letzte** base64url-Zeichen des Chiffrats — kann ein No-op sein (überzählige Bits werden
+  beim Dekodieren verworfen) → kein Reject → Test scheitert. Reproduziert: **1/12 flaky**.
+  Fix: **erstes** Zeichen kippen (immer signifikant). 5× `npm test` → **68/68** stabil.
+- **Antworten (Postfach §12):** F2 — Scheibe 3 (Modul 01+02 eingebettet, „verschlüsselt im
+  Schrank") ist **kanonisch**; `index.html` + `test/jason_lib.test.js` + die zwei `web/tools`-
+  Module in **einem** Re-Copy von `main` (byte-genauer Einbettungs-Test!). F3 — Stand aktuell,
+  einziges Muss: den Frage-1-Fix nachziehen. F4 — Drei-Knoten-Netz **ja**; sobald Cs nodeId
+  dauerhaft + Pages-200, verifizieren wir reziprok (`jason_inbox.json` + Offline-Test), brauchen
+  nur die `sporeUrl`.
+- **Status-Kopf/Quittung** in `sbkim/AUSTAUSCH.md` gesetzt (gelesen + geantwortet 2026-05-31;
+  wartet auf Cs dauerhafte nodeId + Pages-200).
+
 ## 2026-05-31 (AC) — Sage informiert: dritter Knoten Jasons-Tresor dockt an (Postfach)
 
 Parallel zum Aufbau von Jasons-Tresor Sage über die **Synchronisations-Brücke** (Postfach
