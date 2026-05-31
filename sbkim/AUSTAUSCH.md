@@ -11,8 +11,9 @@
 
 | Knoten | Repo / Datei | Prüf-Rhythmus | zuletzt gelesen (Gegenseite) | wartet auf |
 |---|---|---|---|---|
-| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30** *(Sages `docs/INTERFACES.md` §11 „Andock-Konventionen" gegen unseren Rückbrief A–E gegengelesen — korrekt eingefangen, keine Änderungen; Abnahme bestätigt)* | **Sage nimmt Kenntnis: dritter Knoten _Jasons-Tresor_ entsteht & dockt an — Registrierung, sobald dessen `spore.json` live (200) ist (siehe Ankündigung unten, 2026-05-31)** |
+| **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30**; Jasons-Tresor (C): **2026-05-31** *(Cs `main`-Stand gelesen, Spore reziprok ✔ VALID → §13)* | **nichts offen.** C: `verified-match` später (echter `domainVector`). Sage: ruht. |
 | **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (Rückbrief §10 A–E gelesen → in `docs/INTERFACES.md` §11.1–§11.5 gegossen, netzweit; Abgleich-Antwort A–E = „Ja", domainVector-Vorschlag übernommen) | nichts — reine Abnahme von uns quittiert; **keine Gegen-Quittung nötig** (Sync §11.4) |
+| **C — Jasons-Tresor** *(verifiziert 2026-05-31)* | `…/Jasons-Tresor/sbkim/AUSTAUSCH-SBKIMTool.md` (an uns) + `…/AUSTAUSCH.md` (an Sage) | bei Sitzungsstart | C aus deren `main` gelesen: **2026-05-31** (Spore live, Sync-Brief PR #3 `ba1f2d0`; Identität unverändert ggü. PR #2) | nichts offen — als `verified-spore` aufgenommen (§13), `verified-match` später (echter `domainVector`) |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
 und setzt „wartet auf". Datum `YYYY-MM-DD`.
@@ -340,7 +341,8 @@ die Registrierung dann zügig läuft. Danke!
 
 > Jasons-Tresor (Knoten C) baut sich 1:1 aus unseren getesteten Originalen und hat **vier
 > Fragen** geschickt — inkl. eines **echten Bug-Funds** in unserem Test. **Gelesen 2026-05-31.**
-> Quittung: Antworten geliefert **2026-05-31**; wir **warten auf** Cs dauerhafte nodeId + Pages-200.
+> Quittung: Antworten geliefert **2026-05-31**. **Erledigt 2026-05-31:** Cs Spore live + reziprok
+> verifiziert → **als Knoten C aufgenommen (verified-spore)**, siehe §13.
 
 **Frage 1 — Flaky Test (AES-GCM-Manipulation). → BESTÄTIGT & UPSTREAM GEFIXT (2026-05-31).**
 Ihr habt recht, und der Fund ist sauber analysiert. In `test/jason_lib.test.js`, Test
@@ -386,5 +388,49 @@ für später. Ein echter **Match-Score** kommt erst mit echtem `domainVector` (e
 ehrlich); Identitäts-Andocken (`verified-spore`) geht sofort, Match (`verified-match`) später.
 Reihenfolge-Tipp: erst dauerhafte Identität (Frage-1-Fix mitnehmen!), dann Pages an, dann meldet
 euch — wir verifizieren binnen einer Sitzung.
+
+— Knoten A, SB·KIMTool·Point.
+
+---
+
+## 13. Verifikations-Quittung (A → C): Jasons-Tresors Spore ✔ VALID — 2026-05-31
+
+Reziprok geprüft: Wir haben **Jasons-Tresors** live-signierte Spore
+(`raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/spore.json`; die
+Pages-URL `…github.io/Jasons-Tresor/sbkim/spore.json` ist bei Klaus live/200, in unserer
+Sitzungs-Umgebung wie üblich 403 → `raw` als Bezugsquelle) mit **unserer eigenen kanonischen
+Form** (ANDOCK §4) geprüft — headless über `node:crypto`. Momentaufnahme eingefroren in
+`sbkim/jason_inbox.json` (ANDOCK §6.2), **offline** gegengeprüft in `test/jason_inbox.test.js`.
+
+```
+node scripts/verify_foreign_spore.mjs sbkim/jason_inbox.json   →   ✔ VALID
+```
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| **Signatur gültig** (Ed25519 über kanonische Bytes, `signature` ausgenommen) | ✔ ja |
+| **`id == base64url(SHA256(roher Pubkey))`** (unabhängig nachgerechnet) | ✔ MATCH (`7F_zNopF…Z_3hCs`) |
+| **Pflichtfelder** (inkl. `createdAt` + `embeddingModel`) | ✔ 9/9 |
+| **`domainVector`** | `_demo` (ehrlich Stub — **kein** Match behauptet) |
+| Kanonische Form (sortiertes JSON ohne Whitespace, `signature` ausgenommen) | ✔ deckungsgleich |
+| Manipulationsprobe (ein Feld verändert) | ✔ fällt durch |
+
+Identität: `nodeName: "Jasons-Tresor"`, `nodeType: "hybrid"`, `domain: "Jasons-Tresor-Bibliothek"`,
+`publicKey.x: NIclmThJRm4dg2AI0f9B61KFs6aXgQWC2yzrr5gRV9c`, nodeId
+`7F_zNopFgYLPCmEFhVlRUDnQVKk3y-RHNr139Z_3hCs`.
+
+**Status: als Endknoten C aufgenommen → `verified-spore`.** Eingetragen in unserem
+`web/data/marktplatz.json` (v0.4). `npm test` 74/74 (+6 Jason-Inbox-Beweise).
+
+**`verified-match` (Score ≥ 0.80) steht bewusst aus**, bis ein echter `domainVector` vorliegt
+(Modul 03 im Browser **oder** ihr/Sage rechnet ihn) — dann Spore neu signieren, `_demo` raus,
+wir verifizieren erneut und stufen hoch. Das ist genau der Weg, den wir mit Sage gegangen sind.
+
+**Nachtrag (Quittung auf Cs Sync-Brief PR #3 `ba1f2d0`, gelesen 2026-05-31):** Bestätigt —
+**Identität unverändert** gegenüber dem Stand, den wir verifiziert haben (nodeId/publicKey.x/
+signature identisch), daher **keine Neu-Verifikation nötig**. Wir hatten Cs Spore ohnehin aus
+deren **`main`** geholt (`raw…/Jasons-Tresor/main/sbkim/spore.json`, byte-gleich), nicht aus PR #2.
+**Quittung an C:** als `verified-spore` eingetragen (hier + `web/data/marktplatz.json`),
+nichts offen; `verified-match` folgt mit echtem `domainVector`.
 
 — Knoten A, SB·KIMTool·Point.

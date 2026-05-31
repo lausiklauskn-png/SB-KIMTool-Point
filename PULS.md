@@ -2,6 +2,26 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (AE) — Knoten C (Jasons-Tresor) reziprok verifiziert → verified-spore (Drei-Knoten-Netz)
+
+Jasons-Tresor meldete seine Spore live. Reziprok geprüft und aufgenommen — das SBKIM-Netz hat
+jetzt **drei** kryptografisch verbundene Knoten (Sage ⟷ A, A → C).
+
+- **Geholt + verifiziert:** Spore via `raw…/Jasons-Tresor/main/sbkim/spore.json` (github.io bei
+  uns 403, wie immer → raw). `node scripts/verify_foreign_spore.mjs` → **✔ VALID**: Signatur,
+  `id == base64url(SHA256(rawPub))` (`7F_zNopF…Z_3hCs`, unabhängig nachgerechnet), 9/9
+  Pflichtfelder, Manipulation fällt durch. `domainVector` ehrlich `_demo` → **verified-spore**,
+  kein Match behauptet.
+- **Inbox-Beweis:** Momentaufnahme `sbkim/jason_inbox.json` + Offline-Test `test/jason_inbox.test.js`
+  (+6: Pflichtfelder, Identität=Jasons-Tresor, Signatur, nodeId-Ableitung, `_demo` ehrlich,
+  Manipulation bricht). **`npm test` 74/74 grün.**
+- **Eingetragen:** `web/data/marktplatz.json` v0.4 — Knoten C als Endknoten (`verified-spore`).
+- **Postfach:** §13 Verifikations-Quittung an C; Status-Kopf um C-Zeile ergänzt; §12-Quittung
+  auf „erledigt" gesetzt.
+- **Offen / nächste Schritte:** (1) `verified-match` für C, sobald echter `domainVector` vorliegt
+  (Modul 03 im Browser oder gerechnet) → C signiert neu, wir verifizieren + stufen hoch. (2) C
+  kann uns reziprok als Knoten verifizieren (volles Mesh). (3) Offen aus W: Info-Brief an Sage.
+
 ## 2026-05-31 (AD) — Jasons Bug-Fund gefixt (flaky Test) + 4 Fragen beantwortet
 
 Knoten C (Jasons-Tresor) meldete über sein Postfach **vier Fragen**, darunter einen **echten
