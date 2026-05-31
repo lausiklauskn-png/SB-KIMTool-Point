@@ -11,14 +11,15 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 
 ## Eigenständige Werkzeuge (verteilbare Einzeldatei-Apps)
 
-### ▤ Jasons-Bibliothek  ◐ (Scheibe 1+2 fertig, headless + echter Browser bewiesen)
+### ▤ Jasons-Bibliothek  ◐ (Scheibe 1+2+3 fertig, headless + echter Browser bewiesen)
 - **Was:** Offline-Einzeldatei (`jasons-bibliothek/index.html`) zum Sammeln, Benennen,
   Ordnen, Exportieren und Wieder-Einlesen beliebiger `.json`-Dateien — wie eine eigene
-  Bibliothek; verschenkbar; von außen ein Tresor.
+  Bibliothek; verschenkbar; von außen ein Tresor; ein eigener SBKIM-Knoten.
 - **Nutzen:** JSON-Dateien als eigene Arbeit/Wert aufheben; ganze Bibliothek als eine Datei
   sichern. **Tresor (Scheibe 2):** „🔒 Verschlüsselt sichern" / „Verschenken 🔒" mit Passwort
-  (AES-256-GCM/PBKDF2 600k) — gleicher Umschlag wie Modul 02; sichert/liest auch
-  SBKIM-Schlüssel/Knoten-IDs.
+  (AES-256-GCM/PBKDF2 600k) — gleicher Umschlag wie Modul 02. **Identität (Scheibe 3):**
+  Modul 01+02 eingebettet → eigene SBKIM-nodeId anlegen/sichern/wiederherstellen; verschlüsselt
+  bleibt verschlüsselt im Schrank (Öffnen nur per Passwort).
 - **Verwendung:** Seite öffnen → „＋ Jason laden" → benennen/ordnen → „Exportieren" /
   „Bibliothek sichern" / „Bibliothek einlesen".
 - **Einbau:** Reine Datei, keine Abhängigkeiten; auf Pages unter `…/jasons-bibliothek/`.

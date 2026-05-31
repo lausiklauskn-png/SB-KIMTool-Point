@@ -181,3 +181,24 @@ test("isTresor erkennt Modul-02-artige Bloecke strukturell", () => {
   assert.equal(L.isTresor({ eintraege: [] }), false);
   assert.equal(L.isTresor(null), false);
 });
+
+// ---- Scheibe 3: Modul 01+02 eingebettet + verschluesselt-im-Schrank ----
+
+test("index.html bettet Modul 01 + 02 byte-genau ein (eine Datei, offline)", () => {
+  const storageSrc = readFileSync(resolve(ROOT, "web/tools/sbkim-storage.js"), "utf8");
+  const sporeSrc = readFileSync(resolve(ROOT, "web/tools/sbkim-spore.js"), "utf8");
+  assert.ok(html.includes("SBKIM-STORAGE-EMBED-START") && html.includes("SBKIM-SPORE-EMBED-START"), "Marker vorhanden");
+  assert.ok(html.includes(storageSrc), "Modul 01 Storage 1:1 eingebettet");
+  assert.ok(html.includes(sporeSrc), "Modul 02 Spore 1:1 eingebettet");
+});
+
+test("wrapTresorEntry legt einen Tresor VERSCHLUESSELT als Eintrag ab (kein Klartext)", async () => {
+  const blob = await L.encryptTresor(L.buildLibraryExport([L.makeEntry({ name: "x", payload: 1 })]), "passwort123");
+  const e = L.wrapTresorEntry(blob, "geschuetzt");
+  assert.equal(e.kind, "jason-eintrag");
+  assert.equal(e.name, "geschuetzt");
+  assert.equal(e.category, "Verschluesselt");
+  assert.equal(L.isTresor(e.payload), true); // bleibt verschluesselt im Schrank
+  const back = await L.decryptTresor(e.payload, "passwort123"); // nur mit Passwort lesbar
+  assert.equal(back.kind, "jason-bibliothek");
+});

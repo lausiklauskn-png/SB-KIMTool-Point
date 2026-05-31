@@ -1,6 +1,6 @@
 # Jasons-Bibliothek — deine Bibliothek für JSON-Dateien
 
-Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jasons-bibliothek/index.html`
+Stand: 2026-05-31 · Version 0.3.0 (Scheibe 3 — SBKIM-Identität) · Datei: `jasons-bibliothek/index.html`
 
 > „Jason" = Klaus' Name für eine `.json`-Datei. Die Bibliothek ist ein Ort, an dem man
 > beliebige JSON-Dateien **aufhebt, benennt, ordnet, exportiert, wieder einliest** und
@@ -32,6 +32,14 @@ Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jasons-bibl
   Passwort (AES-256-GCM / PBKDF2-SHA256 600k, WebCrypto). Die normalen Exporte bleiben
   Klartext (zum schnellen Aufheben). **Passwort vergessen = Inhalt weg** (kein Hintertürchen).
   Zum Verschenken das Passwort **getrennt** mitteilen.
+- **Verschlüsselt bleibt verschlüsselt im Schrank (Scheibe 3):** Ein eingelesener Tresor wird
+  **NICHT** automatisch entschlüsselt — er liegt verschlüsselt als Eintrag „🔒 verschlüsselt"
+  und wird erst per **„Öffnen 🔓" + Passwort** gelesen. So liegen **keine privaten Schlüssel im
+  Klartext** im Browser-Speicher.
+- **SBKIM-Identität (Scheibe 3):** Der Tresor ist ein eigener SBKIM-Knoten (Ed25519, Modul 02).
+  „🪪 SBKIM-Identität anzeigen/anlegen" zeigt die `nodeId`; „🔒 Identität sichern" legt ein
+  **verschlüsseltes** Backup an (Download + im Schrank). Ein solches Backup lässt sich auf einem
+  anderen Gerät über „Öffnen 🔓" wiederherstellen (Modul 02 `importBackup`).
 - **Größenrahmen:** `localStorage` fasst grob wenige MB. Für sehr große/viele Jasons kommt
   in einer späteren Scheibe IndexedDB (wie Modul 01 Storage). Ehrlich vermerkt.
 
@@ -92,8 +100,9 @@ Beim Einlesen wird der Typ **strukturell** erkannt (`kdf`+`cipher`+`ciphertext` 
 
 **Von außen ein Tresor, drinnen eine Bibliothek** — genau dasselbe Format trägt sowohl die
 verschlüsselte Sammlung als auch das verschlüsselte Identitäts-Backup. Die volle Wieder-
-herstellung eines Schlüssels läuft über Modul 02 `importBackup(blob, password)` (nächste
-Scheibe: Modul 02 in die App einbinden).
+herstellung eines Schlüssels läuft über Modul 02 `importBackup(blob, password)` — **Modul 01
+(Storage) + Modul 02 (Spore) sind ab Scheibe 3 in die Datei eingebettet** (1:1 aus `web/tools/`,
+vom Test byte-genau geprüft).
 
 ## Fahrplan (kleine Scheiben)
 
@@ -105,20 +114,29 @@ Scheibe: Modul 02 in die App einbinden).
   PBKDF2-SHA256 600k über WebCrypto). Einlesen erkennt einen Tresor automatisch und fragt das
   Passwort. **Doppelnutzen:** liest auch verschlüsselte **SBKIM-Schlüssel/ID-Backups** von
   Modul 02 / Mein-Mixarium / Mein-Rezeptbuch (gleiches Format) und legt sie sicher ab.
-- **Scheibe 3 — Brücken + Feinschliff (geplant):** App-übergreifend „immer am selben Ort"
-  über **Web Share Target** (Teilen-Ziel) + **fester Ordner** (File System Access);
-  **Modul 02 einbinden** für volle Schlüssel-Wiederherstellung (`importBackup`); als App
-  **installierbar** (Service-Worker/Offline-Cache); ggf. IndexedDB für große Sammlungen;
-  **Protokoll-Andock** (eigene Spore + `domainVector` + Andock an Sage) für das eigene Repo.
+- **Scheibe 3 — SBKIM-Identität (FERTIG, headless + echter Browser bewiesen):** Modul 01+02
+  eingebettet; Identität anzeigen/anlegen, „🔒 Identität sichern" (verschlüsseltes Backup),
+  Wiederherstellung auf anderem Gerät via `importBackup`; verschlüsselt-im-Schrank
+  (kein Klartext-Schlüssel im Speicher).
+- **Scheibe 3b — App-übergreifende Ablage (geplant, im eigenen Repo):** **Web Share Target**
+  (Teilen-Ziel) + **fester Ordner** (File System Access) brauchen Manifest **+ Service-Worker**
+  (mehrere Dateien) und eine installierte App → gehören in das **Jasons-Tresor-Repo** (dort
+  läuft die App installiert), nicht in die Einzeldatei-Vorlage. Ehrliche Grenze: echte Automatik
+  über *alle* Apps verhindert die Browser-Origin-Trennung; Share-Target + Ordner ist der nächstbeste Weg.
+- **Scheibe 3c — Protokoll-Andock** (eigene Spore + `domainVector` + Andock an Sage) für das
+  eigene Repo: Bauplan in `docs/sessions/BRIEF_jasons-tresor-andock.md`.
 
 ## Beweis
 
-- `test/jason_lib.test.js` — schneidet die Kern-Logik **aus der ausgelieferten
+- `test/jason_lib.test.js` (18 Fälle) — schneidet die Kern-Logik **aus der ausgelieferten
   `index.html`** (zwischen Markern) und prüft sie headless (kein Duplikat): Parsen,
-  Eintrag-Normalisierung, Export-/Import-Hülle, Zusammenführen, Filter/Sortierung **und den
-  Tresor** (Verschlüsseln→Entschlüsseln == Original; falsches Passwort scheitert; Manipulation
-  fällt durch das AES-GCM-Auth-Tag; `payloadToEntries`/`isTresor`). `npm test` grün.
-- Entwickler-Browser-Smoke (Playwright/Chromium): Seite lädt fehlerfrei, `JasonLib`
-  registriert, Leer-Zustand + Knöpfe da, echte Eintrag-Runde **und echter Tresor-Roundtrip
-  mit WebCrypto** (falsches Passwort abgewiesen). **Klaus' eigener Browser-Lauf**
-  (Datei-Auswahl, Download, Passwort-Eingabe, Bearbeiten-Dialog) **steht noch aus**.
+  Eintrag-Normalisierung, Export-/Import-Hülle, Zusammenführen, Filter/Sortierung, **Tresor**
+  (Verschlüsseln→Entschlüsseln == Original; falsches Passwort scheitert; AES-GCM-Manipulation
+  fällt durch; `payloadToEntries`/`isTresor`), **Einbettung** von Modul 01+02 (byte-genau) und
+  **`wrapTresorEntry`** (verschlüsselt im Schrank). `npm test` grün.
+- Echter Browser-Beweis (Playwright/Chromium über lokalen HTTP-Server, damit IndexedDB/WebCrypto
+  real sind): **Gerät A** legt Identität an + signiert Spore + `exportBackup` → verschlüsselter
+  Blob; **Gerät B** (frischer Speicher) `importBackup` → **dieselbe nodeId**; falsches Passwort
+  abgewiesen; `JasonLib.isTresor` erkennt den Modul-02-Blob (Kreuz-Erkennung); keine
+  Konsolenfehler. **Klaus' eigener Browser-Lauf** (Knöpfe, Datei-Auswahl, Download,
+  Passwort-Eingabe) **steht noch aus**.

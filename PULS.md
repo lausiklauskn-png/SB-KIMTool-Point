@@ -2,6 +2,37 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (AA) — Jasons-Bibliothek Scheibe 3: SBKIM-Identität im Tresor + Sicherheits-Fix
+
+Klaus: „Option 3 umsetzen". Umgesetzt der belastbare Kern — die App ist jetzt ein eigener
+**SBKIM-Knoten** und kann Schlüssel/IDs wirklich sichern/wiederherstellen. Zwei ehrliche
+Punkte vorab benannt (statt still zu bauen).
+
+- **Modul 01 (Storage) + Modul 02 (Spore) 1:1 eingebettet** in `jasons-bibliothek/index.html`
+  (zwischen `SBKIM-STORAGE/SPORE-EMBED`-Markern; Datei jetzt ~2820 Zeilen, weiter **eine** Datei,
+  offline). UI: „🪪 SBKIM-Identität anzeigen/anlegen" (zeigt `nodeId`), „🔒 Identität sichern"
+  (`getOrCreateIdentity`→`generateOwnSpore`→`exportBackup` → verschlüsseltes Backup, Download +
+  im Schrank), Wiederherstellung über „Öffnen 🔓" (`importBackup`).
+- **Sicherheits-Fix (Scheibe 2 hatte ein Leck):** ein eingelesener Tresor wurde vorher sofort
+  entschlüsselt und als Klartext (inkl. privater Schlüssel!) in `localStorage` abgelegt. Jetzt:
+  **verschlüsselt bleibt verschlüsselt im Schrank** (`wrapTresorEntry`), Öffnen nur per
+  Knopf+Passwort. Eintrag zeigt „🔒 verschlüsselt" + „Öffnen 🔓".
+- **Befund (ehrlich):** Modul 01/02 brauchen echtes IndexedDB → headless nicht lauffähig; der
+  Beweis dafür ist der **echte Browser** (HTTP-Origin), nicht `npm test`.
+- **Web Share Target bewusst NICHT in die Einzeldatei:** braucht Manifest **+ Service-Worker**
+  (mehrere Dateien) + installierte App → bricht die „eine-Datei"-Regel; gehört ins
+  **Jasons-Tresor-Repo** (dort installiert). In den Andock-/Folge-Brief gelegt.
+- **Beweis:** `npm test` **63/63** (+2: Einbettung byte-genau, `wrapTresorEntry`). **Echter
+  Browser (Playwright/Chromium über lokalen HTTP-Server):** Gerät A legt Identität an + signiert
+  Spore + sichert verschlüsselt; **Gerät B (frischer Speicher) stellt dieselbe `nodeId` wieder
+  her**; falsches Passwort abgewiesen; `JasonLib.isTresor` erkennt den Modul-02-Blob; keine
+  Konsolenfehler. **Klaus' eigener Browser-Lauf** (Knöpfe/Download/Passwort) **steht aus**.
+- **Doku:** `docs/JASONS-BIBLIOTHEK.md` (Scheibe 3), `status.json`, `docs/WERKZEUGE.md`.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf. (2) In Jasons-Tresor den Bauplan
+  ausführen (App + Identität sind durch das Kopieren schon dabei) + **Web Share Target** dort
+  bauen. (3) Offen aus W: Info-Brief an Sage. (4) Optional: `domainVector` + Andock dieses
+  Tools/Knotens an Sage.
+
 ## 2026-05-31 (Z) — Umbenennung Jeson → Jason + Andock-Bauplan fürs eigene Repo
 
 Klaus' Entscheidung: das Werkzeug heißt **Jasons-Tresor** (eigenes Repo
