@@ -9,6 +9,22 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 
 ---
 
+## Eigenständige Werkzeuge (verteilbare Einzeldatei-Apps)
+
+### ▤ Jesons-Bibliothek  ◐ (Scheibe 1 fertig, headless bewiesen)
+- **Was:** Offline-Einzeldatei (`jesons-bibliothek/index.html`) zum Sammeln, Benennen,
+  Ordnen, Exportieren und Wieder-Einlesen beliebiger `.json`-Dateien — wie eine eigene
+  Bibliothek; später verschenkbar.
+- **Nutzen:** JSON-Dateien als eigene Arbeit/Wert aufheben; ganze Bibliothek als eine Datei
+  sichern. Geplant (Scheibe 2): Passwort-Tresor — sichert auch SBKIM-Schlüssel/Knoten-IDs.
+- **Verwendung:** Seite öffnen → „＋ Jeson laden" → benennen/ordnen → „Exportieren" /
+  „Bibliothek sichern" / „Bibliothek einlesen".
+- **Einbau:** Reine Datei, keine Abhängigkeiten; auf Pages unter `…/jesons-bibliothek/`.
+- **Aktiviert durch:** Klaus' Knopfdruck (läuft komplett im Browser).
+- **Volle Doku + Datenvertrag:** `docs/JESONS-BIBLIOTHEK.md`.
+
+---
+
 ## BASIC — Pflicht
 
 ### 02 · Spore  ○(Sage code-stub) · kopiert · headless getestet

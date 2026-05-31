@@ -1,6 +1,36 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-30 · Branch `claude/sage-andock-continue-SI1Lu`
+Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
+
+## 2026-05-31 (X) — Jesons-Bibliothek Scheibe 1 (eigenständige Einzeldatei-App)
+
+Klaus' größere Idee: aus dem Schlüssel-Tresor-Gedanken eine herunterladbare **„Jesons-
+Bibliothek"** machen (wie Mein-Mixarium / Mein-Rezeptbuch) — beliebige `.json` aufheben,
+benennen, ordnen, exportieren, wieder einlesen, später verschenken. Klaus' Zusatz: der
+Tresor soll **auch SBKIM-Schlüssel + Knoten-IDs** sichern. Plan im Chat gezeigt; Klaus
+„keine Präferenz" → empfohlene **Scheibe 1** gebaut (ohne Verschlüsselung; die kommt in 2).
+
+- **`jesons-bibliothek/index.html`** — offline-taugliche **Einzeldatei**, keine externen
+  Abhängigkeiten (Live-PWA-Regel). PWA-Grundausstattung (`lang=de`, data-URI-Manifest +
+  Icon, theme-color, mobile/apple web-app-capable). Eigene dunkle Teal-Identität.
+  Funktion: `.json` laden → benennen, Kategorie + Schlagworte → suchen/sortieren → ansehen
+  → einzeln exportieren → ganze Bibliothek **sichern**/**einlesen**. Speicher = `localStorage`.
+- **Kern browser- UND node-tauglich:** Logik liegt zwischen Markern `JESONLIB-CORE-START/END`
+  im `index.html`. **`test/jeson_lib.test.js`** schneidet genau diese Bytes heraus und prüft
+  sie headless (kein Duplikat): Parsen, Eintrag-Normalisierung, Export-/Import-Hülle,
+  Zusammenführen nach `id` (neuere `updatedAt` gewinnt), Filter/Sortierung. **`npm test`
+  55/55 grün** (+10).
+- **Entwickler-Browser-Smoke (Playwright):** Seite lädt fehlerfrei in Chromium, `JesonLib`
+  registriert, Leer-Zustand + Knöpfe da, echte Eintrag-Runde im DOM. **Klaus' eigener
+  Browser-Lauf** (Datei-Auswahl, Download, Bearbeiten-Dialog) **steht noch aus**.
+- **Spec vor Code:** Datenvertrag in `docs/JESONS-BIBLIOTHEK.md` — `jeson-eintrag`,
+  `jeson-bibliothek` und (für Scheibe 2 geplant) `jeson-tresor` mit **demselben Umschlag**
+  wie `sbkim/node_key.enc.json` (AES-256-GCM/PBKDF2 600k). Pointer in `docs/WERKZEUGE.md`;
+  ehrlicher Eintrag in `status.json`.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf der Seite (Hard-Reload). (2) Scheibe 2
+  = Tresor (Passwort-Verschlüsselung; sichert auch SBKIM-Schlüssel/IDs). (3) Offen aus
+  Eintrag W: Info-Brief an Sage (Krypto-Rezept + Bitte um Werkzeugkiste-Ausrichtung auf echte,
+  getestete Werkzeuge). (4) Optional: Link von der Hub-Seite zur Bibliothek.
 
 ## 2026-05-30 (W) — Andock abgeschlossen + Schlüssel-Tresor + Markt-Links live (grün)
 
