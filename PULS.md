@@ -1,6 +1,93 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-30 · Branch `claude/sage-andock-continue-SI1Lu`
+Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
+
+## 2026-05-31 (Y) — Jesons-Bibliothek Scheibe 2: Tresor (gleicher Umschlag wie Modul 02)
+
+Klaus zeigte (Screenshot Sage-Seite): **Modul 02 macht das Schlüssel-Backup schon** —
+„Identität sichern · Modul 02 Backup-Export Stufe 2" (PBKDF2-SHA256 600k + AES-GCM-256, seit
+2026-05-16, rückwärtskompatibel zu MM/MR-Backups). Ziel: Jesons + Keys an **einem** Ort,
+„von außen ein Tresor, drinnen eine Bibliothek". Klaus „keine Präferenz" → empfohlener Weg
+„hier bauen, dann kopieren". **Scheibe 2 (Tresor) gebaut.**
+
+- **Kern (`jesons-bibliothek/index.html`, zwischen Markern):** `encryptTresor`/`decryptTresor`
+  über **WebCrypto** — **derselbe Umschlag wie Modul 02 `exportBackup`** und `node_key.enc.json`:
+  `{version,kdf:PBKDF2/SHA-256/600k, cipher:AES-GCM-256, ciphertext}` (base64url, Tag im
+  Chiffretext). `isTresor` erkennt strukturell; `payloadToEntries` trennt **Bibliothek**
+  (`eintraege[]`) von **SBKIM-Schlüssel-Backup** (`identities[]`) von roher JSON.
+- **Oberfläche:** Knöpfe „🔒 Verschlüsselt sichern" (ganze Bibliothek) + „Verschenken 🔒"
+  (ein Eintrag, Passwort getrennt mitteilen). Einlesen erkennt einen Tresor **automatisch**
+  und fragt das Passwort — öffnet auch verschlüsselte Identitäts-Backups von Modul 02/MM/MR.
+- **Beweis:** `npm test` **61/61** (+6: Roundtrip, falsches Passwort, GCM-Manipulation,
+  `payloadToEntries`/`isTresor`). **Echter Browser-Smoke (Chromium WebCrypto):** Tresor-Roundtrip
+  stimmt, falsches Passwort abgewiesen, keine Konsolenfehler. **Klaus' eigener Browser-Lauf**
+  (Datei-Auswahl, Download, Passwort-Eingabe) **steht aus**.
+- **Doku:** `docs/JESONS-BIBLIOTHEK.md` (Tresor von „geplant" auf „fertig", Format = Modul 02),
+  `status.json` + `docs/WERKZEUGE.md` nachgezogen.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf. (2) Scheibe 3 — App-übergreifend
+  „immer am selben Ort" (Web Share Target + fester Ordner), **Modul 02 einbinden** für volle
+  Schlüssel-Wiederherstellung (`importBackup`), installierbar (Service-Worker). (3) **Brücke
+  ans Protokoll** für Klaus' neues Bibliothek-Repo (eigene Spore + `domainVector` + Andock an
+  Sage) — als Kopier-Starter, da meine Schreibrechte nur dieses Repo umfassen. (4) Offen aus W:
+  Info-Brief an Sage.
+
+## 2026-05-31 (X) — Jesons-Bibliothek Scheibe 1 (eigenständige Einzeldatei-App)
+
+Klaus' größere Idee: aus dem Schlüssel-Tresor-Gedanken eine herunterladbare **„Jesons-
+Bibliothek"** machen (wie Mein-Mixarium / Mein-Rezeptbuch) — beliebige `.json` aufheben,
+benennen, ordnen, exportieren, wieder einlesen, später verschenken. Klaus' Zusatz: der
+Tresor soll **auch SBKIM-Schlüssel + Knoten-IDs** sichern. Plan im Chat gezeigt; Klaus
+„keine Präferenz" → empfohlene **Scheibe 1** gebaut (ohne Verschlüsselung; die kommt in 2).
+
+- **`jesons-bibliothek/index.html`** — offline-taugliche **Einzeldatei**, keine externen
+  Abhängigkeiten (Live-PWA-Regel). PWA-Grundausstattung (`lang=de`, data-URI-Manifest +
+  Icon, theme-color, mobile/apple web-app-capable). Eigene dunkle Teal-Identität.
+  Funktion: `.json` laden → benennen, Kategorie + Schlagworte → suchen/sortieren → ansehen
+  → einzeln exportieren → ganze Bibliothek **sichern**/**einlesen**. Speicher = `localStorage`.
+- **Kern browser- UND node-tauglich:** Logik liegt zwischen Markern `JESONLIB-CORE-START/END`
+  im `index.html`. **`test/jeson_lib.test.js`** schneidet genau diese Bytes heraus und prüft
+  sie headless (kein Duplikat): Parsen, Eintrag-Normalisierung, Export-/Import-Hülle,
+  Zusammenführen nach `id` (neuere `updatedAt` gewinnt), Filter/Sortierung. **`npm test`
+  55/55 grün** (+10).
+- **Entwickler-Browser-Smoke (Playwright):** Seite lädt fehlerfrei in Chromium, `JesonLib`
+  registriert, Leer-Zustand + Knöpfe da, echte Eintrag-Runde im DOM. **Klaus' eigener
+  Browser-Lauf** (Datei-Auswahl, Download, Bearbeiten-Dialog) **steht noch aus**.
+- **Spec vor Code:** Datenvertrag in `docs/JESONS-BIBLIOTHEK.md` — `jeson-eintrag`,
+  `jeson-bibliothek` und (für Scheibe 2 geplant) `jeson-tresor` mit **demselben Umschlag**
+  wie `sbkim/node_key.enc.json` (AES-256-GCM/PBKDF2 600k). Pointer in `docs/WERKZEUGE.md`;
+  ehrlicher Eintrag in `status.json`.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf der Seite (Hard-Reload). (2) Scheibe 2
+  = Tresor (Passwort-Verschlüsselung; sichert auch SBKIM-Schlüssel/IDs). (3) Offen aus
+  Eintrag W: Info-Brief an Sage (Krypto-Rezept + Bitte um Werkzeugkiste-Ausrichtung auf echte,
+  getestete Werkzeuge). (4) Optional: Link von der Hub-Seite zur Bibliothek.
+
+## 2026-05-30 (W) — Andock abgeschlossen + Schlüssel-Tresor + Markt-Links live (grün)
+
+Abschluss des Sage-Andocks und zwei brauchbare Verbesserungen. **Manual-Check: ✅ von
+Klaus im Browser bestätigt** („alles perfekt") — der Markt ist damit grün.
+
+- **Schlüssel-Tresor (PR #40):** Der private `SBKIM_NODE_KEY` liegt jetzt verschlüsselt im
+  Repo (`sbkim/node_key.enc.json`, AES-256-GCM/PBKDF2 600k) — nur mit Klaus' Passwort zu
+  öffnen, Passwort steht nirgends im Repo. `scripts/open_node_key.mjs` öffnet ihn,
+  `docs/SCHLUESSEL.md` dokumentiert Re-Sign-Ablauf + Verlust-Fall. Damit bleibt die nodeId
+  `CyunQNDR…` dauerhaft erhalten (kein Identitätswechsel mehr nötig).
+- **Andock bilateral vollständig (PR #41 + #42):** Sage hat uns auf `verified-match`
+  (matchScore **0.848508**) gesetzt, neue nodeId registriert (alte als `previousNodeIds`).
+  Wir lieferten den **Rückbrief A–E** (Postfach §10) → Sage goss ihn in `docs/INTERFACES.md`
+  §11 „Andock-Konventionen" (§11.1–§11.5, netzweit). **Abnahme bestätigt:** §11 gegen unseren
+  Rückbrief gegengelesen — korrekt eingefangen, keine Änderungen. **Reine Abnahme, keine
+  Gegen-Quittung nötig** (Sync §11.4) → die Austausch-Runde ist sauber zu, Verbindung ruht.
+- **Markt brauchbar gemacht (PR #43):** Der „→ andocken"-Knopf zeigte auf tote `#andock/…`-
+  Anker und tat nichts. Jetzt öffnet er die **echte Live-Seite** des Knotens in neuem Tab
+  (URLs aus Sages `status.json`): Rezeptbuch→`Mein-Rezeptbuch`, Mixarium→`Mein-Mixarium`,
+  Sage→`Sage-Protokol`. Sage-Karte trägt den Chip **„✓ voller Match · 0.85"** (heutiges
+  Ergebnis). `assets/app.js renderMarkt`: externe Links `target=_blank rel=noopener` +
+  Match-Chip; `web/data/marktplatz.json` mit echten Links + `matchScore`/`matchHinweis`.
+- **Beweis:** `npm test` 45/45 grün. Markt-URLs von Klaus im Browser bestätigt (live).
+- **Offen / nächste Schritte:** (1) Nichts Blockierendes — der Andock-Auftrag ist erledigt,
+  die Verbindung ruht bis zum nächsten echten Bau (neues Modul oder dritter Knoten weckt
+  sie). (2) Optional: Markt-Suche bauen (Daten in `nodes.json` vorbereitet). (3) Optional:
+  weitere reife Sage-Module Datei für Datei kopieren.
 
 ## 2026-05-30 (V) — Re-Sign vollzogen + Schlüsselwechsel + Pages live
 
