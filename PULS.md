@@ -2,6 +2,31 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (AF) — Netz-Briefkasten §11.6: SIGNAL.json + Wächter + 📬-Knopf (Auto-Sync)
+
+Sages netzweite Regel **INTERFACES §11.6** übernommen, damit sich alle drei Knoten automatisch
+über Bauten informieren. Drei Dinge angelegt (Referenz 1:1 von Sage, nur CONFIG/Skin angepasst).
+
+- **Aufgabe 1 — `sbkim/SIGNAL.json`:** Aushang, `seq 1`, `ack` symmetrisch. Sages `seq 7`
+  gelesen → `ack["Sage-Protokol"]=7` (nichts offen); Jasons-Tresor hat noch kein SIGNAL (404)
+  → `ack["Jasons-Tresor"]=null` (kein Alarm).
+- **Aufgabe 2 — Sages Abgleich-Frage (Jason reziprok verifizieren):** Jasons **live** Spore
+  (`raw…/Jasons-Tresor/main`) mit `verify_foreign_spore.mjs` → **✔ VALID** (byte-gleich zur
+  Inbox aus #50). Als `verified-spore` in `status.json` geführt; Prüf-Vermerk
+  `sbkim/jason_inbox.verify.md` angelegt; Postfach §13 (bestand schon). `domainVector` `_demo`
+  → kein Match.
+- **Aufgabe 3 — Auto-Sync-Schicht:** `.github/sbkim-watch.mjs` (Sages Wächter 1:1, CONFIG =
+  Sage+Jasons) + `.github/workflows/sbkim-watch.yml` (Sages Workflow **byte-gleich**) +
+  **📬-Knopf** in der Startseiten-Statusleiste (Button+Popup+Script + CSS, re-geskinnt auf
+  Teal). Wächter lokal getestet (liest beide Peers, „nichts Neues", Jason-404 als Notiz);
+  `node --check` ok; Knopf im echten Browser gegengeprüft (sichtbar, Klick rendert Popup).
+- **CLAUDE.md** um „Briefkasten pflegen" (Sitzungsstart-/-ende-Pflicht) ergänzt. Postfach §14.
+  **`npm test` 74/74.**
+- **Offen / nächste Schritte:** (1) Klaus aktiviert GitHub Actions/Pages (Wächter läuft dann
+  zeitgesteuert; 📬-Knopf braucht Pages-200 der eigenen SIGNAL.json). (2) Sobald Jasons-Tresor
+  ein eigenes `SIGNAL.json` hat, quittiert unser Wächter dessen `seq` automatisch. (3) `verified-match`
+  für C/Sage mit echtem `domainVector`. (4) Klaus' Browser-Lauf des 📬-Knopfs.
+
 ## 2026-05-31 (AE) — Knoten C (Jasons-Tresor) reziprok verifiziert → verified-spore (Drei-Knoten-Netz)
 
 Jasons-Tresor meldete seine Spore live. Reziprok geprüft und aufgenommen — das SBKIM-Netz hat

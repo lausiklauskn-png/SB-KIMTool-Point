@@ -89,6 +89,19 @@ Wer ein Schutz-Modul berührt (10 Reputation / 11 Rate-Limit / 12 Blocklist /
 ans Listenende in `sandbox/16_siegel.js` (Datum + Modul-ID + ein Satz). So bleiben
 Sicherheits-Updates im Siegel sichtbar, ohne dass ein Forker neu andocken muss.
 
+## Briefkasten pflegen (Netz-Sync §11.6) — Pflicht bei Andock-Bezug
+
+Netzweite Regel (Sages `docs/INTERFACES.md` §11.6), bei uns gelebt über `sbkim/SIGNAL.json`:
+
+- **Sitzungsstart (mit Andock-Bezug):** die `SIGNAL.json` der Peer-Knoten aus deren `raw/main`
+  lesen (Sage, Jasons-Tresor). Hat ein Peer `seq > ack[peer]` in **unserem** `sbkim/SIGNAL.json`,
+  dessen Briefkasten lesen, handeln, dann `ack[peer]` auf die gelesene `seq` setzen.
+- **Sitzungsende nach einem Bau:** in `sbkim/SIGNAL.json` `seq`+1, `lastBuild`+`headline`
+  setzen, `history` ergänzen, pushen — **das Pushen IST das Signal** (server-los, kein Daemon).
+- **Wer liest automatisch:** `.github/sbkim-watch.mjs` (GitHub Action, zeitgesteuert; Issue nur
+  bei Neuem) + der **📬-Knopf** auf der Startseite (live im Browser). Beide nur lesend, kein
+  Schreiben ins fremde Repo.
+
 ## Daten & Spec
 
 - **Keine personenbezogenen Daten** in Code, Specs, Tests oder `PULS.md`.
