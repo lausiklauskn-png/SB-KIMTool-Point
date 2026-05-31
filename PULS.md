@@ -2,7 +2,34 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
-## 2026-05-31 (Y) — Jesons-Bibliothek Scheibe 2: Tresor (gleicher Umschlag wie Modul 02)
+## 2026-05-31 (Z) — Umbenennung Jeson → Jason + Andock-Bauplan fürs eigene Repo
+
+Klaus' Entscheidung: das Werkzeug heißt **Jasons-Tresor** (eigenes Repo
+`lausiklauskn-png/Jasons-Tresor`, von Klaus angelegt) — **von außen ein Tresor, drinnen die
+„Jasons-Bibliothek"**. Begründung: weitere Tools kommen später hinzu, die ebenfalls im Tresor
+gesichert werden; die Bibliothek ist der Anfang. Innerer Name daher einheitlich **Jason** (mit „a").
+
+- **Umbenannt (1:1, kein Logikwechsel):** Ordner `jesons-bibliothek/ → jasons-bibliothek/`,
+  `test/jeson_lib.test.js → jason_lib.test.js`, `docs/JESONS-BIBLIOTHEK.md → JASONS-BIBLIOTHEK.md`,
+  Brief `…bruecken-und-repo.md`. Text `Jeson → Jason` in App, Test, aktiver Doku, status.json:
+  Titel/Manifest „Jasons-Bibliothek", Kern-Marker `JASONLIB-CORE`, `window.JasonLib`,
+  `kind: jason-eintrag/jason-bibliothek/jason-tresor`, Storage-Key `jasons-bibliothek-v1`.
+  Historische PULS-Einträge (X/Y) + alter Brief bleiben als Historie unverändert.
+- **Tresor-Kompatibilität unberührt:** der verschlüsselte Umschlag wird **strukturell** erkannt
+  (`isTresor`: kdf+cipher+ciphertext) — bleibt 1:1 kompatibel zu Modul 02 `exportBackup` und
+  `node_key.enc.json` (das `kind`-Label ist nur intern).
+- **PR #44 gemergt** (squash) → App + Test + Bauplan auf `main`.
+- **Andock-Bauplan** `docs/sessions/BRIEF_jasons-tresor-andock.md`: wie Jasons-Tresor sich aus den
+  getesteten Originalen (raw-URLs auf `main`) selbst baut, eigene Ed25519-Identität erzeugt +
+  Schlüssel sichert und **wie SB-KIMTool-Point an Sage andockt**. Ehrliche Grenze vermerkt:
+  dieses Repo kann Jasons-Tresor nicht fernsteuern (Scope) → Kopier-/Selbstbau-Weg.
+- **Beweis:** `npm test` **61/61**; echter Browser-Smoke (Chromium WebCrypto): Titel
+  „Jasons-Bibliothek", `jason-tresor`-Roundtrip grün, keine Konsolenfehler.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf der App. (2) In Jasons-Tresor den Bauplan
+  ausführen (Grundgerüst → App → Identität → Andock an Sage). (3) Scheibe 3 hier: Web Share Target
+  + Modul 02 einbinden (volle Schlüssel-Wiederherstellung). (4) Offen aus W: Info-Brief an Sage.
+
+## 2026-05-31 (Y) — Jasons-Bibliothek Scheibe 2: Tresor (gleicher Umschlag wie Modul 02)
 
 Klaus zeigte (Screenshot Sage-Seite): **Modul 02 macht das Schlüssel-Backup schon** —
 „Identität sichern · Modul 02 Backup-Export Stufe 2" (PBKDF2-SHA256 600k + AES-GCM-256, seit

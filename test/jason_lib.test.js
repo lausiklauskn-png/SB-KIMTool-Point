@@ -1,6 +1,6 @@
-// Headless-Beweis fuer die Kern-Logik der Jesons-Bibliothek (Scheibe 1).
+// Headless-Beweis fuer die Kern-Logik der Jasons-Bibliothek (Scheibe 1).
 // Prinzip: Wir testen exakt die Bytes, die ausgeliefert werden — der Kern wird
-// zwischen den Markern aus jesons-bibliothek/index.html geschnitten und in einer
+// zwischen den Markern aus jasons-bibliothek/index.html geschnitten und in einer
 // Sandbox ausgefuehrt. Keine Kopie der Logik, keine DOM-/Netz-Abhaengigkeit.
 
 import { test } from "node:test";
@@ -10,19 +10,19 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const html = readFileSync(resolve(ROOT, "jesons-bibliothek/index.html"), "utf8");
+const html = readFileSync(resolve(ROOT, "jasons-bibliothek/index.html"), "utf8");
 
-const START = "// JESONLIB-CORE-START";
-const END = "// JESONLIB-CORE-END";
+const START = "// JASONLIB-CORE-START";
+const END = "// JASONLIB-CORE-END";
 const a = html.indexOf(START);
 const b = html.indexOf(END);
 assert.ok(a !== -1 && b !== -1 && b > a, "Kern-Marker in index.html gefunden");
 const core = html.slice(a, b);
 
-// Sandbox: ein minimales window-Objekt; der IIFE registriert window.JesonLib.
+// Sandbox: ein minimales window-Objekt; der IIFE registriert window.JasonLib.
 const root = {};
 // eslint-disable-next-line no-new-func
-const run = new Function("window", "module", core + "\n;return window.JesonLib;");
+const run = new Function("window", "module", core + "\n;return window.JasonLib;");
 const L = run(root, {});
 
 test("Kern wird aus der ausgelieferten Datei geladen", () => {
@@ -46,7 +46,7 @@ test("normalizeTags: trimmt, klein, dedupliziert, akzeptiert String", () => {
 
 test("makeEntry normalisiert und stempelt", () => {
   const e = L.makeEntry({ name: "  Mein Rezept ", tags: "essen, Essen", category: " Kochen ", payload: { z: 1 }, origin: "r.json" });
-  assert.equal(e.kind, "jeson-eintrag");
+  assert.equal(e.kind, "jason-eintrag");
   assert.equal(e.schemaVersion, 1);
   assert.equal(e.name, "Mein Rezept");
   assert.equal(e.category, "Kochen");
@@ -59,13 +59,13 @@ test("makeEntry normalisiert und stempelt", () => {
 });
 
 test("leerer Name faellt auf Standard zurueck", () => {
-  assert.equal(L.makeEntry({ payload: {} }).name, "Unbenannte Jeson");
+  assert.equal(L.makeEntry({ payload: {} }).name, "Unbenannte Jason");
 });
 
 test("buildLibraryExport hat die vereinbarte Huelle", () => {
   const e = L.makeEntry({ name: "a", payload: 1 });
   const lib = L.buildLibraryExport([e]);
-  assert.equal(lib.kind, "jeson-bibliothek");
+  assert.equal(lib.kind, "jason-bibliothek");
   assert.equal(lib.schemaVersion, 1);
   assert.equal(lib.count, 1);
   assert.ok(lib.exportedAt);
@@ -134,7 +134,7 @@ test("allCategories / allTags: sortiert und eindeutig", () => {
 test("Tresor: verschluesseln -> entschluesseln == Original (gleicher Umschlag wie Modul 02)", async () => {
   const lib = L.buildLibraryExport([L.makeEntry({ name: "geheim", payload: { a: 1, b: [2, 3] } })]);
   const blob = await L.encryptTresor(lib, "passwort123");
-  assert.equal(blob.kind, "jeson-tresor");
+  assert.equal(blob.kind, "jason-tresor");
   assert.equal(blob.kdf.algorithm, "PBKDF2");
   assert.equal(blob.kdf.hash, "SHA-256");
   assert.equal(blob.kdf.iterations, 600000);
