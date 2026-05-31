@@ -40,8 +40,11 @@ Kopiere **1:1** aus SB-KIMTool-Point:
   (Scheibe 1+2: laden/benennen/ordnen/suchen/exportieren/einlesen + Passwort-Verschlüsselung
   AES-256-GCM/PBKDF2-SHA256 600k, gleicher Umschlag wie Modul 02).
 - `test/jason_lib.test.js` → dein `test/…` (prüft den Kern aus der ausgelieferten Datei).
-- Optional Name drinnen: „Jasons-Bibliothek" behalten ODER auf „Jasons-Tresor" vereinheitlichen
-  (Klaus entscheidet). `npm test` muss grün sein.
+- **Hinweis:** `index.html` hat ab Scheibe 3 **Modul 01 Storage + Modul 02 Spore schon eingebettet**
+  → die In-App-SBKIM-Identität (anlegen/sichern/wiederherstellen) funktioniert sofort nach dem
+  Kopieren. Die Andock-Skripte (§3) sind zusätzlich für den node-seitigen Spore-Bau/Verify.
+- Innerer Name bleibt **„Jasons-Bibliothek"** (Klaus' Entscheidung: weitere Tools folgen im Tresor).
+  `npm test` muss grün sein.
 
 ## 3. Eigene Identität geben (Modul 02 + Spore) — **so wird der Tresor ein Knoten**
 
@@ -94,10 +97,13 @@ Es braucht **kein** neues Format — die Brücke ist die schon gebaute Mechanik:
   Dateien; eine Tür für Bibliothek **und** Schlüssel-Backup.
 - **Postfach (`AUSTAUSCH.md`):** der ehrliche, prüfbare „Sync" zwischen Knoten — Lese-Quittungen,
   Fragen/Antworten, Log. Kein Dauer-Server, läuft bei Sitzungsstart.
-- **App-übergreifend „immer am selben Ort" (Scheibe 3, geplant):** **Web Share Target**
+- **App-übergreifend „immer am selben Ort" — HIER umsetzen (Scheibe 3b):** **Web Share Target**
   (Tresor-PWA als „Teilen-Ziel" → aus jeder App „Teilen → Jasons-Tresor") + **fester Ordner**
-  (File System Access). Ehrliche Grenze: echte Automatik über *alle* Apps verhindert die
-  Browser-Origin-Trennung — Share-Target + Ordner ist der nächstbeste, offline-taugliche Weg.
+  (File System Access). Das braucht ein echtes `manifest.webmanifest` mit `share_target` **+ einen
+  Service-Worker** (mehrere Dateien) und die **installierte** App — deshalb gehört es in dieses
+  Repo (deployte App), nicht in die kopierbare Einzeldatei. Eingehende Datei → `ingestFile`.
+  Ehrliche Grenze: echte Automatik über *alle* Apps verhindert die Browser-Origin-Trennung —
+  Share-Target + Ordner ist der nächstbeste, offline-taugliche Weg.
 
 ## 7. Datenverträge (NICHT brechen)
 
