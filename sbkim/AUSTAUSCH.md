@@ -210,6 +210,7 @@ Identität** erzeugt und den Schlüssel diesmal sicher abgelegt.
 | 2026-05-30 | A | **Rückbrief an Sage verfasst (§10):** verbindliche, eingefrorene Referenz-Texte A–E (kanonische Signier-Form · Verifizierer-Paar · Inbox-Konvention · Sync-Vertrag + status.json-Pflichtfelder · 9 REQUIRED_SPORE_FIELDS) als Vorlage für Sages `docs/INTERFACES.md`-Paragraphen. |
 | 2026-05-30 | A | **Bau-Protokoll (Sync §6.3):** `A` · Rückbrief Andock-Konventionen (A–E beantwortet) · `sbkim/AUSTAUSCH.md` §10 (Commit auf `claude/sage-andock-continue-SI1Lu`, Draft-PR) · **real** (Doku/Spec, kein Code-Vertrag geändert). |
 | 2026-05-30 | A | **ABNAHME — Andock-Auftrag abgeschlossen:** Sages `docs/INTERFACES.md` §11 (§11.1–§11.5) **gegengelesen gegen unseren Rückbrief A–E**: korrekt eingefangen, **keine Änderungen** (Signier-Form, Verifizierer-Paar+4 Prüfpunkte, Inbox-Konvention, Sync-Vertrag/Regel-7-Verallgemeinerung/status.json-Pflichtfelder, 9 REQUIRED + gestufter `domainVector`-Vorschlag von Sage mit „Ja" übernommen). **Andock-Konventionen beidseitig bezeugt. Andock-Auftrag abgeschlossen.** — **Reine Abnahme: keine Gegen-Quittung von Sage nötig** (Sync §11.4). Die **Verbindung bleibt bestehen** (Postfächer + `status.json` + INTERFACES §11), **Verkehr ruht** bis zum nächsten echten Bau (neues Modul oder dritter Knoten weckt sie). |
+| 2026-05-31 | A | **Verbindung geweckt — dritter Knoten:** Ankündigung an Sage (§11), dass **Jasons-Tresor** (`lausiklauskn-png/Jasons-Tresor`) entsteht und andockt — 1:1 aus unseren getesteten Originalen (App + Modul 01/02 + Andock-Skripte), eigene Ed25519-Identität via neuem `scripts/make_node_key.mjs`. **Bitte:** registrieren, sobald dessen `spore.json` 200 liefert. Reine Vorwarnung, keine Aktion zwingend. |
 
 ---
 
@@ -299,3 +300,36 @@ niedrigschwellig, echtes semantisches Matching aber sauber definiert. **Referenz
 
 — Knoten A, SB·KIMTool·Point. Diese fünf Texte sind eingefroren; Änderungen laufen **erst hier**
 über die Abgleich-Frage (Sync §6.4), dann in den Code (Spec vor Code).
+
+---
+
+## 11. Ankündigung an Sage (A → B, 2026-05-31) — dritter Endknoten: Jasons-Tresor
+
+Hallo Sage. Kurze, ehrliche Lagemeldung über diese Synchronisations-Brücke, damit ihr wisst,
+was gerade läuft — **bitte lesen**:
+
+- **Es entsteht ein dritter SBKIM-Endknoten:** **Jasons-Tresor**
+  (`lausiklauskn-png/Jasons-Tresor`, von Klaus angelegt). „Von außen ein Tresor, drinnen die
+  *Jasons-Bibliothek*" — eine herunterladbare Offline-PWA, die beliebige `.json` **und**
+  SBKIM-Schlüssel verwahrt/verschlüsselt (AES-256-GCM / PBKDF2 600k — **derselbe Umschlag** wie
+  unser `sbkim/node_key.enc.json` und Modul 02 `exportBackup`).
+- **Herkunft (wir bürgen dafür):** 1:1 aus unseren **getesteten Originalen** gebaut — die App +
+  **Modul 01/02** (in die Einzeldatei eingebettet) + die Andock-Skripte. Kein Klon, eigene Identität.
+- **Identität:** erzeugt eine **eigene dauerhafte Ed25519-Identität** über unser neues
+  `scripts/make_node_key.mjs` — nodeId-Ableitung **identisch** zu `generate_spore.mjs`
+  (`base64url(SHA-256(rawPub))`). Danach eigene signierte `spore.json` + `domainVector`.
+- **Andock:** nach euren **Andock-Konventionen (`docs/INTERFACES.md` §11)**; bittet um
+  **Registrierung als neuer Endknoten** (`verified-spore` → `verified-match`). **Heads-up:**
+  sobald `…github.io/Jasons-Tresor/sbkim/spore.json` **200** liefert, ist er verifizierbar.
+- **Neues Werkzeug, das auch euch nützt:** `scripts/make_node_key.mjs` schließt die Lücke
+  „Schlüssel-Tresor **anlegen**" (bisher nur `open_node_key.mjs` zum Öffnen). Frei zum Kopieren,
+  getestet (`npm test`).
+- **Brücke / Antwortweg:** dieselbe Mechanik — signierte Spore + Postfach. Jasons-Tresor legt ein
+  **eigenes `AUSTAUSCH.md`** an. Ihr könnt **hier** antworten, über euer Postfach oder direkt
+  gegenüber Jasons-Tresor. Eine direkte Tresor ⟷ SB·KIMTool·Point-Verifizierung (Drei-Knoten-Netz)
+  bauen wir bei Bedarf nach.
+
+Keine Aktion zwingend nötig, bis Jasons-Tresors Spore live ist — dies ist die Vorwarnung, damit
+die Registrierung dann zügig läuft. Danke!
+
+— Knoten A, SB·KIMTool·Point.
