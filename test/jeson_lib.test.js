@@ -128,3 +128,56 @@ test("allCategories / allTags: sortiert und eindeutig", () => {
   assert.deepEqual(L.allCategories(es), ["A", "B"]);
   assert.deepEqual(L.allTags(es), ["a", "m", "z"]);
 });
+
+// ---- Tresor (Scheibe 2): echte Krypto, WebCrypto in Node >= 20 ----
+
+test("Tresor: verschluesseln -> entschluesseln == Original (gleicher Umschlag wie Modul 02)", async () => {
+  const lib = L.buildLibraryExport([L.makeEntry({ name: "geheim", payload: { a: 1, b: [2, 3] } })]);
+  const blob = await L.encryptTresor(lib, "passwort123");
+  assert.equal(blob.kind, "jeson-tresor");
+  assert.equal(blob.kdf.algorithm, "PBKDF2");
+  assert.equal(blob.kdf.hash, "SHA-256");
+  assert.equal(blob.kdf.iterations, 600000);
+  assert.match(String(blob.cipher.algorithm), /AES-GCM/);
+  assert.ok(typeof blob.ciphertext === "string" && blob.ciphertext.length > 0);
+  assert.equal(L.isTresor(blob), true);
+  const back = await L.decryptTresor(blob, "passwort123");
+  assert.deepEqual(back, lib);
+});
+
+test("Tresor: falsches Passwort scheitert sauber", async () => {
+  const blob = await L.encryptTresor({ x: 1 }, "richtigespasswort");
+  await assert.rejects(() => L.decryptTresor(blob, "falschespw"));
+});
+
+test("Tresor: Manipulation faellt durch (AES-GCM Auth-Tag)", async () => {
+  const blob = await L.encryptTresor({ x: 1 }, "passwort123");
+  const tampered = JSON.parse(JSON.stringify(blob));
+  const ch = tampered.ciphertext;
+  tampered.ciphertext = ch.slice(0, -1) + (ch.slice(-1) === "A" ? "B" : "A");
+  await assert.rejects(() => L.decryptTresor(tampered, "passwort123"));
+});
+
+test("Tresor: zu kurzes Passwort wird abgelehnt", async () => {
+  await assert.rejects(() => L.encryptTresor({ x: 1 }, "kurz"));
+});
+
+test("payloadToEntries trennt Bibliothek / SBKIM-Schluessel / rohe JSON", () => {
+  const lib = L.buildLibraryExport([L.makeEntry({ name: "a", payload: 1 })]);
+  const rLib = L.payloadToEntries(lib);
+  assert.equal(rLib.kind, "bibliothek");
+  assert.equal(rLib.entries.length, 1);
+
+  const ident = { identities: [{ nodeId: "abc" }] };
+  const rId = L.payloadToEntries(ident, "key-backup");
+  assert.equal(rId.kind, "identitaeten");
+  assert.equal(rId.entries[0].category, "SBKIM-Schluessel");
+
+  assert.equal(L.payloadToEntries({ beliebig: true }, "x").kind, "roh");
+});
+
+test("isTresor erkennt Modul-02-artige Bloecke strukturell", () => {
+  assert.equal(L.isTresor({ kdf: { algorithm: "PBKDF2" }, cipher: { algorithm: "AES-GCM-256" }, ciphertext: "x" }), true);
+  assert.equal(L.isTresor({ eintraege: [] }), false);
+  assert.equal(L.isTresor(null), false);
+});

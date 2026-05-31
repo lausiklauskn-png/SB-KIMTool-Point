@@ -11,12 +11,14 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 
 ## Eigenständige Werkzeuge (verteilbare Einzeldatei-Apps)
 
-### ▤ Jesons-Bibliothek  ◐ (Scheibe 1 fertig, headless bewiesen)
+### ▤ Jesons-Bibliothek  ◐ (Scheibe 1+2 fertig, headless + echter Browser bewiesen)
 - **Was:** Offline-Einzeldatei (`jesons-bibliothek/index.html`) zum Sammeln, Benennen,
   Ordnen, Exportieren und Wieder-Einlesen beliebiger `.json`-Dateien — wie eine eigene
-  Bibliothek; später verschenkbar.
+  Bibliothek; verschenkbar; von außen ein Tresor.
 - **Nutzen:** JSON-Dateien als eigene Arbeit/Wert aufheben; ganze Bibliothek als eine Datei
-  sichern. Geplant (Scheibe 2): Passwort-Tresor — sichert auch SBKIM-Schlüssel/Knoten-IDs.
+  sichern. **Tresor (Scheibe 2):** „🔒 Verschlüsselt sichern" / „Verschenken 🔒" mit Passwort
+  (AES-256-GCM/PBKDF2 600k) — gleicher Umschlag wie Modul 02; sichert/liest auch
+  SBKIM-Schlüssel/Knoten-IDs.
 - **Verwendung:** Seite öffnen → „＋ Jeson laden" → benennen/ordnen → „Exportieren" /
   „Bibliothek sichern" / „Bibliothek einlesen".
 - **Einbau:** Reine Datei, keine Abhängigkeiten; auf Pages unter `…/jesons-bibliothek/`.

@@ -1,6 +1,6 @@
 # Jesons-Bibliothek — deine Bibliothek für JSON-Dateien
 
-Stand: 2026-05-31 · Version 0.1.0 (Scheibe 1) · Datei: `jesons-bibliothek/index.html`
+Stand: 2026-05-31 · Version 0.2.0 (Scheibe 2 — Tresor) · Datei: `jesons-bibliothek/index.html`
 
 > „Jeson" = Klaus' Name für eine `.json`-Datei. Die Bibliothek ist ein Ort, an dem man
 > beliebige JSON-Dateien **aufhebt, benennt, ordnet, exportiert, wieder einliest** und
@@ -28,7 +28,10 @@ Stand: 2026-05-31 · Version 0.1.0 (Scheibe 1) · Datei: `jesons-bibliothek/inde
 
 - **Speicherung im Browser** (`localStorage`, pro Gerät/Browser). Wer den Browser-Speicher
   löscht, verliert die Einträge — deshalb ist der **Export die echte Sicherung**.
-- **Scheibe 1 hat noch keinen Passwort-Schutz.** Die exportierte `.json` ist Klartext.
+- **Tresor (Scheibe 2):** „🔒 Verschlüsselt sichern" und „Verschenken 🔒" schützen mit
+  Passwort (AES-256-GCM / PBKDF2-SHA256 600k, WebCrypto). Die normalen Exporte bleiben
+  Klartext (zum schnellen Aufheben). **Passwort vergessen = Inhalt weg** (kein Hintertürchen).
+  Zum Verschenken das Passwort **getrennt** mitteilen.
 - **Größenrahmen:** `localStorage` fasst grob wenige MB. Für sehr große/viele Jesons kommt
   in einer späteren Scheibe IndexedDB (wie Modul 01 Storage). Ehrlich vermerkt.
 
@@ -64,44 +67,58 @@ Stand: 2026-05-31 · Version 0.1.0 (Scheibe 1) · Datei: `jesons-bibliothek/inde
 }
 ```
 
-**Verschlüsselte Bibliothek/Eintrag (Scheibe 2, geplant)** — **gleicher Umschlag** wie der
-Knoten-Schlüssel-Tresor `sbkim/node_key.enc.json` (kein neues Format):
+**Verschlüsselter Tresor (Scheibe 2, FERTIG)** — bewusst **derselbe Umschlag wie Modul 02**
+(`sbkim-spore.js` `exportBackup`) und wie `sbkim/node_key.enc.json`. Eine Tür liest beide:
 
 ```json
 {
   "schemaVersion": 1,
   "kind": "jeson-tresor",
-  "kdf":   { "algorithm": "PBKDF2", "hash": "SHA-256", "iterations": 600000, "salt": "<base64>" },
-  "cipher":{ "algorithm": "AES-256-GCM", "iv": "<base64>", "tag": "<base64>" },
-  "ciphertext": "<base64 der verschluesselten Bibliothek/Eintrag>"
+  "version": 2,
+  "kdf":   { "algorithm": "PBKDF2", "hash": "SHA-256", "iterations": 600000, "salt": "<base64url>" },
+  "cipher":{ "algorithm": "AES-GCM-256", "iv": "<base64url>" },
+  "ciphertext": "<base64url; AES-GCM hängt das Auth-Tag an den Chiffretext>"
 }
 ```
 
-Beim Einlesen wird `kind` erkannt: `jeson-bibliothek` (viele), `jeson-eintrag` (einer),
-`jeson-tresor` (verschlüsselt → fragt nach Passwort), sonst → rohe JSON wird als ein neuer
-Eintrag eingewickelt. Zusammenführen entdoppelt nach `id` (neuere `updatedAt` gewinnt).
+Beim Einlesen wird der Typ **strukturell** erkannt (`kdf`+`cipher`+`ciphertext` → Tresor):
+- **Tresor** → fragt Passwort → entschlüsselt → schaut hinein:
+  - Klartext mit `eintraege[]` → eine **Bibliothek** (Einträge werden zusammengeführt),
+  - Klartext mit `identities[]` → ein **SBKIM-Schlüssel/ID-Backup** (von Modul 02 / Mein-Mixarium
+    / Mein-Rezeptbuch) → wird als Eintrag „SBKIM-Schluessel" sicher abgelegt.
+- sonst Klartext: `jeson-bibliothek` (viele), `jeson-eintrag` (einer), oder rohe JSON
+  (als neuer Eintrag eingewickelt). Zusammenführen entdoppelt nach `id` (neuere `updatedAt`
+  gewinnt).
+
+**Von außen ein Tresor, drinnen eine Bibliothek** — genau dasselbe Format trägt sowohl die
+verschlüsselte Sammlung als auch das verschlüsselte Identitäts-Backup. Die volle Wieder-
+herstellung eines Schlüssels läuft über Modul 02 `importBackup(blob, password)` (nächste
+Scheibe: Modul 02 in die App einbinden).
 
 ## Fahrplan (kleine Scheiben)
 
 - **Scheibe 1 — Bibliothek bedienbar (FERTIG, headless bewiesen):** `.json` laden →
   benennen, Kategorie + Schlagworte → suchen/sortieren → ansehen → einzeln exportieren →
-  ganze Bibliothek sichern/einlesen. Noch **ohne** Verschlüsselung.
-- **Scheibe 2 — Tresor/Schutz (geplant):** Export/Import mit **Passwort verschlüsseln**
-  (AES-256-GCM / PBKDF2 600k über WebCrypto — dieselbe echte Krypto wie der Knoten-Schlüssel).
-  Damit: sicheres Aufheben und **Verschenken** (Beschenkter braucht das Passwort, getrennt
-  mitgeteilt). **Doppelnutzen:** der Tresor sichert auch Klaus' **SBKIM-Schlüssel und
-  Knoten-IDs** — `spore.json`/Schlüssel als Jeson ablegen und passwortgeschützt aufheben,
-  derselbe Umschlag wie `node_key.enc.json`.
-- **Scheibe 3 — Feinschliff (geplant):** Kategorien/Sortierung vertiefen, als App
-  **installierbar** (Service-Worker/Offline-Cache, Icons), „verschenken"-Knopf,
-  ggf. IndexedDB für große Sammlungen.
+  ganze Bibliothek sichern/einlesen.
+- **Scheibe 2 — Tresor/Schutz (FERTIG, headless + echter Browser bewiesen):** „🔒 Verschlüsselt
+  sichern" (ganze Bibliothek) und „Verschenken 🔒" (ein Eintrag) mit **Passwort** (AES-256-GCM /
+  PBKDF2-SHA256 600k über WebCrypto). Einlesen erkennt einen Tresor automatisch und fragt das
+  Passwort. **Doppelnutzen:** liest auch verschlüsselte **SBKIM-Schlüssel/ID-Backups** von
+  Modul 02 / Mein-Mixarium / Mein-Rezeptbuch (gleiches Format) und legt sie sicher ab.
+- **Scheibe 3 — Brücken + Feinschliff (geplant):** App-übergreifend „immer am selben Ort"
+  über **Web Share Target** (Teilen-Ziel) + **fester Ordner** (File System Access);
+  **Modul 02 einbinden** für volle Schlüssel-Wiederherstellung (`importBackup`); als App
+  **installierbar** (Service-Worker/Offline-Cache); ggf. IndexedDB für große Sammlungen;
+  **Protokoll-Andock** (eigene Spore + `domainVector` + Andock an Sage) für das eigene Repo.
 
 ## Beweis
 
 - `test/jeson_lib.test.js` — schneidet die Kern-Logik **aus der ausgelieferten
   `index.html`** (zwischen Markern) und prüft sie headless (kein Duplikat): Parsen,
-  Eintrag-Normalisierung, Export-/Import-Hülle, Zusammenführen, Filter/Sortierung.
-  `npm test` grün.
+  Eintrag-Normalisierung, Export-/Import-Hülle, Zusammenführen, Filter/Sortierung **und den
+  Tresor** (Verschlüsseln→Entschlüsseln == Original; falsches Passwort scheitert; Manipulation
+  fällt durch das AES-GCM-Auth-Tag; `payloadToEntries`/`isTresor`). `npm test` grün.
 - Entwickler-Browser-Smoke (Playwright/Chromium): Seite lädt fehlerfrei, `JesonLib`
-  registriert, Leer-Zustand + Knöpfe da, eine echte Eintrag-Runde im DOM. **Klaus' eigener
-  Browser-Lauf** (Datei-Auswahl, Download, Bearbeiten-Dialog) **steht noch aus**.
+  registriert, Leer-Zustand + Knöpfe da, echte Eintrag-Runde **und echter Tresor-Roundtrip
+  mit WebCrypto** (falsches Passwort abgewiesen). **Klaus' eigener Browser-Lauf**
+  (Datei-Auswahl, Download, Passwort-Eingabe, Bearbeiten-Dialog) **steht noch aus**.

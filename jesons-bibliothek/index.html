@@ -93,15 +93,16 @@
 <header>
   <h1><span class="glyph">▤</span> Jesons-Bibliothek</h1>
   <p class="sub">Deine Bibliothek fuer JSON-Dateien — laden, benennen, ordnen, exportieren, wieder einlesen.</p>
-  <p><span class="chip">offline</span> <span class="chip">Scheibe 1</span>
-     <span class="chip warn">noch ohne Passwort-Schutz</span></p>
+  <p><span class="chip">offline</span> <span class="chip">Scheibe 2</span>
+     <span class="chip">🔒 Tresor: Passwort-Schutz</span></p>
 </header>
 
 <main>
   <div class="bar">
     <button id="btn-add" class="btn-primary">＋ Jeson laden (.json)</button>
     <button id="btn-export-all" class="btn-ghost">⤓ Bibliothek sichern</button>
-    <button id="btn-import-lib" class="btn-ghost">⤒ Bibliothek einlesen</button>
+    <button id="btn-export-enc" class="btn-ghost">🔒 Verschlüsselt sichern</button>
+    <button id="btn-import-lib" class="btn-ghost">⤒ Einlesen / Tresor öffnen</button>
     <input id="file-add" type="file" accept=".json,application/json" class="hidden" />
     <input id="file-import" type="file" accept=".json,application/json" class="hidden" />
   </div>
@@ -129,7 +130,9 @@
   <p>
     Gespeichert wird <b>in diesem Browser</b> (pro Geraet). Der Export als <code>.json</code>
     ist deine echte, mitnehmbare Sicherung — zum Aufheben und Verschenken.
-    Passwort-Schutz (der „Tresor") kommt in <b>Scheibe 2</b>.
+    <b>🔒 Verschlüsselt sichern</b> schützt mit Passwort (AES-256-GCM / PBKDF2 600k — gleicher
+    Umschlag wie Modul 02). Zum Verschenken das Passwort <b>getrennt</b> mitteilen.
+    Passwort vergessen = Inhalt weg (kein Hintertürchen).
   </p>
 </footer>
 
@@ -289,12 +292,96 @@
     return s.sort();
   }
 
+  // ---- Tresor (Scheibe 2): Passwort-Verschluesselung. GLEICHER Umschlag wie
+  //      Modul 02 (sbkim-spore.js exportBackup) und sbkim/node_key.enc.json:
+  //      PBKDF2-SHA256 600k -> AES-GCM-256. Browser UND Node (>=20) tauglich.
+  var TRESOR_ITER = 600000;
+
+  function cryptoObj() {
+    var c = root.crypto || (typeof globalThis !== "undefined" ? globalThis.crypto : null);
+    if (!c || !c.subtle) throw new Error("WebCrypto nicht verfuegbar (crypto.subtle fehlt).");
+    return c;
+  }
+  function b64uFromBytes(bytes) {
+    var bin = "", i;
+    for (i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    var enc = root.btoa || (typeof globalThis !== "undefined" && globalThis.btoa) || null;
+    var b64 = enc ? enc(bin) : Buffer.from(bytes).toString("base64");
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function bytesFromB64u(s) {
+    var b64 = String(s).replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    var dec = root.atob || (typeof globalThis !== "undefined" && globalThis.atob) || null;
+    var bin = dec ? dec(b64) : Buffer.from(b64, "base64").toString("binary");
+    var out = new Uint8Array(bin.length), i;
+    for (i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  async function deriveAesKey(password, salt, iterations, usages) {
+    var c = cryptoObj();
+    var mat = await c.subtle.importKey("raw", new TextEncoder().encode(String(password)),
+      { name: "PBKDF2" }, false, ["deriveKey"]);
+    return await c.subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: iterations, hash: "SHA-256" },
+      mat, { name: "AES-GCM", length: 256 }, false, usages);
+  }
+  async function encryptTresor(plainObj, password) {
+    if (typeof password !== "string" || password.length < 8) throw new Error("Passwort zu kurz (mind. 8 Zeichen).");
+    var c = cryptoObj();
+    var salt = c.getRandomValues(new Uint8Array(16));
+    var iv = c.getRandomValues(new Uint8Array(12));
+    var key = await deriveAesKey(password, salt, TRESOR_ITER, ["encrypt"]);
+    var pt = new TextEncoder().encode(JSON.stringify(plainObj));
+    var ctBuf = await c.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, pt);
+    return {
+      schemaVersion: SCHEMA, kind: "jeson-tresor", version: 2,
+      kdf: { algorithm: "PBKDF2", hash: "SHA-256", iterations: TRESOR_ITER, salt: b64uFromBytes(salt) },
+      cipher: { algorithm: "AES-GCM-256", iv: b64uFromBytes(iv) },
+      ciphertext: b64uFromBytes(new Uint8Array(ctBuf))
+    };
+  }
+  async function decryptTresor(blob, password) {
+    var c = cryptoObj();
+    var salt = bytesFromB64u(blob.kdf.salt);
+    var iv = bytesFromB64u(blob.cipher.iv);
+    var ct = bytesFromB64u(blob.ciphertext);
+    var key = await deriveAesKey(password, salt, blob.kdf.iterations || TRESOR_ITER, ["decrypt"]);
+    var plainBuf = await c.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct); // wirft bei falschem PW/Manipulation
+    return JSON.parse(new TextDecoder().decode(plainBuf));
+  }
+  function isTresor(v) {
+    return !!(v && v.kdf && v.cipher && typeof v.ciphertext === "string" &&
+      v.kdf.algorithm === "PBKDF2" && /AES-GCM/.test(String(v.cipher.algorithm)));
+  }
+  function tresorPayloadKind(plainObj) {
+    if (plainObj && plainObj.kind === "jeson-bibliothek" && Array.isArray(plainObj.eintraege)) return "bibliothek";
+    if (plainObj && Array.isArray(plainObj.identities)) return "identitaeten";
+    return "roh";
+  }
+  function payloadToEntries(plainObj, fallbackName) {
+    var kind = tresorPayloadKind(plainObj), entries = [];
+    if (kind === "bibliothek") {
+      plainObj.eintraege.forEach(function (e) { entries.push(asEntry(e)); });
+    } else if (kind === "identitaeten") {
+      entries.push(makeEntry({
+        name: fallbackName || "SBKIM Schluessel-Backup",
+        category: "SBKIM-Schluessel", tags: "schluessel, identitaet", payload: plainObj
+      }));
+    } else {
+      entries.push(asEntry(plainObj, fallbackName));
+    }
+    return { kind: kind, entries: entries };
+  }
+
   var api = {
     SCHEMA: SCHEMA, genId: genId, nowIso: nowIso, validateAndParse: validateAndParse,
     byteSize: byteSize, normalizeTags: normalizeTags, makeEntry: makeEntry,
     buildLibraryExport: buildLibraryExport, parseLibraryImport: parseLibraryImport,
     mergeEntries: mergeEntries, filterSort: filterSort,
-    allCategories: allCategories, allTags: allTags
+    allCategories: allCategories, allTags: allTags,
+    encryptTresor: encryptTresor, decryptTresor: decryptTresor, isTresor: isTresor,
+    tresorPayloadKind: tresorPayloadKind, payloadToEntries: payloadToEntries
   };
   root.JesonLib = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
@@ -434,6 +521,7 @@
       act.appendChild(btn("Ansehen", function () { toggleView(li, e); }));
       act.appendChild(btn("Bearbeiten", function () { openEdit(e); }));
       act.appendChild(btn("Exportieren", function () { exportOne(e); }));
+      act.appendChild(btn("Verschenken 🔒", function () { giftEncrypted(e); }));
       act.appendChild(btn("Loeschen", function () { removeOne(e); }, "btn-bad"));
       li.appendChild(act);
 
@@ -457,17 +545,50 @@
   }
 
   // ---- Actions ----
-  function addFromFile(file) {
+  function ingestFile(file) {
     readFile(file, function (err, text) {
       if (err) { toast("Datei konnte nicht gelesen werden", true); return; }
       var p = L.validateAndParse(text);
       if (!p.ok) { toast("Keine gueltige JSON-Datei: " + p.error, true); return; }
       var base = file.name.replace(/\.json$/i, "");
-      var e = L.makeEntry({ name: base, origin: file.name, payload: p.value });
-      entries = L.mergeEntries(entries, [e]);
+      if (L.isTresor(p.value)) {
+        var pw = window.prompt("Passwort fuer diesen Tresor:");
+        if (pw == null) return;
+        L.decryptTresor(p.value, pw).then(function (plain) {
+          var r = L.payloadToEntries(plain, base);
+          entries = L.mergeEntries(entries, r.entries);
+          persist(); render();
+          toast("Tresor geoeffnet: " + r.entries.length + " Eintrag(e)" +
+            (r.kind === "identitaeten" ? " — SBKIM Schluessel-Backup" : ""));
+        }).catch(function () { toast("Falsches Passwort oder Tresor beschaedigt.", true); });
+        return;
+      }
+      var r = L.parseLibraryImport(text, base);
+      var isWrapped = p.value && (p.value.kind === "jeson-bibliothek" || p.value.kind === "jeson-eintrag");
+      if (r.entries.length === 1 && !isWrapped) r.entries[0].origin = file.name; // rohe Datei: Herkunft merken
+      entries = L.mergeEntries(entries, r.entries);
       persist(); render();
-      toast("„" + e.name + "“ in die Bibliothek gelegt");
+      toast("Eingelesen: " + r.entries.length + " (Bibliothek jetzt " + entries.length + ")");
     });
+  }
+
+  function exportEncrypted() {
+    if (entries.length === 0) { toast("Bibliothek ist leer", true); return; }
+    var pw = window.prompt("Passwort zum Verschluesseln (mind. 8 Zeichen):");
+    if (pw == null) return;
+    L.encryptTresor(L.buildLibraryExport(entries), pw).then(function (blob) {
+      download("jesons-tresor_" + new Date().toISOString().slice(0, 10) + ".json", blob);
+      toast("Verschluesselt gesichert (" + entries.length + " Eintraege)");
+    }).catch(function (e) { toast(String((e && e.message) || e), true); });
+  }
+
+  function giftEncrypted(e) {
+    var pw = window.prompt("Passwort fuer „" + e.name + "“ (mind. 8 Zeichen):");
+    if (pw == null) return;
+    L.encryptTresor(L.buildLibraryExport([e]), pw).then(function (blob) {
+      download(safeName(e.name) + ".tresor.json", blob);
+      toast("„" + e.name + "“ verschluesselt — Passwort getrennt weitergeben");
+    }).catch(function (err) { toast(String((err && err.message) || err), true); });
   }
 
   function exportOne(e) {
@@ -487,18 +608,6 @@
     download("jesons-bibliothek_" + new Date().toISOString().slice(0, 10) + ".json",
       L.buildLibraryExport(entries));
     toast("Bibliothek gesichert (" + entries.length + " Eintraege)");
-  }
-
-  function importLibrary(file) {
-    readFile(file, function (err, text) {
-      if (err) { toast("Datei konnte nicht gelesen werden", true); return; }
-      var r = L.parseLibraryImport(text, file.name.replace(/\.json$/i, ""));
-      if (!r.ok) { toast("Keine gueltige JSON-Datei: " + r.error, true); return; }
-      var before = entries.length;
-      entries = L.mergeEntries(entries, r.entries);
-      persist(); render();
-      toast("Eingelesen: " + r.entries.length + " (Bibliothek jetzt " + entries.length + ", war " + before + ")");
-    });
   }
 
   // ---- Edit dialog ----
@@ -525,14 +634,15 @@
   $("btn-add").addEventListener("click", function () { $("file-add").click(); });
   $("file-add").addEventListener("change", function (ev) {
     var f = ev.target.files && ev.target.files[0];
-    if (f) addFromFile(f);
+    if (f) ingestFile(f);
     ev.target.value = "";
   });
   $("btn-export-all").addEventListener("click", exportAll);
+  $("btn-export-enc").addEventListener("click", exportEncrypted);
   $("btn-import-lib").addEventListener("click", function () { $("file-import").click(); });
   $("file-import").addEventListener("change", function (ev) {
     var f = ev.target.files && ev.target.files[0];
-    if (f) importLibrary(f);
+    if (f) ingestFile(f);
     ev.target.value = "";
   });
   ["q", "f-cat", "f-tag", "f-sort"].forEach(function (id) {

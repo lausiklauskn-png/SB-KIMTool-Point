@@ -2,6 +2,35 @@
 
 Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-05-31 (Y) — Jesons-Bibliothek Scheibe 2: Tresor (gleicher Umschlag wie Modul 02)
+
+Klaus zeigte (Screenshot Sage-Seite): **Modul 02 macht das Schlüssel-Backup schon** —
+„Identität sichern · Modul 02 Backup-Export Stufe 2" (PBKDF2-SHA256 600k + AES-GCM-256, seit
+2026-05-16, rückwärtskompatibel zu MM/MR-Backups). Ziel: Jesons + Keys an **einem** Ort,
+„von außen ein Tresor, drinnen eine Bibliothek". Klaus „keine Präferenz" → empfohlener Weg
+„hier bauen, dann kopieren". **Scheibe 2 (Tresor) gebaut.**
+
+- **Kern (`jesons-bibliothek/index.html`, zwischen Markern):** `encryptTresor`/`decryptTresor`
+  über **WebCrypto** — **derselbe Umschlag wie Modul 02 `exportBackup`** und `node_key.enc.json`:
+  `{version,kdf:PBKDF2/SHA-256/600k, cipher:AES-GCM-256, ciphertext}` (base64url, Tag im
+  Chiffretext). `isTresor` erkennt strukturell; `payloadToEntries` trennt **Bibliothek**
+  (`eintraege[]`) von **SBKIM-Schlüssel-Backup** (`identities[]`) von roher JSON.
+- **Oberfläche:** Knöpfe „🔒 Verschlüsselt sichern" (ganze Bibliothek) + „Verschenken 🔒"
+  (ein Eintrag, Passwort getrennt mitteilen). Einlesen erkennt einen Tresor **automatisch**
+  und fragt das Passwort — öffnet auch verschlüsselte Identitäts-Backups von Modul 02/MM/MR.
+- **Beweis:** `npm test` **61/61** (+6: Roundtrip, falsches Passwort, GCM-Manipulation,
+  `payloadToEntries`/`isTresor`). **Echter Browser-Smoke (Chromium WebCrypto):** Tresor-Roundtrip
+  stimmt, falsches Passwort abgewiesen, keine Konsolenfehler. **Klaus' eigener Browser-Lauf**
+  (Datei-Auswahl, Download, Passwort-Eingabe) **steht aus**.
+- **Doku:** `docs/JESONS-BIBLIOTHEK.md` (Tresor von „geplant" auf „fertig", Format = Modul 02),
+  `status.json` + `docs/WERKZEUGE.md` nachgezogen.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf. (2) Scheibe 3 — App-übergreifend
+  „immer am selben Ort" (Web Share Target + fester Ordner), **Modul 02 einbinden** für volle
+  Schlüssel-Wiederherstellung (`importBackup`), installierbar (Service-Worker). (3) **Brücke
+  ans Protokoll** für Klaus' neues Bibliothek-Repo (eigene Spore + `domainVector` + Andock an
+  Sage) — als Kopier-Starter, da meine Schreibrechte nur dieses Repo umfassen. (4) Offen aus W:
+  Info-Brief an Sage.
+
 ## 2026-05-31 (X) — Jesons-Bibliothek Scheibe 1 (eigenständige Einzeldatei-App)
 
 Klaus' größere Idee: aus dem Schlüssel-Tresor-Gedanken eine herunterladbare **„Jesons-
