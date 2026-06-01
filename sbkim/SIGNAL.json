@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
-  "lastBuild": "2026-05-31",
-  "seq": 1,
-  "headline": "Briefkasten-Aushang angelegt; Netz-Sync §11.6 aktiv (Wächter + 📬-Knopf). Jasons-Tresor reziprok verifiziert (verified-spore).",
+  "lastBuild": "2026-06-01",
+  "seq": 2,
+  "headline": "📬-Knopf jetzt auf ALLEN vier Seiten (gemeinsame assets/netz-briefkasten.js, injiziert sich selbst); Browser-gegengeprüft.",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md"
@@ -11,6 +11,7 @@
   "ack": { "Sage-Protokol": 7, "Jasons-Tresor": null },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal. Wer liest: .github/sbkim-watch.mjs (zeitgesteuert) + 📬-Knopf auf der Startseite (live im Browser).",
   "history": [
-    { "seq": 1, "date": "2026-05-31", "headline": "Aushang angelegt; Netz-Sync §11.6 (Wächter + Knopf); Jasons-Tresor verified-spore." }
+    { "seq": 1, "date": "2026-05-31", "headline": "Aushang angelegt; Netz-Sync §11.6 (Wächter + Knopf); Jasons-Tresor verified-spore." },
+    { "seq": 2, "date": "2026-06-01", "headline": "📬-Knopf auf allen vier Seiten (gemeinsame assets/netz-briefkasten.js)." }
   ]
 }
