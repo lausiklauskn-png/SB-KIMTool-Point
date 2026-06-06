@@ -2,6 +2,21 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AO) — Andock-Wizard Schritt 4: Identität wiederherstellen (importBackup)
+
+Klaus (Screenshot Sage): der Wizard braucht den **4. Schritt „Identität wiederherstellen"** —
+Backup-Datei (Schritt 3) + Passwort zurückspielen.
+
+- **`assets/sbkim-siegel.js`**: Schritt 4 ergänzt — Datei-Input + Knopf „Backup-Datei wählen +
+  wiederherstellen". Liest die Datei (`file.text()` → JSON), fragt Passwort, ruft
+  `SbkimSpore.importBackup(blob, pw)` → Schlüssel + Spore zurück in die Browser-IndexedDB.
+  Bei vorhandenem Slot: bewusster `confirm` → `importBackup(blob, pw, {force:true})`. Logik
+  1:1 nach Sages `andockStep4Restore` (Overwrite-Fallback inklusive). Funktioniert auch auf
+  neuem Gerät/Browser.
+- **Echter Browser:** Schritt-4-Knopf + Datei-Input vorhanden, 0 Fehler. `npm test` 77/77.
+  `SIGNAL.json` seq 12. Wizard jetzt mit **4 Schritten wie Sage** (Identität → Spore → Backup
+  → Wiederherstellen). Schritt 2–4 brauchen Klaus' echten Browser-Lauf.
+
 ## 2026-06-06 (AN) — Toten [Andocken]-Knopf (Modul 18) auf echten Wizard umgeleitet
 
 Klaus' Befund: im Siegel-Modal steht unter meinem neuen Knopf noch Modul 16s Bronze-Block
