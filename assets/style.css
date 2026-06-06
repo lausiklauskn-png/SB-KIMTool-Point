@@ -21,15 +21,23 @@
 
 * { box-sizing: border-box; }
 
-/* === SBKIM-Siegel (Modul 16, Wappen 1:1 aus Sage/Jason) + Lampen (lebt/verkehr/fremd) === */
-.sbkim-siegel-badge { width: 34px; height: 34px; border-radius: 50%; margin-left: 0.3rem; padding: 0;
+/* === SBKIM-Siegel (Modul 16, echtes Modul) + Lampen (lebt/verkehr/fremd, Modul 15) ===
+   Das Badge #sbkim-siegel-badge wird vom echten Modul 16 selbst injiziert (inline-SVG).
+   Bronze = "Mycel suchend" (noch kein Handshake), Gold = mind. ein echter Cross-Knoten-
+   Handshake in dieser Session. */
+#sbkim-siegel-badge { width: 34px; height: 34px; border-radius: 50%; margin-left: 0.3rem; padding: 0;
   background: transparent; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
   overflow: visible; transition: filter .25s, transform .25s; flex: 0 0 auto; }
-.sbkim-siegel-badge img { width: 34px; height: 34px; display: block; pointer-events: none; }
-.sbkim-siegel-badge:hover { filter: drop-shadow(0 0 8px rgba(201,169,97,0.55)); transform: scale(1.06); }
-.sbkim-siegel-badge:focus-visible { outline: 2px solid #C9A961; outline-offset: 3px; }
-.sbkim-siegel-badge.first-boot { animation: siegel-first-boot 600ms ease-out; }
-@keyframes siegel-first-boot { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 0 14px rgba(201,169,97,0.55)); } 100% { transform: scale(1); opacity: 1; } }
+#sbkim-siegel-badge svg, #sbkim-siegel-badge img { width: 34px; height: 34px; display: block; pointer-events: none; }
+#sbkim-siegel-badge:hover { filter: drop-shadow(0 0 8px rgba(201,169,97,0.55)); transform: scale(1.06); }
+#sbkim-siegel-badge:focus-visible { outline: 2px solid #C9A961; outline-offset: 3px; }
+/* Bronze gedämpft (suchend), Gold voll + Glühen (verbunden, Beweis erbracht). */
+#sbkim-siegel-badge[data-stufe="bronze"] { filter: saturate(0.55) brightness(0.82); }
+#sbkim-siegel-badge[data-stufe="gold"] { filter: drop-shadow(0 0 7px rgba(201,169,97,0.6)); }
+#sbkim-siegel-badge.first-boot { animation: siegel-first-boot 600ms ease-out; }
+#sbkim-siegel-badge.stufenwechsel-gold { animation: siegel-stufenwechsel 600ms ease-out; }
+@keyframes siegel-first-boot { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes siegel-stufenwechsel { 0% { transform: scale(1); } 50% { transform: scale(1.2); filter: drop-shadow(0 0 14px rgba(201,169,97,0.8)); } 100% { transform: scale(1); } }
 .lamps { display: inline-flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; }
 .lamp { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--muted); font-family: var(--mono); }
 .lamp::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); box-shadow: none; transition: background .25s, box-shadow .25s; }
@@ -90,12 +98,6 @@ a { color: var(--accent); }
 }
 .brand .dot { color: var(--accent); }
 .lamps { display: flex; gap: 1rem; flex-wrap: wrap; }
-.lamp { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); font-family: var(--mono); }
-.lamp::before {
-  content: ""; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--lamp-live); box-shadow: 0 0 8px var(--lamp-live);
-}
-.lamp.dorm::before { background: var(--lamp-dorm); box-shadow: 0 0 8px var(--lamp-dorm); }
 .version { margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
 a.brand { text-decoration: none; }
 

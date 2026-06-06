@@ -1,83 +1,111 @@
-/* SBKIM-Siegel (Modul 16) + Lampen (lebt/verkehr/fremd) — gemeinsam für alle Seiten.
- * Re-geskinnt für SB·KIMTool·Point; Wappen-SVG 1:1 aus dem Sage-Protokoll (geteiltes
- * Markt-Zertifikat). Injiziert sich selbst in die .statusbar, damit jede Seite nur EINE
- * <script src="assets/sbkim-siegel.js">-Zeile braucht.
+/* SBKIM-Siegel (Modul 16) + Membran-Lampe (Modul 15) + Lebt/Verkehr-Lampen
+ * — ECHTE Module, kein Attrappen-Mock. Lädt die unveränderten web/tools/-Module
+ * und verdrahtet die Statusleiste ehrlich:
  *
- * Lampen ehrlich: „lebt" = Seite/Identität geladen (an). „verkehr" pulst kurz beim
- * status.json-Fetch. „fremd" bleibt ruhig (Demo-Anker für Modul 15 Membran; rot nur,
- * wenn echter Fremdzugriff erkannt würde — hier nichts vorgetäuscht).
+ *   • "lebt"    — an, sobald die eigene SBKIM-Identität (Modul 02) wirklich geladen ist
+ *                 (echtes IndexedDB/WebCrypto). Scheitert das, bleibt die Lampe grau.
+ *   • "verkehr" — pulst nur bei echtem Netz-Verkehr (status.json-Fetch ODER eine
+ *                 Peer-SIGNAL.json-Abfrage über den 📬-Knopf).
+ *   • "fremd"   — wird von Modul 15 (Membran) bedient: rot NUR bei echtem
+ *                 Fremdzugriff (Cross-Origin/SW-Probe). Ruhe = nichts erkannt.
+ *   • Siegel    — Modul 16: startet BRONZE ("Mycel suchend"), wird GOLD erst, wenn
+ *                 in dieser Session ein echter Cross-Knoten-Handshake bestätigt wurde
+ *                 (Event sbkim:handshake, outcome:"established"). Der Beweis, dass es
+ *                 wirklich funktioniert hat — nicht vorgetäuscht.
+ *
+ * Re-Init-fest (Mehrfach-Einbindung schadet nicht). Lädt die Modul-Skripte einmal
+ * dynamisch nach (damit jede Seite nur EINE <script>-Zeile braucht).
  */
 (function () {
   "use strict";
-  var NODE_ID = "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY";
-  var ENDPOINT = "https://lausiklauskn-png.github.io/SB-KIMTool-Point/";
+  if (window.__sbkimSiegelWired) return;
+  window.__sbkimSiegelWired = true;
 
-  function el(tag, attrs, html) {
-    var e = document.createElement(tag);
-    if (attrs) for (var k in attrs) { if (k === "class") e.className = attrs[k]; else e.setAttribute(k, attrs[k]); }
-    if (html != null) e.innerHTML = html;
-    return e;
+  var BASE = "web/tools/";
+  // Reihenfolge zählt: 01 Storage zuerst, dann 02; 15/16 zuletzt.
+  var SCRIPTS = [
+    "sbkim-storage.js", "sbkim-spore.js", "sbkim-match.js",
+    "sbkim-anastomose.js", "sbkim-apoptose.js",
+    "sbkim-membran.js", "sbkim-siegel.js"
+  ];
+
+  function loadScript(src) {
+    return new Promise(function (resolve) {
+      // schon geladen?
+      var existing = document.querySelector('script[data-sbkim="' + src + '"]');
+      if (existing) { resolve(true); return; }
+      var s = document.createElement("script");
+      s.src = src; s.async = false; s.setAttribute("data-sbkim", src);
+      s.onload = function () { resolve(true); };
+      s.onerror = function () { resolve(false); };
+      document.head.appendChild(s);
+    });
   }
 
-  function init() {
-    var bar = document.querySelector(".statusbar");
-    if (!bar || document.getElementById("sbkim-siegel-badge")) return;
+  function lamp(id) { return document.getElementById(id); }
+  function setLamp(id, cls) {
+    var el = lamp(id); if (!el) return;
+    el.classList.remove("on", "warn", "bad");
+    if (cls) el.classList.add(cls);
+  }
+  function pulseTraffic() {
+    var el = lamp("lamp-traffic"); if (!el) return;
+    el.classList.remove("traffic-pulse"); void el.offsetWidth; el.classList.add("traffic-pulse");
+  }
 
-    // Lampen (vor dem Netz-Knopf / der Version)
-    var lamps = el("div", { class: "lamps", title: "Sichtbarkeits-Lampen — lebt / verkehr / fremd" });
-    lamps.appendChild(el("span", { class: "lamp on", id: "lamp-alive", title: "Knoten lebt — Seite/Identität geladen" }, '<span class="lamp-label">lebt</span>'));
-    lamps.appendChild(el("span", { class: "lamp", id: "lamp-traffic", title: "Verkehr — pulst beim status.json-Fetch" }, '<span class="lamp-label">verkehr</span>'));
-    lamps.appendChild(el("span", { class: "lamp", id: "lamp-fremd", title: "Fremdzugriff — ruhig (Membran 15 warnt nur, zerstört nichts)" }, '<span class="lamp-label">fremd</span>'));
+  async function wireAliveLamp() {
+    // "lebt" ehrlich: nur an, wenn Modul 02 wirklich eine Identität laden kann.
+    try {
+      if (window.SbkimSpore && typeof window.SbkimSpore.getOrCreateIdentity === "function") {
+        var id = await window.SbkimSpore.getOrCreateIdentity();
+        if (id && id.nodeId) { setLamp("lamp-alive", "on"); return; }
+      }
+    } catch (e) { /* IndexedDB/WebCrypto fehlt → ehrlich grau lassen */ }
+    setLamp("lamp-alive", null);
+  }
 
-    // Siegel-Wappen (Klick öffnet Andock-Modal)
-    var badge = el("button", {
-      type: "button", id: "sbkim-siegel-badge", class: "sbkim-siegel-badge first-boot",
-      title: "SBKIM-Siegel — Andock zum Werkzeug öffnen", "aria-label": "SBKIM-Siegel — Andock öffnen"
-    }, '<img src="assets/sbkim-siegel-wappen.svg" alt="" decoding="async" />');
+  function wireTrafficLamp() {
+    // Pulst bei echtem Netz-Verkehr: status.json-Fetch oder Peer-SIGNAL-Abfrage.
+    if (!window.fetch || window.__sbkimTrafficWrapped) return;
+    window.__sbkimTrafficWrapped = true;
+    var orig = window.fetch;
+    window.fetch = function (input) {
+      try {
+        var url = typeof input === "string" ? input : (input && input.url) || "";
+        if (/status\.json|SIGNAL\.json|spore\.json/.test(url)) pulseTraffic();
+      } catch (e) {}
+      return orig.apply(this, arguments);
+    };
+  }
 
-    // Einsortieren: Lampen + Siegel direkt vor den Netz-Knopf bzw. die Version.
-    var anchor = bar.querySelector("#netz-check-btn") || bar.querySelector(".version");
-    if (anchor) { bar.insertBefore(lamps, anchor); bar.insertBefore(badge, anchor); }
-    else { bar.appendChild(lamps); bar.appendChild(badge); }
-
-    // Andock-Modal
-    var dlg = el("dialog", { id: "sbkim-andock", class: "andock-modal", "aria-label": "SBKIM Andock" },
-      '<h3>SBKIM · Andock</h3>' +
-      '<p style="color:var(--muted);margin:.2em 0 1em;font-size:.9rem">SB·KIMTool·Point ist ein bezeugter SBKIM-Endknoten am Sage-Protokoll.</p>' +
-      '<div class="andock-row"><span>Endknoten</span><code>SB-KIMTool-Point</code></div>' +
-      '<div class="andock-row"><span>Endpunkt</span><a href="' + ENDPOINT + '" target="_blank" rel="noopener">…github.io/SB-KIMTool-Point/ ↗</a></div>' +
-      '<div class="andock-row"><span>nodeId</span><code>' + NODE_ID + '</code></div>' +
-      '<div class="andock-row"><span>Spore</span><a href="sbkim/spore.json" target="_blank" rel="noopener">sbkim/spore.json ↗</a></div>' +
-      '<div class="andock-row"><span>Markt</span><a href="markt.html">verbundene Knoten ansehen →</a></div>' +
-      '<p style="color:var(--muted);font-size:.78rem;margin:.9em 0 0">Siegel-Wappen 1:1 aus dem Sage-Protokoll (Modul 16, geteiltes Markt-Zertifikat). Verbunden: Sage (verified-match 0.85), Jasons-Tresor (verified-spore).</p>' +
-      '<button class="andock-close" type="button">Schließen</button>');
-    document.body.appendChild(dlg);
-
-    function open() { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
-    function close() { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
-    badge.addEventListener("click", open);
-    dlg.querySelector(".andock-close").addEventListener("click", close);
-    dlg.addEventListener("click", function (e) { if (e.target === dlg) close(); });
-
-    // first-boot-Animation nur einmal
-    setTimeout(function () { badge.classList.remove("first-boot"); }, 700);
-
-    // Verkehrs-Lampe pulst, wenn status.json gelesen wird (auf Seiten, die das tun).
-    var traffic = document.getElementById("lamp-traffic");
-    if (traffic && window.fetch) {
-      var orig = window.fetch;
-      window.fetch = function (input) {
-        try {
-          var url = typeof input === "string" ? input : (input && input.url) || "";
-          if (/status\.json/.test(url)) {
-            traffic.classList.remove("traffic-pulse");
-            void traffic.offsetWidth;
-            traffic.classList.add("traffic-pulse");
-          }
-        } catch (e) {}
-        return orig.apply(this, arguments);
-      };
+  async function init() {
+    if (!document.querySelector(".statusbar")) return; // nur Seiten mit Statusleiste
+    // 1) echte Module nachladen
+    var ok = true;
+    for (var i = 0; i < SCRIPTS.length; i++) {
+      var got = await loadScript(BASE + SCRIPTS[i]);
+      if (!got) ok = false;
     }
+
+    // 2) Lampen ehrlich verdrahten
+    wireTrafficLamp();
+    await wireAliveLamp();
+
+    // 3) Modul 15 (Membran) → bedient #lamp-fremd bei echtem Fremdzugriff
+    try {
+      if (window.SbkimMembrane && typeof window.SbkimMembrane.init === "function") {
+        await window.SbkimMembrane.init({ lampSelector: "#lamp-fremd", mountModal: true });
+      }
+    } catch (e) { /* fail-soft */ }
+
+    // 4) Modul 16 (Siegel) → injiziert Badge in .lamps, Bronze→Gold bei echtem Handshake
+    try {
+      if (window.SbkimSiegel && typeof window.SbkimSiegel.init === "function") {
+        await window.SbkimSiegel.init({ badgeSelector: ".lamps", mountModal: true });
+      }
+    } catch (e) { /* fail-soft */ }
+
+    if (!ok) console.info("SBKIM-Statusleiste: einige Module nicht erreichbar — Lampen/Siegel zeigen nur den real ladbaren Stand (ehrlich).");
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
