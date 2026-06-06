@@ -98,6 +98,22 @@
       }
     } catch (e) { /* fail-soft */ }
 
+    // 3b) Modul-18-Shim: Modul 16 zeigt im Bronze-Zustand einen [Andocken]-Knopf, der
+    //     SbkimToolPwa.openAndockTab() (Modul 18 Tool-PWA-Container) aufruft. Modul 18 ist
+    //     bei uns NICHT eingebunden (und unnötig) — statt des toten Knopfs leiten wir ihn
+    //     auf unseren echten Andock-Wizard um. So nimmt Modul 16 seinen Erfolgs-Pfad
+    //     (closeModal) und der Knopf funktioniert ehrlich, statt "Modul 18 nicht installiert".
+    if (!window.SbkimToolPwa) {
+      window.SbkimToolPwa = {
+        openAndockTab: function () {
+          // Wizard sicherstellen + öffnen. Wirft NICHT → Modul 16 Pfad 1.
+          setupAndockWizard();
+          // kurz warten, bis Modul 16 sein Modal geschlossen hat, dann Wizard zeigen.
+          setTimeout(openWizard, 60);
+        }
+      };
+    }
+
     // 4) Modul 16 (Siegel) → injiziert Badge in .lamps, Bronze→Gold bei echtem Handshake
     try {
       if (window.SbkimSiegel && typeof window.SbkimSiegel.init === "function") {

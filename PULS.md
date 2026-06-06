@@ -2,6 +2,21 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AN) — Toten [Andocken]-Knopf (Modul 18) auf echten Wizard umgeleitet
+
+Klaus' Befund: im Siegel-Modal steht unter meinem neuen Knopf noch Modul 16s Bronze-Block
+„Mycel suchend → [Andocken] (Modul 18)" — und *dieser* Knopf meldete „Modul 18 nicht
+installiert". Erklärung: Modul 16 ruft `SbkimToolPwa.openAndockTab()` (Modul 18, Tool-PWA-
+Container) auf — bei uns **nie eingebunden** und unnötig (Sage nutzt 18 auch nicht, sondern den
+Seiten-Wizard).
+
+- **Fix (`assets/sbkim-siegel.js`):** **vor** Modul-16-Init einen minimalen `window.SbkimToolPwa`-
+  Shim registriert; dessen `openAndockTab()` öffnet **unseren** Andock-Wizard (wirft nicht →
+  Modul 16 nimmt seinen Erfolgs-Pfad `closeModal`). Damit funktioniert der [Andocken]-Knopf
+  ehrlich; kein „Modul 18 nicht installiert" mehr. Modul 16 selbst unangetastet.
+- **Echter Browser:** Shim registriert, [Andocken] vorhanden, Klick schließt Modal + öffnet
+  Wizard, 0 Fehler. `npm test` 77/77. `SIGNAL.json` seq 11.
+
 ## 2026-06-06 (AM) — Andock-Wizard im Siegel-Modal (Identität & Spore erzeugen/pflegen)
 
 Klaus' Befund (Screenshot Sage): im Siegel-Modal fehlte der Knopf „🔑 Eigene Identität & Spore
