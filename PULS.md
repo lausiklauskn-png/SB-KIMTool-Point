@@ -2,6 +2,19 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-07 (AP) — Siegel-Modal aufgeräumt: doppeltes Andocken raus (wie Sage)
+
+Klaus: im Siegel-Modal soll oben **nur** „🔑 Eigene Identität & Spore erzeugen / verwalten →" +
+„Bezeugt seit …" stehen — wie bei Sage. Der zweite Block „Mycel suchend → [Andocken]" war
+doppelt und nannte fälschlich **Modul 18** (das Andock-/Siegel-Modul ist **Modul 16**).
+
+- **`assets/sbkim-siegel.js`**: Modul 16s Bronze-„Andocken"-Block (`[data-siegel-bronze-hinweis]`)
+  wird dauerhaft ausgeblendet (`hideBronzeAndockBlock` + MutationObserver, da Modul 16 ihn erst
+  beim Öffnen sichtbar schaltet). Der jetzt überflüssige `SbkimToolPwa`-Shim (aus AN) wieder
+  entfernt. Modul 16 selbst unangetastet.
+- **Echter Browser:** oberer Identitäts-Knopf da, Bronze-Andock-Block unsichtbar, 0 Fehler.
+  `npm test` 77/77. `SIGNAL.json` seq 13.
+
 ## 2026-06-06 (AO) — Andock-Wizard Schritt 4: Identität wiederherstellen (importBackup)
 
 Klaus (Screenshot Sage): der Wizard braucht den **4. Schritt „Identität wiederherstellen"** —
