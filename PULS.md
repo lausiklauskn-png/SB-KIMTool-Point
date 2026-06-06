@@ -2,7 +2,41 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
-## 2026-06-07 (AP) — Siegel-Modal aufgeräumt: doppeltes Andocken raus (wie Sage)
+## 2026-06-07 (AQ) — SITZUNGSABSCHLUSS: Netz-Sync, vier Knoten, Siegel/Lampen/Wizard ehrlich
+
+**Übergabe nach `CLAUDE.md`.** Lange Sitzung; alles unten (X–AP) ist auf `main`, keine offenen
+PRs, `npm test` **77/77**, `SIGNAL.json` seq 13.
+
+**Was diese Sitzung erreicht hat (Kurzfassung):**
+- **Jasons-Bibliothek** als eigenständige Offline-App (Scheibe 1–3): laden/ordnen/exportieren,
+  Passwort-Tresor (AES-256-GCM/PBKDF2 600k, Modul-02-Umschlag), Modul 01+02 eingebettet,
+  „verschlüsselt im Schrank". Umbenannt Jeson→**Jason**. → neues Repo **Jasons-Tresor** (C).
+- **Werkzeug `make_node_key.mjs`** (Tresor anlegen) gebaut — schloss Jasons Blockade.
+- **Netz-Briefkasten §11.6**: `sbkim/SIGNAL.json` + Wächter (`.github/sbkim-watch.mjs` +
+  Workflow) + **📬-Knopf** auf allen vier Seiten.
+- **Ehrlichkeits-Fix Lampen/Siegel**: Lampen waren fälschlich alle grün → jetzt echt verdrahtet
+  (Modul 15 Membran „fremd"; „lebt"=Identität geladen; „verkehr" pulst bei echtem Fetch);
+  **Siegel Bronze→Gold** nur bei echtem Cross-Knoten-Kontakt (Modul 16).
+- **Andock-Wizard im Siegel-Modal** (4 Schritte wie Sage: Identität → Spore+echter Vektor →
+  verschlüsseltes Backup → Wiederherstellen). Doppeltes/totes „Andocken" (falsch „Modul 18")
+  entfernt → Modal sauber wie Sage.
+- **Netz gewachsen auf vier Knoten**, alles echt reziprok verifiziert (raw/main):
+  - **Sage** ⟷ A: `verified-match` 0.8485
+  - **A ⟷ C (Jasons-Tresor)**: Identitätswechsel `E13GDzIp…` + echter Vektor →
+    **`verified-match` 0.853740** (erster echter Tresor-Match)
+  - **A → D (Mein-Tresor)**: `verified-spore` (nodeId `wRsGQouO…`), `domainVector` folgt
+- **Verfahren festgezurrt:** SBKIM-SYNC-VEREINBARUNG v1 + Verfahrens-Erklärungen
+  (`AUSTAUSCH-MeinTresor.md`); **GENERALPROBE-Plan** (`sbkim/GENERALPROBE.md`) — Bisheriges =
+  Testlauf/Lernphase, später Re-Sync „von links nach rechts" über Browser-Tools.
+  `docs/SCHLUESSEL.md`: headless-Tresor (unser Weg) vs. Browser-Identität dokumentiert.
+
+**Manual-Check (ehrlich):** Pages ist live (Klaus bestätigt). **Offen — Klaus' Browser-Lauf:**
+Andock-Wizard Schritt 2–4 (Embedding ~30 MB, Spore-Download, Backup, Restore) — headless nicht
+voll prüfbar, wartet auf Klaus.
+
+**Nächste Schritte:** siehe Brief `docs/sessions/BRIEF_naechste-sitzung.md` (unten) + Chat.
+
+
 
 Klaus: im Siegel-Modal soll oben **nur** „🔑 Eigene Identität & Spore erzeugen / verwalten →" +
 „Bezeugt seit …" stehen — wie bei Sage. Der zweite Block „Mycel suchend → [Andocken]" war
