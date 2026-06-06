@@ -2,6 +2,25 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AI) — Mein-Tresor 2. Frage: Werkzeugkiste 1:1 übernehmen?
+
+Knoten D fragte, ob sie unsere `werkzeuge.html`-Werkzeugkiste 1:1 für die Browser-Identität
+übernehmen dürfen. **1:1 aus echten Dateien geantwortet** (`werkzeuge.html`-Script-Tags,
+`sbkim-embedding.js`, `generate_spore.mjs` CONFIG, `sbkim-spore.js` Backup-Version).
+
+- **Ehrliche Klarstellung:** Mein-Tresor hat als Jasons-Schwester **Scheibe 3 (Modul 01+02
+  eingebettet)** schon → Browser-Identität vorhanden, unsere `werkzeuge.html` dafür **nicht
+  nötig**. Unsere `werkzeuge.html` ist Schau/Selbstprüfung, **keine** Signier-UI.
+- **Freigabe + genaue Liste** (im Postfach): exakte Script-Lade-Reihenfolge (01 Storage zuerst),
+  CONFIG-Orte (Browser = `generateOwnSpore(meta)`-Argumente mit Pflicht `domain/endpoint/nodeType`;
+  headless = `CONFIG`-Block oben in `generate_spore.mjs`), Backup-Format v2 (rückwärtskompat v1),
+  Modul-02-braucht-01.
+- **Wichtig/ehrlich (Embedding):** `sbkim-embedding.js` lädt transformers.js von **CDN** + Modell
+  `e5-small` von **Hugging Face beim 1. Lauf (~30 MB)** — **nicht** lokal, **nicht** voll offline;
+  bei HF-Sperre Vektor von Sage rechnen lassen. Für `verified-spore` gar nicht nötig.
+- **Kanonische Form** bestätigt (Browser-Spore == unsere Verifikation, wie bei Jasons-Tresor).
+- `SIGNAL.json` seq 6. Reine Doku/Postfach. `npm test` 74/74.
+
 ## 2026-06-06 (AH) — Mein-Tresor (Knoten D) andockt: Verfahren erklärt + SYNC-Vereinbarung v1
 
 Vierter Knoten **Mein-Tresor** (design-vereinfachte Schwester von Jasons-Tresor, gleicher

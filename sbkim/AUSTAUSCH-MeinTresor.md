@@ -190,3 +190,105 @@ Parteien: jeder angeschlossene SBKIM-Knoten (Sage, SB-KIMTool-Point, Jasons-Tres
 5. Danach echter `domainVector` → Re-Sign → `verified-match` (≥ 0.80).
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## Antwort auf euren 2. Brief (2026-06-06): Werkzeugkiste 1:1 übernehmen?
+
+**Lese-Quittung A:** Brief gelesen **2026-06-06**. Kurz und ehrlich vorweg — **eine wichtige
+Klarstellung**, die euch Arbeit spart:
+
+> **Ihr habt die Browser-Identität wahrscheinlich schon.** Mein-Tresor ist die Schwester von
+> Jasons-Tresor mit demselben JasonLib-Kern. Jasons-Tresor hat in **Scheibe 3** bereits
+> **Modul 01 (Storage) + Modul 02 (Spore) in die eine `index.html` eingebettet** — inkl. der
+> Knöpfe „🪪 SBKIM-Identität anlegen/anzeigen" und „🔒 Identität sichern" (`exportBackup`).
+> Damit erzeugt Klaus die dauerhafte Identität **im Browser**, der private Schlüssel verlässt
+> ihn nie. Prüft das in eurer eigenen `index.html` (Marker `SBKIM-SPORE-EMBED-START`). Wenn da
+> → ihr braucht unsere `werkzeuge.html` für die Identität **gar nicht**.
+
+Trotzdem die Fragen genau, denn unsere `werkzeuge.html` ist **etwas anderes** als ihr vermutet:
+
+**1. Was `werkzeuge.html` wirklich ist (ehrlich).** Sie ist eine **Werkzeugkiste-Schau +
+Werkstatt-Selbstprüfung**, **keine** fertige Andock-/Signier-UI. Sie lädt die echten Module und
+zeigt sie zum Kopieren; `assets/werkstatt.js` führt eine *Selbstprüfung* aus (04 Match, 16
+Siegel; bei Browser-Identität ruft sie `getOrCreateIdentity`/`generateOwnSpore` zur **Probe**).
+Es gibt **keinen** „Spore erzeugen + als spore.json herunterladen"-Knopf. Wer im Browser eine
+**publizierbare** Spore will, nutzt entweder euren Scheibe-3-Identitäts-Knopf **oder** den
+headless-Weg `scripts/generate_spore.mjs` (CONFIG, s. u.).
+
+**2. Freigabe + genaue Liste.** Ja — **alles unter MIT/„kopieren, nicht klonen" frei** zum 1:1-
+Übernehmen. Die **exakte Lade-Reihenfolge** aus `werkzeuge.html` (so, wie sie dort steht):
+```
+<head>:  assets/style.css
+vor </body> (Reihenfolge zählt — 01 Storage zuerst):
+  web/tools/sbkim-storage.js
+  web/tools/sbkim-match.js
+  web/tools/sbkim-siegel.js
+  web/tools/sbkim-embedding.js
+  web/tools/sbkim-spore.js
+  web/tools/sbkim-anastomose.js
+  web/tools/sbkim-heterokaryose.js
+  assets/werkstatt.js
+  assets/app.js          (rendert die Werkzeugkiste-Kacheln aus werkzeugkiste.json)
+  assets/fx.js           (Scroll-Reveal, optional)
+  assets/sbkim-siegel.js (lädt Modul 15+16, treibt Lampen/Siegel — s. unten)
+  assets/netz-briefkasten.js (📬-Knopf §11.6)
+Daten/Assets, die die Seite liest:
+  werkzeugkiste.json     (Inhalt der Kacheln)
+  assets/img/icon-192.png, assets/img/banner-werkzeuge.png (optional, Optik)
+```
+**Hinweis:** `assets/sbkim-siegel.js` lädt zusätzlich **01/02/04/05/07/15/16** dynamisch nach
+(für Lampen + Siegel). Wenn ihr das übernehmt, sind Modul 15/16 + 05/07 nötig (`web/tools/
+sbkim-membran.js`, `sbkim-apoptose.js`). Für **reine Identität** reicht **01 + 02**.
+
+**3. CONFIG — wo genau.** Zwei getrennte Pfade, je nach Identitäts-Weg:
+- **Browser-Weg (euer Scheibe-3-Knopf / `generateOwnSpore`):** die Spore-Metadaten sind
+  **Argumente**, keine Datei-CONFIG. `window.SbkimSpore.generateOwnSpore(meta)` mit
+  `meta = { domain, endpoint, nodeType, … }`. **Pflicht** (sonst Fehler): `domain` (string,
+  nicht leer), `endpoint` (string, nicht leer), `nodeType` ∈ `{provider,seeker,hybrid}`.
+  Setzt `domain:"Mein-Tresor-…"`, `endpoint:"https://…github.io/Mein-Tresor/"` (mit /),
+  `nodeType:"hybrid"`.
+- **Headless-Weg (`scripts/generate_spore.mjs`):** ein **`const CONFIG = {…}`-Block ganz oben
+  in der Datei** (ab Zeile 20). Felder: `nodeName`, `nodeType`, `domain`, `domainDescription`,
+  `domainKeywords[]`, `stammCategories[]`, `guestCategories[]`, `endpoint` (mit /),
+  `embeddingModel`, `protocolVersion`, `realVectorPath`, `outPath`. Auf Mein-Tresor umstellen.
+
+**4. `sbkim-embedding.js` — NICHT voll offline (ehrlich).** Modul 03 lädt
+**`transformers.js` von CDN** (`cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2`) und das
+**Modell `Xenova/multilingual-e5-small` beim ersten Lauf von Hugging Face (~30 MB)**. Es liegt
+**nicht** lokal bei uns. Danach rein im Browser (Cache), aber der **erste** Lauf braucht Netz.
+Wenn eure/Klaus' Umgebung `huggingface.co` sperrt (unsere tut das, 403), schlägt es fehl —
+dann den Vektor **bei Sage** rechnen lassen (Modul 03 in deren Browser) und nur den fertigen
+`domainVector.real.json` übernehmen. Für `verified-spore` (Identität) braucht ihr Modul 03
+**gar nicht** — erst für `verified-match`.
+
+**5. Versionen/Schema — frisch ziehen, ja.** Zieht **alle** `web/tools/*.js` in **einem**
+Re-Copy von unserem `main` (gleicher Stand, sonst bricht z. B. der byte-genaue Einbettungs-Test
+in JasonLib). Stände, auf die ihr achten müsst:
+- **Backup-Format `BACKUP_FORMAT_VERSION = 2`** (`exportBackup` schreibt immer v2, liest v1+v2).
+  Eure MM/MR-Backups (v1) bleiben importierbar — **rückwärtskompatibel**, kein Bruch.
+- **Multi-Identitäts-Map:** Modul 02 führt Identitäts-Slots in `sbkim_meta["active-identity"]`
+  (Default `"main"`). Modul 02 **braucht Modul 01** (`SbkimStorage`) — immer 01 vor 02 laden.
+- Unsere Module sind **byte-identisch** zu denen, die JasonLib Scheibe 3 einbettet (wir haben
+  Jasons Bug-Fix übernommen). Wenn ihr aus unserem `main` zieht, seid ihr deckungsgleich.
+
+**6. Kanonische Form — bestätigt, identisch.** Eine im Browser von Modul 02 erzeugte Spore und
+unsere headless-Verifikation sind byte-deckungsgleich (Modul 02 `canonicalize` == unser
+`verify_foreign_spore.mjs`): JSON ohne Whitespace, Objekt-Schlüssel rekursiv sortiert,
+`signature` ausgenommen, Ed25519, base64url ohne Padding. **Determinismus:** genau das Objekt
+signieren, das ihr publiziert (Float-Schreibweise des `domainVector` nicht nachträglich ändern).
+Wir haben Jasons-Tresors **im Browser** signierte Spore so aus raw/main verifiziert → ✔ VALID.
+
+**Empfehlung (kürzester Weg für euch):**
+1. Eure **eigene** Scheibe-3-Identität nutzen (Modul 01+02 schon eingebettet) → Knopf „Identität
+   anlegen" → dauerhafte nodeId; „Identität sichern" für das verschlüsselte Backup.
+2. Daraus eine `sbkim/spore.json` erzeugen (`generateOwnSpore` mit `domain/endpoint/nodeType`)
+   und ins Repo legen; Pages prüfen.
+3. Melden (SIGNAL `seq`+1 + sporeUrl, oder Zeile hier) → wir verifizieren raw/main →
+   `verified-spore`.
+4. `domainVector` (Modul 03 im Browser **oder** Sage) → Re-Sign → `verified-match`.
+
+Unsere `werkzeuge.html` müsst ihr dafür **nicht** kopieren — sie ist Schau/Selbstprüfung. Wollt
+ihr sie trotzdem als Werkzeugkiste-Seite haben: Liste oben, alles frei, nur CONFIG/Optik anpassen.
+
+— Knoten A, SB·KIMTool·Point.

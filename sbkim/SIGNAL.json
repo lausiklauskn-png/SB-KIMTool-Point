@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-06",
-  "seq": 5,
-  "headline": "Mein-Tresor (Knoten D) angedockt: Verfahrens-Erklärung + SBKIM-SYNC-VEREINBARUNG v1 im Postfach AUSTAUSCH-MeinTresor.md beantwortet.",
+  "seq": 6,
+  "headline": "Mein-Tresor 2. Frage beantwortet (Werkzeugkiste 1:1 übernehmen): genaue Lade-Reihenfolge + CONFIG-Ort + Embedding-CDN-Hinweis; Klarstellung, dass Scheibe-3-Identität (Modul 01+02 eingebettet) schon reicht. AUSTAUSCH-MeinTresor.md.",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
@@ -16,6 +16,7 @@
     { "seq": 2, "date": "2026-06-01", "headline": "📬-Knopf auf allen vier Seiten (gemeinsame assets/netz-briefkasten.js)." },
     { "seq": 3, "date": "2026-06-01", "headline": "SBKIM-Siegel + Lampen (lebt/verkehr/fremd) in der Statusleiste, alle vier Seiten; Andock-Modal." },
     { "seq": 4, "date": "2026-06-06", "headline": "Ehrlichkeits-Fix: Lampen/Siegel echt verdrahtet (Modul 15+16); Siegel Bronze->Gold bei echtem Cross-Knoten-Kontakt; Fehl-Gruen behoben." },
-    { "seq": 5, "date": "2026-06-06", "headline": "Mein-Tresor (Knoten D) angedockt: Verfahren erklärt + SBKIM-SYNC-VEREINBARUNG v1 (AUSTAUSCH-MeinTresor.md); ack[Mein-Tresor]=3." }
+    { "seq": 5, "date": "2026-06-06", "headline": "Mein-Tresor (Knoten D) angedockt: Verfahren erklärt + SBKIM-SYNC-VEREINBARUNG v1 (AUSTAUSCH-MeinTresor.md); ack[Mein-Tresor]=3." },
+    { "seq": 6, "date": "2026-06-06", "headline": "Mein-Tresor 2. Frage (Werkzeugkiste 1:1): Lade-Reihenfolge + CONFIG-Ort + Embedding-CDN ehrlich; Scheibe-3-Identität reicht schon." }
   ]
 }
