@@ -49,11 +49,12 @@
       btn.classList.add("checking"); btn.classList.remove("has-news");
       var ackRes = await getJson(SELF_SIGNAL);
       var ack = (ackRes.json && ackRes.json.ack) || {};
-      var rows = [], news = 0, notes = [];
+      var rows = [], news = 0, notes = [], reached = 0;
       for (var i = 0; i < PEERS.length; i++) {
         var p = PEERS[i];
         var r = await getJson(p.signal);
         if (r.err) { notes.push(esc(p.name) + ": kein SIGNAL.json (" + esc(r.err) + ")"); continue; }
+        reached++; // echter Cross-Knoten-Kontakt: Peer-Signal wirklich gelesen
         var seq = Number(r.json.seq);
         var acked = ack[p.name] == null ? -1 : Number(ack[p.name]);
         if (isFinite(seq) && seq > acked) {
@@ -72,6 +73,10 @@
       pop.classList.add("show");
       btn.classList.remove("checking");
       btn.classList.toggle("has-news", news > 0);
+      // Echter Cross-Knoten-Kontakt erreicht -> Siegel-Beweis (Modul 16 Bronze->Gold).
+      if (reached > 0) {
+        try { window.dispatchEvent(new CustomEvent("sbkim:handshake", { detail: { outcome: "established", via: "briefkasten", peers: reached } })); } catch (e) {}
+      }
     }
 
     btn.addEventListener("click", check);

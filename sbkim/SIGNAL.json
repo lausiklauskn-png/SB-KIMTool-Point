@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-01",
-  "seq": 3,
-  "headline": "SBKIM-Siegel (Wappen 1:1 aus Sage) + Lampen (lebt/verkehr/fremd) jetzt in der Statusleiste, alle vier Seiten; Klick aufs Siegel öffnet Andock-Modal.",
+  "seq": 4,
+  "headline": "EHRLICHKEITS-FIX: Lampen/Siegel jetzt echt verdrahtet (Modul 15 Membran + Modul 16 Siegel statt Attrappe). 'lebt'=Identität geladen, 'verkehr' pulst nur bei echtem Fetch, 'fremd' rot nur bei echtem Fremdzugriff; Siegel Bronze->Gold erst bei echtem Cross-Knoten-Kontakt. Vorher leuchteten alle Lampen faelschlich gruen (alte CSS-Regel).",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md"
@@ -13,6 +13,7 @@
   "history": [
     { "seq": 1, "date": "2026-05-31", "headline": "Aushang angelegt; Netz-Sync §11.6 (Wächter + Knopf); Jasons-Tresor verified-spore." },
     { "seq": 2, "date": "2026-06-01", "headline": "📬-Knopf auf allen vier Seiten (gemeinsame assets/netz-briefkasten.js)." },
-    { "seq": 3, "date": "2026-06-01", "headline": "SBKIM-Siegel + Lampen (lebt/verkehr/fremd) in der Statusleiste, alle vier Seiten; Andock-Modal." }
+    { "seq": 3, "date": "2026-06-01", "headline": "SBKIM-Siegel + Lampen (lebt/verkehr/fremd) in der Statusleiste, alle vier Seiten; Andock-Modal." },
+    { "seq": 4, "date": "2026-06-06", "headline": "Ehrlichkeits-Fix: Lampen/Siegel echt verdrahtet (Modul 15+16); Siegel Bronze->Gold bei echtem Cross-Knoten-Kontakt; Fehl-Gruen behoben." }
   ]
 }

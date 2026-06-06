@@ -1,6 +1,33 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-31 · Branch `claude/sage-andock-continue-SI1Lu`
+Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
+
+## 2026-06-06 (AG) — EHRLICHKEITS-FIX: Lampen + Siegel echt verdrahtet (Modul 15+16)
+
+Klaus' Befund (Pages jetzt live): **alle drei Lampen leuchteten grün** — falscher Eindruck.
+Zwei echte Probleme gefunden und behoben:
+
+- **Bug (CSS):** eine alte Regel `.lamp::before { background: var(--lamp-live) }` (Altbestand,
+  Zeile ~94) überschrieb die Logik und färbte **jede** Lampe fest grün. Entfernt.
+- **Konzept (der eigentliche Punkt):** mein `assets/sbkim-siegel.js` war eine **Attrappe**
+  (statische Lampen + Andock-Modal), benutzte die **echten Module 15/16 nicht**. Neu
+  geschrieben: lädt jetzt die unveränderten `web/tools/`-Module (01/02/04/05/07/15/16) und
+  verdrahtet ehrlich:
+  - **lebt** = an, nur wenn Modul 02 wirklich eine Identität lädt (echtes IndexedDB/WebCrypto);
+  - **verkehr** = pulst nur bei echtem Fetch (status/SIGNAL/spore.json), kein Dauer-Grün;
+  - **fremd** = von **Modul 15 (Membran)** bedient, rot **nur** bei echtem Fremdzugriff;
+  - **Siegel** = **Modul 16**, startet **Bronze** („Mycel suchend"), wird **Gold** bei echtem
+    Cross-Knoten-Handshake (`sbkim:handshake` outcome:"established"). Der 📬-Knopf feuert das
+    Event, wenn er einen Peer (Sage/Jasons-Tresor) **wirklich erreicht** → Gold = Beweis.
+- **Lampen-HTML** in alle vier `.statusbar` eingsetzt; altes ungenutztes Wappen-SVG gelöscht
+  (Modul 16 trägt sein eigenes inline-SVG).
+- **Beweis (echter Browser):** Lampen ehrlich (lebt=on, verkehr/fremd=grau); Modul 15+16 als
+  `object` geladen, 0 Fehler; Siegel **bronze→gold** beim 📬-Kontakt verifiziert. `npm test`
+  74/74. Statusleisten-Screenshots an Klaus.
+- **Offen / nächste Schritte:** (1) Klaus' Browser-Lauf der korrigierten Leiste (Hard-Reload).
+  (2) Optional: Gold-Stand über Reload hinweg merken (Modul 16 ist bewusst RAM-only/Bronze nach
+  Reload — gewollt, ehrlich). (3) Impressum (Text steht aus). (4) Jason denselben Fix anbieten,
+  falls dort auch Fehl-Grün.
 
 ## 2026-05-31 (AF) — Netz-Briefkasten §11.6: SIGNAL.json + Wächter + 📬-Knopf (Auto-Sync)
 
