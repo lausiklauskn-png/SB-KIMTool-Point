@@ -2,6 +2,28 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AH) — Mein-Tresor (Knoten D) andockt: Verfahren erklärt + SYNC-Vereinbarung v1
+
+Vierter Knoten **Mein-Tresor** (design-vereinfachte Schwester von Jasons-Tresor, gleicher
+JasonLib-Kern) bat — vorbildlich vor dem Signieren — um detailgetreue Verfahrens-Erklärung +
+Synchronisationsvereinbarung. Alles **1:1 aus echten Dateien** beantwortet, nichts geraten.
+
+- **`sbkim/AUSTAUSCH-MeinTresor.md`** (neu, an D adressiert, B3): beantwortet A1–A3 (Registrierung:
+  9 Pflichtfelder `createdAt/domain/embeddingModel/endpoint/id/nodeType/protocolVersion/publicKey/
+  signature`, Kanal raw/main + SIGNAL/📬, raw genügt), B1–B5 (SIGNAL-Konvention bestätigt,
+  Kadenz „lesen bei Start / melden bei Bau", adressiertes Postfach, ack-Semantik), C1–C3
+  (domainVector: Modul 03 im Browser/Sage rechnet, veröffentlichen + neu signieren bei gleichem
+  Schlüssel→gleiche nodeId, `Xenova/multilingual-e5-small`/384/L2≈1/Cosine≥0.80), D1–D2
+  (kanonische Form byte-deckungsgleich, protocolVersion 0.1 kein Drift). Plus **SBKIM-SYNC-
+  VEREINBARUNG v1** als fester, 1:1 ablegbarer Text (9 Punkte inkl. Divergenz-Auflösung).
+- **`sbkim/SIGNAL.json`** seq 5: Mein-Tresor in `mailboxes` + `ack["Mein-Tresor"]=3` (ihr SIGNAL
+  seq 3 gelesen). Status-Kopf D-Zeile in `AUSTAUSCH.md` ergänzt.
+- **Ehrlich:** Ds nodeId ist noch flüchtig (kein dauerhafter Tresor), domainVector `_demo` →
+  noch **keine** Registrierung; erst nach ihrer dauerhaften Identität + sporeUrl.
+- **Offen / nächste Schritte:** (1) D legt Identität an + meldet sporeUrl → wir verifizieren
+  raw/main, tragen `verified-spore` ein (Inbox + Offline-Test + marktplatz). (2) danach echter
+  `domainVector` → `verified-match`. (3) Impressum (Text steht aus).
+
 ## 2026-06-06 (AG) — EHRLICHKEITS-FIX: Lampen + Siegel echt verdrahtet (Modul 15+16)
 
 Klaus' Befund (Pages jetzt live): **alle drei Lampen leuchteten grün** — falscher Eindruck.

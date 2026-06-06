@@ -1,19 +1,21 @@
 {
   "node": "SB-KIMTool-Point",
-  "lastBuild": "2026-06-01",
-  "seq": 4,
-  "headline": "EHRLICHKEITS-FIX: Lampen/Siegel jetzt echt verdrahtet (Modul 15 Membran + Modul 16 Siegel statt Attrappe). 'lebt'=Identität geladen, 'verkehr' pulst nur bei echtem Fetch, 'fremd' rot nur bei echtem Fremdzugriff; Siegel Bronze->Gold erst bei echtem Cross-Knoten-Kontakt. Vorher leuchteten alle Lampen faelschlich gruen (alte CSS-Regel).",
+  "lastBuild": "2026-06-06",
+  "seq": 5,
+  "headline": "Mein-Tresor (Knoten D) angedockt: Verfahrens-Erklärung + SBKIM-SYNC-VEREINBARUNG v1 im Postfach AUSTAUSCH-MeinTresor.md beantwortet.",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
-    "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md"
+    "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
+    "Mein-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH-MeinTresor.md"
   },
   "forNodes": ["*"],
-  "ack": { "Sage-Protokol": 7, "Jasons-Tresor": null },
+  "ack": { "Sage-Protokol": 7, "Jasons-Tresor": null, "Mein-Tresor": 3 },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal. Wer liest: .github/sbkim-watch.mjs (zeitgesteuert) + 📬-Knopf auf der Startseite (live im Browser).",
   "history": [
     { "seq": 1, "date": "2026-05-31", "headline": "Aushang angelegt; Netz-Sync §11.6 (Wächter + Knopf); Jasons-Tresor verified-spore." },
     { "seq": 2, "date": "2026-06-01", "headline": "📬-Knopf auf allen vier Seiten (gemeinsame assets/netz-briefkasten.js)." },
     { "seq": 3, "date": "2026-06-01", "headline": "SBKIM-Siegel + Lampen (lebt/verkehr/fremd) in der Statusleiste, alle vier Seiten; Andock-Modal." },
-    { "seq": 4, "date": "2026-06-06", "headline": "Ehrlichkeits-Fix: Lampen/Siegel echt verdrahtet (Modul 15+16); Siegel Bronze->Gold bei echtem Cross-Knoten-Kontakt; Fehl-Gruen behoben." }
+    { "seq": 4, "date": "2026-06-06", "headline": "Ehrlichkeits-Fix: Lampen/Siegel echt verdrahtet (Modul 15+16); Siegel Bronze->Gold bei echtem Cross-Knoten-Kontakt; Fehl-Gruen behoben." },
+    { "seq": 5, "date": "2026-06-06", "headline": "Mein-Tresor (Knoten D) angedockt: Verfahren erklärt + SBKIM-SYNC-VEREINBARUNG v1 (AUSTAUSCH-MeinTresor.md); ack[Mein-Tresor]=3." }
   ]
 }
