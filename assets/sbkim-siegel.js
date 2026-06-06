@@ -98,22 +98,6 @@
       }
     } catch (e) { /* fail-soft */ }
 
-    // 3b) Modul-18-Shim: Modul 16 zeigt im Bronze-Zustand einen [Andocken]-Knopf, der
-    //     SbkimToolPwa.openAndockTab() (Modul 18 Tool-PWA-Container) aufruft. Modul 18 ist
-    //     bei uns NICHT eingebunden (und unnötig) — statt des toten Knopfs leiten wir ihn
-    //     auf unseren echten Andock-Wizard um. So nimmt Modul 16 seinen Erfolgs-Pfad
-    //     (closeModal) und der Knopf funktioniert ehrlich, statt "Modul 18 nicht installiert".
-    if (!window.SbkimToolPwa) {
-      window.SbkimToolPwa = {
-        openAndockTab: function () {
-          // Wizard sicherstellen + öffnen. Wirft NICHT → Modul 16 Pfad 1.
-          setupAndockWizard();
-          // kurz warten, bis Modul 16 sein Modal geschlossen hat, dann Wizard zeigen.
-          setTimeout(openWizard, 60);
-        }
-      };
-    }
-
     // 4) Modul 16 (Siegel) → injiziert Badge in .lamps, Bronze→Gold bei echtem Handshake
     try {
       if (window.SbkimSiegel && typeof window.SbkimSiegel.init === "function") {
@@ -161,7 +145,29 @@
       if (panel.firstChild) panel.insertBefore(openBtn, panel.firstChild);
       else panel.appendChild(openBtn);
     }
+    // Doppeltes Andocken entfernen: Modul 16 zeigt im Bronze-Zustand einen eigenen
+    // „Mycel suchend → [Andocken] (Modul 18)"-Block. Der ist bei uns überflüssig
+    // (unser Knopf oben macht das echte Andocken) und nennt faelschlich „Modul 18".
+    // -> dauerhaft ausblenden. Modul 16 selbst bleibt unangetastet.
+    hideBronzeAndockBlock(modal);
     if (!document.getElementById("sbkim-ident-wizard")) buildWizardDialog();
+  }
+
+  // Blendet Modul 16s Bronze-„Andocken"-Block aus — auch wenn er erst beim Öffnen
+  // des Modals sichtbar geschaltet wird (MutationObserver auf das Modal).
+  function hideBronzeAndockBlock(modal) {
+    if (!modal) modal = document.getElementById("sbkim-siegel-modal");
+    if (!modal) return;
+    function kill() {
+      var blk = modal.querySelector("[data-siegel-bronze-hinweis]");
+      if (blk && blk.style.display !== "none") blk.style.display = "none";
+    }
+    kill();
+    if (!modal.__bronzeHidden && typeof MutationObserver === "function") {
+      modal.__bronzeHidden = true;
+      var mo = new MutationObserver(kill);
+      mo.observe(modal, { attributes: true, childList: true, subtree: true });
+    }
   }
 
   function buildWizardDialog() {

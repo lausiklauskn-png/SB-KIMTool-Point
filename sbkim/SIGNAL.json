@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-06",
-  "seq": 12,
-  "headline": "Andock-Wizard Schritt 4 'Identitaet wiederherstellen' ergaenzt (Modul 02 importBackup): Backup-Datei + Passwort zurueckspielen -> Schluessel+Spore zurueck in IndexedDB, force-Overwrite bei vorhandenem Slot. Jetzt 4 Schritte wie Sage.",
+  "seq": 13,
+  "headline": "Siegel-Modal aufgeraeumt wie bei Sage: doppelter 'Andocken'-Block (nannte faelschlich Modul 18; Andock/Siegel ist Modul 16) entfernt. Oben bleibt nur 'Eigene Identitaet & Spore erzeugen / verwalten'.",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
@@ -23,6 +23,7 @@
     { "seq": 9, "date": "2026-06-06", "headline": "Jasons-Tresor (C) Identitaetswechsel E13GDzIp… + echter domainVector -> verified-MATCH 0.853740 (erster Tresor-Match)." },
     { "seq": 10, "date": "2026-06-06", "headline": "Andock-Wizard im Siegel-Modal (Identitaet+Spore+Backup, 3 Schritte) wie bei Sage; Notfall-Neuerzeugung moeglich." },
     { "seq": 11, "date": "2026-06-06", "headline": "[Andocken]-Knopf (Modul 16) repariert: SbkimToolPwa-Shim leitet auf den echten Wizard um statt 'Modul 18 nicht installiert'." },
-    { "seq": 12, "date": "2026-06-06", "headline": "Andock-Wizard Schritt 4 'Identitaet wiederherstellen' (importBackup): Backup-Datei+Passwort zurueckspielen; 4 Schritte wie Sage." }
+    { "seq": 12, "date": "2026-06-06", "headline": "Andock-Wizard Schritt 4 'Identitaet wiederherstellen' (importBackup): Backup-Datei+Passwort zurueckspielen; 4 Schritte wie Sage." },
+    { "seq": 13, "date": "2026-06-07", "headline": "Siegel-Modal aufgeraeumt: doppelter 'Andocken'-Block (falsch 'Modul 18'; korrekt Modul 16) entfernt; nur Identitaets-Knopf oben, wie Sage." }
   ]
 }
