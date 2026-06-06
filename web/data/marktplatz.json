@@ -37,6 +37,15 @@
       "status": "verified-spore-2026-05-31",
       "echt": true,
       "matchHinweis": "Knoten C — Spore reziprok ✔ VALID (verified-spore). verified-match folgt mit echtem domainVector."
+    },
+    {
+      "name": "Mein-Tresor",
+      "nodeId": "wRsGQouOYPVB…",
+      "kannDas": "Tresor/Bibliothek (design-vereinfachte Schwester von Jasons-Tresor): JSON + SBKIM-Schluessel offline verwahren/verschluesseln.",
+      "andockLink": "https://lausiklauskn-png.github.io/Mein-Tresor/",
+      "status": "verified-spore-2026-06-06",
+      "echt": true,
+      "matchHinweis": "Knoten D — Spore reziprok ✔ VALID (verified-spore). verified-match folgt mit echtem domainVector."
     }
   ]
 }
