@@ -2,6 +2,27 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AM) — Andock-Wizard im Siegel-Modal (Identität & Spore erzeugen/pflegen)
+
+Klaus' Befund (Screenshot Sage): im Siegel-Modal fehlte der Knopf „🔑 Eigene Identität & Spore
+erzeugen / verwalten" — das Andock-Modul, mit dem man notfalls eine **neue** Spore/Identität
+erzeugen und pflegen kann (genau das, was Jasons-Tresor beim Schlüsselverlust brauchte).
+
+- **`assets/sbkim-siegel.js`**: Modul 03 (Embedding) zu den geladenen Modulen ergänzt; nach
+  Modul-16-Init wird ein Knopf ins Siegel-Modal (`#sbkim-siegel-modal`) injiziert, der einen
+  **Wizard-Dialog** öffnet — re-geskinnt nach Sages Andock-Wizard, mit **unseren** CONFIG-Werten
+  (nodeName/domain/endpoint/Kategorien). Drei Schritte über die **echten** Module:
+  1. **Identität erzeugen** (`getOrCreateIdentity`, Ed25519 im Browser, nodeId),
+  2. **Spore signieren + ⬇** (Modul 03 echter 384-dim domainVector → `generateOwnSpore` →
+     `spore.json`-Download),
+  3. **verschlüsseltes Backup** (`exportBackup`, AES-256-GCM/PBKDF2 600k).
+  Modul 16 (`web/tools/sbkim-siegel.js`) bleibt **unangetastet** (1:1 Sage, byte-getestet).
+- **Echter Browser-Beweis:** Siegel→Modal→Knopf sichtbar→Wizard öffnet→Schritt 1 erzeugt echte
+  nodeId, Schritt 2 freigeschaltet, 0 Fehler. Schritt 2/3 (Embedding ~30 MB + Backup) brauchen
+  Klaus' echten Browser-Lauf. `npm test` 77/77. `SIGNAL.json` seq 10.
+- **Nutzen:** jeder unserer Knoten kann jetzt — wie Sage — im Browser eine neue Identität
+  erzeugen/sichern, ohne headless-Tresor (passt zum Generalprobe-Plan).
+
 ## 2026-06-06 (AL) — Jasons-Tresor (C) Identitätswechsel + erster Tresor-Match → verified-MATCH
 
 C meldete **Identitätswechsel**: alte nodeId `7F_zNopF…` war Demo-Schlüssel (Passwort verloren)

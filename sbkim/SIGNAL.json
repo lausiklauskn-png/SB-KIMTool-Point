@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-06",
-  "seq": 9,
-  "headline": "Jasons-Tresor (C) Identitaetswechsel -> neue nodeId E13GDzIp… + ECHTER domainVector: erster Tresor-Match A<->C = 0.853740 >= 0.80 -> verified-MATCH. Inbox/Test/status/marktplatz aktualisiert.",
+  "seq": 10,
+  "headline": "Andock-Wizard wie bei Sage: Siegel-Modal hat jetzt Knopf 'Eigene Identitaet & Spore erzeugen / verwalten' (3 Schritte: Identitaet -> Spore signieren+Download -> verschluesseltes Backup). Notfall-tauglich fuer neue Identitaet.",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
@@ -20,6 +20,7 @@
     { "seq": 6, "date": "2026-06-06", "headline": "Mein-Tresor 2. Frage (Werkzeugkiste 1:1): Lade-Reihenfolge + CONFIG-Ort + Embedding-CDN ehrlich; Scheibe-3-Identität reicht schon." },
     { "seq": 7, "date": "2026-06-06", "headline": "GENERALPROBE-PLAN netzweit (sbkim/GENERALPROBE.md): Testlauf/Lernphase jetzt, spaeter Re-Sync von links nach rechts ueber Browser-Tools; headless-Tresor vs. Browser-Identitaet in docs/SCHLUESSEL.md." },
     { "seq": 8, "date": "2026-06-06", "headline": "Mein-Tresor (Knoten D) verified-spore: Spore raw/main VALID, Inbox + Offline-Test + marktplatz; ack[Mein-Tresor]=4." },
-    { "seq": 9, "date": "2026-06-06", "headline": "Jasons-Tresor (C) Identitaetswechsel E13GDzIp… + echter domainVector -> verified-MATCH 0.853740 (erster Tresor-Match)." }
+    { "seq": 9, "date": "2026-06-06", "headline": "Jasons-Tresor (C) Identitaetswechsel E13GDzIp… + echter domainVector -> verified-MATCH 0.853740 (erster Tresor-Match)." },
+    { "seq": 10, "date": "2026-06-06", "headline": "Andock-Wizard im Siegel-Modal (Identitaet+Spore+Backup, 3 Schritte) wie bei Sage; Notfall-Neuerzeugung moeglich." }
   ]
 }

@@ -25,7 +25,7 @@
   // Reihenfolge zählt: 01 Storage zuerst, dann 02; 15/16 zuletzt.
   var SCRIPTS = [
     "sbkim-storage.js", "sbkim-spore.js", "sbkim-match.js",
-    "sbkim-anastomose.js", "sbkim-apoptose.js",
+    "sbkim-embedding.js", "sbkim-anastomose.js", "sbkim-apoptose.js",
     "sbkim-membran.js", "sbkim-siegel.js"
   ];
 
@@ -105,7 +105,128 @@
       }
     } catch (e) { /* fail-soft */ }
 
+    // 5) Andock-Wizard: Knopf „🔑 Eigene Identität & Spore erzeugen / verwalten"
+    //    ins Modul-16-Modal hängen + eigenen Wizard-Dialog bereitstellen (wie Sage).
+    setupAndockWizard();
+
     if (!ok) console.info("SBKIM-Statusleiste: einige Module nicht erreichbar — Lampen/Siegel zeigen nur den real ladbaren Stand (ehrlich).");
+  }
+
+  // ---- Andock-Wizard (eigene Identität/Spore erzeugen + pflegen) ----
+  // Re-geskinnt nach Sages Andock-Wizard. Nutzt die ECHTEN Module 02 (Spore) +
+  // 03 (Embedding). Erzeugt Identität im Browser, signiert die Spore (mit echtem
+  // domainVector), bietet sie als Download an und macht ein verschlüsseltes Backup
+  // (exportBackup). Notfall-tauglich: neue Identität, wenn die alte verloren ist.
+  var WIZ = {
+    domain: "SBKIM-Werkzeug-Point",
+    endpoint: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",
+    nodeType: "hybrid",
+    nodeName: "SB-KIMTool-Point",
+    domainDescription: "Werkzeugkiste + headless Modell-Lauf für das SBKIM-Protokoll.",
+    domainKeywords: ["Werkzeugkiste", "SBKIM-Module", "Modell", "Markt", "Endknoten"],
+    stammCategories: ["Werkzeugkiste", "SBKIM-Module", "Headless-Modell-Lauf", "Markt-Siegel"],
+    guestCategories: ["Werkzeug-Kopie", "Modul-Andock", "Spore-Verifikation"]
+  };
+  var lastSpore = null;
+
+  function setupAndockWizard() {
+    var modal = document.getElementById("sbkim-siegel-modal");
+    if (modal && !modal.querySelector("#sbkim-ident-open")) {
+      // Knopf möglichst weit oben im Modal-Panel platzieren.
+      var panel = modal.querySelector('[role="dialog"]') || modal;
+      var openBtn = document.createElement("button");
+      openBtn.type = "button"; openBtn.id = "sbkim-ident-open"; openBtn.className = "andock-tool";
+      openBtn.textContent = "🔑 Eigene Identität & Spore erzeugen / verwalten →";
+      openBtn.style.cssText = "display:block;width:100%;margin:0 0 0.9rem;padding:0.6rem 0.9rem;" +
+        "font:inherit;cursor:pointer;border-radius:10px;border:1px solid #C9A961;" +
+        "background:rgba(201,169,97,0.12);color:#F5E6B8;font-weight:700;";
+      openBtn.addEventListener("click", openWizard);
+      // robust: an den Anfang des Panels (vor das erste Kind, falls vorhanden).
+      if (panel.firstChild) panel.insertBefore(openBtn, panel.firstChild);
+      else panel.appendChild(openBtn);
+    }
+    if (!document.getElementById("sbkim-ident-wizard")) buildWizardDialog();
+  }
+
+  function buildWizardDialog() {
+    var dlg = document.createElement("dialog");
+    dlg.id = "sbkim-ident-wizard"; dlg.className = "andock-modal";
+    dlg.setAttribute("aria-label", "Identität & Spore erzeugen");
+    dlg.innerHTML =
+      '<h3>🔑 Eigene Identität & Spore</h3>' +
+      '<p style="color:var(--muted);margin:.2em 0 1em;font-size:.88rem">Erzeugt eine SBKIM-Identität <b>im Browser</b> (Ed25519, IndexedDB) — der private Schlüssel verlässt diesen Browser nie. Notfall-tauglich: damit kann man jederzeit eine <b>neue</b> Spore/Identität erzeugen und sichern. Erstes Embedding lädt ~30 MB (Modul 03, einmalig).</p>' +
+      '<ol style="padding-left:1.1rem;line-height:1.5;font-size:.9rem">' +
+        '<li><b>Identität erzeugen</b> — Ed25519-Schlüsselpaar, nodeId aus dem Public Key.<br>' +
+          '<button type="button" class="andock-close" id="wiz-s1" style="margin:.4em 0">Identität erzeugen</button>' +
+          '<div id="wiz-o1" style="font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all"></div></li>' +
+        '<li style="margin-top:.6em"><b>Spore signieren + herunterladen</b> — mit echtem 384-dim domainVector.<br>' +
+          '<button type="button" class="andock-close" id="wiz-s2" disabled style="margin:.4em 0">Spore erzeugen + ⬇</button>' +
+          '<div id="wiz-o2" style="font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all"></div></li>' +
+        '<li style="margin-top:.6em"><b>Verschlüsseltes Backup</b> — Passwort-Sicherung (AES-256-GCM/PBKDF2 600k) gegen IndexedDB-Verlust.<br>' +
+          '<button type="button" class="andock-close" id="wiz-s3" disabled style="margin:.4em 0">Backup erzeugen + ⬇</button>' +
+          '<div id="wiz-o3" style="font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all"></div></li>' +
+      '</ol>' +
+      '<p style="color:var(--muted);font-size:.78rem;margin:.7em 0 0">Die heruntergeladene <code>spore.json</code> nach <code>sbkim/spore.json</code> ins Repo legen. Backup-Datei + Passwort sicher aufbewahren — ohne beides keine Wiederherstellung.</p>' +
+      '<button class="andock-close" type="button" id="wiz-close" style="margin-top:1em">Schließen</button>';
+    document.body.appendChild(dlg);
+
+    function out(id, msg, bad) {
+      var e = dlg.querySelector(id); if (!e) return;
+      e.textContent = msg; e.style.color = bad ? "var(--bad)" : "var(--accent)";
+    }
+    dlg.querySelector("#wiz-s1").addEventListener("click", function () {
+      var b = dlg.querySelector("#wiz-s1");
+      if (!window.SbkimSpore || !window.SbkimSpore.getOrCreateIdentity) { out("#wiz-o1", "Modul 02 nicht geladen.", true); return; }
+      b.disabled = true; out("#wiz-o1", "Erzeuge Identität …");
+      window.SbkimSpore.getOrCreateIdentity().then(function (id) {
+        out("#wiz-o1", "nodeId: " + id.nodeId);
+        dlg.querySelector("#wiz-s2").disabled = false;
+      }).catch(function (e) { out("#wiz-o1", "Fehler: " + (e && e.message || e), true); b.disabled = false; });
+    });
+    dlg.querySelector("#wiz-s2").addEventListener("click", function () {
+      var b = dlg.querySelector("#wiz-s2");
+      if (!window.SbkimEmbedding || !window.SbkimSpore) { out("#wiz-o2", "Modul 02/03 nicht geladen.", true); return; }
+      b.disabled = true; out("#wiz-o2", "Lade Embedding-Modell (~30 MB, einmalig) …");
+      window.SbkimEmbedding.init()
+        .then(function () { out("#wiz-o2", "Erzeuge domainVector (384) …");
+          return window.SbkimEmbedding.embedPassage(WIZ.domainDescription + ". " + WIZ.domainKeywords.join(", ")); })
+        .then(function (vec) { out("#wiz-o2", "Signiere Spore …");
+          return window.SbkimSpore.generateOwnSpore({
+            domain: WIZ.domain, endpoint: WIZ.endpoint, nodeType: WIZ.nodeType, nodeName: WIZ.nodeName,
+            domainDescription: WIZ.domainDescription, domainKeywords: WIZ.domainKeywords,
+            domainVector: Array.from(vec), stammCategories: WIZ.stammCategories, guestCategories: WIZ.guestCategories
+          }); })
+        .then(function (spore) { lastSpore = spore; downloadJson("spore.json", spore);
+          out("#wiz-o2", "Spore erzeugt + ⬇ (nodeId=" + spore.id + "). Nach sbkim/spore.json committen.");
+          dlg.querySelector("#wiz-s3").disabled = false; })
+        .catch(function (e) { out("#wiz-o2", "Fehler: " + (e && e.message || e), true); b.disabled = false; });
+    });
+    dlg.querySelector("#wiz-s3").addEventListener("click", function () {
+      if (!window.SbkimSpore || !window.SbkimSpore.exportBackup) { out("#wiz-o3", "Modul 02 exportBackup fehlt.", true); return; }
+      var pw = window.prompt("Backup-Passwort (mind. 8 Zeichen, KEIN Reset möglich):");
+      if (!pw) { out("#wiz-o3", "Abgebrochen — kein Passwort.", true); return; }
+      var b = dlg.querySelector("#wiz-s3"); b.disabled = true;
+      out("#wiz-o3", "Erzeuge Backup (PBKDF2 600k + AES-GCM-256) …");
+      window.SbkimSpore.exportBackup(pw).then(function (blob) {
+        downloadJson("sbkimtool-backup-" + new Date().toISOString().replace(/[:.]/g, "-") + ".sbkim.json", blob);
+        out("#wiz-o3", "Backup ⬇ — Datei + Passwort sicher aufbewahren.");
+      }).catch(function (e) { out("#wiz-o3", "Fehler: " + (e && e.message || e), true); b.disabled = false; });
+    });
+    dlg.querySelector("#wiz-close").addEventListener("click", function () { closeWiz(dlg); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) closeWiz(dlg); });
+  }
+
+  function openWizard() {
+    var dlg = document.getElementById("sbkim-ident-wizard");
+    if (dlg && dlg.showModal) dlg.showModal(); else if (dlg) dlg.setAttribute("open", "");
+  }
+  function closeWiz(dlg) { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
+  function downloadJson(filename, obj) {
+    var blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a"); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
