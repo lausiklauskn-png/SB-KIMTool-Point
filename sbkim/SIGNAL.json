@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-06",
-  "seq": 6,
-  "headline": "Mein-Tresor 2. Frage beantwortet (Werkzeugkiste 1:1 übernehmen): genaue Lade-Reihenfolge + CONFIG-Ort + Embedding-CDN-Hinweis; Klarstellung, dass Scheibe-3-Identität (Modul 01+02 eingebettet) schon reicht. AUSTAUSCH-MeinTresor.md.",
+  "seq": 7,
+  "headline": "GENERALPROBE-PLAN (netzweit): bisheriges = Testlauf/Lernphase; später systematischer Re-Sync 'von links nach rechts' über Browser-Tools, jedes Tool neue Identität/Spore/Handshake. sbkim/GENERALPROBE.md + docs/SCHLUESSEL.md (headless-Tresor vs. Browser-Identität).",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
@@ -17,6 +17,7 @@
     { "seq": 3, "date": "2026-06-01", "headline": "SBKIM-Siegel + Lampen (lebt/verkehr/fremd) in der Statusleiste, alle vier Seiten; Andock-Modal." },
     { "seq": 4, "date": "2026-06-06", "headline": "Ehrlichkeits-Fix: Lampen/Siegel echt verdrahtet (Modul 15+16); Siegel Bronze->Gold bei echtem Cross-Knoten-Kontakt; Fehl-Gruen behoben." },
     { "seq": 5, "date": "2026-06-06", "headline": "Mein-Tresor (Knoten D) angedockt: Verfahren erklärt + SBKIM-SYNC-VEREINBARUNG v1 (AUSTAUSCH-MeinTresor.md); ack[Mein-Tresor]=3." },
-    { "seq": 6, "date": "2026-06-06", "headline": "Mein-Tresor 2. Frage (Werkzeugkiste 1:1): Lade-Reihenfolge + CONFIG-Ort + Embedding-CDN ehrlich; Scheibe-3-Identität reicht schon." }
+    { "seq": 6, "date": "2026-06-06", "headline": "Mein-Tresor 2. Frage (Werkzeugkiste 1:1): Lade-Reihenfolge + CONFIG-Ort + Embedding-CDN ehrlich; Scheibe-3-Identität reicht schon." },
+    { "seq": 7, "date": "2026-06-06", "headline": "GENERALPROBE-PLAN netzweit (sbkim/GENERALPROBE.md): Testlauf/Lernphase jetzt, spaeter Re-Sync von links nach rechts ueber Browser-Tools; headless-Tresor vs. Browser-Identitaet in docs/SCHLUESSEL.md." }
   ]
 }

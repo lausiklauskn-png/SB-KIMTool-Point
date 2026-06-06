@@ -1,8 +1,31 @@
 # SCHLÜSSEL — Knoten-Identität von SB·KIMTool·Point
 
-Stand: 2026-05-30
+Stand: 2026-06-06
 
-## Worum geht's
+## Zwei Wege, eine Identität: headless-Tresor vs. Browser-Identität
+
+Es gibt im SBKIM-Netz **zwei** Arten, wie ein Knoten seinen privaten Schlüssel hält. Beide
+ergeben dieselbe Art Spore, dieselbe kanonische Signier-Form, und beide cross-verifizieren sich.
+Unterschiedlich ist nur, **wo der private Schlüssel wohnt**:
+
+- **(A) Headless-Tresor — DAS macht SB·KIMTool·Point.** Der Schlüssel wird in Node
+  (`node:crypto`) erzeugt und **verschlüsselt als Datei im Repo** abgelegt
+  (`sbkim/node_key.enc.json`, AES-256-GCM / PBKDF2-600k). **Deshalb braucht es ein Passwort** —
+  zum Ver- und Entschlüsseln genau dieser Datei. **Wichtig:** das **Passwort steht NICHT im
+  Repo**; im Repo liegt nur die verschlüsselte Hülle (ohne Passwort wertlos). Das Passwort hält
+  Klaus (Passwort-Manager / Umgebungs-Secret `SBKIM_KEY_PW`). Wir gingen diesen Weg, weil unsere
+  Session-Umgebung **kein** echtes IndexedDB/WebCrypto hat (headless).
+- **(B) Browser-Identität — das machen Jasons-Tresor, Mein-Tresor, Mein-Mixarium/Rezeptbuch.**
+  Der Schlüssel wird **im Browser** erzeugt (WebCrypto) und lebt **im Browser** (IndexedDB,
+  Modul 01+02). Beim Erzeugen braucht es **kein** Passwort — der Browser hält den Schlüssel.
+  Ein Passwort kommt erst ins Spiel, wenn man die Identität **exportiert/sichert**
+  (`exportBackup(password)` → verschlüsseltes Backup zum Mitnehmen/Verschenken).
+
+**Merksatz:** Bei (A) ist der verschlüsselte Schlüssel im Repo, das Passwort außerhalb. Bei (B)
+ist der Schlüssel im Browser, ein Passwort nur fürs Backup. Klaus' Beobachtung war also richtig:
+hätten **wir** den Browser-Weg genommen, hätte man fürs reine Erzeugen kein Passwort gebraucht.
+
+## Worum geht's (Weg A, unser aktueller Stand)
 
 Unser Knoten unterschreibt seine Spore mit einem **privaten Ed25519-Schlüssel**
 (`SBKIM_NODE_KEY`, base64 PKCS8-PEM). Daraus leitet sich die dauerhafte **nodeId**

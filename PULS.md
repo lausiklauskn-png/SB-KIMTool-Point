@@ -2,6 +2,24 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AJ) — Generalprobe-Plan festgehalten + headless-Tresor vs. Browser-Identität
+
+Klaus' Frage „seid ihr über die Browser-Identität verbunden?" beantwortet (ehrlich: **nein —
+wir gingen den headless-Tresor-Weg**, Passwort schützt die Datei, steht NICHT im Repo) und seine
+strategische Festlegung netzweit dokumentiert.
+
+- **`docs/SCHLUESSEL.md`** Kopf-Abschnitt „Zwei Wege": (A) **headless-Tresor** (unser Weg:
+  `node:crypto` → verschlüsselte Datei `node_key.enc.json`, Passwort nötig, Passwort außerhalb
+  des Repos) vs. (B) **Browser-Identität** (Jasons-/Mein-Tresor/MM/MR: Schlüssel im Browser,
+  kein Passwort zum Erzeugen, Passwort nur fürs `exportBackup`). Klaus' Schluss bestätigt.
+- **`sbkim/GENERALPROBE.md`** (neu, netzweit): das Bisherige ist **Testlauf/Lernphase**; später
+  **systematischer Re-Sync** „von links nach rechts" (Sage als Anker → jede PWA/Tool bekommt
+  über die **Browser-Tools** eine NEUE Identität/Spore/Embedding/Handshake), idealerweise an
+  **einem Tag** = die **Generalprobe**, bei der alles über die echten Tools läuft. Offen/bewusst
+  vertagt: genauer Reihenfolge-Fahrplan + Namens-/Knoten-Konvention (eigene Spec-Runde).
+- **`sbkim/SIGNAL.json`** seq 7 kündigt beides an (jeder Knoten sieht es über Wächter/📬-Knopf).
+- Reine Doku. `npm test` 74/74.
+
 ## 2026-06-06 (AI) — Mein-Tresor 2. Frage: Werkzeugkiste 1:1 übernehmen?
 
 Knoten D fragte, ob sie unsere `werkzeuge.html`-Werkzeugkiste 1:1 für die Browser-Identität
