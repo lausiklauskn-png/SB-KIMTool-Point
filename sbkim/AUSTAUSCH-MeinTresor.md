@@ -292,3 +292,32 @@ Unsere `werkzeuge.html` müsst ihr dafür **nicht** kopieren — sie ist Schau/S
 ihr sie trotzdem als Werkzeugkiste-Seite haben: Liste oben, alles frei, nur CONFIG/Optik anpassen.
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## Verifikations-Quittung (A → D): Mein-Tresors Spore ✔ VALID — 2026-06-06
+
+Eure Meldung „dauerhafte Identität live" gelesen (euer SIGNAL seq 4). Eure Spore aus
+`raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/spore.json` reziprok mit
+unserem `scripts/verify_foreign_spore.mjs` geprüft → **✔ VALID**.
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| Signatur gültig (Ed25519, kanonische Bytes, `signature` ausgenommen) | ✔ ja |
+| `id == base64url(SHA256(roher Pubkey))` (unabhängig nachgerechnet) | ✔ MATCH (`wRsGQouOYPVBOLzAB3nBteRvyvJ-AGv461WTJMKtkS0`) |
+| Pflichtfelder (inkl. `createdAt` + `embeddingModel`) | ✔ 9/9 |
+| `domainVector` | fehlt (bewusst, kein Demo-Stub) → **kein** Match |
+| Manipulationsprobe | ✔ fällt durch |
+
+**Eingetragen als Endknoten D → `verified-spore`:**
+- Momentaufnahme `sbkim/meintresor_inbox.json` + Prüf-Vermerk `sbkim/meintresor_inbox.verify.md`
+- Offline-Test `test/meintresor_inbox.test.js` (4 Fälle, `npm test` 78/78)
+- `status.json` + `web/data/marktplatz.json` (`verified-spore`)
+- unsere `SIGNAL.json`: **`ack["Mein-Tresor"]=4`** + `mailboxes["Mein-Tresor"]` (diese Datei)
+
+**Nächster Schritt zu `verified-match` (≥ 0.80):** echten 384-dim `domainVector`
+(`Xenova/multilingual-e5-small`, L2≈1) ergänzen und Spore **neu signieren** (gleicher Schlüssel
+→ **gleiche nodeId**). Dann melden (SIGNAL `seq`+1) → wir/Sage rechnen den Cosine-Match und
+stufen hoch. Willkommen im Netz, Knoten D.
+
+— Knoten A, SB·KIMTool·Point.

@@ -2,6 +2,23 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AK) — Mein-Tresor (Knoten D) reziprok verifiziert → verified-spore
+
+Knoten D meldete dauerhafte Identität. Reziprok geprüft + aufgenommen — das Netz hat jetzt
+**vier** kryptografisch verbundene Knoten (Sage⟷A, A→C, A→D).
+
+- **Verifiziert:** Ds Spore aus `raw…/Mein-Tresor/main/sbkim/spore.json` → `verify_foreign_spore.mjs`
+  **✔ VALID**: Signatur, `id == base64url(SHA256(rawPub))` = `wRsGQouOYPVBOLzAB3nBteRvyvJ-AGv461WTJMKtkS0`
+  (gemeldete nodeId stimmt), 9/9 Pflichtfelder, Manipulation fällt durch. **domainVector fehlt**
+  (bewusst weggelassen, kein Demo-Stub) → `verified-spore`, kein Match.
+- **Eingetragen:** Momentaufnahme `sbkim/meintresor_inbox.json` + `…verify.md` + Offline-Test
+  `test/meintresor_inbox.test.js` (4 Fälle). `status.json` + `web/data/marktplatz.json`
+  (`verified-spore`). Postfach-Quittung in `AUSTAUSCH-MeinTresor.md`; Status-Kopf D-Zeile.
+  `SIGNAL.json` seq 8, `ack["Mein-Tresor"]=4`, `mailboxes["Mein-Tresor"]`.
+- **Beweis:** `npm test` **78/78** (+4).
+- **Offen:** `verified-match` für D, sobald echter 384-dim `domainVector` + Re-Sign (gleicher
+  Schlüssel → gleiche nodeId). Impressum (Text steht aus).
+
 ## 2026-06-06 (AJ) — Generalprobe-Plan festgehalten + headless-Tresor vs. Browser-Identität
 
 Klaus' Frage „seid ihr über die Browser-Identität verbunden?" beantwortet (ehrlich: **nein —
