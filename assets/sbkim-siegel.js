@@ -181,8 +181,12 @@
         '<li style="margin-top:.6em"><b>Verschlüsseltes Backup</b> — Passwort-Sicherung (AES-256-GCM/PBKDF2 600k) gegen IndexedDB-Verlust.<br>' +
           '<button type="button" class="andock-close" id="wiz-s3" disabled style="margin:.4em 0">Backup erzeugen + ⬇</button>' +
           '<div id="wiz-o3" style="font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all"></div></li>' +
+        '<li style="margin-top:.6em"><b>Identität wiederherstellen</b> — Backup-Datei (Schritt 3) + Passwort zurückspielen: Schlüssel <em>und</em> Spore landen wieder in der Browser-IndexedDB. Funktioniert auch auf neuem Gerät/Browser.<br>' +
+          '<input type="file" id="wiz-s4-file" accept=".json,application/json" hidden />' +
+          '<button type="button" class="andock-close" id="wiz-s4" style="margin:.4em 0">Backup-Datei wählen + wiederherstellen</button>' +
+          '<div id="wiz-o4" style="font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all"></div></li>' +
       '</ol>' +
-      '<p style="color:var(--muted);font-size:.78rem;margin:.7em 0 0">Die heruntergeladene <code>spore.json</code> nach <code>sbkim/spore.json</code> ins Repo legen. Backup-Datei + Passwort sicher aufbewahren — ohne beides keine Wiederherstellung.</p>' +
+      '<p style="color:var(--muted);font-size:.78rem;margin:.7em 0 0">Die heruntergeladene <code>spore.json</code> nach <code>sbkim/spore.json</code> ins Repo legen. Backup-Datei + Passwort sicher aufbewahren — ohne beides keine Wiederherstellung. Mit Schritt 4 spielst du sie jederzeit (auch auf neuem Gerät) zurück.</p>' +
       '<button class="andock-close" type="button" id="wiz-close" style="margin-top:1em">Schließen</button>';
     document.body.appendChild(dlg);
 
@@ -228,6 +232,47 @@
         out("#wiz-o3", "Backup ⬇ — Datei + Passwort sicher aufbewahren.");
       }).catch(function (e) { out("#wiz-o3", "Fehler: " + (e && e.message || e), true); b.disabled = false; });
     });
+    // Schritt 4 — Identität wiederherstellen (Modul 02 importBackup). Datei + Passwort →
+    // Schlüssel + Spore zurück in die IndexedDB. Bei vorhandenem Slot bewusstes force-Overwrite.
+    dlg.querySelector("#wiz-s4").addEventListener("click", function () {
+      dlg.querySelector("#wiz-s4-file").click();
+    });
+    dlg.querySelector("#wiz-s4-file").addEventListener("change", function (ev) {
+      var input = ev.target;
+      var file = input.files && input.files[0];
+      if (!window.SbkimSpore || !window.SbkimSpore.importBackup) { out("#wiz-o4", "Modul 02 importBackup fehlt.", true); return; }
+      if (!file) { out("#wiz-o4", "Keine Datei gewählt.", true); return; }
+      file.text().then(function (text) {
+        var blob;
+        try { blob = JSON.parse(text); }
+        catch (e) { out("#wiz-o4", "Datei ist kein gültiges JSON-Backup.", true); input.value = ""; return; }
+        var pw = window.prompt("Backup-Passwort eingeben (das beim Sichern in Schritt 3 vergebene):");
+        if (!pw) { out("#wiz-o4", "Abgebrochen — kein Passwort.", true); input.value = ""; return; }
+        out("#wiz-o4", "Entschlüssele Backup (AES-GCM-256) + spiele Identität zurück …");
+        window.SbkimSpore.importBackup(blob, pw).then(function (res) {
+          afterRestore(res);
+        }).catch(function (err) {
+          var msg = (err && err.message) ? err.message : String(err);
+          var name = (err && err.name) ? err.name : "";
+          if (/Overwrite/i.test(name) || /vorhanden|überschreib|overwrite/i.test(msg)) {
+            if (window.confirm("Eine Identität mit diesem Schlüssel existiert bereits im Browser. Mit der Backup-Version überschreiben? (Die jetzige lokale Identität geht verloren.)")) {
+              out("#wiz-o4", "Überschreibe vorhandene Identität …");
+              window.SbkimSpore.importBackup(blob, pw, { force: true }).then(afterRestore)
+                .catch(function (e2) { out("#wiz-o4", "Fehler beim Überschreiben: " + (e2 && e2.message || e2), true); });
+            } else { out("#wiz-o4", "Abgebrochen — vorhandene Identität unverändert.", true); }
+          } else { out("#wiz-o4", "Fehler: " + msg + " (falsches Passwort oder beschädigte Datei?)", true); }
+        }).then(function () { input.value = ""; });
+      });
+    });
+    function afterRestore(res) {
+      if (res && res.restored) {
+        out("#wiz-o4", "Identität wiederhergestellt — Schlüssel + Spore zurück in der Browser-IndexedDB.");
+        dlg.querySelector("#wiz-s2").disabled = false;
+        dlg.querySelector("#wiz-s3").disabled = false;
+      } else {
+        out("#wiz-o4", "Nichts wiederhergestellt" + (res && res.reason ? " — " + res.reason : "") + ".", true);
+      }
+    }
     dlg.querySelector("#wiz-close").addEventListener("click", function () { closeWiz(dlg); });
     dlg.addEventListener("click", function (e) { if (e.target === dlg) closeWiz(dlg); });
   }
