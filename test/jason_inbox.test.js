@@ -1,77 +1,62 @@
 // Offline-Beweis: die live-signierte Spore von Jasons-Tresor (Knoten C, Momentaufnahme in
-// sbkim/jason_inbox.json) bleibt unter UNSERER kanonischen Form ✔ VALID — und Manipulation
-// faellt durch. Kein Netz: die Momentaufnahme ist eingefroren (ANDOCK §6.2). Beweist die
-// Cross-Knoten-Vertrauensmechanik A ⟷ C headless + reproduzierbar.
+// sbkim/jason_inbox.json) bleibt unter UNSERER kanonischen Form ✔ VALID — und der echte
+// Cross-Knoten-Match A<->C ist offline reproduzierbar (>= 0.80 -> verified-match).
+// Kein Netz (eingefrorene Momentaufnahmen). Identitätswechsel 2026-06-06:
+// alte nodeId 7F_zNopF… (Demo-Schlüssel, Passwort verloren) -> neue E13GDzIp…
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { createHash, createPublicKey, verify as edVerify } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { verifyForeignSpore } from "../scripts/verify_foreign_spore.mjs";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(__dirname, "..");
 const inbox = JSON.parse(readFileSync(resolve(ROOT, "sbkim/jason_inbox.json"), "utf8"));
 
-function base64url(buf) {
-  return Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+function loadVec(p) {
+  const v = JSON.parse(readFileSync(resolve(ROOT, p), "utf8"));
+  return Array.isArray(v) ? v : (v.vector || v.domainVector);
 }
-function base64urlToBuf(str) {
-  const pad = str.length % 4 === 0 ? "" : "====".slice(str.length % 4);
-  return Buffer.from(str.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64");
-}
-function canonicalize(value) {
-  if (value === null) return null;
-  if (Array.isArray(value)) return value.map(canonicalize);
-  if (typeof value === "object") {
-    const out = {};
-    for (const k of Object.keys(value).sort()) out[k] = canonicalize(value[k]);
-    return out;
-  }
-  return value;
-}
-function canonicalBytes(obj) {
-  const { signature, ...rest } = obj;
-  return Buffer.from(JSON.stringify(canonicalize(rest)), "utf8");
+function cosine(a, b) {
+  let d = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  return d / (Math.sqrt(na) * Math.sqrt(nb));
 }
 
-test("Jason-Inbox: Momentaufnahme hat die Pflichtfelder", () => {
-  for (const f of ["nodeName", "publicKey", "signature", "id"]) {
-    assert.ok(inbox[f] !== undefined, "Feld fehlt: " + f);
-  }
+test("jason_inbox: Spore verifiziert mit unserer kanonischen Form (✔ VALID)", () => {
+  const r = verifyForeignSpore(inbox);
+  assert.equal(r.valid, true, `Jason-Spore nicht VALID: ${r.reason}`);
+  assert.equal(r.checks.id, true, "nodeId != base64url(SHA256(pubkey))");
+  assert.equal(r.checks.signature, true, "Signatur ungültig");
+  assert.equal(r.checks.tamperRejected, true, "Manipulation nicht erkannt");
 });
 
-test("Jason-Inbox: Identitaet ist Jasons-Tresor (Knoten C)", () => {
+test("jason_inbox: NEUE Identität nach Identitätswechsel 2026-06-06", () => {
   assert.equal(inbox.nodeName, "Jasons-Tresor");
-  assert.equal(inbox.id, "7F_zNopFgYLPCmEFhVlRUDnQVKk3y-RHNr139Z_3hCs");
+  assert.equal(inbox.nodeType, "hybrid");
+  assert.equal(inbox.id, "E13GDzIp0c7JfeZD0jVvFarNxPde8AcoP7qz7FtmdNM");
+  // alte Demo-nodeId ist hinfällig:
+  assert.notEqual(inbox.id, "7F_zNopFgYLPCmEFhVlRUDnQVKk3y-RHNr139Z_3hCs");
 });
 
-test("Jason-Inbox: Signatur gueltig unter unserer kanonischen Form", () => {
-  const pub = createPublicKey({
-    key: { kty: "OKP", crv: "Ed25519", x: inbox.publicKey.x },
-    format: "jwk",
-  });
-  const ok = edVerify(null, canonicalBytes(inbox), pub, base64urlToBuf(inbox.signature));
-  assert.ok(ok, "Signatur muss gueltig sein");
+test("jason_inbox: echter domainVector (384-dim, L2≈1, kein _demo)", () => {
+  assert.ok(Array.isArray(inbox.domainVector) && inbox.domainVector.length === 384);
+  assert.equal("_demo" in inbox, false);
+  const l2 = Math.sqrt(inbox.domainVector.reduce((a, x) => a + x * x, 0));
+  assert.ok(Math.abs(l2 - 1) < 1e-3, `domainVector nicht L2-normalisiert (L2=${l2})`);
 });
 
-test("Jason-Inbox: nodeId == base64url(SHA256(rawPub))", () => {
-  const rawPub = base64urlToBuf(inbox.publicKey.x);
-  const derived = base64url(createHash("sha256").update(rawPub).digest());
-  assert.equal(derived, inbox.id, "nodeId muss aus dem Public Key ableitbar sein");
+test("jason_inbox: echter Cross-Knoten-Match A<->C >= 0.80 (verified-match)", () => {
+  const mine = loadVec("sbkim/domainVector.real.json");
+  const score = cosine(mine, inbox.domainVector);
+  // Reproduzierbar 0.853740 (Stand 2026-06-06). Toleranz fuer Float-Schreibweisen.
+  assert.ok(score >= 0.80, `Match unter Schwelle: ${score}`);
+  assert.ok(Math.abs(score - 0.853740) < 1e-4, `Match-Score abweichend: ${score}`);
 });
 
-test("Jason-Inbox: domainVector ist ehrlich Demo (_demo) — kein Match behauptet", () => {
-  assert.ok(Array.isArray(inbox._demo) && inbox._demo.includes("domainVector"),
-    "Knoten C ist verified-spore, nicht verified-match (echtes Embedding steht aus)");
-});
-
-test("Jason-Inbox: Manipulation faellt durch (Signatur bricht)", () => {
-  const pub = createPublicKey({
-    key: { kty: "OKP", crv: "Ed25519", x: inbox.publicKey.x },
-    format: "jwk",
-  });
-  const tampered = { ...inbox, nodeName: inbox.nodeName + "_tampered" };
-  assert.ok(!edVerify(null, canonicalBytes(tampered), pub, base64urlToBuf(inbox.signature)),
-    "Manipulation muss die Signatur brechen");
+test("jason_inbox: Manipulation am Inhalt wird abgelehnt", () => {
+  const tampered = { ...inbox, domain: "GEFAELSCHT" };
+  assert.equal(verifyForeignSpore(tampered).valid, false);
 });
