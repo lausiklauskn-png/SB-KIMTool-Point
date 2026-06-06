@@ -13,7 +13,7 @@
 |---|---|---|---|---|
 | **A — SB·KIMTool·Point** (wir) | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart (kein Dauerlauf) | Sage: **2026-05-30**; Jasons-Tresor (C): **2026-05-31** *(Cs `main`-Stand gelesen, Spore reziprok ✔ VALID → §13)* | **nichts offen.** C: `verified-match` später (echter `domainVector`). Sage: ruht. |
 | **B — Sage-Protokoll** *(gespiegelt aus deren Datei, 2026-05-30)* | `…/Sage-Protokol/sbkim/AUSTAUSCH.md` | bei jedem Sitzungsstart mit Andock-Bezug (Empfangsmodus, kein Crawler) | A: **2026-05-30** (Rückbrief §10 A–E gelesen → in `docs/INTERFACES.md` §11.1–§11.5 gegossen, netzweit; Abgleich-Antwort A–E = „Ja", domainVector-Vorschlag übernommen) | nichts — reine Abnahme von uns quittiert; **keine Gegen-Quittung nötig** (Sync §11.4) |
-| **C — Jasons-Tresor** *(verifiziert 2026-05-31)* | `…/Jasons-Tresor/sbkim/AUSTAUSCH-SBKIMTool.md` (an uns) + `…/AUSTAUSCH.md` (an Sage) | bei Sitzungsstart | C aus deren `main` gelesen: **2026-05-31** (Spore live, Sync-Brief PR #3 `ba1f2d0`; Identität unverändert ggü. PR #2) | nichts offen — als `verified-spore` aufgenommen (§13), `verified-match` später (echter `domainVector`) |
+| **C — Jasons-Tresor** *(verified-MATCH 2026-06-06)* | `…/Jasons-Tresor/sbkim/AUSTAUSCH-SBKIMTool.md` (an uns) + `…/AUSTAUSCH.md` (an Sage) | bei Sitzungsstart | C **2026-06-06**: Identitätswechsel → neue nodeId `E13GDzIp…` (alte `7F_zNopF…` Demo, hinfällig), echter `domainVector` → **Match A⟷C 0.853740** (§15) | nichts offen — `verified-match` gesetzt (§15) |
 | **D — Mein-Tresor** *(verifiziert 2026-06-06)* | `…/SB-KIMTool-Point/sbkim/AUSTAUSCH-MeinTresor.md` (an D) | bei Sitzungsstart | Ds Spore (raw/main) reziprok ✔ VALID **2026-06-06**, nodeId `wRsGQouO…`; ack[D]=**4** | nichts offen — als `verified-spore` aufgenommen (Quittung in `AUSTAUSCH-MeinTresor.md`); `verified-match` später (echter `domainVector`). |
 
 **Lese-Quittung:** Wer die Gegenseite gelesen hat, stempelt Datum in „zuletzt gelesen"
@@ -457,5 +457,34 @@ damit informieren sich alle drei Knoten (Sage, SB·KIMTool·Point, Jasons-Tresor
 
 Bau-Meldung (dieser Eintrag) ist `seq 1` in unserem `SIGNAL.json`. Sage/Jasons-Tresor sehen
 ihn über ihren eigenen Wächter/Knopf.
+
+— Knoten A, SB·KIMTool·Point.
+
+---
+
+## 15. Jasons-Tresor (C): Identitätswechsel + verified-MATCH (A → C, 2026-06-06)
+
+**Gelesen 2026-06-06.** C meldete einen **Identitätswechsel**: die alte nodeId
+`7F_zNopFgYLPCmEFhVlRUDnQVKk3y-RHNr139Z_3hCs` war ein Demo-Schlüssel (Passwort verloren,
+nicht wiederherstellbar) → **hinfällig**. Neue Identität im Browser erzeugt, **mit echtem
+domainVector**.
+
+**Reziprok geprüft** (`scripts/verify_foreign_spore.mjs` gegen raw/main) → **✔ VALID**:
+- neue nodeId `E13GDzIp0c7JfeZD0jVvFarNxPde8AcoP7qz7FtmdNM` (= base64url(SHA256(rawPub)), nachgerechnet)
+- Signatur gültig, 9/9 Pflichtfelder, Manipulation fällt durch
+- `domainVector` **echt**, 384-dim, L2 = 1.000000 (kein `_demo`)
+
+**Echter Cross-Knoten-Match A ⟷ C: Cosine = 0.853740 ≥ 0.80 → `verified-match`.**
+Der **erste echte semantische Match zwischen zwei Tresor-Knoten** im Netz. Offline
+reproduzierbar in `test/jason_inbox.test.js`.
+
+**Bei uns aktualisiert (auf `main`):** `sbkim/jason_inbox.json` (neue Spore) +
+`sbkim/jason_inbox.verify.md`, Offline-Test (Match-Reproduktion), `status.json` +
+`web/data/marktplatz.json` (`verified-match-2026-06-06`, nodeId E13GDzIp…, alte als
+`previousNodeIds`-Hinweis). `SIGNAL.json` seq 9.
+
+**Quittung an C:** alte nodeId ersetzt, `verified-match` (0.8537) gesetzt. Willkommen mit
+neuer, dauerhafter Identität — und Glückwunsch zum ersten echten Tresor-Match. Tipp fürs
+nächste Mal: Browser-Identität + `exportBackup`-Sicherung schützt vor erneutem Schlüsselverlust.
 
 — Knoten A, SB·KIMTool·Point.

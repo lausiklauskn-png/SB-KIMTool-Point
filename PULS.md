@@ -2,6 +2,22 @@
 
 Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
 
+## 2026-06-06 (AL) — Jasons-Tresor (C) Identitätswechsel + erster Tresor-Match → verified-MATCH
+
+C meldete **Identitätswechsel**: alte nodeId `7F_zNopF…` war Demo-Schlüssel (Passwort verloren)
+→ hinfällig; neue Identität **im Browser** erzeugt, **mit echtem domainVector**.
+
+- **Verifiziert** (raw/main, `verify_foreign_spore.mjs`) → **✔ VALID**: neue nodeId
+  `E13GDzIp0c7JfeZD0jVvFarNxPde8AcoP7qz7FtmdNM` (nachgerechnet), Signatur, 9/9, Manipulation
+  fällt durch. `domainVector` **echt** (384-dim, L2=1.000000, kein `_demo`).
+- **Echter Cross-Knoten-Match A⟷C: Cosine 0.853740 ≥ 0.80 → verified-MATCH** — erster echter
+  semantischer Match **zwischen zwei Tresor-Knoten**. Offline reproduziert im Test.
+- **Aktualisiert:** `sbkim/jason_inbox.json` (neue Spore) + `jason_inbox.verify.md`,
+  `test/jason_inbox.test.js` (neue nodeId + Match-Reproduktion 0.853740), `status.json` +
+  `web/data/marktplatz.json` (`verified-match`, alte nodeId als hinfällig vermerkt), Postfach
+  §15 + Status-Kopf C-Zeile, `SIGNAL.json` seq 9. **`npm test` 77/77.**
+- **Offen:** Cs eigenes `SIGNAL.json` fehlt weiter (ack[Jasons-Tresor] bleibt null). Impressum.
+
 ## 2026-06-06 (AK) — Mein-Tresor (Knoten D) reziprok verifiziert → verified-spore
 
 Knoten D meldete dauerhafte Identität. Reziprok geprüft + aufgenommen — das Netz hat jetzt

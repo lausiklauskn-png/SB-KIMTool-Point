@@ -31,12 +31,13 @@
     },
     {
       "name": "Jasons-Tresor",
-      "nodeId": "7F_zNopFgYLP…",
+      "nodeId": "E13GDzIp0c7J…",
       "kannDas": "Tresor/Bibliothek: JSON-Dateien und SBKIM-Schluessel offline verwahren und verschluesseln.",
       "andockLink": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
-      "status": "verified-spore-2026-05-31",
+      "status": "verified-match-2026-06-06",
       "echt": true,
-      "matchHinweis": "Knoten C — Spore reziprok ✔ VALID (verified-spore). verified-match folgt mit echtem domainVector."
+      "matchScore": 0.853740,
+      "matchHinweis": "Knoten C — verified-MATCH 0.8537 (echter domainVector). Identitaetswechsel 2026-06-06: neue nodeId E13GDzIp… (alte 7F_zNopF… Demo, hinfaellig)."
     },
     {
       "name": "Mein-Tresor",
