@@ -21,6 +21,35 @@
 
 * { box-sizing: border-box; }
 
+/* === SBKIM-Siegel (Modul 16, Wappen 1:1 aus Sage/Jason) + Lampen (lebt/verkehr/fremd) === */
+.sbkim-siegel-badge { width: 34px; height: 34px; border-radius: 50%; margin-left: 0.3rem; padding: 0;
+  background: transparent; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  overflow: visible; transition: filter .25s, transform .25s; flex: 0 0 auto; }
+.sbkim-siegel-badge img { width: 34px; height: 34px; display: block; pointer-events: none; }
+.sbkim-siegel-badge:hover { filter: drop-shadow(0 0 8px rgba(201,169,97,0.55)); transform: scale(1.06); }
+.sbkim-siegel-badge:focus-visible { outline: 2px solid #C9A961; outline-offset: 3px; }
+.sbkim-siegel-badge.first-boot { animation: siegel-first-boot 600ms ease-out; }
+@keyframes siegel-first-boot { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 0 14px rgba(201,169,97,0.55)); } 100% { transform: scale(1); opacity: 1; } }
+.lamps { display: inline-flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; }
+.lamp { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--muted); font-family: var(--mono); }
+.lamp::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); box-shadow: none; transition: background .25s, box-shadow .25s; }
+.lamp.on::before  { background: var(--lamp-live); box-shadow: 0 0 8px var(--lamp-live); }
+.lamp.warn::before { background: var(--lamp-dorm); box-shadow: 0 0 8px var(--lamp-dorm); }
+.lamp.bad::before { background: var(--lamp-dead); box-shadow: 0 0 8px var(--lamp-dead); }
+.lamp.traffic-pulse::before { animation: lamp-pulse 0.9s ease-out; }
+@keyframes lamp-pulse { 0% { background: var(--accent); box-shadow: 0 0 12px var(--accent); } 100% { background: var(--muted); box-shadow: none; } }
+@media (max-width: 620px) { .lamp .lamp-label { display: none; } }
+
+/* Andock-Modal (Klick aufs Siegel) */
+.andock-modal { border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--text); max-width: 460px; width: 92%; padding: 1.1rem 1.2rem; }
+.andock-modal::backdrop { background: rgba(0,0,0,0.6); }
+.andock-modal h3 { margin: 0 0 0.3rem; font-family: var(--mono); }
+.andock-row { display: flex; justify-content: space-between; gap: 0.8rem; padding: 0.35rem 0; border-bottom: 1px solid var(--line); font-size: 0.88rem; }
+.andock-row span { color: var(--muted); } .andock-row code, .andock-row a { font-family: var(--mono); color: var(--accent); word-break: break-all; }
+.andock-tool { display: inline-block; margin-top: 0.4rem; font-weight: 700; color: var(--accent); }
+.andock-close { margin-top: 0.9rem; font: inherit; background: transparent; color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+.andock-close:hover { border-color: var(--accent); }
+
 /* === Netz-Briefkasten-Knopf (INTERFACES §11.6, kopiert von Sage, re-geskinnt) === */
 .netz-check-btn { display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem; padding: 0.3rem 0.7rem; font: inherit; font-size: 0.78rem; color: var(--muted); background: rgba(0,0,0,0.35); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
 .netz-check-btn:hover { color: var(--accent); border-color: var(--accent); }
