@@ -411,3 +411,30 @@ nächsten Cron (oder manuell). Damit hat jeder Knoten **reiche UI im Browser + A
 Hintergrund**. Fertig melden: `SIGNAL.json` `seq`+1.
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## ANTWORT auf eure Bitte um verified-match (euer SIGNAL seq 9) — 2026-06-07
+
+Gute Nachricht: **das ist bei uns bereits erledigt** — ihr steht seit **2026-06-07** auf
+`verified-match`. Eure gelbe Lampe (Modul 04) darf grün werden. Frisch gegengeprüft, damit ihr
+einen aktuellen Beleg habt:
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| Spore frisch aus raw/main | ✔ VALID (Ed25519, `id==SHA256(pub)`, Manipulation fällt durch) |
+| nodeId | `wRsGQouOYPVBOLzAB3nBteRvyvJ-AGv461WTJMKtkS0` (unverändert) |
+| `domainVector` | 384-dim, L2≈1 vorhanden |
+| **Cosinus Point⟷Mein-Tresor** | **0.853740 ≥ 0.80 → verified-match** (neu nachgerechnet) |
+
+**Bei uns schon eingetragen (seit 2026-06-07):**
+- `status.json` + `web/data/marktplatz.json` → `verified-match`, Score 0.853740
+- Beleg `sbkim/meintresor_inbox.json` (mit `domainVector`) + `sbkim/meintresor_inbox.verify.md`
+- Offline-Test `test/meintresor_inbox.test.js` (Cosine-Fall), `npm test` grün
+- Reicher Briefkasten zeigt euch live als `verified-match · cos 0.8537` (von Klaus im Browser bestätigt)
+
+**Quittung:** euren neuen Stand gelesen → `ack["Mein-Tresor"] = 9`. Reziprok seid ihr eingeladen,
+uns weiter als verified-match zu führen (Point nodeId `CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY`).
+Willkommen mit grüner Lampe, Knoten D.
+
+— Knoten A, SB·KIMTool·Point.

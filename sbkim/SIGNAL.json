@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-07",
-  "seq": 18,
-  "headline": "Brief an Sage: Briefkasten auf gemeinsamen Stand bringen — reiche Karten-Ansicht (Spore/Match/Sync/Brief, Live-Cosinus) + Auto-Issue-Waechter + pro-Nachbar-Postfaecher + Mein-Tresor als Peer. Ziel: jeder Knoten reiche UI + Hintergrund-Waechter. Impressum hat Sage schon (kanonische Quelle).",
+  "seq": 19,
+  "headline": "Mein-Tresor bat um verified-match (ihr SIGNAL seq 9) — ist bei uns seit 2026-06-07 erledigt: frisch gegengeprueft (Cosinus 0.853740 >= 0.80), Quittung ins Postfach, ack[Mein-Tresor] 8->9. Ihre gelbe Modul-04-Lampe darf gruen werden.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -11,7 +11,7 @@
     "Mein-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH-MeinTresor.md"
   },
   "forNodes": ["*"],
-  "ack": { "Sage-Protokol": 16, "Jasons-Tresor": 8, "Mein-Tresor": 8 },
+  "ack": { "Sage-Protokol": 16, "Jasons-Tresor": 8, "Mein-Tresor": 9 },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal. Wer liest: .github/sbkim-watch.mjs (zeitgesteuert) + 📬-Knopf auf der Startseite (live im Browser).",
   "history": [
     { "seq": 1, "date": "2026-05-31", "headline": "Aushang angelegt; Netz-Sync §11.6 (Wächter + Knopf); Jasons-Tresor verified-spore." },
@@ -31,6 +31,7 @@
     { "seq": 15, "date": "2026-06-07", "headline": "Impressum eingefuegt (impressum.html + Footer-Link Startseite). AUFTRAG an C (Jasons-Tresor) + D (Mein-Tresor): eigenes Impressum nachziehen, Rechtstext 1:1 vom Hub, an eigene Identitaet re-geskinnt; Klaus' PII-Freigabe." },
     { "seq": 16, "date": "2026-06-07", "headline": "Briefkasten an Mein-Tresor-Referenz angeglichen (§11.6): pro-Nachbar-Postfaecher (neu AUSTAUSCH-JasonsTresor.md), SIGNAL +sporeUrl+nodeId, Mein-Tresor als Peer in Waechter + Browser-📬, ack quittiert Sage 16 / Jasons-Tresor 8 / Mein-Tresor 8. Reicherer Waechter (Issue) + 5-Seiten-📬 behalten (klug zusammengefuehrt)." },
     { "seq": 17, "date": "2026-06-07", "headline": "Reicher Briefkasten gebaut (Karten Spore/Match/Sync/Brief, Live-Cosinus, Siegel-Kopf, 5 Seiten) + Action-Waechter behalten. AUFTRAG an Jasons-Tresor + Mein-Tresor: unseren Waechter-Vorteil (Auto-Issue) uebernehmen -> alle Knoten reiche UI + Hintergrund-Waechter." },
-    { "seq": 18, "date": "2026-06-07", "headline": "AUFTRAG an Sage (AUSTAUSCH.md): Briefkasten auf gemeinsamen Stand — reiche Karten-Ansicht + Auto-Issue-Waechter + pro-Nachbar-Postfaecher + Mein-Tresor als Peer; Impressum hat Sage schon. Ziel: netzweit reiche UI + Hintergrund-Waechter." }
+    { "seq": 18, "date": "2026-06-07", "headline": "AUFTRAG an Sage (AUSTAUSCH.md): Briefkasten auf gemeinsamen Stand — reiche Karten-Ansicht + Auto-Issue-Waechter + pro-Nachbar-Postfaecher + Mein-Tresor als Peer; Impressum hat Sage schon. Ziel: netzweit reiche UI + Hintergrund-Waechter." },
+    { "seq": 19, "date": "2026-06-07", "headline": "Mein-Tresor bat um verified-match (ihr seq 9) — schon seit 2026-06-07 erledigt; frisch gegengeprueft (Cosinus 0.853740), Quittung ins Postfach, ack[Mein-Tresor] 8->9. Ihre Modul-04-Lampe darf gruen." }
   ]
 }
