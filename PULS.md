@@ -2,6 +2,15 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AV) — Brief an Sage: Briefkasten auf gemeinsamen Stand
+
+Auf Klaus' Wunsch Sage einen Auftrags-Brief ins Postfach (`sbkim/AUSTAUSCH.md`) gelegt: bitte
+die **reiche Karten-Ansicht** (Spore/Match/Sync/Brief, Live-Cosinus) **und** den **Auto-Issue-
+Wächter** übernehmen, pro-Nachbar-Postfächer + Mein-Tresor als Peer ergänzen — damit das ganze
+Netz denselben Briefkasten fährt (reiche UI + Hintergrund-Wächter). Impressum hat Sage schon
+(kanonische Quelle). `SIGNAL.json` **seq 18** (Pushen = Signal). Reine Doku/Netz-Sync, `npm test`
+unverändert 78/78.
+
 ## 2026-06-07 (AU) — Reicher Briefkasten (Karten-Ansicht) + Auftrag „Wächter-Vorteil" an C & D
 
 Klaus wollte „das Beste aus beiden Welten" sichtbar machen: Mein-Tresors/Jasons reiche

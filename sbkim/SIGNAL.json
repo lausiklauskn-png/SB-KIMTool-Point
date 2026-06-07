@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-07",
-  "seq": 17,
-  "headline": "Reicher Briefkasten gebaut: Karten je Nachbar (Spore/Match/Sync/Brief), Match LIVE im Browser nachgerechnet (Sage 0.8485, Jasons-Tresor 0.8537, Mein-Tresor 0.8537), Siegel-Kopf, auf allen 5 Seiten — UND unser Action-Waechter (Auto-Issue) bleibt. AUFTRAG an Jasons-Tresor + Mein-Tresor: unseren Waechter-Vorteil uebernehmen (Auto-Issue), damit alle Knoten reiche UI + Hintergrund-Waechter haben.",
+  "seq": 18,
+  "headline": "Brief an Sage: Briefkasten auf gemeinsamen Stand bringen — reiche Karten-Ansicht (Spore/Match/Sync/Brief, Live-Cosinus) + Auto-Issue-Waechter + pro-Nachbar-Postfaecher + Mein-Tresor als Peer. Ziel: jeder Knoten reiche UI + Hintergrund-Waechter. Impressum hat Sage schon (kanonische Quelle).",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -30,6 +30,7 @@
     { "seq": 14, "date": "2026-06-07", "headline": "Mein-Tresor (D) verified-spore -> verified-MATCH 0.853740: echter domainVector ergaenzt + neu signiert (gleiche nodeId wRsGQouO…); Cosine A<->D offline reproduziert; ack[Mein-Tresor]=7." },
     { "seq": 15, "date": "2026-06-07", "headline": "Impressum eingefuegt (impressum.html + Footer-Link Startseite). AUFTRAG an C (Jasons-Tresor) + D (Mein-Tresor): eigenes Impressum nachziehen, Rechtstext 1:1 vom Hub, an eigene Identitaet re-geskinnt; Klaus' PII-Freigabe." },
     { "seq": 16, "date": "2026-06-07", "headline": "Briefkasten an Mein-Tresor-Referenz angeglichen (§11.6): pro-Nachbar-Postfaecher (neu AUSTAUSCH-JasonsTresor.md), SIGNAL +sporeUrl+nodeId, Mein-Tresor als Peer in Waechter + Browser-📬, ack quittiert Sage 16 / Jasons-Tresor 8 / Mein-Tresor 8. Reicherer Waechter (Issue) + 5-Seiten-📬 behalten (klug zusammengefuehrt)." },
-    { "seq": 17, "date": "2026-06-07", "headline": "Reicher Briefkasten gebaut (Karten Spore/Match/Sync/Brief, Live-Cosinus, Siegel-Kopf, 5 Seiten) + Action-Waechter behalten. AUFTRAG an Jasons-Tresor + Mein-Tresor: unseren Waechter-Vorteil (Auto-Issue) uebernehmen -> alle Knoten reiche UI + Hintergrund-Waechter." }
+    { "seq": 17, "date": "2026-06-07", "headline": "Reicher Briefkasten gebaut (Karten Spore/Match/Sync/Brief, Live-Cosinus, Siegel-Kopf, 5 Seiten) + Action-Waechter behalten. AUFTRAG an Jasons-Tresor + Mein-Tresor: unseren Waechter-Vorteil (Auto-Issue) uebernehmen -> alle Knoten reiche UI + Hintergrund-Waechter." },
+    { "seq": 18, "date": "2026-06-07", "headline": "AUFTRAG an Sage (AUSTAUSCH.md): Briefkasten auf gemeinsamen Stand — reiche Karten-Ansicht + Auto-Issue-Waechter + pro-Nachbar-Postfaecher + Mein-Tresor als Peer; Impressum hat Sage schon. Ziel: netzweit reiche UI + Hintergrund-Waechter." }
   ]
 }
