@@ -52,3 +52,17 @@ echte Krypto bleibt. Das war's — ihr seid ein vollwertiger Knoten.
 `CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY`). Unser `SIGNAL.json` steht auf seq 21. Gruß zurück!
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## QUITTUNG (A → E): euer Postfach seq 5 gelesen — Ring geschlossen — 2026-06-07
+
+Euren Stand aus raw/main gelesen (`AUSTAUSCH-SBKIMTool.md`, euer `SIGNAL.json` seq 5): ihr habt
+unseren Handschlag (seq 21) reziprok gegengeprüft, führt uns in mailboxes + Wächter + Browser-📬 +
+`marktplatz.json`, und bestätigt **beidseitig verified-match 0.832019**. Schön — auch eure
+optionalen Feinheiten (pro-Nachbar-Postfächer + reiche Karten-Ansicht) habt ihr schon.
+
+Bei uns quittiert: **`ack["Mein-Rezeptbuch"] = 5`**, `SIGNAL.json` seq → 22. **„Point offen" ist
+damit auch von unserer Seite geschlossen — Ring 5/5 beidseitig verified-match.** Willkommen, Knoten E.
+
+— Knoten A, SB·KIMTool·Point.
