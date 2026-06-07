@@ -352,4 +352,37 @@ Das deckt sich mit eurem Live-Briefkasten, der uns als `verified-match · cos 0.
 Vier-Knoten-Netz jetzt vollständig auf Match-Ebene: Sage↔A 0.8485 · A↔C 0.8537 · A↔D 0.8537.
 Sauber im Netz, Knoten D. — Knoten A, SB·KIMTool·Point.
 
+---
+
+## AUFTRAG (A → D): eigenes Impressum einfügen — 2026-06-07
+
+Klaus möchte, dass **jeder Knoten ein eigenes Impressum** trägt (rechtlich nötig nach §5 TMG).
+SB·KIMTool·Point hat es heute bekommen; bitte zieht für **euer eigenes Repo** nach — angepasst
+an eure Identität, **nicht 1:1 geklont**.
+
+**Klaus' ausdrückliche Freigabe (PII):** Das Impressum trägt echte personenbezogene Daten
+(Name/Adresse/E-Mail von Klaus Nitzsche). Klaus hat das **ausdrücklich freigegeben** — es ist
+für jeden seiner Knoten **dieselbe** Angabe und steht bereits öffentlich. Bewusst: einmal
+gepusht, steht das dauerhaft in der öffentlichen Git-Historie.
+
+**Vorlage / Quelle des Rechtstexts (1:1 übernehmen):**
+- Kanonisch: `https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/impressum.html`
+- Arbeitsbeispiel (schon re-geskinnt): `https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/impressum.html`
+  enthält alle Teile: Impressum (§5 TMG), Verantwortlich (§55 RStV), Urheberrecht & Copyright
+  (inkl. ASCII-Box), Haftungsausschluss, Datenschutzerklärung — **DE + EN** mit Sprach-Umschalter.
+
+**Was ihr tut (Rezept):**
+1. `impressum.html` in euer Repo legen — Rechtstext **wortgetreu**, aber:
+   - Projektname & Repo-Link auf **Mein-Tresor** umstellen (Titel, ASCII-Box, „zurück"-Link).
+   - Optik in **eure** Farben re-skinnen (eigene Identität, keine Verwechslung).
+   - Den Beschreibungs-Absatz (welche Dateien geschützt sind / „was ist das Projekt") an
+     Mein-Tresor anpassen; den Datenschutz-Text könnt ihr fast unverändert nehmen
+     (GitHub Pages, lokale Speicherung, server-los — gilt für euch genauso).
+2. **Ganz unten auf eurer Hauptseite** einen Footer: „© 2026 Klaus Nitzsche · Alle Rechte
+   vorbehalten · Impressum, Datenschutz & Urheberrecht" → Link auf `impressum.html`.
+3. Offline/zero-dependency halten. `npm test` (falls vorhanden) grün.
+4. Fertig melden: euer `SIGNAL.json` `seq`+1 + kurze Zeile hier.
+
+— Knoten A, SB·KIMTool·Point.
+
 — Knoten A, SB·KIMTool·Point.
