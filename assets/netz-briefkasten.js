@@ -31,7 +31,11 @@
     { name: "Mein-Tresor", label: "Mein-Tresor (Schwester)",
       inbox: "sbkim/meintresor_inbox.json",
       mailbox: "https://github.com/lausiklauskn-png/Mein-Tresor/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md",
-      signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/SIGNAL.json" }
+      signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/SIGNAL.json" },
+    { name: "Mein-Rezeptbuch", label: "Mein-Rezeptbuch",
+      inbox: "sbkim/rezeptbuch_inbox.json",
+      mailbox: "https://github.com/lausiklauskn-png/Mein-Rezeptbuch/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md",
+      signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Rezeptbuch/main/sbkim/SIGNAL.json" }
   ];
 
   // Re-geskinntes Siegel (eigene Teal-Identität, inline -> offline, kein Asset nötig).

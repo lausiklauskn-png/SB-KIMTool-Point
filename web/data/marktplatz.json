@@ -5,11 +5,13 @@
   "eintraege": [
     {
       "name": "Rezeptbuch",
-      "nodeId": "BSWxXmXvxF8F…",
+      "nodeId": "uOpUBezUVbOM…",
       "kannDas": "Rezepte anbieten und passende Zutaten/Gerichte finden.",
       "andockLink": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
-      "status": "live-direct",
-      "echt": true
+      "status": "verified-match-2026-06-07",
+      "echt": true,
+      "matchScore": 0.832019,
+      "matchHinweis": "Knoten E — verified-MATCH 0.8320 (echter domainVector, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet uOpUBez… (dauerhaft, von Sage 2026-06-07 bestaetigt); beidseitig nachgerechnet."
     },
     {
       "name": "Mixarium",
