@@ -1,15 +1,15 @@
 {
   "node": "SB-KIMTool-Point",
-  "lastBuild": "2026-06-06",
-  "seq": 13,
-  "headline": "Siegel-Modal aufgeraeumt wie bei Sage: doppelter 'Andocken'-Block (nannte faelschlich Modul 18; Andock/Siegel ist Modul 16) entfernt. Oben bleibt nur 'Eigene Identitaet & Spore erzeugen / verwalten'.",
+  "lastBuild": "2026-06-07",
+  "seq": 14,
+  "headline": "Mein-Tresor (Knoten D) hochgestuft auf verified-MATCH 0.853740: D hat den echten domainVector ergaenzt + mit gleichem Schluessel neu signiert (gleiche nodeId). Cosine A<->D unabhaengig nachgerechnet. Vier-Knoten-Netz jetzt komplett auf Match-Ebene.",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Jasons-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH.md",
     "Mein-Tresor": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH-MeinTresor.md"
   },
   "forNodes": ["*"],
-  "ack": { "Sage-Protokol": 7, "Jasons-Tresor": null, "Mein-Tresor": 4 },
+  "ack": { "Sage-Protokol": 7, "Jasons-Tresor": null, "Mein-Tresor": 7 },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal. Wer liest: .github/sbkim-watch.mjs (zeitgesteuert) + 📬-Knopf auf der Startseite (live im Browser).",
   "history": [
     { "seq": 1, "date": "2026-05-31", "headline": "Aushang angelegt; Netz-Sync §11.6 (Wächter + Knopf); Jasons-Tresor verified-spore." },
@@ -24,6 +24,7 @@
     { "seq": 10, "date": "2026-06-06", "headline": "Andock-Wizard im Siegel-Modal (Identitaet+Spore+Backup, 3 Schritte) wie bei Sage; Notfall-Neuerzeugung moeglich." },
     { "seq": 11, "date": "2026-06-06", "headline": "[Andocken]-Knopf (Modul 16) repariert: SbkimToolPwa-Shim leitet auf den echten Wizard um statt 'Modul 18 nicht installiert'." },
     { "seq": 12, "date": "2026-06-06", "headline": "Andock-Wizard Schritt 4 'Identitaet wiederherstellen' (importBackup): Backup-Datei+Passwort zurueckspielen; 4 Schritte wie Sage." },
-    { "seq": 13, "date": "2026-06-07", "headline": "Siegel-Modal aufgeraeumt: doppelter 'Andocken'-Block (falsch 'Modul 18'; korrekt Modul 16) entfernt; nur Identitaets-Knopf oben, wie Sage." }
+    { "seq": 13, "date": "2026-06-07", "headline": "Siegel-Modal aufgeraeumt: doppelter 'Andocken'-Block (falsch 'Modul 18'; korrekt Modul 16) entfernt; nur Identitaets-Knopf oben, wie Sage." },
+    { "seq": 14, "date": "2026-06-07", "headline": "Mein-Tresor (D) verified-spore -> verified-MATCH 0.853740: echter domainVector ergaenzt + neu signiert (gleiche nodeId wRsGQouO…); Cosine A<->D offline reproduziert; ack[Mein-Tresor]=7." }
   ]
 }

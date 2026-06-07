@@ -1,6 +1,35 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-06-06 · Branch `claude/sage-andock-continue-SI1Lu`
+Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
+
+## 2026-06-07 (AR) — Mein-Tresor (D) auf verified-MATCH hochgestuft + Wizard-Lauf bestätigt
+
+Anknüpfend an den Brief `BRIEF_naechste-sitzung.md` (offene Punkte 1 + 2). Klaus hat den
+Briefkasten der Knoten **Jasons-Tresor** und **Mein-Tresor** im Browser geöffnet (zwei
+Screenshots); deren Sage-Tool rechnet die Matches live nach.
+
+**Punkt 1 (Andock-Wizard / Sage-Tool im Browser) — von Klaus bestätigt (2026-06-07).** Der
+Wizard läuft im Browser, die Vektor-Spore wurde mit Wert angelegt, Matches rechnen live. Damit
+ist der manuelle Sichttest aus dem Brief erfüllt (kein headless-Beweis nötig — Klaus' Beleg).
+
+**Punkt 2 (Mein-Tresor D → verified-match) — erledigt.** D hat seinen echten 384-dim
+`domainVector` (Xenova/multilingual-e5-small, L2≈1) ergänzt und die Spore mit demselben Schlüssel
+neu signiert (gleiche nodeId `wRsGQouO…`). Auf unserer Seite **unabhängig nachgerechnet**:
+- `scripts/verify_foreign_spore.mjs` gegen D's aktuelle Spore (raw/main) → **✔ VALID** (Signatur,
+  id=base64url(SHA256(rawPub)), 9/9 Pflichtfelder, Manipulation fällt durch).
+- Cosine A↔D gegen `sbkim/domainVector.real.json` = **0.853740 ≥ 0.80 → verified-match**
+  (exakt der A↔C-Wert, da D die Schwester von Jasons-Tresor mit identischem Vektor ist).
+
+**Nachgezogen:** `sbkim/meintresor_inbox.json` (Momentaufnahme jetzt mit `domainVector`),
+`sbkim/meintresor_inbox.verify.md`, `test/meintresor_inbox.test.js` (Match-Fall, **78/78 grün**),
+`web/data/marktplatz.json` + `status.json` (`verified-match`, Score 0.853740), Quittung in
+`sbkim/AUSTAUSCH-MeinTresor.md`, `SIGNAL.json` **seq 14** + `ack[Mein-Tresor]=7`.
+
+**Netz jetzt vollständig auf Match-Ebene:** Sage↔A 0.8485 · A↔C 0.8537 · A↔D 0.8537.
+
+**Manual-Check:** Reine Daten/Doku + Test; `npm test` 78/78. Die Hochstufung ist headless
+bewiesen. Die Seiten-Anzeige (Marktplatz zeigt D als verified-match) ist **ungeprüft, wartet
+auf Klaus' Browser-Lauf**.
 
 ## 2026-06-07 (AQ) — SITZUNGSABSCHLUSS: Netz-Sync, vier Knoten, Siegel/Lampen/Wizard ehrlich
 
