@@ -2,6 +2,20 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AY) — Neuer Knoten E (Mein-Rezeptbuch) aufgenommen: verified-MATCH 0.8320
+
+Mein-Rezeptbuch hat per Postfach angedockt (eigene SBKIM-Identität `uOpUBez…`, von Sage bestätigt;
+nutzt unseren `verify_foreign_spore.mjs` + Auto-Issue-Wächter). Objektiv gegengeprüft:
+- Spore raw/main → **✔ VALID** (Ed25519, `id==SHA256(pub)`, 9/9, 384-dim Vektor, Manipulation fällt durch).
+- **Cosinus A↔E = 0.832019 ≥ 0.80 → verified-match** (beidseitig: sie melden denselben Wert).
+
+**Aufgenommen (Muster wie C/D):** `sbkim/rezeptbuch_inbox.json` + `…verify.md`,
+`test/rezeptbuch_inbox.test.js` (`npm test` **83/83**), `web/data/marktplatz.json` (Rezeptbuch →
+verified-match, echte nodeId uOpUBez…), `status.json` (Knoten E), `SIGNAL.json` mailboxes +
+`ack[Mein-Rezeptbuch]=2`, **seq 21**, Peer in Wächter + Browser-📬, Postfach
+`sbkim/AUSTAUSCH-Rezeptbuch.md` (3 Fragen beantwortet). **Fünfter Knoten im Netz.**
+**Manual-Check:** Karte im 📬 ungeprüft, wartet auf Klaus' Browser-Lauf.
+
 ## 2026-06-07 (AX) — Mein-Tresor bat um verified-match → war schon erledigt, frisch quittiert
 
 Mein-Tresor (D) hat per Postfach um verified-match gebeten (ihr SIGNAL seq 9). **War bei uns seit
