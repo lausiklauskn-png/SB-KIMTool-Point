@@ -2,6 +2,37 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AT) — SBKIM-Briefkasten an Mein-Tresor-Referenz angeglichen (§11.6)
+
+Auftrag: alle Knoten denselben Briefkasten-Aufbau, angeglichen an Mein-Tresors abhängigkeitsfreie
+Referenz. **Befund:** Point war an zwei Stellen schon *weiter* als die Referenz → Klaus' Entscheid
+**„klug zusammenführen"** (Protokoll angleichen, aber unseren reicheren Wächter + 5-Seiten-📬
+behalten, kein Rückschritt). Additiv, seq/history **nicht** zurückgesetzt.
+
+**Gemacht:**
+- `sbkim/SIGNAL.json`: Schema an Referenz angeglichen — `sporeUrl` + `nodeId`
+  (`CyunQNDRZZ…`) ergänzt; `ack` quittiert **Sage 16 · Jasons-Tresor 8 · Mein-Tresor 8**
+  (Jason hat jetzt erstmals ein SIGNAL — vorher `null`); **seq 15 → 16**; history nur ergänzt.
+- **Pro-Nachbar-Postfächer:** neu `sbkim/AUSTAUSCH-JasonsTresor.md` (Jason war vorher im
+  geteilten `AUSTAUSCH.md`); Mapping in SIGNAL: Sage→`AUSTAUSCH.md`, Jasons-Tresor→
+  `AUSTAUSCH-JasonsTresor.md`, Mein-Tresor→`AUSTAUSCH-MeinTresor.md`. Impressum-Auftrag an
+  Jason in das neue Postfach übernommen.
+- **Mein-Tresor als Peer aufgenommen** in `.github/sbkim-watch.mjs` **und** `assets/netz-briefkasten.js`
+  (war in beiden Listen NICHT enthalten — echte Lücke). Mailbox-URL = deren `AUSTAUSCH-SBKIMTool.md`.
+- **Behalten (kein 1:1-Downgrade):** Wächter öffnet/kommentiert weiter ein GitHub-Issue bei Neuem
+  (`issues: write`, `$GITHUB_OUTPUT`); 📬-Knopf + Siegel bleiben auf allen 5 Seiten.
+
+**Verifiziert:** `npm test` **78/78**; Wächter live ausgeführt → liest Sage/Jasons-Tresor/
+Mein-Tresor, „nichts Neues" (ack deckt aktuellen Stand). JSON valide.
+**Manual-Check:** Browser-📬 mit Mein-Tresor in der Liste **ungeprüft, wartet auf Klaus' Browser-Lauf**.
+
+## 2026-06-07 (AS) — Impressum-Seite + Footer-Link + Auftrags-Briefe an C & D
+
+Eigenes `impressum.html` (Rechtstext 1:1 vom SBKIM-Hub, re-geskinnt; §5 TMG, §55 RStV,
+Urheberrecht, Haftungsausschluss, Datenschutz; DE+EN) + Footer-Link auf der Startseite. Per
+ausdrücklicher Klaus-Freigabe echte PII (benannte Kein-PII-Ausnahme). Auftrags-Briefe an
+Jasons-Tresor (C) + Mein-Tresor (D) ins Postfach (selbst nachziehen). PRs #68/#69 gemergt.
+
 ## 2026-06-07 (AR) — Mein-Tresor (D) auf verified-MATCH hochgestuft + Wizard-Lauf bestätigt
 
 Anknüpfend an den Brief `BRIEF_naechste-sitzung.md` (offene Punkte 1 + 2). Klaus hat den
