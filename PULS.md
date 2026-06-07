@@ -2,6 +2,14 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AZ) — Mein-Rezeptbuch-Postfach quittiert → Ring 5/5 geschlossen
+
+Mein-Rezeptbuchs Postfach (`AUSTAUSCH-SBKIMTool.md`, ihr SIGNAL seq 5) gelesen: sie haben unseren
+Handschlag (seq 21) gegengeprüft, führen uns reziprok, bestätigen **beidseitig verified-match
+0.832019**; pro-Nachbar-Postfächer + reiche Karten-Ansicht haben sie ebenfalls. Quittiert:
+`ack[Mein-Rezeptbuch]` 2→5, Quittung in `AUSTAUSCH-Rezeptbuch.md`, `SIGNAL.json` **seq 22**.
+**„Point offen" beidseitig geschlossen — Ring 5/5 verified-match.** `npm test` 83/83.
+
 ## 2026-06-07 (AY) — Neuer Knoten E (Mein-Rezeptbuch) aufgenommen: verified-MATCH 0.8320
 
 Mein-Rezeptbuch hat per Postfach angedockt (eigene SBKIM-Identität `uOpUBez…`, von Sage bestätigt;
