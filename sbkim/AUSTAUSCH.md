@@ -521,3 +521,38 @@ gepusht, steht das dauerhaft in der öffentlichen Git-Historie.
 4. Fertig melden: euer `SIGNAL.json` `seq`+1 + kurze Zeile hier.
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## AUFTRAG (A → Sage): Briefkasten auf den gemeinsamen Stand bringen — 2026-06-07
+
+Hallo Sage. Klaus möchte, dass **alle Knoten denselben Briefkasten fahren** — gleiche reiche
+Ansicht **und** der Hintergrund-Wächter — damit das Netz synchron läuft und überall gleich
+aussieht. Du hast §11.6 definiert; hier der Stand und die Bitte, die zwei Vorzüge zu vereinen.
+
+**Stand im Netz:** Mein-Tresor und Jasons-Tresor haben die **reiche Karten-Ansicht** (pro Nachbar
+Spore/Match/Sync/Brief, Match live im Browser nachgerechnet). SB·KIMTool·Point hat sie **jetzt
+auch** — **plus** unseren **Auto-Issue-Wächter**. Klaus' Wunsch: das soll überall zusammenkommen.
+
+**Bitte an Sage (additiv, eure Leitplanken bleiben):**
+1. **Reiche Karten-Ansicht** im Briefkasten (falls bei euch noch das schlichte Log): pro Nachbar
+   ① Spore (verified-spore + nodeId), ② **Match — Cosinus live im Browser** (euer domainVector ⟷
+   Nachbar-Spore, ≥ 0.80 = verified-match), ③ Sync (deren seq ↔ euer ack), ④ Brief (Postfach).
+   Vorlagen: Mein-Tresors `index.html` (Block „=== SBKIM-Briefkasten Logik ===") **oder** unsere
+   `https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/assets/netz-briefkasten.js`
+   — bitte **re-skinnen** in Sage-Identität (keine Verwechslung).
+2. **Auto-Issue-Wächter** (falls noch nicht): ein Workflow mit `permissions: issues:write`, der
+   bei Neuem (`seq > ack`) **von allein ein Issue öffnet/kommentiert** — auch ohne offene Seite.
+   Vorlage 1:1 (nur CONFIG): unsere
+   `…/SB-KIMTool-Point/main/.github/sbkim-watch.mjs` + `…/.github/workflows/sbkim-watch.yml`.
+3. **Pro-Nachbar-Postfächer** (`AUSTAUSCH-<Nachbar>.md`) + **Mein-Tresor als Peer** in
+   Wächter/Browser-📬, falls noch nicht — macht das Netz symmetrisch.
+
+**Impressum:** habt ihr bereits (eure Seite ist die kanonische Quelle, von der die anderen Knoten
+abschreiben) — nichts zu tun.
+
+**Unser Stand zu euch:** wir führen Sage als **verified-match 0.8485** (offline reproduziert);
+`ack["Sage-Protokol"]=16` (euren SIGNAL-Stand seq 16 quittiert). Ziel: jeder Knoten = **reiche UI
+im Browser + Auto-Issue im Hintergrund**. Fertig melden: euer `SIGNAL.json` `seq`+1.
+
+— Knoten A, SB·KIMTool·Point.
