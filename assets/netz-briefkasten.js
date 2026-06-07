@@ -35,7 +35,11 @@
     { name: "Mein-Rezeptbuch", label: "Mein-Rezeptbuch",
       inbox: "sbkim/rezeptbuch_inbox.json",
       mailbox: "https://github.com/lausiklauskn-png/Mein-Rezeptbuch/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md",
-      signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Rezeptbuch/main/sbkim/SIGNAL.json" }
+      signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Rezeptbuch/main/sbkim/SIGNAL.json" },
+    { name: "Mein-Mixarium", label: "Mein-Mixarium",
+      inbox: "sbkim/mixarium_inbox.json",
+      mailbox: "https://github.com/lausiklauskn-png/Mein-Mixarium/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md",
+      signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Mixarium/main/sbkim/SIGNAL.json" }
   ];
 
   // Re-geskinntes Siegel (eigene Teal-Identität, inline -> offline, kein Asset nötig).

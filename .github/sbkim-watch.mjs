@@ -44,6 +44,11 @@ const PEERS = [
     signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Rezeptbuch/main/sbkim/SIGNAL.json",
     mailbox: "https://github.com/lausiklauskn-png/Mein-Rezeptbuch/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md",
   },
+  {
+    name: "Mein-Mixarium",
+    signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Mixarium/main/sbkim/SIGNAL.json",
+    mailbox: "https://github.com/lausiklauskn-png/Mein-Mixarium/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md",
+  },
 ];
 /* ===================================================================== */
 

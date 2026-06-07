@@ -15,11 +15,13 @@
     },
     {
       "name": "Mixarium",
-      "nodeId": "JOlHK31XEiyl…",
+      "nodeId": "B7Fke9CYTR1…",
       "kannDas": "Getraenke/Cocktails anbieten und passende Mixturen finden.",
       "andockLink": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
-      "status": "live-direct",
-      "echt": true
+      "status": "verified-match-2026-06-07",
+      "echt": true,
+      "matchScore": 0.802994,
+      "matchHinweis": "Knoten F — verified-MATCH 0.8030 (echter domainVector, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet B7Fke9…; beidseitig nachgerechnet (knapp ueber 0.80)."
     },
     {
       "name": "Sage",

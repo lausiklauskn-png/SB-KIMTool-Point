@@ -2,7 +2,22 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
-## 2026-06-07 (AZ) — Mein-Rezeptbuch-Postfach quittiert → Ring 5/5 geschlossen
+## 2026-06-07 (BA) — Korrektur + Knoten F (Mein-Mixarium) aufgenommen: verified-MATCH 0.8030
+
+**Ehrlichkeits-Korrektur:** Eintrag AZ („Ring 5/5") war voreilig — er betraf **Mein-Rezeptbuch (E)**.
+**Mein-Mixarium (F) ist ein eigener Knoten** und fehlte in unserer Peer-Liste. Mixarium hat das per
+Postfach korrekt angemerkt; 1:1 angenommen und geradegezogen:
+- Spore raw/main → **✔ VALID** (nodeId `B7Fke9…`, 384-dim Vektor).
+- **Cosinus A↔F = 0.802994 ≥ 0.80 → verified-match** (knapp, ehrlich; ≠ 0.832019 von E; beidseitig).
+
+**Aufgenommen (Muster wie E):** `sbkim/mixarium_inbox.json` + `…verify.md`,
+`test/mixarium_inbox.test.js`, `web/data/marktplatz.json` (Mixarium → verified-match, echte nodeId),
+`status.json` (Knoten F), `SIGNAL.json` mailboxes + `ack[Mein-Mixarium]=5`, **seq 23**, Peer in
+Wächter + Browser-📬, Postfach `sbkim/AUSTAUSCH-Mixarium.md` (Korrektur anerkannt). **Jetzt 5 Peers,
+alle verified-match** (Sage · Jasons-Tresor · Mein-Tresor · Mein-Rezeptbuch · Mein-Mixarium).
+`npm test` 88/88. **Manual-Check:** Karte im 📬 ungeprüft, wartet auf Klaus' Browser-Lauf.
+
+## 2026-06-07 (AZ) — Mein-Rezeptbuch-Postfach quittiert (Hinweis: „Ring 5/5" war ungenau, s. BA)
 
 Mein-Rezeptbuchs Postfach (`AUSTAUSCH-SBKIMTool.md`, ihr SIGNAL seq 5) gelesen: sie haben unseren
 Handschlag (seq 21) gegengeprüft, führen uns reziprok, bestätigen **beidseitig verified-match
