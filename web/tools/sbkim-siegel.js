@@ -111,6 +111,12 @@
       aspect:      "Mycel-Verbindung etabliert (erster Handshake)",
       description: "Diese App hat in der aktuellen Session mindestens einen erfolgreichen Cross-Knoten-Handshake durchgeführt. SIEGEL-Stufe Gold.",
     },
+    {
+      since:       "2026-06-07",
+      module:      "16",
+      aspect:      "Semantische Selbst-Beschreibung im Siegel",
+      description: "Der Knoten beschreibt seine Domäne in eigenen Worten direkt im Siegel; daraus wird der domainVector neu berechnet und die Spore frisch signiert (Modul 02/03). Reiner Render-/Bedien-Pfad, kein Protokoll-Eingriff.",
+    },
   ];
 
   // ---- Aspekt-4-Anker (Karte 16 § Sub (e) dynamische Render-Variante) ----
@@ -144,8 +150,6 @@
   var HANDSHAKE_EVENT = "sbkim:handshake";
   var ARIA_LABEL_BRONZE = "SBKIM-Siegel · Mycel suchend";
   var ARIA_LABEL_GOLD = "SBKIM-Siegel · Mycel verbunden";
-  var BRONZE_HINWEIS_HTML_FALLBACK =
-    "Modul 18 noch nicht verfügbar — Andocken via Sage-Page-Andock-Wizard.";
 
   // ---- Wappen-SVG (Akkretions-Disk-Korona + Auszeichnungs-Siegel) ----
   //
@@ -682,9 +686,10 @@
     header.appendChild(closeBtn);
 
     // Sub (e) Bronze-Hinweis-Block (Karte 16 § Sub (e) Klick-Verhalten in
-    // Bronze). Sichtbar nur wenn _meta.mycelConnected === false. Enthält
-    // den Hinweis-Text + einen [Andocken]-Knopf, der Modul 18 Sub (a)
-    // öffnet (fail-soft: wenn Modul 18 nicht da, Info-Notiz im Modal).
+    // Bronze). Sichtbar nur wenn _meta.mycelConnected === false. Reiner
+    // Hinweis-Text — kein [Andocken]-Knopf mehr (Modul-18-Pfad entfernt
+    // 2026-06-07): das echte Andocken läuft über den 🔑-Knopf, den der
+    // Glue (assets/sbkim-siegel.js) oben ins Panel hängt.
     var bronzeHinweisBlock = doc.createElement("div");
     bronzeHinweisBlock.setAttribute("data-siegel-bronze-hinweis", "");
     bronzeHinweisBlock.style.cssText = [
@@ -793,7 +798,8 @@
 
   // Sub (e) Bronze-Hinweis-Block-Render (Karte 16 § Sub (e) Klick-
   // Verhalten in Bronze). Wird aus renderModalContents() bei jedem
-  // Modal-Render aufgerufen.
+  // Modal-Render aufgerufen. Reiner Hinweis-Text (Modul-18-Pfad
+  // entfernt 2026-06-07) — verweist auf den 🔑-Knopf des Glue.
   function renderBronzeHinweisBlock(modalRoot) {
     var block = modalRoot.querySelector("[data-siegel-bronze-hinweis]");
     if (!block) return;
@@ -809,87 +815,17 @@
     block.style.display = "block";
 
     var p = doc.createElement("p");
-    p.style.cssText = "margin:0 0 0.6rem;";
+    p.style.cssText = "margin:0;";
     var strong = doc.createElement("strong");
     strong.textContent = "Mycel suchend";
     strong.style.cssText = "color:var(--siegel-bronze, #8C6E2F);font-weight:600;";
     p.appendChild(strong);
     p.appendChild(doc.createTextNode(
-      " — diese App ist SBKIM-fähig, aber noch nicht mit Geschwister-Knoten verbunden. " +
-      "Klick auf [Andocken] (Modul 18) um eine Verbindung herzustellen.",
+      " — diese App ist SBKIM-fähig, aber in dieser Session noch nicht mit einem " +
+      "Geschwister-Knoten verbunden. Eine eigene Identität & Spore erzeugst oder " +
+      "pflegst du oben über den 🔑-Knopf.",
     ));
     block.appendChild(p);
-
-    var andockBtn = doc.createElement("button");
-    andockBtn.type = "button";
-    andockBtn.setAttribute("data-siegel-andock-btn", "");
-    andockBtn.textContent = "Andocken";
-    andockBtn.style.cssText = [
-      "padding:0.4rem 0.9rem",
-      "background:var(--siegel-bronze, #8C6E2F)",
-      "color:#1A1306",
-      "border:1px solid var(--siegel-line, rgba(201,169,97,0.45))",
-      "border-radius:6px",
-      "font-family:'Geist', system-ui, sans-serif",
-      "font-size:0.86rem",
-      "font-weight:500",
-      "cursor:pointer",
-    ].join(";");
-    andockBtn.addEventListener("click", function () {
-      // Drei-Pfad-Logik (Pflege 2026-05-28 Refinement von PR #197):
-      //   Pfad 1 — toolPwa.openAndockTab existiert + Aufruf wirft NICHT
-      //            → Wizard startet → Bronze-Modal schließt sich.
-      //   Pfad 2 — toolPwa.openAndockTab existiert + Aufruf wirft (z.B.
-      //            ToolPwaNotReadyError weil init() im Andocker fehlt)
-      //            → Bronze-Modal BLEIBT OFFEN + Info-Hinweis im Block.
-      //   Pfad 3 — toolPwa fehlt komplett (Modul 18 nicht geladen)
-      //            → Fallback BRONZE_HINWEIS_HTML_FALLBACK.
-      var toolPwa = global.SbkimToolPwa;
-      if (toolPwa && typeof toolPwa.openAndockTab === "function") {
-        var threw = false;
-        var thrownErr = null;
-        try { toolPwa.openAndockTab(); }
-        catch (err) {
-          threw = true;
-          thrownErr = err;
-          warn("Modul 18 openAndockTab fehlgeschlagen.", err);
-        }
-        if (!threw) {
-          // Pfad 1 — Erfolg: Wizard ist im Mount, Bronze-Modal weg.
-          closeModal();
-          return;
-        }
-        // Pfad 2 — Throw: Modal bleibt offen, Info-Hinweis im Block.
-        var existing2 = block.querySelector("[data-siegel-andock-info]");
-        if (existing2) return;
-        var info2 = doc.createElement("p");
-        info2.setAttribute("data-siegel-andock-info", "");
-        var errName = (thrownErr && thrownErr.name) || "Error";
-        if (errName === "ToolPwaNotReadyError") {
-          info2.textContent =
-            "Modul 18 ist geladen, aber im Andocker nicht initialisiert " +
-            "(SbkimToolPwa.init() fehlt). Bauer muss init() im sbkim-init " +
-            "nach SbkimSiegel.init ergänzen.";
-        } else {
-          info2.textContent =
-            "Andock-Wizard konnte nicht starten — " +
-            (thrownErr && thrownErr.message ? thrownErr.message : errName) +
-            ".";
-        }
-        info2.style.cssText = "margin:0.6rem 0 0;font-size:0.82rem;color:rgba(245,245,255,0.7);font-style:italic;";
-        block.appendChild(info2);
-        return;
-      }
-      // Pfad 3 — Fallback: Modul 18 fehlt komplett.
-      var existing = block.querySelector("[data-siegel-andock-info]");
-      if (existing) return;        // idempotent
-      var info = doc.createElement("p");
-      info.setAttribute("data-siegel-andock-info", "");
-      info.textContent = BRONZE_HINWEIS_HTML_FALLBACK;
-      info.style.cssText = "margin:0.6rem 0 0;font-size:0.82rem;color:rgba(245,245,255,0.7);font-style:italic;";
-      block.appendChild(info);
-    });
-    block.appendChild(andockBtn);
   }
 
   function renderModalContents() {
