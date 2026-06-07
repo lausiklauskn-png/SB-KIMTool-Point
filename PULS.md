@@ -1,6 +1,32 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
+Stand: 2026-06-07 · Branch `claude/point-siegel-angleich-sage-lkjSH`
+
+## 2026-06-07 (BB) — Siegel-Erlebnis an Sage angeglichen (Beschreibungs-Feld, Schutz-Block, Erklär-Seite)
+
+Das Siegel-Modal bekommt das Sage-Erlebnis, an Points Struktur angepasst. Vier Bausteine:
+
+- **A · Modul 16** (`web/tools/sbkim-siegel.js`): Modul-18-Andock-Pfad entfernt
+  (`BRONZE_HINWEIS_HTML_FALLBACK`, `[data-siegel-andock-btn]`, `SbkimToolPwa`-Drei-Pfad-Logik
+  raus). Der Bronze-Block ist jetzt **reiner Hinweis-Text** und verweist auf den 🔑-Knopf.
+  Neuer `ZERTIFIKAT_ASPEKTE`-Eintrag „Semantische Selbst-Beschreibung im Siegel" (2026-06-07).
+  Modul 16 bleibt **reines Render-Modul** (kein Protokoll-Eingriff).
+- **B · Beschreibungs-Textfeld** (`assets/sbkim-siegel.js`, `setupAndockWizard`): auto-wachsendes
+  `<textarea>` direkt unter dem 🔑-Knopf + Sage-Hinweistext + Knopf „Beschreibung übernehmen →
+  Vektor & Spore neu signieren". Voller Sign-Pfad (Modul 02/03): `getOrCreateIdentity` (gleiche
+  nodeId) → `SbkimEmbedding.init` (Fortschritt via `sbkim:embedding-progress`) → `embedPassage`
+  → `generateOwnSpore` → `spore.json`-Download + Erfolgsmeldung (nodeId, L2). Vorbefüllt aus der
+  eigenen Spore, sonst Point-Default. Point-`WIZ.domainDescription` auf den reicheren Default
+  gehoben.
+- **C · Schutz-Block**: „🛡 Was bedeutet dieses Siegel — und wie bist du geschützt?" + zwei
+  beruhigende Sätze + Knopf „Ausführlich erklärt …".
+- **D · Erklär-Seite** `sicherheit.html` (flach, dunkler Teal-Skin, selbsttragend): die
+  Mycel-Erklärung wortgleich aus Sage. Der C-Knopf öffnet sie als **In-Page-Overlay** (iframe,
+  ✕/Backdrop/Esc, kein neuer Tab); der „zurück"-Link blendet sich im Overlay aus.
+
+`hideBronzeAndockBlock()` ist damit überflüssig und entfernt (Bronze-Block ist jetzt sauber).
+**`npm test` 88/88 grün** (Modell + Module unberührt; Siegel-Lesepfad `getAspects()` weiter ok).
+**Manual-Check: Browser-Lauf ungeprüft, wartet auf Klaus' Hard-Reload (Ctrl+Shift+R).**
 
 ## 2026-06-07 (BA) — Korrektur + Knoten F (Mein-Mixarium) aufgenommen: verified-MATCH 0.8030
 

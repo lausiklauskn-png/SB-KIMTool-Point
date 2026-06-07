@@ -122,7 +122,7 @@
     endpoint: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",
     nodeType: "hybrid",
     nodeName: "SB-KIMTool-Point",
-    domainDescription: "Werkzeugkiste + headless Modell-Lauf für das SBKIM-Protokoll.",
+    domainDescription: "SB-KIMTool-Point ist das offene Observatorium und die Werkzeugkiste des SBKIM-Mycels: ein Knoten, an dem Forker die fertigen SBKIM-Bausteine (Module 00–19) anschauen, verstehen und ins eigene Repo kopieren können — von Identität und signierter Spore über Embedding und semantischen Match bis Membran und Siegel. Dazu ein ehrlicher Real-Anteil aus status.json, ein animiertes Modell der Rollen-Kette und ein Marktplatz für Knoten, die schon laufen. Für Mensch und KI-Agent gleichermaßen, zum Mitbauen.",
     domainKeywords: ["Werkzeugkiste", "SBKIM-Module", "Modell", "Markt", "Endknoten"],
     stammCategories: ["Werkzeugkiste", "SBKIM-Module", "Headless-Modell-Lauf", "Markt-Siegel"],
     guestCategories: ["Werkzeug-Kopie", "Modul-Andock", "Spore-Verifikation"]
@@ -144,29 +144,234 @@
       // robust: an den Anfang des Panels (vor das erste Kind, falls vorhanden).
       if (panel.firstChild) panel.insertBefore(openBtn, panel.firstChild);
       else panel.appendChild(openBtn);
+
+      // (B) Semantik-Beschreibungs-Textfeld DIREKT unter dem 🔑-Knopf:
+      //     Domänentext frei beschreiben → Vektor (Modul 03) + Spore (Modul 02)
+      //     neu signieren. Speist denselben Sign-Pfad wie der Wizard.
+      var semantik = buildSemantikBlock();
+      if (openBtn.nextSibling) panel.insertBefore(semantik, openBtn.nextSibling);
+      else panel.appendChild(semantik);
+
+      // (C) Vertrauens-/Schutz-Block direkt darunter: beruhigende Sätze +
+      //     Knopf, der die Erklär-Seite als In-Page-Overlay öffnet (kein neuer Tab).
+      var schutz = buildSchutzInfoBlock();
+      if (semantik.nextSibling) panel.insertBefore(schutz, semantik.nextSibling);
+      else panel.appendChild(schutz);
     }
-    // Doppeltes Andocken entfernen: Modul 16 zeigt im Bronze-Zustand einen eigenen
-    // „Mycel suchend → [Andocken] (Modul 18)"-Block. Der ist bei uns überflüssig
-    // (unser Knopf oben macht das echte Andocken) und nennt faelschlich „Modul 18".
-    // -> dauerhaft ausblenden. Modul 16 selbst bleibt unangetastet.
-    hideBronzeAndockBlock(modal);
+    // Modul 16s Bronze-Block ist seit 2026-06-07 ein reiner Hinweis-Text (der
+    // alte „[Andocken] (Modul 18)"-Pfad wurde im Modul entfernt) — er verweist
+    // jetzt sauber auf den 🔑-Knopf oben. Kein Ausblenden mehr nötig.
     if (!document.getElementById("sbkim-ident-wizard")) buildWizardDialog();
   }
 
-  // Blendet Modul 16s Bronze-„Andocken"-Block aus — auch wenn er erst beim Öffnen
-  // des Modals sichtbar geschaltet wird (MutationObserver auf das Modal).
-  function hideBronzeAndockBlock(modal) {
-    if (!modal) modal = document.getElementById("sbkim-siegel-modal");
-    if (!modal) return;
-    function kill() {
-      var blk = modal.querySelector("[data-siegel-bronze-hinweis]");
-      if (blk && blk.style.display !== "none") blk.style.display = "none";
+  // ---- (B) Semantik-Beschreibungs-Textfeld ----
+  // Auto-wachsendes Textfeld + Hinweis + Knopf „Beschreibung übernehmen →
+  // Vektor & Spore neu signieren". Vorbefüllt mit der aktuellen
+  // domainDescription der eigenen Spore (sonst Point-Default).
+  function buildSemantikBlock() {
+    var wrap = document.createElement("div");
+    wrap.id = "sbkim-semantik-block";
+    wrap.style.cssText = "margin:0 0 1rem;padding:0.75rem 0.9rem;border-radius:10px;" +
+      "border:1px solid rgba(201,169,97,0.3);background:rgba(201,169,97,0.06);";
+
+    var ta = document.createElement("textarea");
+    ta.id = "sbkim-semantik-text";
+    ta.rows = 4;
+    ta.placeholder = "Beschreibe deine App neu oder kopiere die Beschreibung / README hier hinein.";
+    ta.style.cssText = "display:block;width:100%;box-sizing:border-box;resize:none;overflow:hidden;" +
+      "min-height:5.5em;padding:0.55rem 0.65rem;font:inherit;font-size:0.88rem;line-height:1.5;" +
+      "color:#F5F5FF;background:rgba(0,0,0,0.35);border:1px solid rgba(201,169,97,0.35);border-radius:8px;";
+    // Vorbefüllen: aktuelle Spore-Beschreibung, sonst Point-Default.
+    ta.value = WIZ.domainDescription;
+    try {
+      if (window.SbkimSpore && window.SbkimSpore.getOwnSpore) {
+        window.SbkimSpore.getOwnSpore().then(function (sp) {
+          if (sp && typeof sp.domainDescription === "string" && sp.domainDescription.trim()) {
+            ta.value = sp.domainDescription;
+            autoGrow(ta);
+          }
+        }).catch(function () { /* fail-soft: Default bleibt */ });
+      }
+    } catch (e) { /* fail-soft */ }
+    // Auto-Grow: Höhe folgt dem Inhalt.
+    ta.addEventListener("input", function () { autoGrow(ta); });
+
+    var hint = document.createElement("p");
+    hint.style.cssText = "margin:0.55rem 0 0;font-size:0.8rem;line-height:1.5;color:rgba(245,245,255,0.7);";
+    hint.textContent = "Je konkreter, desto besser findet dich das Mycel. Beschreibe in eigenen " +
+      "Worten: was die App/Seite ist, wofür man sie nutzt, welche Themen/Stichworte sie abdeckt, " +
+      "für wen sie gedacht ist. Ein gut gefüllter Absatz (ca. 3–8 Sätze) ist ideal — gern auch die " +
+      "README hineinkopieren, sie beschreibt das Projekt meist am treffendsten. Vermeide reine " +
+      "Schlagwort-Listen ohne Kontext.";
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "sbkim-semantik-resign";
+    btn.className = "andock-tool";
+    btn.textContent = "Beschreibung übernehmen → Vektor & Spore neu signieren";
+    btn.style.cssText = "display:block;width:100%;margin:0.7rem 0 0;padding:0.5rem 0.8rem;font:inherit;" +
+      "font-weight:700;cursor:pointer;border-radius:8px;border:1px solid #C9A961;" +
+      "background:rgba(201,169,97,0.12);color:#F5E6B8;";
+
+    var out = document.createElement("div");
+    out.id = "sbkim-semantik-out";
+    out.style.cssText = "margin:0.6rem 0 0;font-family:var(--mono);font-size:0.78rem;" +
+      "line-height:1.5;color:var(--accent);word-break:break-word;";
+
+    btn.addEventListener("click", function () { reSignWithDescription(ta, btn, out); });
+
+    wrap.appendChild(ta);
+    wrap.appendChild(hint);
+    wrap.appendChild(btn);
+    wrap.appendChild(out);
+    // Auto-Grow einmal initial (nach Mount, wenn scrollHeight stimmt).
+    setTimeout(function () { autoGrow(ta); }, 0);
+    return wrap;
+  }
+
+  function autoGrow(ta) {
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+  }
+
+  // Voller Re-Sign-Pfad (wie Sage): gleiche Identität → Embedding (mit
+  // Fortschritt) → embedPassage(beschreibung) → generateOwnSpore → Download.
+  function reSignWithDescription(ta, btn, out) {
+    function say(msg, bad) {
+      out.textContent = msg;
+      out.style.color = bad ? "var(--bad, #e5484d)" : "var(--accent)";
     }
-    kill();
-    if (!modal.__bronzeHidden && typeof MutationObserver === "function") {
-      modal.__bronzeHidden = true;
-      var mo = new MutationObserver(kill);
-      mo.observe(modal, { attributes: true, childList: true, subtree: true });
+    var beschreibung = (ta.value || "").trim();
+    if (!beschreibung) { say("Bitte zuerst eine Beschreibung eintippen.", true); return; }
+    if (!window.SbkimSpore || !window.SbkimEmbedding) {
+      say("Module 02/03 nicht geladen — Re-Signieren nicht möglich.", true); return;
+    }
+    btn.disabled = true;
+    var progressHandler = function (ev) {
+      var d = ev && ev.detail;
+      if (!d) return;
+      var pct = (typeof d.progress === "number") ? " " + Math.round(d.progress) + "%" : "";
+      say("Lade Sprachmodell (einmalig ~30 MB)" + pct + " …");
+    };
+    window.addEventListener("sbkim:embedding-progress", progressHandler);
+    say("Erzeuge / lade Identität …");
+    window.SbkimSpore.getOrCreateIdentity()
+      .then(function (id) {
+        say("Identität: " + id.nodeId + " — initialisiere Embedding …");
+        return window.SbkimEmbedding.init();
+      })
+      .then(function () { say("Berechne semantischen Vektor (384-dim) …");
+        return window.SbkimEmbedding.embedPassage(beschreibung); })
+      .then(function (vec) {
+        say("Signiere Spore …");
+        var arr = Array.from(vec);
+        var l2 = 0; for (var i = 0; i < arr.length; i++) l2 += arr[i] * arr[i];
+        l2 = Math.sqrt(l2);
+        return window.SbkimSpore.generateOwnSpore({
+          domain: WIZ.domain, endpoint: WIZ.endpoint, nodeType: WIZ.nodeType, nodeName: WIZ.nodeName,
+          domainDescription: beschreibung, domainKeywords: WIZ.domainKeywords,
+          domainVector: arr, stammCategories: WIZ.stammCategories, guestCategories: WIZ.guestCategories
+        }).then(function (spore) { return { spore: spore, l2: l2 }; });
+      })
+      .then(function (res) {
+        lastSpore = res.spore;
+        downloadJson("spore.json", res.spore);
+        say("Spore neu signiert + ⬇  ·  nodeId=" + res.spore.id +
+            "  ·  L2=" + res.l2.toFixed(4) + ". Datei nach sbkim/spore.json committen.");
+      })
+      .catch(function (e) { say("Fehler: " + (e && e.message || e), true); })
+      .then(function () {
+        window.removeEventListener("sbkim:embedding-progress", progressHandler);
+        btn.disabled = false;
+      });
+  }
+
+  // ---- (C) Vertrauens-/Schutz-Block ----
+  // Beruhigende Kurz-Erklärung + Knopf, der die Erklär-Seite als In-Page-
+  // Overlay öffnet (kein neuer Tab — bleibt im App-/Siegel-Fenster).
+  function buildSchutzInfoBlock() {
+    var wrap = document.createElement("div");
+    wrap.id = "sbkim-schutz-block";
+    wrap.style.cssText = "margin:0 0 1rem;padding:0.75rem 0.9rem;border-radius:10px;" +
+      "border:1px solid rgba(201,169,97,0.3);background:rgba(201,169,97,0.06);";
+
+    var h = document.createElement("p");
+    h.style.cssText = "margin:0 0 0.4rem;font-weight:700;color:#F5E6B8;";
+    h.textContent = "🛡 Was bedeutet dieses Siegel — und wie bist du geschützt?";
+
+    var p = document.createElement("p");
+    p.style.cssText = "margin:0;font-size:0.84rem;line-height:1.55;color:rgba(245,245,255,0.78);";
+    p.textContent = "Das Siegel ist selbst-ausgestellt: der Knoten hat beim Start geprüft, " +
+      "dass seine Schutz-Bausteine geladen sind, und zeigt das offen. Es wandern nur Daten, " +
+      "nie Programme; dein privater Schlüssel verlässt diesen Browser nie. Kein Server in der " +
+      "Mitte, keine Anmeldung.";
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "sbkim-schutz-open";
+    btn.className = "andock-tool";
+    btn.textContent = "Ausführlich erklärt → So funktioniert das Mycel & wie du geschützt bist";
+    btn.style.cssText = "display:block;width:100%;margin:0.7rem 0 0;padding:0.5rem 0.8rem;font:inherit;" +
+      "font-weight:700;cursor:pointer;border-radius:8px;border:1px solid #C9A961;" +
+      "background:rgba(201,169,97,0.12);color:#F5E6B8;";
+    btn.addEventListener("click", openSchutzModal);
+
+    wrap.appendChild(h);
+    wrap.appendChild(p);
+    wrap.appendChild(btn);
+    return wrap;
+  }
+
+  // ---- (D) In-Page-Overlay für die Erklär-Seite (sicherheit.html) ----
+  // Fixed Overlay + <iframe src="sicherheit.html">; ✕ / Backdrop / Esc
+  // schließen; z-index über dem Siegel-Modal. Kein target=_blank.
+  var schutzKeyHandler = null;
+  function openSchutzModal() {
+    var ov = document.getElementById("sbkim-schutz-overlay");
+    if (!ov) {
+      ov = document.createElement("div");
+      ov.id = "sbkim-schutz-overlay";
+      ov.style.cssText = "position:fixed;inset:0;z-index:100000;display:flex;align-items:center;" +
+        "justify-content:center;background:rgba(0,0,0,0.72);";
+
+      var frame = document.createElement("div");
+      frame.style.cssText = "position:relative;width:min(900px,94vw);height:min(88vh,900px);" +
+        "background:#0c0f12;border:1px solid rgba(201,169,97,0.45);border-radius:12px;overflow:hidden;" +
+        "box-shadow:0 24px 64px rgba(0,0,0,0.7);";
+
+      var closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.setAttribute("aria-label", "Schließen");
+      closeBtn.textContent = "✕";
+      closeBtn.style.cssText = "position:absolute;top:0.5rem;right:0.6rem;z-index:1;cursor:pointer;" +
+        "background:rgba(0,0,0,0.5);color:#F5F5FF;border:1px solid rgba(201,169,97,0.45);" +
+        "border-radius:8px;padding:0.25rem 0.6rem;font-size:1rem;";
+      closeBtn.addEventListener("click", closeSchutzModal);
+
+      var iframe = document.createElement("iframe");
+      iframe.src = "sicherheit.html";
+      iframe.title = "So funktioniert das Mycel & wie du geschützt bist";
+      iframe.style.cssText = "width:100%;height:100%;border:0;display:block;background:#0c0f12;";
+
+      frame.appendChild(closeBtn);
+      frame.appendChild(iframe);
+      ov.appendChild(frame);
+      ov.addEventListener("click", function (e) { if (e.target === ov) closeSchutzModal(); });
+      document.body.appendChild(ov);
+    }
+    ov.style.display = "flex";
+    if (!schutzKeyHandler) {
+      schutzKeyHandler = function (e) { if (e && e.key === "Escape") closeSchutzModal(); };
+      document.addEventListener("keydown", schutzKeyHandler);
+    }
+  }
+  function closeSchutzModal() {
+    var ov = document.getElementById("sbkim-schutz-overlay");
+    if (ov) ov.style.display = "none";
+    if (schutzKeyHandler) {
+      document.removeEventListener("keydown", schutzKeyHandler);
+      schutzKeyHandler = null;
     }
   }
 
