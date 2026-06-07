@@ -74,6 +74,30 @@
 .netz-check-pop a { color: var(--accent); }
 .netz-check-pop .close { position: absolute; top: 0.5rem; right: 0.6rem; cursor: pointer; color: var(--muted); background: none; border: none; font-size: 1rem; }
 
+/* === Netz-Briefkasten — reiche Karten-Ansicht (Spore/Match/Sync/Brief), re-geskinnt === */
+.ncb-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 1.05rem; height: 1.05rem; padding: 0 0.25rem; margin-left: 0.1rem; border-radius: 999px; background: var(--lamp-dorm, #e0a52b); color: #1a1407; font-size: 0.66rem; font-weight: 700; line-height: 1; }
+#netz-mb-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 4.5vh 1rem 2rem; background: rgba(4,7,9,0.72); backdrop-filter: blur(3px); overflow-y: auto; }
+#netz-mb-overlay.show { display: flex; }
+.netz-mb-card { position: relative; width: 100%; max-width: 34rem; background: var(--card-2); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,0.6); padding: 1.2rem 1.25rem 1.4rem; color: var(--text); }
+.netz-mb-close { position: absolute; top: 0.6rem; right: 0.8rem; cursor: pointer; color: var(--muted); background: none; border: none; font-size: 1.3rem; line-height: 1; }
+.netz-mb-close:hover { color: var(--accent); }
+.netz-mb-title { margin: 0 0 0.6rem; font-size: 1.02rem; }
+.netz-mb-loading { color: var(--muted); text-align: center; padding: 1.2rem 0; }
+.netz-mb-head { text-align: center; margin: 0 0 0.7rem; }
+.netz-mb-head .nm-self { font-weight: 600; }
+.netz-mb-head .nm-id { font-size: 0.72rem; color: var(--muted); word-break: break-all; font-family: var(--mono); }
+.netz-mb-peer { border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.75rem; margin: 0.5rem 0; background: rgba(0,0,0,0.22); }
+.netz-mb-peer .nm-name { font-weight: 600; margin-bottom: 0.3rem; }
+.netz-mb-peer .nm-rows { font-size: 0.83rem; line-height: 1.85; }
+.netz-mb-peer .nm-k { display: inline-block; min-width: 4.6rem; color: var(--muted); }
+.netz-mb-peer code { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); }
+.netz-mb-peer a { color: var(--accent); }
+.nm-ok { color: #34d399; }
+.nm-warn { color: var(--lamp-dorm, #e0a52b); }
+.nm-muted { color: var(--muted); }
+.netz-mb-foot { margin: 0.7rem 0 0; text-align: center; }
+.netz-mb-note { margin: 0.3rem 0 0; font-size: 0.7rem; color: var(--muted); text-align: center; }
+
 body {
   margin: 0;
   background: var(--bg);

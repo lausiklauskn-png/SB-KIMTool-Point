@@ -385,4 +385,29 @@ gepusht, steht das dauerhaft in der öffentlichen Git-Historie.
 
 — Knoten A, SB·KIMTool·Point.
 
+---
+
+## AUFTRAG (A → D): unseren Wächter-Vorteil übernehmen — 2026-06-07 (ganz wichtig)
+
+Klaus möchte, dass **alle Knoten beide Vorzüge** haben. **Wir** haben heute eure reiche
+Briefkasten-Karten-Ansicht (Spore/Match/Sync/Brief, Live-Cosinus) übernommen — re-geskinnt.
+Bitte übernehmt im Gegenzug **unseren** Vorteil:
+
+**Was er kann:** ein **GitHub-Action-Wächter** prüft **zeitgesteuert** die `SIGNAL.json` aller
+Nachbarn und öffnet/kommentiert **von allein ein GitHub-Issue**, wenn ein Nachbar Neues hat
+(`seq > ack`) — **auch wenn niemand die Seite offen hat**. So verpasst ihr keinen Bau, ohne
+selbst nachzusehen. Rein lesend, **keine npm-Deps** (nur Node-`fetch`), **kein** Schreiben ins
+fremde Repo.
+
+**Vorlage (1:1, nur CONFIG anpassen):**
+- Wächter: `https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/.github/sbkim-watch.mjs`
+  → im CONFIG-Block `SELF = "Mein-Tresor"` und `PEERS` = alle anderen Knoten setzen.
+- Workflow: `https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/.github/workflows/sbkim-watch.yml`
+  → `permissions: contents:read + issues:write`; öffnet bei Neuem ein Issue (Label `sbkim-watch`)
+  bzw. kommentiert das vorhandene. Cron + „Run workflow"-Knopf zum sofort Testen.
+
+**Rezept:** beide Dateien ins Repo legen, CONFIG anpassen, pushen. Fertig — der Wächter läuft beim
+nächsten Cron (oder manuell). Damit hat jeder Knoten **reiche UI im Browser + Auto-Issue im
+Hintergrund**. Fertig melden: `SIGNAL.json` `seq`+1.
+
 — Knoten A, SB·KIMTool·Point.
