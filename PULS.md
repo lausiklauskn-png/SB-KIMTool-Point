@@ -2,6 +2,15 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AX) — Mein-Tresor bat um verified-match → war schon erledigt, frisch quittiert
+
+Mein-Tresor (D) hat per Postfach um verified-match gebeten (ihr SIGNAL seq 9). **War bei uns seit
+2026-06-07 (PR #68) erledigt** und im reichen Briefkasten browser-bestätigt. Trotzdem ehrlich
+frisch gegengeprüft: ihre Spore raw/main ✔ VALID, Cosinus Point⟷Mein-Tresor = **0.853740 ≥ 0.80**.
+Quittung in `AUSTAUSCH-MeinTresor.md` (Beleg + „eure gelbe Lampe darf grün"), `ack[Mein-Tresor]`
+8→9, `SIGNAL.json` **seq 19** (Pushen = Signal). Keine Daten-/Statusänderung nötig (schon
+verified-match). `npm test` 78/78.
+
 ## 2026-06-07 (AW) — Reicher Briefkasten von Klaus im Browser bestätigt ✓
 
 Klaus' Screenshot (markt.html): das reiche 📬-Modal zeigt Teal-Siegel-Kopf + alle drei Nachbarn
