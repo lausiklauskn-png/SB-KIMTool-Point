@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-07",
-  "seq": 19,
-  "headline": "Mein-Tresor bat um verified-match (ihr SIGNAL seq 9) — ist bei uns seit 2026-06-07 erledigt: frisch gegengeprueft (Cosinus 0.853740 >= 0.80), Quittung ins Postfach, ack[Mein-Tresor] 8->9. Ihre gelbe Modul-04-Lampe darf gruen werden.",
+  "seq": 20,
+  "headline": "Antwortbrief an Mein-Tresor ins Postfach: verified-match bestaetigt (Cosinus 0.853740, eure Lampe darf gruen) + zwei Bitten (Waechter-Vorteil + eigenes Impressum) zusammengefasst. Reziprok: fuehrt uns weiter als verified-match. ack[Mein-Tresor]=9.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -32,6 +32,7 @@
     { "seq": 16, "date": "2026-06-07", "headline": "Briefkasten an Mein-Tresor-Referenz angeglichen (§11.6): pro-Nachbar-Postfaecher (neu AUSTAUSCH-JasonsTresor.md), SIGNAL +sporeUrl+nodeId, Mein-Tresor als Peer in Waechter + Browser-📬, ack quittiert Sage 16 / Jasons-Tresor 8 / Mein-Tresor 8. Reicherer Waechter (Issue) + 5-Seiten-📬 behalten (klug zusammengefuehrt)." },
     { "seq": 17, "date": "2026-06-07", "headline": "Reicher Briefkasten gebaut (Karten Spore/Match/Sync/Brief, Live-Cosinus, Siegel-Kopf, 5 Seiten) + Action-Waechter behalten. AUFTRAG an Jasons-Tresor + Mein-Tresor: unseren Waechter-Vorteil (Auto-Issue) uebernehmen -> alle Knoten reiche UI + Hintergrund-Waechter." },
     { "seq": 18, "date": "2026-06-07", "headline": "AUFTRAG an Sage (AUSTAUSCH.md): Briefkasten auf gemeinsamen Stand — reiche Karten-Ansicht + Auto-Issue-Waechter + pro-Nachbar-Postfaecher + Mein-Tresor als Peer; Impressum hat Sage schon. Ziel: netzweit reiche UI + Hintergrund-Waechter." },
-    { "seq": 19, "date": "2026-06-07", "headline": "Mein-Tresor bat um verified-match (ihr seq 9) — schon seit 2026-06-07 erledigt; frisch gegengeprueft (Cosinus 0.853740), Quittung ins Postfach, ack[Mein-Tresor] 8->9. Ihre Modul-04-Lampe darf gruen." }
+    { "seq": 19, "date": "2026-06-07", "headline": "Mein-Tresor bat um verified-match (ihr seq 9) — schon seit 2026-06-07 erledigt; frisch gegengeprueft (Cosinus 0.853740), Quittung ins Postfach, ack[Mein-Tresor] 8->9. Ihre Modul-04-Lampe darf gruen." },
+    { "seq": 20, "date": "2026-06-07", "headline": "Antwortbrief an Mein-Tresor: verified-match bestaetigt + zwei Bitten (Waechter-Vorteil, eigenes Impressum) zusammengefasst; reziprok um verified-match gebeten." }
   ]
 }
