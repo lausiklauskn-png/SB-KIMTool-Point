@@ -10,7 +10,8 @@
   var SELF_SIGNAL = "sbkim/SIGNAL.json";
   var PEERS = [
     { name: "Sage-Protokol", signal: "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/sbkim/SIGNAL.json", mailbox: "https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/sbkim/AUSTAUSCH.md" },
-    { name: "Jasons-Tresor", signal: "https://raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/SIGNAL.json", mailbox: "https://github.com/lausiklauskn-png/Jasons-Tresor/blob/main/sbkim/AUSTAUSCH.md" }
+    { name: "Jasons-Tresor", signal: "https://raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/SIGNAL.json", mailbox: "https://github.com/lausiklauskn-png/Jasons-Tresor/blob/main/sbkim/AUSTAUSCH.md" },
+    { name: "Mein-Tresor", signal: "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/SIGNAL.json", mailbox: "https://github.com/lausiklauskn-png/Mein-Tresor/blob/main/sbkim/AUSTAUSCH-SBKIMTool.md" }
   ];
 
   function init() {
