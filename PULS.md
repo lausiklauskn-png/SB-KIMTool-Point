@@ -2,6 +2,13 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AW) — Reicher Briefkasten von Klaus im Browser bestätigt ✓
+
+Klaus' Screenshot (markt.html): das reiche 📬-Modal zeigt Teal-Siegel-Kopf + alle drei Nachbarn
+mit Karten — Sage verified-match 0.8485 · Jasons-Tresor 0.8537 · Mein-Tresor 0.8537, je
+synchron, „3/3 verbunden · alles synchron"; Match live im Browser nachgerechnet. Damit ist der
+reiche Briefkasten **browser-bestätigt „grün"** (vorher „wartet auf Klaus' Browser-Lauf").
+
 ## 2026-06-07 (AV) — Brief an Sage: Briefkasten auf gemeinsamen Stand
 
 Auf Klaus' Wunsch Sage einen Auftrags-Brief ins Postfach (`sbkim/AUSTAUSCH.md`) gelegt: bitte
