@@ -2,6 +2,29 @@
 
 Stand: 2026-06-07 · Branch `claude/reconstruct-session-letter-Tg0Tj`
 
+## 2026-06-07 (AU) — Reicher Briefkasten (Karten-Ansicht) + Auftrag „Wächter-Vorteil" an C & D
+
+Klaus wollte „das Beste aus beiden Welten" sichtbar machen: Mein-Tresors/Jasons reiche
+Karten-Ansicht **und** unseren Hintergrund-Wächter — bei allen Knoten.
+
+**Gemacht (Point):**
+- `assets/netz-briefkasten.js` **komplett neu** — statt mageres Eck-Popup jetzt ein **Modal mit
+  einer Karte pro Nachbar**: ① Spore (verified-spore + nodeId aus Inbox), ② Match (**Cosinus
+  LIVE im Browser** aus `spore.json`-Vektor ⟷ Inbox-Vektor; ≥0.80 = verified-match), ③ Sync
+  (Nachbar-seq ↔ unser ack), ④ Brief (Postfach öffnen). Siegel-Kopf + „X/Y verbunden". Badge mit
+  Ungelesen-Zahl beim Laden. Re-geskinnt (Teal, inline-Siegel — kein fremdes Gold-Wappen).
+- `assets/style.css`: Modal-/Karten-Styles ergänzt.
+- **Vorteil behalten:** Action-Wächter (`.github/sbkim-watch.mjs` + Workflow, Auto-Issue) bleibt
+  unverändert → wir haben jetzt **reiche UI (Browser) + Auto-Issue (Hintergrund)**.
+
+**Auftrags-Briefe (ganz wichtig, Klaus):** an `AUSTAUSCH-MeinTresor.md` + `AUSTAUSCH-JasonsTresor.md`
+— bitte **unseren Wächter-Vorteil** (Auto-Issue) übernehmen (Vorlage = unsere `.github/`-Dateien,
+nur CONFIG anpassen). Ziel: jeder Knoten hat beide Vorzüge.
+
+**Verifiziert:** `npm test` **78/78**; Live-Match headless reproduziert (Sage 0.8485,
+Jasons-Tresor 0.8537, Mein-Tresor 0.8537); JS `node --check` ok; JSON valide. `SIGNAL.json` **seq 17**.
+**Manual-Check:** reiche Karten-Ansicht im Browser **ungeprüft, wartet auf Klaus' Browser-Lauf**.
+
 ## 2026-06-07 (AT) — SBKIM-Briefkasten an Mein-Tresor-Referenz angeglichen (§11.6)
 
 Auftrag: alle Knoten denselben Briefkasten-Aufbau, angeglichen an Mein-Tresors abhängigkeitsfreie
