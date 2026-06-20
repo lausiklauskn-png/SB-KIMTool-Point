@@ -1,5 +1,36 @@
 # PULS — Übergabeprotokoll
 
+Stand: 2026-06-19 · Branch `claude/bookledgerpro-node-integration-bzxt9z`
+
+## 2026-06-19 — Sechster Peer BookLedgerPro aufgenommen (verified-spore)
+
+Sage hat BookLedgerPro vermittelt (offline-first, **verschlüsselte** Buchhaltung). Reziprok,
+offline und unabhängig verifiziert (nicht das Wort der Gegenseite übernommen) — im
+**etablierten `sbkim/`-Muster** (wie C/D/E/F), nicht als paralleles System:
+
+- **Verifikation:** `scripts/verify_foreign_spore.mjs` gegen die Live-Spore → **VALID**
+  (9/9 Pflichtfelder, `id == SHA256(pubkey)`, Ed25519-Signatur, Manipulation fällt durch).
+  → Stufe **verified-spore**. `domainVector` ist `_demo` → **kein** verified-match, Match offen.
+- **Beweis:** `sbkim/bookledgerpro_inbox.json` (eingefrorene 1:1-Spore) +
+  `sbkim/bookledgerpro_inbox.verify.md` + `test/bookledgerpro_inbox.test.js` (offline,
+  4 Fälle). **`npm test` grün** (88 → 92).
+- **Netz:** `web/data/marktplatz.json` (Status `verified-spore`, kein Match-Score),
+  `sbkim/AUSTAUSCH-BookLedgerPro.md` (Postfach), `sbkim/SIGNAL.json` (seq 24, mailbox,
+  `ack[BookLedgerPro]=5`, history), `status.json`. `assets/app.js`: ehrlicher Chip
+  „✓ Spore verifiziert · Match offen" (statt fälschlich wie voller Match).
+- **Verschlüsselungs-Achse:** als **Hypothese** dokumentiert (Nähe zu Tresor-Knoten steht nur
+  in `domainDescription`, nicht in `domainKeywords`) — **keine** Match-Aussage bis echtes
+  Embedding. BookLedgerPro nimmt die Krypto-Nähe beim echten Vektor in den Domänen-Text auf.
+- **Manual-Check:** `npm test` belegt die Verifikation offline. Marktplatz-Darstellung des
+  neuen Chips **ungeprüft, wartet auf Klaus' Browser-Lauf**.
+- **Korrektur-Hinweis:** Der erste Anlauf (PR #80) baute versehentlich ein **paralleles**
+  Knoten-System (`web/data/knoten/…`, `docs/KNOTEN.md`), weil der Branch auf dem alten
+  Gründungs-Skelett saß. Auf aktuellen `main` neu aufgesetzt und ins bestehende Muster überführt.
+
+---
+
+## (Historie ab hier — älterer Stand)
+
 Stand: 2026-06-07 · Branch `claude/point-siegel-angleich-sage-lkjSH`
 
 ## 2026-06-07 (BB) — Siegel-Erlebnis an Sage angeglichen (Beschreibungs-Feld, Schutz-Block, Erklär-Seite)
