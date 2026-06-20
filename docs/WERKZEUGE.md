@@ -26,6 +26,38 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 - **Aktiviert durch:** Klaus' Knopfdruck (läuft komplett im Browser).
 - **Volle Doku + Datenvertrag:** `docs/JASONS-BIBLIOTHEK.md`.
 
+### ▣ Komplett-Werkzeuge von Sage (1:1 gespiegelt, byte-kompatibel)
+
+Vollständige Ein-Datei-PWAs, gepflegt von **Sage-Protokol** (Spec-Hub). Hier **1:1 lokal
+gespiegelt** (`web/tools/`, Offline-Default) **plus Live-Link** zur Sage-Quelle. Nicht
+verändert (per `sha256` gegenprüfbar). Geholt 2026-06-20 aus Sage `docs/observatorium/tools/`
+(PR #318). Konventionen (von Sage): generisch (`MeinKnoten`-Platzhalter), **Siegel-Band leer**
+(netzweite Regel 2026-06-20), kein PII, kein Netz von selbst.
+
+#### Andock-Werkzeug  ✅ (browser-tauglich · extern, von Sage gepflegt)
+- Datei: `web/tools/andock.html` · sha256 `af8a265b…110816`
+- **Was:** Erzeugt im Browser eine eigene Ed25519-Identität, eine signierte `spore.json`
+  (byte-kompatibel mit Sages Verifizierer), ein echtes `e5-small`-Domain-Embedding (384-dim),
+  das SBKIM-Siegel (SVG + PNG) und die Briefkasten-Dateien (`SIGNAL.json` + `AUSTAUSCH-Sage.md`).
+- **Nutzen:** Ein Forker wird in einem Rutsch andock-fähig — Identität, Visitenkarte, Siegel,
+  serverloser Briefkasten, ohne Build und ohne Abhängigkeiten.
+- **Verwendung:** Datei öffnen → Eckdaten ausfüllen → vier Schritte durchklicken → Dateien
+  herunterladen → ins eigene Repo legen → veröffentlichen.
+- **Einbau:** Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffähig
+  (einzige optionale Netz-Aktion: Modell-Download im Embedding-Schritt).
+- **Aktiviert durch:** Erstkontakt / Andocken eines neuen Knotens.
+
+#### Komplett-Knoten  ✅ (browser-tauglich · extern, von Sage gepflegt)
+- Datei: `web/tools/mycelknoten.html` · sha256 `297b7638…a7a4d5`
+- **Was:** Bündelt die echten, unveränderten Sage-Module 01/02/03/04/05/07/15/16/17 in einer
+  Datei, inkl. Live-Lampen-Widget (LEBT / VERKEHR / FREMD / SIEGEL).
+- **Nutzen:** Referenz-Knoten zum Anschauen und Andocken — zeigt die echten Module live.
+- **Verwendung:** Datei öffnen; das schwebende Panel unten rechts zeigt den Live-Zustand.
+- **Einbau:** Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffähig
+  (Modelle/CDN nur im Embedding-Schritt).
+- **Aktiviert durch:** Öffnen der Datei (Live-Lampen springen an); FREMD-Lampe bei Angriff (15).
+- **Herkunft/Pflege:** `web/tools/KOMPLETT-WERKZEUGE.herkunft.md` (Sage-README, mitgespiegelt).
+
 ---
 
 ## BASIC — Pflicht

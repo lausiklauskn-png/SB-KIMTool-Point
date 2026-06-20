@@ -159,6 +159,52 @@ async function renderWerkzeuge() {
   draw("basic");
 }
 
+// --- Komplett-Werkzeuge: full single-file PWAs (mirrored from Sage) --------
+// Honest "Kopie + Link": open/download the LOCAL mirror (offline) AND link to
+// the live Sage source (always current). Rendered in the native .tool style.
+async function renderKomplettWerkzeuge() {
+  let data;
+  try {
+    data = await loadJSON("werkzeugkiste.json");
+  } catch (e) {
+    $("#komplett").textContent = "werkzeugkiste.json nicht gefunden.";
+    return;
+  }
+  const grid = $("#komplett");
+  const tools = data.komplett_werkzeuge || [];
+  if (!tools.length) {
+    grid.textContent = "Keine Komplett-Werkzeuge eingetragen.";
+    return;
+  }
+  for (const t of tools) {
+    const el = document.createElement("div");
+    el.className = "tool m-fertig";
+    el.innerHTML = `
+      <div class="head"><span class="id-orb">▣</span><span class="name">${t.name}</span></div>
+      <div class="status-row">
+        <span class="chip c-fertig"><span class="dot"></span>browser-tauglich ✅</span>
+        <span class="chip c-point"><span class="dot"></span>Quelle: ${t.herkunft}</span>
+      </div>
+      <p class="lead"><b>Nutzen</b>${t.nutzen}</p>
+      <details class="more">
+        <summary>Mehr — Was · Verwendung · Einbau · Aktiviert durch</summary>
+        <dl>
+          <dt>Was</dt><dd>${t.was}</dd>
+          <dt>Verwendung</dt><dd>${t.verwendung}</dd>
+          <dt>Einbau</dt><dd>${t.einbau}</dd>
+          <dt>Aktiviert durch</dt><dd>${t.aktiviert_durch}</dd>
+        </dl>
+      </details>
+      <div class="actions">
+        <a class="get" href="${t.datei}" target="_blank" rel="noopener">▶ Öffnen</a>
+        <a class="get download" href="${t.datei}" download>⬇ Herunterladen</a>
+        <a class="get download" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live-Quelle (Sage)</a>
+        <p class="getnote">Lokal gespiegelt (<code>${t.datei}</code>) · byte-kompatibel · sha256 ${t.sha256}</p>
+      </div>`;
+    grid.appendChild(el);
+  }
+}
+
 // --- Schicht 3: marketplace ------------------------------------------------
 async function renderMarkt() {
   let data;
@@ -366,6 +412,7 @@ async function renderPuls() {
   }
 }
 
+if ($("#komplett")) renderKomplettWerkzeuge();
 if ($("#tabs")) renderWerkzeuge();
 if ($("#market")) renderMarkt();
 if ($("#werkstatt-run")) renderWerkstatt();
