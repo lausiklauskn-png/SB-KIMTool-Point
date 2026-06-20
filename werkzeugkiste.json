@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-30",
+  "lastUpdated": "2026-06-20",
   "hinweis": "Quelle der Werkzeugkiste-Kacheln. sage_status = Reife im Sage-Protokol (verifiziert aus Sage/status.json, 2026-05-29). point_status = Stand hier im Tool-Point. 'vorgebaut-schlummert' heisst: bereits gebaut, springt bei Bedarf an (z.B. Angriff) — NICHT leer. Optionales Feld 'datei' = echte, offline einbaubare Datei in diesem Repo (Seite bietet sie zum Kopieren/Laden an).",
   "stufen": {
     "basic": "Pflicht — bringt den Point/SBKIM ueberhaupt zum Laufen.",
@@ -204,6 +204,35 @@
       "verwendung": "Werkzeug in den Container legen; als PWA ausliefern/kopieren.",
       "einbau": "Umschliesst ein Tool; nutzt Membran (15) als Aussenhuelle.",
       "aktiviert_durch": "Auslieferung eines selbstgebauten Tools."
+    }
+  ],
+  "komplett_werkzeuge_hinweis": "Komplett-Werkzeuge sind vollstaendige Ein-Datei-PWAs (kein Build, keine Abhaengigkeiten), gepflegt von Sage-Protokol (Spec-Hub). Hier 1:1 lokal gespiegelt (Offline-Default, web/tools/) PLUS Live-Link zur Sage-Quelle. byte-kompatibel mit Sage; nicht veraendert; gegenpruefbar ueber sha256. Quelle/Stand: Sage docs/observatorium/tools (PR #318), geholt 2026-06-20.",
+  "komplett_werkzeuge": [
+    {
+      "id": "andock", "name": "Andock-Werkzeug", "kategorie": "komplett-werkzeug",
+      "datei": "web/tools/andock.html",
+      "quelle": "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/docs/observatorium/tools/andock.html",
+      "herkunft": "Sage-Protokol (Spec-Hub)",
+      "sha256": "af8a265b87c33bf7b0ce64a4b0ab413a3a34cb0da569fa55b351478b59110816",
+      "point_status": "real-browser-tauglich · extern · von Sage gepflegt · lokal gespiegelt 2026-06-20",
+      "was": "Vollstaendige Ein-Datei-PWA. Erzeugt im Browser eine eigene Ed25519-Identitaet, eine signierte spore.json (byte-kompatibel mit Sages Verifizierer), ein echtes e5-small-Domain-Embedding (384-dim), das SBKIM-Siegel (SVG + PNG) und die Briefkasten-Dateien (SIGNAL.json + AUSTAUSCH-Sage.md).",
+      "nutzen": "Ein Forker wird in einem Rutsch andock-faehig: eigene Identitaet, Netz-Visitenkarte, Siegel und serverloser Briefkasten — ohne Build, ohne Abhaengigkeiten.",
+      "verwendung": "Datei oeffnen, Eckdaten ausfuellen, vier Schritte durchklicken, erzeugte Dateien herunterladen, ins eigene Repo legen, veroeffentlichen.",
+      "einbau": "Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffaehig, keine Dependencies (einzige optionale Netz-Aktion: Modell-Download im Embedding-Schritt).",
+      "aktiviert_durch": "Erstkontakt / Andocken eines neuen Knotens."
+    },
+    {
+      "id": "mycelknoten", "name": "Komplett-Knoten", "kategorie": "komplett-werkzeug",
+      "datei": "web/tools/mycelknoten.html",
+      "quelle": "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/docs/observatorium/tools/mycelknoten.html",
+      "herkunft": "Sage-Protokol (Spec-Hub)",
+      "sha256": "297b76388604782099ecf2b5127ce3542085266962169d87b4b1958e8ad7a4d5",
+      "point_status": "real-browser-tauglich · extern · von Sage gepflegt · lokal gespiegelt 2026-06-20",
+      "was": "Vollstaendige Ein-Datei-PWA. Buendelt die echten, unveraenderten Sage-Module 01/02/03/04/05/07/15/16/17 in einer Datei, inkl. Live-Lampen-Widget (LEBT / VERKEHR / FREMD / SIEGEL).",
+      "nutzen": "Referenz-Knoten zum Anschauen und Andocken — zeigt die echten Module live in Aktion (Identitaet, Match, Membran-Schutz, Siegel).",
+      "verwendung": "Datei oeffnen; das schwebende Panel unten rechts zeigt den Live-Zustand (vier Lampen); ueber die echten Module andocken.",
+      "einbau": "Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffaehig, keine Dependencies (Modelle/CDN nur im Embedding-Schritt).",
+      "aktiviert_durch": "Oeffnen der Datei (Live-Lampen springen an); FREMD-Lampe bei Angriff (Membran 15)."
     }
   ]
 }

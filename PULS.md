@@ -1,6 +1,28 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-06-19 · Branch `claude/bookledgerpro-node-integration-bzxt9z`
+Stand: 2026-06-20 · Branch `claude/sage-protokol-tools-e2qh79`
+
+## 2026-06-20 — Zwei Komplett-Werkzeuge von Sage aufgenommen
+
+Sage-Brief (2026-06-20) bat, zwei fertige Ein-Datei-PWAs in die Werkzeugliste aufzunehmen.
+Umgesetzt als **„Kopie + Link"** (Klaus' Wahl) auf dem **aktuellen** `main`.
+
+- **Wichtig:** Die Sitzung startete versehentlich auf einem **alten Branch-Stand**; `main`
+  war weit voraus (bis #80). Branch sauber auf `origin/main` gesetzt und die Arbeit **neu
+  gegen die aktuellen Dateien** integriert (statt Stand-Konflikte zu mergen).
+- **Sync mit Sage:** anfangs 404 (privat/PR #318) → nach Klaus' Freischaltung **byte-exakt
+  per `curl`** geholt (WebFetch wandelt verlustbehaftet zu Markdown, daher curl).
+- **Gespiegelt** nach `web/tools/`: `andock.html`, `mycelknoten.html` + Sage-README als
+  `web/tools/KOMPLETT-WERKZEUGE.herkunft.md`. Nicht verändert; `sha256` im Katalog + Test.
+- **Neue Kategorie „Komplett-Werkzeuge"**: Sektion in `werkzeuge.html`, gerendert aus
+  `werkzeugkiste.json` → `komplett_werkzeuge` via `assets/app.js`
+  (`renderKomplettWerkzeuge`, **nativer `.tool`-Stil**, kein neues CSS).
+- **Doku/Ehrlichkeit:** `docs/WERKZEUGE.md` (unter „Eigenständige Werkzeuge"), `status.json`
+  (neue real-browser-taugliche Komponente, lastUpdated 2026-06-20).
+- **Test:** `test/komplett-werkzeuge.test.js` (Existenz + HTML + Pflichtfelder + sha256).
+- **Manual-Check:** Seite **ungeprüft, wartet auf Klaus' Browser-Lauf** (Hard-Reload).
+- **Offen:** Quittung an Sage (Ein-Zeiler + Point-URL) — Entwurf im Chat; Versand über
+  Sages Briefkasten-Weg, sobald Klaus die Point-URL bestätigt.
 
 ## 2026-06-19 — Sechster Peer BookLedgerPro aufgenommen (verified-spore)
 
