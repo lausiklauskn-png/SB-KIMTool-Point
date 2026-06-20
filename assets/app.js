@@ -178,6 +178,10 @@ async function renderMarkt() {
       ? `<span class="chip c-fertig"><span class="dot"></span>✓ echt</span>` : "";
     const matchChip = (typeof e.matchScore === "number")
       ? `<span class="chip c-fertig" title="${e.matchHinweis || ""}"><span class="dot"></span>✓ voller Match · ${e.matchScore.toFixed(2)}</span>` : "";
+    // verified-spore (Identitaet echt, Domaenen-Match noch offen): ehrlich kennzeichnen,
+    // statt faelschlich wie einen vollen Match aussehen zu lassen.
+    const sporeChip = (e.status === "verified-spore")
+      ? `<span class="chip c-int" title="${e.matchHinweis || ""}"><span class="dot"></span>✓ Spore verifiziert · Match offen</span>` : "";
     const monogram = (e.name || "?").trim().charAt(0).toUpperCase();
     // "→ andocken" öffnet die echte Live-Seite des Knotens. Externe (http)-Links
     // gehen in einem neuen Tab auf; tote #-Anker bleiben (falls je wieder genutzt) inline.
@@ -188,7 +192,7 @@ async function renderMarkt() {
     el.className = "pwa";
     el.innerHTML = `
       <div class="p-head"><span class="p-mark">${monogram}</span><span class="name">${e.name}</span></div>
-      <div class="p-chips">${statusChip}${echtChip}${matchChip}</div>
+      <div class="p-chips">${statusChip}${echtChip}${matchChip}${sporeChip}</div>
       <div class="can">„${e.kannDas}"</div>
       <div class="nodeid">${e.nodeId}</div>
       <a class="dock" href="${e.andockLink}"${dockAttr}>${dockLabel}</a>`;
