@@ -204,6 +204,25 @@ verändert (per `sha256` gegenprüfbar). Geholt 2026-06-20 aus Sage `docs/observ
 - **Einbau:** Nutzt Membran (15) als Außenhülle.
 - **Aktiviert durch:** Auslieferung eines selbstgebauten Tools.
 
+### 22 · Such-Werkzeug (semantische Suche)  ◐ · 1:1 aus Sage · `web/tools/sbkim-such-widget.js`
+- **Was:** Frei bewegliches Floating-Such-Tool (🔍-Blase → Panel): **semantische,
+  server-lose Bedeutungs-Suche** über drei Bereiche — **App**-Korpus, verbundene **Knoten**
+  und **Internet** (KI-Such-Brücke, BYOK). Eigener Schlüssel-Tresor (Shamir 2/3), Treffer als
+  Prozent + Block-Kopieren, Fortschrittsbalken.
+- **Nutzen:** Findet nach **Bedeutung/Absicht** statt nach Stichwörtern; läuft auch
+  **eigenständig** ohne Mycel-Anschluss.
+- **Verwendung:** 🔍-Blase öffnen, Frage in eigenen Worten eingeben; Treffer nach Bedeutungs-
+  Nähe sortiert. Das Panel ist an der unteren rechten Ecke **größer ziehbar** (Größe gemerkt).
+- **Einbau:** Drei Skript-Tags (`sbkim-embedding.js` 03, `sbkim-match.js` 04,
+  `sbkim-such-widget.js` 22) **nach** den Abhängigkeiten laden (KEIN Auto-Init), dann
+  `SbkimSearchWidget.init({ … })` rufen — das Widget self-mountet. Tresor-Krypto self-contained;
+  optional 21 Spracheingabe. Standalone als eine Datei: `such-werkzeug.html`.
+- **Aktiviert durch:** Nutzer öffnet die Such-Blase (semantische Suche on demand).
+- **Ehrlich:** Headless-Smoke `tests/smoke_bau22_such_widget.mjs` **148/148**; semantische
+  Hälfte (verstehen + sortieren) bewiesen. Die volle **bidirektionale Cross-Knoten-Suche
+  server-los** ist noch NICHT end-to-end gezeigt (siehe `docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md`).
+  Sichtbares Panel im Browser: **wartet auf Klaus' Browser-Lauf**.
+
 ---
 
 ## Echte, einbaubare Dateien (nicht nur Anzeige)

@@ -126,6 +126,15 @@ jeweiligen Anbieter übertragen. Es werden keine personenbezogenen Inhalte des N
 Für die semantische Match-Funktion wird ein Embedding-Modell beim ersten Gebrauch vom
 CDN (jsDelivr / Hugging Face) in den Browser geladen und läuft anschließend lokal. Beim
 Laden gelten die Datenschutzbestimmungen des jeweiligen CDN-Anbieters.</p>
+<p><strong>6a. Such-Werkzeug — externe KI-/Web-Suche &amp; Schlüssel (BYOK)</strong><br>
+Das Such-Werkzeug (Modul 22) kann auf <strong>ausdrückliche Nutzer-Aktion</strong> eine
+externe KI-/Web-Suche anstoßen (ein vom Nutzer gewählter KI-Anbieter mit Web-Suche). Das
+geschieht <strong>nie automatisch im Hintergrund</strong>, sondern nur, wenn der Nutzer die
+Internet-Suche bewusst auslöst; dabei wird die eingegebene Suchanfrage an den gewählten
+Anbieter übermittelt (es gelten dessen Datenschutzbestimmungen). Eigene KI-Schlüssel (BYOK)
+werden <strong>ausschließlich lokal und verschlüsselt</strong> im Browser verwahrt
+(Schlüssel-Tresor) und <strong>niemals an den Betreiber oder Dritte</strong> weitergegeben.
+Die App- und Knoten-Suche läuft rein lokal und server-los.</p>
 <p><strong>7. Speicherdauer</strong><br>
 Da keine zentrale Speicherung erfolgt, bestimmt der Nutzer selbst die Speicherdauer
 seiner Daten auf seinem Gerät (Löschen über die App- bzw. Browser-Funktionen).</p>
@@ -194,6 +203,15 @@ providers. No personal user content is transmitted.</p>
 For the semantic match function, an embedding model is loaded into the browser from a CDN
 (jsDelivr / Hugging Face) on first use and then runs locally. The CDN provider's privacy
 terms apply during loading.</p>
+<p><strong>6a. Search tool — external AI/web search &amp; keys (BYOK)</strong><br>
+The search tool (module 22) may trigger an external AI/web search on
+<strong>deliberate user action</strong> (an AI provider with web search chosen by the user).
+This <strong>never happens automatically in the background</strong>, only when the user
+consciously starts an internet search; the entered query is then transmitted to the chosen
+provider (whose privacy terms apply). The user's own AI keys (BYOK) are kept
+<strong>locally and encrypted</strong> in the browser only (key vault) and are
+<strong>never shared with the operator or third parties</strong>. App and node search run
+purely locally and server-less.</p>
 <p><strong>7. Retention</strong><br>
 As there is no central storage, the user determines the retention of their data on their
 own device.</p>

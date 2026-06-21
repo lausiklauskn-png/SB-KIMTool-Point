@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "demo": "node sandbox/loop.js",
-    "test": "node --test",
+    "test": "node --test && node tests/smoke_bau22_such_widget.mjs",
+    "build:such-pwa": "node scripts/build-such-pwa.mjs",
     "verify": "node scripts/browser-verify.mjs"
   },
   "license": "UNLICENSED"
