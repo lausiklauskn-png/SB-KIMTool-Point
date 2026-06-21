@@ -204,6 +204,17 @@
       "verwendung": "Werkzeug in den Container legen; als PWA ausliefern/kopieren.",
       "einbau": "Umschliesst ein Tool; nutzt Membran (15) als Aussenhuelle.",
       "aktiviert_durch": "Auslieferung eines selbstgebauten Tools."
+    },
+    {
+      "id": "22", "name": "Such-Werkzeug (semantische Suche)", "stufe": "profi",
+      "sage_status": "teil-fertig", "point_status": "1:1 aus Sage kopiert · headless 148/148",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-such-widget.js (1:1 aus Sage-Protokol/src/modules/22_such_widget.js). Semantische, server-lose Bedeutungs-Suche: versteht die Absicht hinter den Worten statt Stichwoerter zu zaehlen. Drei waehlbare Bereiche (App-Korpus / verbundene Knoten / Internet-KI-Bruecke), eigener Schluessel-Tresor (Shamir 2/3), Treffer als Prozent + Block-Kopieren. Abhaengigkeiten 03 Embedding + 04 Match liegen hier (web/tools/), Tresor-Krypto self-contained. Headless-Smoke tests/smoke_bau22_such_widget.mjs 148/148 gruen (Widget-Logik bewiesen). EHRLICH OFFEN: die semantische Haelfte (Bedeutung verstehen + sortieren) ist bewiesen; die volle bidirektionale Cross-Knoten-Suche server-los ist noch NICHT end-to-end gezeigt (siehe docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md). Sichtbares Panel im Browser ungeprueft (wartet auf Klaus' Browser-Lauf).",
+      "datei": "web/tools/sbkim-such-widget.js",
+      "was": "Frei bewegliches Floating-Such-Tool (Blase -> Panel): semantische Bedeutungs-Suche ueber App-Korpus, verbundene Knoten und Internet (KI-Such-Bruecke, BYOK).",
+      "nutzen": "Findet nach BEDEUTUNG/Absicht statt nach Stichwoertern — server-los im Browser; laeuft auch eigenstaendig ohne Mycel-Anschluss.",
+      "verwendung": "Skripte 03+04+22 nach den Abhaengigkeiten laden (KEIN Auto-Init), dann SbkimSearchWidget.init({...}) rufen — das Widget self-mountet die Blase unten rechts.",
+      "einbau": "Drei Skript-Tags (sbkim-embedding.js, sbkim-match.js, sbkim-such-widget.js) + ein init()-Aufruf; optional 21 Spracheingabe.",
+      "aktiviert_durch": "Nutzer oeffnet die Such-Blase (semantische Suche on demand)."
     }
   ],
   "komplett_werkzeuge_hinweis": "Komplett-Werkzeuge sind vollstaendige Ein-Datei-PWAs (kein Build, keine Abhaengigkeiten), gepflegt von Sage-Protokol (Spec-Hub). Hier 1:1 lokal gespiegelt (Offline-Default, web/tools/) PLUS Live-Link zur Sage-Quelle. byte-kompatibel mit Sage; nicht veraendert; gegenpruefbar ueber sha256. Quelle/Stand: Sage docs/observatorium/tools (PR #318), geholt 2026-06-20.",

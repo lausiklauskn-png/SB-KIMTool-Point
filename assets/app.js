@@ -50,6 +50,7 @@ const TOOL_FILES = {
   "16": "web/tools/sbkim-siegel.js",
   "17": "web/tools/sbkim-floating-widget.js",
   "18": "web/tools/sbkim-tool-pwa.js",
+  "22": "web/tools/sbkim-such-widget.js",
 };
 
 async function renderWerkzeuge() {
@@ -244,6 +245,28 @@ async function renderMarkt() {
       <a class="dock" href="${e.andockLink}"${dockAttr}>${dockLabel}</a>`;
     market.appendChild(el);
   }
+
+  // Eigenständige Werkzeuge am Markt (kein Knoten, sondern ein Tool zum
+  // Mitnehmen). Klar als Werkzeug gekennzeichnet — öffnen/laden statt andocken.
+  const werkzeuge = Array.isArray(data.werkzeuge) ? data.werkzeuge : [];
+  for (const w of werkzeuge) {
+    const monogram = (w.name || "?").trim().charAt(0).toUpperCase();
+    const echtChip = w.echt
+      ? `<span class="chip c-fertig"><span class="dot"></span>✓ echt</span>` : "";
+    const el = document.createElement("div");
+    el.className = "pwa";
+    el.innerHTML = `
+      <div class="p-head"><span class="p-mark">${monogram}</span><span class="name">${w.name}</span></div>
+      <div class="p-chips"><span class="chip c-point"><span class="dot"></span>Werkzeug · ${w.kennung || ""}</span>${echtChip}</div>
+      <div class="can">„${w.kannDas}"</div>
+      <div class="nodeid">${w.status || ""}</div>
+      <div class="actions">
+        <a class="dock" href="${w.oeffnen}" target="_blank" rel="noopener">▶ öffnen</a>
+        <a class="get download" href="${w.datei}" download>⬇ Datei laden</a>
+      </div>`;
+    market.appendChild(el);
+  }
+
   $("#market-note").textContent = data.hinweis;
 }
 

@@ -1,6 +1,41 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-06-20 · Branch `claude/sage-protokol-tools-e2qh79`
+Stand: 2026-06-21 · Branch `claude/modul22-such-werkzeug-aTHX`
+
+## 2026-06-21 — Such-Werkzeug (Modul 22) als eigenständiges Tool übernommen
+
+Zwei Sage-Briefe (2026-06-21) baten, das fertige **Such-Werkzeug (Modul 22)** zu
+übernehmen — eine **semantische, server-lose Bedeutungs-Suche** (versteht die Absicht,
+nicht Stichwörter). Umgesetzt **gegen den aktuellen `origin/main`** (frischer Branch;
+der zugewiesene alte Branch war 112 Commits zurück und hatte das `web/tools/`-Layout
++ Briefkasten nicht — bewusst nicht darauf gebaut, Klaus' Entscheidung „neuer Branch aus main").
+
+- **Kopiert (1:1, „kopieren, nicht klonen"):** `web/tools/sbkim-such-widget.js`
+  (= Sage `src/modules/22_such_widget.js`). Abhängigkeit **04 Match auf den aktuellen
+  Sage-Stand gehoben** (`web/tools/sbkim-match.js`, +`hybridMatch`/04.D — Modul 22 braucht
+  den KI-Richter); 03 Embedding war schon identisch. Docs: `docs/components/22_such_widget.md`,
+  `docs/components/_such_referenzfaelle.md`, `docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md`.
+- **Beweis:** `tests/smoke_bau22_such_widget.mjs` **148/148**, in `npm test` eingehängt.
+  Das Heben von 04 bricht **nichts** — **95** node:test + **148** Proben grün; `npm run verify`
+  (Playwright/Chromium) lädt `werkzeuge.html` mit dem Widget **ohne JS-Fehler (16/16)**.
+- **In der App (Sage §1):** Profi-Kachel in `werkzeugkiste.json` + Kopier/Download in
+  `assets/app.js`; eingehängt auf `werkzeuge.html` **und** `markt.html`; eigener Markt-
+  Eintrag (`web/data/marktplatz.json` → `werkzeuge[]`, gerendert in `renderMarkt`).
+- **Größer ziehen (Sage §2):** **nicht-invasiv** in `assets/such-widget-init.js` — Panel
+  `resize: both` + Größe in `localStorage`; Treffer-Lesefeld-Deckel gelöst. Modul 22 selbst
+  **unverändert** (kein Umbau fremder Module).
+- **Impressum/Datenschutz (Sage §3):** `impressum.html` Datenschutz **§6a** (DE+EN) ergänzt:
+  externe KI-/Web-Suche nur auf **bewusste Nutzer-Aktion**, BYOK-Schlüssel **lokal
+  verschlüsselt, nie an Dritte**. Dezenter Footer-Link auf `werkzeuge.html` + `markt.html`.
+- **Standalone (Sage §c):** `such-werkzeug.html` — **eine** Single-File-PWA (Module 03/04/22 +
+  Init inline, Manifest/Icon als data-URI, kein Build), erzeugt via `npm run build:such-pwa`
+  (`scripts/build-such-pwa.mjs`, eine Quelle → keine Divergenz).
+- **Manual-Check:** sichtbares Panel/Suchen **ungeprüft, wartet auf Klaus' Browser-Lauf**
+  (Hard-Reload). Headless + „mountet ohne JS-Fehler" sind belegt.
+- **Ehrlich offen:** semantische Hälfte bewiesen; volle **bidirektionale Cross-Knoten-Suche
+  server-los** noch NICHT end-to-end (Meilenstein-Doku). KI-Richter braucht einen Schlüssel.
+- **Quittung an Sage:** Entwurf (a/b/c) im Chat; Versand über den Briefkasten-Weg, sobald
+  Klaus es freigibt (Sage relayt über Klaus).
 
 ## 2026-06-20 — Zwei Komplett-Werkzeuge von Sage aufgenommen
 
