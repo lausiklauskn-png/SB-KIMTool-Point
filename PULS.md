@@ -1,6 +1,19 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-06-21 · Branch `claude/modul22-such-werkzeug-aTHX`
+Stand: 2026-06-21 · zuletzt in `main` (PR #83 gemergt, Squash `31bfe46`)
+
+## 2026-06-21 — Such-Werkzeug (Modul 22) **in `main` gemergt** (Sitzungsabschluss)
+
+PR #83 wurde auf Klaus' ausdrückliche Ansage **in `main` gemergt** (Squash `31bfe46`).
+Damit ist das Such-Werkzeug (Modul 22) live: Profi-Kachel unter **Werkzeuge**, Eintrag im
+**Markt** und eigene Download-Seite `such-werkzeug.html`. Die Inhalte stehen im Detail im
+Eintrag direkt darunter. **Manual-Check weiter offen:** sichtbares Panel/Suchen **ungeprüft,
+wartet auf Klaus' Browser-Lauf** (Hard-Reload Ctrl+Shift+R). **Quittung an Sage** (a/b/c)
+noch nicht in den Briefkasten geschrieben — erst auf Klaus' Ansage.
+
+> Notiz zur Klärung: Eine zwischenzeitliche Bitte um einen „separaten Container unter dem
+> schwarzen Loch" war **fehlgeleitet** (für Sage gedacht, nicht für Point) — hier nichts zu
+> tun, bewusst **nicht** gebaut. Festgehalten, damit Folge-Sitzungen nicht danach suchen.
 
 ## 2026-06-21 — Such-Werkzeug (Modul 22) als eigenständiges Tool übernommen
 
