@@ -1,30 +1,77 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-29",
-  "hinweis": "Schicht 3 — PWA-Marktplatz. Saat = echte Live-Endknoten aus dem Sage-Protokol (verifiziert 2026-05-29). Die Suche ist bewusst noch NICHT gebaut; die Daten sind aber bereits durchsuchbar strukturiert.",
+  "lastUpdated": "2026-06-19",
+  "hinweis": "Schicht 3 — PWA-Marktplatz. Saat = echte Live-Endknoten aus dem Sage-Protokoll (verifiziert). „→ andocken\" öffnet die echte Live-Seite des Knotens in einem neuen Tab. Heute bezeugt: erster vollständiger semantischer Match SB·KIMTool·Point ⟷ Sage (0.848508 ≥ 0.80, beidseitig signatur-verifiziert). NEU 2026-06-19: sechster Peer BookLedgerPro reziprok verifiziert (verified-spore). NEU 2026-06-21: erstes eigenständiges Werkzeug am Markt — das semantische Such-Werkzeug (Modul 22, von Sage übernommen) zum Öffnen/Herunterladen; siehe Werkzeuge unten.",
   "eintraege": [
     {
       "name": "Rezeptbuch",
-      "nodeId": "BSWxXmXvxF8F…",
+      "nodeId": "uOpUBezUVbOM…",
       "kannDas": "Rezepte anbieten und passende Zutaten/Gerichte finden.",
-      "andockLink": "#andock/rezeptbuch",
-      "status": "live-direct",
-      "echt": true
+      "andockLink": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+      "status": "verified-match-2026-06-07",
+      "echt": true,
+      "matchScore": 0.832019,
+      "matchHinweis": "Knoten E — verified-MATCH 0.8320 (echter domainVector, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet uOpUBez… (dauerhaft, von Sage 2026-06-07 bestaetigt); beidseitig nachgerechnet."
     },
     {
       "name": "Mixarium",
-      "nodeId": "JOlHK31XEiyl…",
+      "nodeId": "B7Fke9CYTR1…",
       "kannDas": "Getraenke/Cocktails anbieten und passende Mixturen finden.",
-      "andockLink": "#andock/mixarium",
-      "status": "live-direct",
-      "echt": true
+      "andockLink": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+      "status": "verified-match-2026-06-07",
+      "echt": true,
+      "matchScore": 0.802994,
+      "matchHinweis": "Knoten F — verified-MATCH 0.8030 (echter domainVector, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet B7Fke9…; beidseitig nachgerechnet (knapp ueber 0.80)."
     },
     {
       "name": "Sage",
       "nodeId": "nysOZE3VuKqZ…",
       "kannDas": "Hub: Knoten verbinden, Protokoll bereitstellen.",
-      "andockLink": "#andock/sage",
+      "andockLink": "https://lausiklauskn-png.github.io/Sage-Protokol/",
       "status": "integriert-2026-05-21",
+      "echt": true,
+      "matchScore": 0.848508,
+      "matchHinweis": "Voller Match mit uns am 2026-05-30 — beidseitig signatur-verifiziert, pingStatus verified-match."
+    },
+    {
+      "name": "Jasons-Tresor",
+      "nodeId": "E13GDzIp0c7J…",
+      "kannDas": "Tresor/Bibliothek: JSON-Dateien und SBKIM-Schluessel offline verwahren und verschluesseln.",
+      "andockLink": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
+      "status": "verified-match-2026-06-06",
+      "echt": true,
+      "matchScore": 0.853740,
+      "matchHinweis": "Knoten C — verified-MATCH 0.8537 (echter domainVector). Identitaetswechsel 2026-06-06: neue nodeId E13GDzIp… (alte 7F_zNopF… Demo, hinfaellig)."
+    },
+    {
+      "name": "Mein-Tresor",
+      "nodeId": "wRsGQouOYPVB…",
+      "kannDas": "Tresor/Bibliothek (design-vereinfachte Schwester von Jasons-Tresor): JSON + SBKIM-Schluessel offline verwahren/verschluesseln.",
+      "andockLink": "https://lausiklauskn-png.github.io/Mein-Tresor/",
+      "status": "verified-match-2026-06-07",
+      "echt": true,
+      "matchScore": 0.853740,
+      "matchHinweis": "Knoten D — verified-MATCH 0.8537 (echter domainVector, am 2026-06-07 ergaenzt + mit gleichem Schluessel neu signiert, gleiche nodeId wRsGQouO…). Gleicher Wert wie A↔C, da D die Schwester von Jasons-Tresor mit identischem domainVector ist."
+    },
+    {
+      "name": "BookLedgerPro",
+      "nodeId": "MyHVM7PdwEtN…",
+      "kannDas": "Offline-first, verschluesselte Buchhaltung: Belege, Konten, USt/EUER, GoBD + Hash-Kette, Auftraege/Kunden.",
+      "andockLink": "https://lausiklauskn-png.github.io/BookLedgerPro/",
+      "status": "verified-spore",
+      "echt": true,
+      "matchHinweis": "Sechster Peer (von Sage vermittelt, 2026-06-19). Identitaet reziprok + offline geprueft -> verified-SPORE (9/9, id=SHA256(pubkey), Ed25519, Manipulation faellt durch). KEIN Match-Score: domainVector ist _demo, Domaenen-Match offen bis echtes Embedding. Verschluesselungs-/Tresor-Achse als Hypothese mitbeobachtet."
+    }
+  ],
+  "werkzeuge_hinweis": "Eigenstaendige Werkzeuge am Markt (kein Knoten, sondern ein Tool zum Mitnehmen). Von Sage-Protokol uebernommen, hier 1:1 gespiegelt.",
+  "werkzeuge": [
+    {
+      "name": "Such-Werkzeug (semantische Suche)",
+      "kennung": "Modul 22 · Profi",
+      "kannDas": "Nach BEDEUTUNG/Absicht suchen statt nach Stichwoertern — server-los im Browser, ueber App-Korpus, verbundene Knoten und Internet (KI-Such-Bruecke, BYOK). Laeuft auch eigenstaendig ohne Mycel-Anschluss.",
+      "oeffnen": "such-werkzeug.html",
+      "datei": "web/tools/sbkim-such-widget.js",
+      "status": "1:1 aus Sage uebernommen · headless 148/148 gruen · sichtbares Panel wartet auf Klaus' Browser-Lauf",
       "echt": true
     }
   ]

@@ -21,6 +21,83 @@
 
 * { box-sizing: border-box; }
 
+/* === SBKIM-Siegel (Modul 16, echtes Modul) + Lampen (lebt/verkehr/fremd, Modul 15) ===
+   Das Badge #sbkim-siegel-badge wird vom echten Modul 16 selbst injiziert (inline-SVG).
+   Bronze = "Mycel suchend" (noch kein Handshake), Gold = mind. ein echter Cross-Knoten-
+   Handshake in dieser Session. */
+#sbkim-siegel-badge { width: 34px; height: 34px; border-radius: 50%; margin-left: 0.3rem; padding: 0;
+  background: transparent; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  overflow: visible; transition: filter .25s, transform .25s; flex: 0 0 auto; }
+#sbkim-siegel-badge svg, #sbkim-siegel-badge img { width: 34px; height: 34px; display: block; pointer-events: none; }
+#sbkim-siegel-badge:hover { filter: drop-shadow(0 0 8px rgba(201,169,97,0.55)); transform: scale(1.06); }
+#sbkim-siegel-badge:focus-visible { outline: 2px solid #C9A961; outline-offset: 3px; }
+/* Bronze gedämpft (suchend), Gold voll + Glühen (verbunden, Beweis erbracht). */
+#sbkim-siegel-badge[data-stufe="bronze"] { filter: saturate(0.55) brightness(0.82); }
+#sbkim-siegel-badge[data-stufe="gold"] { filter: drop-shadow(0 0 7px rgba(201,169,97,0.6)); }
+#sbkim-siegel-badge.first-boot { animation: siegel-first-boot 600ms ease-out; }
+#sbkim-siegel-badge.stufenwechsel-gold { animation: siegel-stufenwechsel 600ms ease-out; }
+@keyframes siegel-first-boot { 0% { transform: scale(0.7); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes siegel-stufenwechsel { 0% { transform: scale(1); } 50% { transform: scale(1.2); filter: drop-shadow(0 0 14px rgba(201,169,97,0.8)); } 100% { transform: scale(1); } }
+.lamps { display: inline-flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; }
+.lamp { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--muted); font-family: var(--mono); }
+.lamp::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); box-shadow: none; transition: background .25s, box-shadow .25s; }
+.lamp.on::before  { background: var(--lamp-live); box-shadow: 0 0 8px var(--lamp-live); }
+.lamp.warn::before { background: var(--lamp-dorm); box-shadow: 0 0 8px var(--lamp-dorm); }
+.lamp.bad::before { background: var(--lamp-dead); box-shadow: 0 0 8px var(--lamp-dead); }
+.lamp.traffic-pulse::before { animation: lamp-pulse 0.9s ease-out; }
+@keyframes lamp-pulse { 0% { background: var(--accent); box-shadow: 0 0 12px var(--accent); } 100% { background: var(--muted); box-shadow: none; } }
+@media (max-width: 620px) { .lamp .lamp-label { display: none; } }
+
+/* Andock-Modal (Klick aufs Siegel) */
+.andock-modal { border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--text); max-width: 460px; width: 92%; padding: 1.1rem 1.2rem; }
+.andock-modal::backdrop { background: rgba(0,0,0,0.6); }
+.andock-modal h3 { margin: 0 0 0.3rem; font-family: var(--mono); }
+.andock-row { display: flex; justify-content: space-between; gap: 0.8rem; padding: 0.35rem 0; border-bottom: 1px solid var(--line); font-size: 0.88rem; }
+.andock-row span { color: var(--muted); } .andock-row code, .andock-row a { font-family: var(--mono); color: var(--accent); word-break: break-all; }
+.andock-tool { display: inline-block; margin-top: 0.4rem; font-weight: 700; color: var(--accent); }
+.andock-close { margin-top: 0.9rem; font: inherit; background: transparent; color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+.andock-close:hover { border-color: var(--accent); }
+
+/* === Netz-Briefkasten-Knopf (INTERFACES §11.6, kopiert von Sage, re-geskinnt) === */
+.netz-check-btn { display: inline-flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem; padding: 0.3rem 0.7rem; font: inherit; font-size: 0.78rem; color: var(--muted); background: rgba(0,0,0,0.35); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+.netz-check-btn:hover { color: var(--accent); border-color: var(--accent); }
+.netz-check-btn.checking { opacity: 0.65; cursor: progress; }
+.netz-check-btn.has-news { color: var(--lamp-dorm); border-color: var(--lamp-dorm); box-shadow: 0 0 10px rgba(224,169,58,0.35); }
+@media (max-width: 560px) { .netz-check-btn .ncb-label { display: none; } }
+.netz-check-pop { position: fixed; top: 3.6rem; right: 1rem; z-index: 120; max-width: 340px; padding: 0.85rem 1rem; background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,0.6); font-size: 0.85rem; color: var(--text); display: none; }
+.netz-check-pop.show { display: block; }
+.netz-check-pop h4 { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.netz-check-pop .row { margin: 0.3rem 0; line-height: 1.4; }
+.netz-check-pop .ok { color: var(--accent); }
+.netz-check-pop .new { color: var(--lamp-dorm); }
+.netz-check-pop .muted { color: var(--muted); font-size: 0.78rem; }
+.netz-check-pop a { color: var(--accent); }
+.netz-check-pop .close { position: absolute; top: 0.5rem; right: 0.6rem; cursor: pointer; color: var(--muted); background: none; border: none; font-size: 1rem; }
+
+/* === Netz-Briefkasten — reiche Karten-Ansicht (Spore/Match/Sync/Brief), re-geskinnt === */
+.ncb-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 1.05rem; height: 1.05rem; padding: 0 0.25rem; margin-left: 0.1rem; border-radius: 999px; background: var(--lamp-dorm, #e0a52b); color: #1a1407; font-size: 0.66rem; font-weight: 700; line-height: 1; }
+#netz-mb-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: flex-start; justify-content: center; padding: 4.5vh 1rem 2rem; background: rgba(4,7,9,0.72); backdrop-filter: blur(3px); overflow-y: auto; }
+#netz-mb-overlay.show { display: flex; }
+.netz-mb-card { position: relative; width: 100%; max-width: 34rem; background: var(--card-2); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,0.6); padding: 1.2rem 1.25rem 1.4rem; color: var(--text); }
+.netz-mb-close { position: absolute; top: 0.6rem; right: 0.8rem; cursor: pointer; color: var(--muted); background: none; border: none; font-size: 1.3rem; line-height: 1; }
+.netz-mb-close:hover { color: var(--accent); }
+.netz-mb-title { margin: 0 0 0.6rem; font-size: 1.02rem; }
+.netz-mb-loading { color: var(--muted); text-align: center; padding: 1.2rem 0; }
+.netz-mb-head { text-align: center; margin: 0 0 0.7rem; }
+.netz-mb-head .nm-self { font-weight: 600; }
+.netz-mb-head .nm-id { font-size: 0.72rem; color: var(--muted); word-break: break-all; font-family: var(--mono); }
+.netz-mb-peer { border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.75rem; margin: 0.5rem 0; background: rgba(0,0,0,0.22); }
+.netz-mb-peer .nm-name { font-weight: 600; margin-bottom: 0.3rem; }
+.netz-mb-peer .nm-rows { font-size: 0.83rem; line-height: 1.85; }
+.netz-mb-peer .nm-k { display: inline-block; min-width: 4.6rem; color: var(--muted); }
+.netz-mb-peer code { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); }
+.netz-mb-peer a { color: var(--accent); }
+.nm-ok { color: #34d399; }
+.nm-warn { color: var(--lamp-dorm, #e0a52b); }
+.nm-muted { color: var(--muted); }
+.netz-mb-foot { margin: 0.7rem 0 0; text-align: center; }
+.netz-mb-note { margin: 0.3rem 0 0; font-size: 0.7rem; color: var(--muted); text-align: center; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -45,12 +122,6 @@ a { color: var(--accent); }
 }
 .brand .dot { color: var(--accent); }
 .lamps { display: flex; gap: 1rem; flex-wrap: wrap; }
-.lamp { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: var(--muted); font-family: var(--mono); }
-.lamp::before {
-  content: ""; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--lamp-live); box-shadow: 0 0 8px var(--lamp-live);
-}
-.lamp.dorm::before { background: var(--lamp-dorm); box-shadow: 0 0 8px var(--lamp-dorm); }
 .version { margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
 a.brand { text-decoration: none; }
 
@@ -68,7 +139,7 @@ a.brand { text-decoration: none; }
 .hero { text-align: center; margin: 1.4rem 0 0.4rem; }
 .hero h1 { font-family: var(--mono); letter-spacing: 0.06em; font-size: 1.4rem; margin: 0 0 0.3rem; }
 .hero p { color: var(--muted); margin: 0 auto; max-width: 640px; font-size: 0.9rem; }
-.entries { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.6rem 0; }
+.entries { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.6rem 0; align-items: start; }
 .entry {
   display: block; text-decoration: none; color: inherit;
   background: var(--card); border: 1px solid var(--line); border-radius: 12px;
@@ -95,68 +166,611 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   padding: 1rem;
 }
 
-/* --- Schicht 1: Agenten-Board --- */
-.board { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-.agent {
-  flex: 1 1 180px; background: var(--card-2); border: 1px solid var(--line);
-  border-radius: 8px; padding: 0.8rem; min-width: 160px;
+/* --- Schicht 1: animiertes Modell-Board (siehe model.js) ------------------- */
+/* Farben fuer den Angriffs-Bogen gruen->orange->rot. */
+:root {
+  --att-green: #3fd06b;
+  --att-orange: #e0a93a;
+  --att-red: #d65a5a;
 }
-.agent h3 { margin: 0 0 0.3rem; font-family: var(--mono); font-size: 0.92rem; }
-.agent .task { color: var(--muted); font-size: 0.82rem; min-height: 2.4em; }
-.agent .lamp { margin-top: 0.4rem; }
-.edge { color: var(--accent); }
-.arrow { color: var(--accent-dim); font-size: 1.4rem; }
-.agent.sybil { opacity: 0.45; border-style: dashed; }
-.agent.sybil h3::after { content: " ✗"; color: var(--lamp-dead); }
 
+/* Steuerung */
+.controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.2rem; }
+.ctl {
+  font-family: var(--mono); font-size: 0.78rem; cursor: pointer;
+  background: var(--card); border: 1px solid var(--line); color: var(--text);
+  padding: 0.4rem 0.8rem; border-radius: 999px;
+}
+.ctl:hover { border-color: var(--accent-dim); }
+
+/* Klartext-Statusleiste */
+.statusline {
+  display: flex; align-items: center; gap: 0.7rem;
+  margin: 0.5rem 0; padding: 0.7rem 1rem; border-radius: 10px;
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-left: 4px solid var(--line); font-size: 0.95rem; min-height: 2.7em;
+  transition: border-color 0.3s, background 0.3s;
+}
+.statusline .sl-icon { font-size: 1.3rem; line-height: 1; }
+.statusline b { color: var(--text); }
+.statusline code { font-family: var(--mono); font-size: 0.85em; color: var(--accent); }
+.phase-idle  { border-left-color: var(--muted); }
+.phase-idee  { border-left-color: var(--accent); }
+.phase-build { border-left-color: var(--accent); }
+.phase-test  { border-left-color: var(--lamp-live); }
+.phase-attack{ border-left-color: var(--att-orange); }
+.phase-flag  { border-left-color: var(--att-red); background: linear-gradient(90deg, #1b1012, var(--bg-soft)); }
+.phase-done  { border-left-color: var(--lamp-live); }
+.seal {
+  color: #0c0f12; background: var(--lamp-live); padding: 0 0.35rem; border-radius: 4px;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+}
+
+/* Die Buehne */
+.stage {
+  position: relative; width: 100%; aspect-ratio: 1000 / 560;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(54,214,195,0.08), transparent 60%),
+    linear-gradient(180deg, #0e141a, #0b0e12);
+  border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  margin: 0.5rem 0;
+}
+.stage::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 42px 42px; opacity: 0.10;
+}
+
+.wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+.edge { fill: none; stroke: var(--line); stroke-width: 2.5; }
+.edge.edge-attack { stroke: #4a2c2c; stroke-dasharray: 3 7; }
+.edge.flow { stroke: url(#edgeGrad); stroke-width: 3.5; stroke-dasharray: 7 9; animation: dash 0.55s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -32; } }
+.packet { opacity: 0; filter: drop-shadow(0 0 7px var(--accent)); transition: opacity 0.2s; }
+.burst { fill: none; stroke: var(--att-red); stroke-width: 3; filter: drop-shadow(0 0 7px var(--att-red)); }
+
+/* Knoten */
+.node {
+  position: absolute; transform: translate(-50%, -50%); width: 132px; text-align: center;
+  transition: filter 0.3s, opacity 0.5s, transform 0.5s; z-index: 2;
+}
+.orb {
+  width: 74px; height: 74px; margin: 0 auto; border-radius: 50%;
+  display: grid; place-items: center; font-size: 2rem;
+  background: radial-gradient(circle at 35% 30%, var(--card-2), #0e1419);
+  border: 1px solid var(--line); box-shadow: inset 0 0 12px #0008;
+  transition: border-color 0.35s, box-shadow 0.35s;
+}
+.node .ic { filter: grayscale(0.35) opacity(0.8); transition: filter 0.3s; }
+.node .nm { font-family: var(--mono); font-size: 0.8rem; margin-top: 0.35rem; color: var(--text); }
+.node .st { font-size: 0.68rem; color: var(--muted); min-height: 1.7em; line-height: 1.25; }
+
+.node.active .ic { filter: none; }
+.node.active .orb {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim), 0 0 22px var(--accent), inset 0 0 12px #0008;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--accent-dim), 0 0 16px var(--accent), inset 0 0 12px #0008; }
+  50%      { box-shadow: 0 0 0 3px var(--accent-dim), 0 0 32px var(--accent), inset 0 0 12px #0008; }
+}
+
+/* Bauer mit Siegel-Funke, Arzt-Reparatur/Verwerfen */
+.node.sealed .orb { border-color: var(--lamp-live); box-shadow: 0 0 26px var(--lamp-live), inset 0 0 12px #0008; }
+.node.repair .orb { border-color: var(--accent); box-shadow: 0 0 24px var(--accent), inset 0 0 12px #0008; }
+.node.reject .orb { border-color: var(--att-red); box-shadow: 0 0 24px var(--att-red), inset 0 0 12px #0008; }
+
+/* Angreifer: gruen -> orange -> rot -> Zerfall */
+.node.attacker .orb { border-color: #5a3030; }
+.node.att-green .orb  { border-color: var(--att-green);  box-shadow: 0 0 20px var(--att-green),  inset 0 0 12px #0008; }
+.node.att-orange .orb { border-color: var(--att-orange); box-shadow: 0 0 22px var(--att-orange), inset 0 0 12px #0008; animation: pulseWarn 0.9s ease-in-out infinite; }
+.node.att-red .orb    { border-color: var(--att-red);    box-shadow: 0 0 28px var(--att-red),    inset 0 0 12px #0008; animation: shake 0.3s ease-in-out 3; }
+@keyframes pulseWarn {
+  0%, 100% { box-shadow: 0 0 16px var(--att-orange), inset 0 0 12px #0008; }
+  50%      { box-shadow: 0 0 30px var(--att-orange), inset 0 0 12px #0008; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); } 75% { transform: translateX(4px); }
+}
+.node.dead { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(18deg); }
+
+/* "WIRD GETESTET"-Stempel beim Gate/Arzt */
+.stamp {
+  position: absolute; left: 65%; top: 15%; transform: translate(-50%, -50%) scale(0.6);
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; font-weight: 700;
+  color: #0c0f12; background: var(--lamp-live); padding: 0.2rem 0.5rem; border-radius: 6px;
+  opacity: 0; pointer-events: none; z-index: 3;
+}
+.stamp.show { animation: stamp 0.9s ease-out; }
+@keyframes stamp {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-7deg); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.12) rotate(-7deg); }
+  80%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-7deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-7deg); }
+}
+
+/* Detail-Karte */
+.detail { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin: 0.6rem 0; }
+.detail.is-fake { border-color: #5a3030; }
+.d-head { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.d-kind {
+  font-family: var(--mono); font-size: 0.68rem; padding: 0.15rem 0.55rem; border-radius: 999px;
+  border: 1px solid var(--accent-dim); color: var(--accent);
+}
+.kind-hintergrund-tool { border-color: var(--lamp-dorm); color: var(--lamp-dorm); }
+.kind-webseite { border-color: var(--muted); color: var(--muted); }
+.d-title { margin: 0; font-size: 1.05rem; border: 0; padding: 0; text-transform: none; color: var(--text); }
+.d-desc { color: var(--muted); font-size: 0.9rem; margin: 0.5rem 0 0.7rem; }
+.d-rail { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.rail-step {
+  font-family: var(--mono); font-size: 0.7rem; padding: 0.2rem 0.55rem; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--muted);
+}
+.rail-step.done { color: var(--text); border-color: var(--accent-dim); }
+.rail-step.now { color: #0c0f12; background: var(--accent); border-color: var(--accent); font-weight: 700; }
+.rail-step.reject { color: #fff; background: var(--att-red); border-color: var(--att-red); }
+.d-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.8rem; flex-wrap: wrap; }
+.d-note { color: var(--muted); font-size: 0.78rem; }
+.d-export {
+  font-family: var(--mono); font-size: 0.78rem; cursor: pointer;
+  background: transparent; border: 1px solid var(--accent); color: var(--accent);
+  border-radius: 8px; padding: 0.4rem 0.7rem;
+}
+.d-export:hover { background: var(--accent); color: #0c0f12; }
+
+/* Abschluss-Bilanz */
+.tally { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin: 0.6rem 0; }
+.tally-grid { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 0.9rem; margin: 0.6rem 0; font-size: 0.88rem; }
+.tally-grid b { font-family: var(--mono); color: var(--accent); }
+.tally-note { color: var(--muted); font-size: 0.78rem; margin: 0.3rem 0 0; }
+
+/* Erklaer-Bloecke (Legende, Rollen) */
+.explain { margin: 0.5rem 0; border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 0.1rem 0.9rem; }
+.explain summary { cursor: pointer; padding: 0.6rem 0; font-family: var(--mono); font-size: 0.85rem; color: var(--accent); }
+.explain p { font-size: 0.88rem; line-height: 1.55; color: var(--text); margin: 0.7rem 0; }
+.explain p strong { color: var(--accent); }
+
+/* --- Werkstatt (echte Selbst-Prüfung der Werkzeuge) ---------------------- */
+.werkstatt-titel { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); margin: 0.2rem 0 0.3rem; }
+.werkstatt-sub { font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin: 0 0 0.7rem; }
+.werkstatt-sub strong { color: var(--accent); }
+.werkstatt-run { font-size: 0.85rem; }
+.werkstatt-out { display: grid; gap: 0.7rem; margin-top: 0.8rem; }
+.probe { border: 1px solid var(--line); border-left: 4px solid var(--muted); border-radius: 8px; padding: 0.6rem 0.8rem; background: var(--bg-soft); }
+.probe.ok { border-left-color: var(--lamp-live); }
+.probe.ready { border-left-color: var(--lamp-dorm); }
+.probe.bad { border-left-color: var(--lamp-dead); }
+.probe-group { display: grid; gap: 0.6rem; }
+.probe-group + .probe-group { margin-top: 0.6rem; }
+.probe-group-titel { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+
+/* Live-Match: zwei Profile vergleichen */
+.livematch, .protokoll { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+.livematch-titel { font-family: var(--mono); font-size: 0.9rem; color: var(--accent); margin: 0 0 0.3rem; }
+.livematch-sub { font-size: 0.83rem; color: var(--muted); line-height: 1.5; margin: 0 0 0.6rem; }
+.lm-feld {
+  display: block; width: 100%; box-sizing: border-box; margin: 0 0 0.5rem;
+  background: var(--bg-soft); color: var(--text); border: 1px solid var(--line);
+  border-radius: 8px; padding: 0.5rem 0.7rem; font-family: var(--sans); font-size: 0.85rem;
+  resize: vertical;
+}
+.lm-feld:focus { outline: none; border-color: var(--accent-dim); }
+.lm-out { margin-top: 0.7rem; }
+.probe-head { font-family: var(--mono); font-size: 0.82rem; color: var(--text); font-weight: 700; }
+.probe-steps { list-style: none; padding: 0; margin: 0.4rem 0; display: grid; gap: 0.25rem; font-size: 0.8rem; }
+.probe-steps li.ok { color: var(--lamp-live); }
+.probe-steps li.bad { color: var(--lamp-dead); }
+.probe-fazit { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; }
+.legend { list-style: none; padding: 0; margin: 0.2rem 0 0.8rem; display: grid; gap: 0.45rem; font-size: 0.85rem; }
+.legend .lg { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 0.4rem; }
+.lg-active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.lg-pkt { background: #eafffb; box-shadow: 0 0 8px var(--accent); }
+.lg-green { background: var(--att-green); }
+.lg-orange { background: var(--att-orange); }
+.lg-red { background: var(--att-red); }
+.lg-seal { background: var(--lamp-live); border-radius: 3px; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.7rem; margin: 0.4rem 0 0.6rem; }
+.role { background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem; }
+.role .ic { font-size: 1.3rem; }
+.role b { display: block; font-family: var(--mono); margin: 0.2rem 0; color: var(--text); }
+.role p { color: var(--muted); font-size: 0.8rem; margin: 0; }
+.role.attacker { border-color: #5a3030; }
+.why { color: var(--muted); font-size: 0.83rem; }
+.why code { font-family: var(--mono); color: var(--accent); }
+
+/* Protokoll-Ticker (im Detail-Aufklapper) */
 .ticker {
-  margin-top: 0.9rem; font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
+  font-family: var(--mono); font-size: 0.78rem; color: var(--muted);
   background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px;
-  padding: 0.6rem 0.8rem; max-height: 180px; overflow: auto;
+  padding: 0.6rem 0.8rem; max-height: 220px; overflow: auto; margin-bottom: 0.7rem;
 }
 .ticker .ok { color: var(--lamp-live); }
 .ticker .bad { color: var(--lamp-dead); }
 .ticker .flag { color: var(--lamp-dorm); }
 
-/* --- Schicht 2: Werkzeugkiste --- */
-.tabs { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; }
+/* Ruhe-Variante: prefers-reduced-motion ODER Bewegung-aus-Knopf */
+.stage.no-motion *, .stage.no-motion *::before, .stage.no-motion *::after {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage .edge.flow { animation: none; }
+  .node.active .orb, .node.att-orange .orb, .node.att-red .orb { animation: none; }
+  .stamp.show { animation: none; opacity: 1; }
+}
+
+/* --- Schicht 2: Werkzeugkiste (Werkbank) ---------------------------------- */
+/* Optik wie die Modell-Seite: Glow-Orbs, Reife-Spine, Chips, Hover-Lift. */
+
+/* Stufen-Legende (nutzt die bisher ungezeigten stufen-Texte aus dem JSON) */
+.tier-legend {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.6rem; margin: 0.2rem 0 1rem;
+}
+.tier-card {
+  background: var(--card-2); border: 1px solid var(--line);
+  border-left: 3px solid var(--accent-dim); border-radius: 9px; padding: 0.65rem 0.8rem;
+}
+.tier-card b { font-family: var(--mono); color: var(--accent); display: block; font-size: 0.8rem; letter-spacing: 0.05em; }
+.tier-card span { color: var(--muted); font-size: 0.8rem; }
+
+/* Reife-Schlüssel: Punkt-Farben erklären */
+.maturity-key { display: flex; gap: 1rem; flex-wrap: wrap; margin: 0 0 0.9rem; font-size: 0.78rem; color: var(--muted); font-family: var(--mono); }
+.maturity-key span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.mk-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 7px currentColor; }
+.mk-fertig { color: var(--lamp-live); }
+.mk-schlummert { color: var(--lamp-dorm); }
+.mk-teil { color: var(--accent); }
+.mk-stub { color: var(--muted); }
+.maturity-key .mk-dot { background: currentColor; }
+
+.tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; flex-wrap: wrap; }
 .tab {
   font-family: var(--mono); font-size: 0.85rem; cursor: pointer;
   background: var(--card); border: 1px solid var(--line); color: var(--muted);
-  padding: 0.4rem 0.9rem; border-radius: 999px;
+  padding: 0.4rem 0.9rem; border-radius: 999px; transition: border-color 0.15s, color 0.15s;
 }
-.tab.active { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 700; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
+.tab:hover { border-color: var(--accent-dim); color: var(--text); }
+.tab.active {
+  color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 700;
+  box-shadow: 0 0 14px var(--accent-dim);
+}
+.tab .cnt { opacity: 0.7; margin-left: 0.35rem; font-size: 0.72rem; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; }
 .tool {
-  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem;
+  position: relative; overflow: hidden;
+  background: radial-gradient(circle at 88% 0%, rgba(54,214,195,0.05), transparent 45%), var(--card);
+  border: 1px solid var(--line); border-radius: 11px; padding: 0.9rem 0.95rem 0.95rem;
+  transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
 }
-.tool .head { display: flex; align-items: baseline; gap: 0.5rem; }
-.tool .id { font-family: var(--mono); color: var(--accent); font-size: 0.8rem; }
-.tool .name { font-weight: 700; }
-.tool .badges { margin: 0.4rem 0; display: flex; gap: 0.35rem; flex-wrap: wrap; }
-.badge {
-  font-family: var(--mono); font-size: 0.68rem; padding: 0.12rem 0.45rem; border-radius: 4px;
+/* farbiger Reife-Spine am linken Rand */
+.tool::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--line); transition: box-shadow 0.18s;
+}
+.tool.m-fertig::before { background: var(--lamp-live); }
+.tool.m-schlummert::before { background: var(--lamp-dorm); }
+.tool.m-teil::before { background: var(--accent); }
+.tool.m-stub::before { background: var(--muted); }
+.tool:hover {
+  border-color: var(--accent); transform: translateY(-3px);
+  box-shadow: 0 10px 26px #0007;
+}
+.tool:hover::before { box-shadow: 0 0 14px currentColor; }
+.tool.m-fertig:hover::before { box-shadow: 0 0 14px var(--lamp-live); }
+.tool.m-schlummert:hover::before { box-shadow: 0 0 14px var(--lamp-dorm); }
+.tool.m-teil:hover::before { box-shadow: 0 0 14px var(--accent); }
+
+.tool .head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.55rem; }
+/* Mono-Orb mit Modul-Nummer — Echo der Modell-Orbs */
+.tool .id-orb {
+  flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center; font-family: var(--mono); font-size: 0.85rem; font-weight: 700;
+  color: var(--accent);
+  background: radial-gradient(circle at 35% 30%, var(--card-2), #0e1419);
+  border: 1px solid var(--line); box-shadow: inset 0 0 10px #0007;
+}
+.tool .name { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+
+.tool .status-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.55rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--mono); font-size: 0.68rem; padding: 0.18rem 0.5rem; border-radius: 999px;
   border: 1px solid var(--line); color: var(--muted);
 }
-.badge.fertig { color: var(--lamp-live); border-color: var(--lamp-live); }
-.badge.schlummert { color: var(--lamp-dorm); border-color: var(--lamp-dorm); }
-.badge.stub, .badge.teil { color: var(--accent); border-color: var(--accent-dim); }
-.tool dl { margin: 0.4rem 0 0; font-size: 0.8rem; }
-.tool dt { color: var(--accent); font-family: var(--mono); font-size: 0.72rem; margin-top: 0.35rem; }
-.tool dd { margin: 0 0 0.1rem; color: var(--text); }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 6px currentColor; }
+.chip.c-fertig { color: var(--lamp-live); border-color: var(--lamp-live); }
+.chip.c-schlummert { color: var(--lamp-dorm); border-color: var(--lamp-dorm); }
+.chip.c-teil { color: var(--accent); border-color: var(--accent-dim); }
+.chip.c-stub { color: var(--muted); }
+.chip.c-point { color: var(--accent); border-color: var(--accent-dim); }
+.chip.c-point.c-cold { color: var(--muted); border-color: var(--line); }
+.chip .dot { background: currentColor; }
+
+.tool .lead { color: var(--text); font-size: 0.86rem; margin: 0 0 0.55rem; }
+.tool .lead b { color: var(--accent); font-family: var(--mono); font-size: 0.72rem; display: block; letter-spacing: 0.04em; margin-bottom: 0.1rem; }
+
+.tool details.more { border-top: 1px solid var(--line); margin-top: 0.2rem; }
+.tool details.more summary { cursor: pointer; font-family: var(--mono); font-size: 0.74rem; color: var(--accent); padding: 0.5rem 0 0.2rem; }
+.tool details.more dl { margin: 0.2rem 0 0.4rem; font-size: 0.8rem; }
+.tool details.more dt { color: var(--accent); font-family: var(--mono); font-size: 0.7rem; margin-top: 0.4rem; }
+.tool details.more dd { margin: 0 0 0.1rem; color: var(--text); }
+
 .tool .copy {
-  margin-top: 0.6rem; font-family: var(--mono); font-size: 0.75rem; cursor: pointer;
+  margin-top: 0.7rem; font-family: var(--mono); font-size: 0.75rem; cursor: pointer;
   background: transparent; border: 1px solid var(--accent-dim); color: var(--accent);
-  border-radius: 6px; padding: 0.3rem 0.6rem;
+  border-radius: 8px; padding: 0.35rem 0.7rem; transition: background 0.15s, color 0.15s;
+}
+.tool .copy:hover { background: var(--accent); color: #0c0f12; }
+
+/* Ehrlicher Modul-Hinweis (z.B. Browser-Anforderung / bewiesener Pfad). */
+.tool .pointnote {
+  margin: 0.6rem 0 0; padding: 0.45rem 0.6rem; font-size: 0.74rem; line-height: 1.4;
+  color: var(--muted); border-left: 2px solid var(--accent-dim);
+  background: rgba(54, 214, 195, 0.04); border-radius: 0 6px 6px 0;
 }
 
-/* --- Schicht 3: Marktplatz --- */
-.market { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
-.pwa { background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem; }
-.pwa .name { font-weight: 700; }
-.pwa .nodeid { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
-.pwa .can { color: var(--text); font-size: 0.85rem; margin: 0.4rem 0; }
-.pwa .dock { font-family: var(--mono); font-size: 0.78rem; }
-.note { color: var(--muted); font-size: 0.8rem; margin-top: 0.6rem; }
+/* Liefer-Knoepfe fuer Module mit echter, offline einbaubarer Datei. */
+.tool .actions { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.tool .get {
+  font-family: var(--mono); font-size: 0.75rem; cursor: pointer; text-decoration: none;
+  background: var(--accent); border: 1px solid var(--accent); color: #0c0f12;
+  border-radius: 8px; padding: 0.35rem 0.7rem; transition: filter 0.15s;
+}
+.tool .get.download { background: transparent; color: var(--accent); }
+.tool .get:hover { filter: brightness(1.1); }
+.tool .getnote { flex: 1 1 100%; margin: 0.1rem 0 0; font-size: 0.68rem; color: var(--muted); }
+.tool .getnote code { font-family: var(--mono); color: var(--accent); }
 
-footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); }
+/* --- Schicht 3: Marktplatz (Schaufenster) --------------------------------- */
+.markt-intro { color: var(--muted); font-size: 0.85rem; margin: 0.1rem 0 1rem; }
+.market { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; }
+.pwa {
+  position: relative; overflow: hidden;
+  background: radial-gradient(circle at 50% -10%, rgba(54,214,195,0.07), transparent 55%), var(--card);
+  border: 1px solid var(--line); border-radius: 12px; padding: 1rem;
+  transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+.pwa:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 26px #0007; }
+.pwa .p-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+.pwa .p-mark {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 11px;
+  display: grid; place-items: center; font-size: 1.3rem;
+  background: radial-gradient(circle at 35% 30%, var(--card-2), #0e1419);
+  border: 1px solid var(--line); box-shadow: inset 0 0 10px #0007;
+}
+.pwa .name { font-weight: 700; font-size: 1.05rem; }
+.pwa .p-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.55rem; }
+.chip.c-live { color: var(--lamp-live); border-color: var(--lamp-live); }
+.chip.c-int { color: var(--accent); border-color: var(--accent-dim); }
+.pwa .can {
+  color: var(--text); font-size: 0.9rem; font-style: italic;
+  border-left: 3px solid var(--accent-dim); padding-left: 0.6rem; margin: 0.5rem 0 0.7rem;
+}
+.pwa .nodeid { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 0.7rem; }
+.pwa .dock {
+  display: inline-block; font-family: var(--mono); font-size: 0.78rem; text-decoration: none;
+  background: transparent; border: 1px solid var(--accent); color: var(--accent);
+  border-radius: 8px; padding: 0.35rem 0.75rem; transition: background 0.15s, color 0.15s;
+}
+.pwa .dock:hover { background: var(--accent); color: #0c0f12; }
+.note { color: var(--muted); font-size: 0.8rem; margin-top: 0.8rem; }
+
+/* Schicht 2/3 Hover-Bewegung bei Reduced-Motion abschalten */
+@media (prefers-reduced-motion: reduce) {
+  .tool, .pwa, .tab, .copy, .dock, .entry, .entry .entry-art { transition: none; }
+  .tool:hover, .pwa:hover, .entry:hover { transform: none; }
+  /* Bild-Wachstum nicht animieren; Standardgroesse halten (kein Sprung). */
+  .entry:hover .entry-art { height: 180px; }
+}
+
+footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); position: relative; z-index: 1; }
+
+/* ========================================================================
+   OPTIK-EBENE — Ambient-Hintergrund, Halo/Glow, Glas, Bilder, Einblendungen.
+   Rein additiv: Techniken preisgekroenter Seiten, original in eigener
+   Teal-Identitaet umgesetzt (kein Klon). Offline, zero-dependency.
+   PNG-Plaetze (assets/img/…) sind progressive enhancement: fehlt ein Bild,
+   bleibt der Gradient-Fallback sichtbar — die Seite sieht trotzdem fertig aus.
+   ===================================================================== */
+
+/* Grundfarbe auf <html>, damit der fixe Ambient-Layer (body::before, z-index:-1)
+   sichtbar HINTER dem Inhalt, aber VOR der Grundflaeche liegt. */
+html { background: var(--bg); }
+body { background: transparent; position: relative; }
+
+/* Ebene 1: ruhiger Ambient-Backdrop (Glow-Blooms + optionale Textur-PNG) */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 18% 0%, rgba(54,214,195,0.10), transparent 60%),
+    radial-gradient(55% 45% at 88% 8%, rgba(31,122,114,0.12), transparent 60%),
+    radial-gradient(70% 60% at 50% 110%, rgba(54,214,195,0.06), transparent 60%),
+    var(--ambient-img, none) center / cover no-repeat,
+    var(--bg);
+  background-blend-mode: screen, screen, screen, normal, normal;
+}
+/* Ambient-Textur wird gesetzt, sobald das PNG existiert (Fallback: nur Glows) */
+:root { --ambient-img: url("img/ambient.png"); }
+
+/* Ebene 2: sehr langsame Aurora — nur Bewegung, dezent; reduced-motion aus */
+body::after {
+  content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(40% 30% at 30% 30%, rgba(54,214,195,0.07), transparent 70%),
+    radial-gradient(35% 28% at 70% 60%, rgba(31,122,114,0.07), transparent 70%);
+  filter: blur(30px); opacity: 0.8;
+  animation: aurora 26s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0%   { transform: translate3d(-2%, -1%, 0) scale(1.02); }
+  100% { transform: translate3d(3%, 2%, 0) scale(1.08); }
+}
+
+/* Inhalt sicher ueber den Ambient-Layern */
+.statusbar, main { position: relative; z-index: 1; }
+
+/* Glas-Effekt: Statusleiste + Karten frosten den Ambient leicht an */
+.statusbar {
+  background: linear-gradient(180deg, rgba(14,20,25,0.82), rgba(12,15,18,0.72));
+  -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
+}
+.brand:hover .dot { text-shadow: 0 0 10px var(--accent); }
+.panel, .tool, .pwa, .detail, .tally, .tier-card, .explain {
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+
+/* --- Wiederverwendbarer Bild-Banner (Seitenkopf) ------------------------- */
+/* Nutzung: <div class="page-banner" style="--art:url('img/banner-x.png')">…</div>
+   Ohne --art bleibt der Gradient-Fallback — nie ein kaputtes Bild-Icon. */
+.page-banner {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 16px;
+  min-height: 132px; margin: 0.4rem 0 1.1rem;
+  display: flex; align-items: flex-end; gap: 0.8rem;
+  padding: 1rem 1.1rem;
+  background:
+    linear-gradient(90deg, rgba(12,15,18,0.92) 0%, rgba(12,15,18,0.55) 45%, rgba(12,15,18,0.2) 100%),
+    var(--art, none) center / cover no-repeat,
+    radial-gradient(120% 140% at 0% 0%, rgba(54,214,195,0.16), transparent 55%),
+    linear-gradient(135deg, #11181e, #0b0e12);
+}
+.page-banner::after { /* Halo-Schimmer oben rechts */
+  content: ""; position: absolute; right: -10%; top: -60%;
+  width: 60%; height: 180%; pointer-events: none;
+  background: radial-gradient(circle, rgba(54,214,195,0.18), transparent 60%);
+}
+.page-banner .pb-kicker {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--accent);
+}
+.page-banner .pb-title { font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0.1rem 0 0; }
+.page-banner .pb-body { position: relative; z-index: 1; }
+
+/* --- Startseite: Hero als Layered-Komposition + Halo --------------------- */
+.hero { position: relative; padding: 2.2rem 1.1rem 1.3rem; border-radius: 18px; overflow: hidden; }
+.hero::before { /* Hero-Bild als Blickfang + lesbarkeits-Veil (Fallback: nur Glow) */
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(12,15,18,0.28) 0%, rgba(12,15,18,0.42) 48%, rgba(12,15,18,0.82) 100%),
+    var(--hero-img, none) center / cover no-repeat,
+    radial-gradient(60% 80% at 50% -10%, rgba(54,214,195,0.16), transparent 60%);
+  --hero-img: url("img/hero.png");
+}
+.hero > * { position: relative; z-index: 1; }
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  text-shadow: 0 2px 18px rgba(0,0,0,0.7), 0 0 28px rgba(54,214,195,0.35);
+}
+.hero p { text-shadow: 0 1px 10px rgba(0,0,0,0.6); }
+
+/* Werkzeugkiste-Karte: die Truhe IST der mittlere Knopf. Standard handlich
+   (Text drunter gut lesbar, auch auf Handys); waechst beim Drueberfahren und
+   schrumpft zurueck, wenn die Maus weg ist. Klick oeffnet die Werkzeuge-Seite. */
+.hero h1::after { /* Akzent-Punkt-Glow unter dem Titel */
+  content: ""; display: block; width: 64px; height: 3px; margin: 0.7rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 16px var(--accent); border-radius: 2px;
+}
+
+/* Eingangs-Karten: optionales Vorschaubild oben (Fallback: Glow-Streifen) */
+.entry { position: relative; overflow: hidden; }
+.entry .entry-art {
+  /* <img>: GANZES Bild zeigen (contain), nicht abschneiden. */
+  display: block; width: calc(100% + 2.6rem); height: 180px;
+  margin: -1.3rem -1.3rem 0.9rem; border-radius: 12px 12px 0 0;
+  object-fit: contain; object-position: center;
+  background:
+    radial-gradient(70% 90% at 50% 40%, rgba(54,214,195,0.10), transparent 70%),
+    linear-gradient(135deg, #14201f, #0e1419);
+  border-bottom: 1px solid var(--line);
+  transition: height 0.3s ease, box-shadow 0.25s ease;
+}
+.entry:hover { box-shadow: 0 14px 34px #0008; }
+/* Maus drueber: Bild waechst zum Blickfang; geht weg -> wieder normal. */
+.entry:hover .entry-art { height: 260px; box-shadow: inset 0 0 30px rgba(54,214,195,0.12); }
+/* Touch-Geraete (Handys): kein echtes Hover -> normale Hoehe, Text lesbar. */
+@media (hover: none) {
+  .entry:hover .entry-art { height: 180px; }
+}
+
+/* --- Scroll-Reveal (siehe assets/fx.js) ---------------------------------- */
+[data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-reveal].in { opacity: 1; transform: none; }
+
+/* Gestaffelte Einblendung der dynamischen Karten (Werkzeuge/Markt) */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.grid .tool, .market .pwa { animation: fadeUp 0.5s ease both; }
+.grid .tool:nth-child(2), .market .pwa:nth-child(2) { animation-delay: 0.05s; }
+.grid .tool:nth-child(3), .market .pwa:nth-child(3) { animation-delay: 0.10s; }
+.grid .tool:nth-child(4), .market .pwa:nth-child(4) { animation-delay: 0.15s; }
+.grid .tool:nth-child(5), .market .pwa:nth-child(5) { animation-delay: 0.20s; }
+.grid .tool:nth-child(6), .market .pwa:nth-child(6) { animation-delay: 0.25s; }
+.grid .tool:nth-child(n+7) { animation-delay: 0.30s; }
+
+/* --- Reduced-Motion: alle neuen Bewegungen ruhigstellen ------------------- */
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .grid .tool, .market .pwa { animation: none; }
+}
+
+/* --- Puls: Real-Anteil-Ring + Agenten in Aktion (Startseite) ------------- */
+.puls {
+  margin: 1.4rem 0; padding: 1.2rem 1.3rem; border: 1px solid var(--line);
+  border-radius: 14px; background: var(--card);
+}
+.puls-tag { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.puls-head h2 { margin: 0.25rem 0 0.3rem; font-size: 1.2rem; color: var(--text); }
+.puls-sub { margin: 0; font-size: 0.86rem; line-height: 1.55; color: var(--muted); max-width: 60ch; }
+.puls-body { display: flex; gap: 1.6rem; align-items: center; margin-top: 1.1rem; flex-wrap: wrap; }
+
+.ring-wrap { position: relative; width: 168px; height: 168px; flex: 0 0 auto; }
+.ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--bg-soft); }
+.ring-real {
+  fill: none; stroke: url(#ring-real-grad); stroke-linecap: round;
+  stroke-dasharray: 0 999; transition: stroke-dasharray 1.2s cubic-bezier(.22,1,.36,1);
+}
+.ring-center {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.1rem;
+}
+.ring-knoten { background: none; border: none; padding: 0; cursor: pointer; width: 40px; height: 40px; }
+.ring-knoten svg { width: 100%; height: 100%; transform: none; transition: transform .2s ease; }
+.ring-knoten:hover svg, .ring-knoten.active svg { transform: scale(1.12); }
+.kn-core { fill: var(--accent); }
+.kn-sat { fill: var(--accent-dim); }
+.ring-knoten:hover .kn-sat, .ring-knoten.active .kn-sat { fill: var(--accent); }
+.kn-link { stroke: var(--accent-dim); stroke-width: 1.4; fill: none; opacity: 0.7; }
+.ring-pct { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; color: var(--lamp-live); margin-top: 0.2rem; }
+.ring-lbl { font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+
+.agenten { flex: 1 1 280px; min-width: 240px; }
+.agenten-titel { font-family: var(--mono); font-size: 0.78rem; color: var(--text); margin-bottom: 0.5rem; }
+.agenten-liste { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.3rem; }
+.agent { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; padding: 0.25rem 0.4rem; border-radius: 6px; background: var(--bg-soft); }
+.agent-lamp { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.agent.alive .agent-lamp { background: var(--lamp-live); box-shadow: 0 0 6px var(--lamp-live); }
+.agent.demo .agent-lamp { background: var(--lamp-dorm); }
+.agent-name { flex: 1 1 auto; color: var(--text); }
+.agent-state { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.agent.alive .agent-state { color: var(--lamp-live); }
+.agent.demo .agent-state { color: var(--lamp-dorm); }
+.agenten-fuss { margin-top: 0.6rem; font-size: 0.76rem; color: var(--muted); }
+
+.puls-erkl { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+.puls-erkl p { font-size: 0.84rem; line-height: 1.55; color: var(--text); margin: 0.5rem 0; }
+.puls-erkl strong { color: var(--accent); }
+
+/* --- Mobile/Tablet: Banner etwas flacher --------------------------------- */
+@media (max-width: 640px) {
+  .page-banner { min-height: 104px; }
+  .hero { padding: 1.6rem 0.8rem 1.1rem; }
+  .puls-body { gap: 1rem; }
+  .ring-wrap { margin: 0 auto; }
+}

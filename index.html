@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SB·KIMTool·Point — Start</title>
+  <meta name="theme-color" content="#0c0f12" />
+  <link rel="icon" href="assets/img/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -16,6 +19,11 @@
       <a href="werkzeuge.html">Werkzeuge</a>
       <a href="markt.html">Markt</a>
     </nav>
+    <div class="lamps" title="Lampen — lebt / verkehr / fremd (Modul 15 Membran)">
+      <span class="lamp" id="lamp-alive" title="lebt — eigene SBKIM-Identität geladen"><span class="lamp-label">lebt</span></span>
+      <span class="lamp" id="lamp-traffic" title="verkehr — pulst bei echtem Netz-Verkehr (status/SIGNAL/spore)"><span class="lamp-label">verkehr</span></span>
+      <span class="lamp" id="lamp-fremd" title="fremd — rot nur bei echtem Fremdzugriff (Membran 15 warnt, zerstört nichts)"><span class="lamp-label">fremd</span></span>
+    </div>
     <span class="version">v0.2</span>
   </header>
 
@@ -23,38 +31,110 @@
     <div class="hero">
       <h1>SB·KIMTool·Point</h1>
       <p>
-        Drei Schichten, drei Seiten. Wähle eine — du kannst jederzeit oben
-        wieder wechseln. Optik an Sage angelehnt, eigene neutrale Identität.
+        Drei Bereiche, drei Seiten. Klick dich rein, wo du magst — oben
+        kommst du jederzeit wieder zurück.
       </p>
     </div>
 
+    <!-- Real-Anteil + Agenten in Aktion — selbst-aktualisierend aus status.json -->
+    <section class="puls" id="puls" data-reveal aria-label="Was ist real, was ist Demo">
+      <div class="puls-head">
+        <span class="puls-tag">live aus status.json · ehrlicher Real-Anteil</span>
+        <h2>Was ist real, was ist Demo?</h2>
+        <p class="puls-sub">
+          Der grüne Bogen wächst mit jedem echten Beweis (Werkzeug rechnet wirklich,
+          headless oder im Browser belegt). Was nur gezeigt, aber nicht live gerechnet
+          wird, bleibt im hellen Rest. Klick auf den Knoten in der Mitte für die Erklärung.
+        </p>
+      </div>
+
+      <div class="puls-body">
+        <!-- Ring -->
+        <div class="ring-wrap" title="echte Komponenten / alle Komponenten (aus status.json)">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="ring-real-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#34D399"/>
+                <stop offset="100%" stop-color="#16A34A"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="100" cy="100" r="86" stroke-width="13"/>
+            <circle id="ring-real" class="ring-real" cx="100" cy="100" r="86" stroke-width="13"/>
+          </svg>
+          <div class="ring-center">
+            <button class="ring-knoten" type="button" id="ring-knoten" aria-label="Was bedeutet das?">
+              <!-- eigenes, re-geskinntes Knoten-Glyph (kein Pilz-Klon) -->
+              <svg viewBox="0 0 48 48" aria-hidden="true">
+                <circle cx="24" cy="24" r="7" class="kn-core"/>
+                <circle cx="24" cy="8"  r="3.2" class="kn-sat"/>
+                <circle cx="40" cy="20" r="3.2" class="kn-sat"/>
+                <circle cx="34" cy="39" r="3.2" class="kn-sat"/>
+                <circle cx="11" cy="36" r="3.2" class="kn-sat"/>
+                <circle cx="7"  cy="17" r="3.2" class="kn-sat"/>
+                <path class="kn-link" d="M24 24 L24 8 M24 24 L40 20 M24 24 L34 39 M24 24 L11 36 M24 24 L7 17"/>
+              </svg>
+            </button>
+            <div class="ring-pct"><span id="ring-num">…</span></div>
+            <div class="ring-lbl">real belegt</div>
+          </div>
+        </div>
+
+        <!-- Agenten in Aktion -->
+        <div class="agenten" id="agenten" aria-label="Agenten im SBKIM-Netzwerk in Aktion">
+          <div class="agenten-titel">Die Mitarbeiter — Agenten im Netzwerk</div>
+          <ul class="agenten-liste" id="agenten-liste"></ul>
+          <div class="agenten-fuss" id="agenten-fuss"></div>
+        </div>
+      </div>
+
+      <!-- Erklär-Box (vom Knoten in der Mitte aufgeklappt) -->
+      <div class="puls-erkl" id="puls-erkl" hidden>
+        <p><strong>Wie der Bogen rechnet:</strong> Jede Zeile in <code>status.json</code> trägt
+        ein ehrliches <code>echt</code>-Kennzeichen. Der grüne Anteil ist <em>echte ÷ alle</em>
+        Komponenten — kein Marketing, sondern gezählt. Wird ein weiteres Werkzeug nachweislich
+        live (Test grün oder Browser-Beweis), springt es von Demo auf real und der Bogen wächst.</p>
+        <p><strong>Die Mitarbeiter</strong> sind die echten Bausteine in Aktion: Module, die jetzt
+        wirklich rechnen (✓ lebt) oder vorgebaut schlummern und auf ihren Einsatz warten (◐ Demo).
+        So siehst du auf einen Blick, was das Netzwerk schon kann — und was noch Schau ist.</p>
+      </div>
+    </section>
+
     <div class="entries">
-      <a class="entry" href="modell.html">
+      <a class="entry" href="modell.html" data-reveal>
+        <img class="entry-art" src="assets/img/banner-modell.png?v=5" alt="" aria-hidden="true"
+             width="1200" height="400" loading="eager" decoding="async" />
         <span class="step">Schicht 1</span>
         <h2>Modell</h2>
         <p>
-          Aufgezeichneter, headless Node-Lauf als Agenten-Board. Die Seite
-          <strong>spielt</strong> ihn ab — sie führt das Modell nicht live aus.
+          Schau zu, wie kleine Helfer zusammenarbeiten — einer baut, einer
+          prüft, einer schaut zu. Du siehst eine Aufzeichnung davon, wie einen
+          kurzen Film: ehrlich gezeigt, nicht live gerechnet.
         </p>
         <span class="go">→ ansehen</span>
       </a>
 
-      <a class="entry" href="werkzeuge.html">
+      <a class="entry" href="werkzeuge.html" data-reveal>
+        <img class="entry-art" src="assets/img/banner-werkzeuge.png?v=5" alt="" aria-hidden="true"
+             width="1200" height="801" loading="eager" decoding="async" />
         <span class="step">Schicht 2</span>
         <h2>Werkzeugkiste</h2>
         <p>
-          Drei Stufen (Basic · Pro · Profi). Jede Kachel mit Doppel-Status und
-          Erklärung. Hier wachsen einzelne Tools heran.
+          Klick auf die Truhe und stöber durch fertige Bausteine — von einfach
+          bis fortgeschritten. Jeder sagt dir in Klartext, was er kann und wie
+          du ihn nutzt; manche nimmst du gleich mit.
         </p>
         <span class="go">→ öffnen</span>
       </a>
 
-      <a class="entry" href="markt.html">
+      <a class="entry" href="markt.html" data-reveal>
+        <img class="entry-art" src="assets/img/banner-markt.png?v=5" alt="" aria-hidden="true"
+             width="1200" height="400" loading="eager" decoding="async" />
         <span class="step">Schicht 3</span>
         <h2>Markt</h2>
         <p>
-          PWA-Tool-Vermittlung. Schaufenster der Live-Endknoten zum Andocken.
-          Suche bewusst noch nicht gebaut.
+          Ein Schaufenster für kleine Apps, die schon laufen und sich verbinden
+          lassen. Schau, wer mitmacht und wo du andocken kannst. Eine Suche
+          kommt später.
         </p>
         <span class="go">→ stöbern</span>
       </a>
@@ -64,8 +144,14 @@
   <footer>
     SB·KIMTool·Point — Werkzeugkiste + Modell. Ehrlicher Real-Anteil: siehe
     <code>status.json</code>. Beweis der Modell-Logik: <code>npm test</code>.
+    <br>
+    © 2026 Klaus Nitzsche · Alle Rechte vorbehalten ·
+    <a href="impressum.html">Impressum, Datenschutz &amp; Urheberrecht</a>
   </footer>
 
   <script src="assets/app.js"></script>
+  <script src="assets/fx.js"></script>
+  <script src="assets/sbkim-siegel.js"></script>
+  <script src="assets/netz-briefkasten.js"></script>
 </body>
 </html>

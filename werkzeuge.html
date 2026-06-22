@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SB·KIMTool·Point — Werkzeugkiste</title>
+  <meta name="theme-color" content="#0c0f12" />
+  <link rel="icon" href="assets/img/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -15,6 +18,11 @@
       <a href="werkzeuge.html" class="active">Werkzeuge</a>
       <a href="markt.html">Markt</a>
     </nav>
+    <div class="lamps" title="Lampen — lebt / verkehr / fremd (Modul 15 Membran)">
+      <span class="lamp" id="lamp-alive" title="lebt — eigene SBKIM-Identität geladen"><span class="lamp-label">lebt</span></span>
+      <span class="lamp" id="lamp-traffic" title="verkehr — pulst bei echtem Netz-Verkehr (status/SIGNAL/spore)"><span class="lamp-label">verkehr</span></span>
+      <span class="lamp" id="lamp-fremd" title="fremd — rot nur bei echtem Fremdzugriff (Membran 15 warnt, zerstört nichts)"><span class="lamp-label">fremd</span></span>
+    </div>
     <span class="version">v0.2</span>
   </header>
 
@@ -46,14 +54,98 @@
       </div>
     </section>
 
+    <!-- Komplett-Werkzeuge · vollstaendige Ein-Datei-PWAs (von Sage gepflegt) -->
+    <section class="layer" id="schicht-komplett">
+      <h2>Komplett-Werkzeuge — fertige Ein-Datei-PWAs</h2>
+      <p class="sub">
+        Vollständige, eigenständige Werkzeuge: eine einzige Datei, kein Build, keine
+        Abhängigkeiten. Von <strong>Sage-Protokol</strong> gepflegt, hier 1:1 lokal
+        gespiegelt (offline öffnen/herunterladen) plus Live-Link zur Sage-Quelle.
+      </p>
+      <div class="panel" data-reveal>
+        <div class="grid" id="komplett"></div>
+      </div>
+    </section>
+
     <!-- Schicht 2 · WERKZEUGKISTE (herunterladen) -->
     <section class="layer" id="schicht-werkzeuge">
+      <div class="page-banner" style="--art:url('assets/img/banner-werkzeuge.png')">
+        <div class="pb-body">
+          <div class="pb-kicker">Schicht 2 · herunterladen</div>
+          <div class="pb-title">Die Werkbank — Module in drei Stufen</div>
+        </div>
+      </div>
       <h2>Schicht 2 · Werkzeugkiste (herunterladen)</h2>
       <p class="sub">
         Drei Stufen. Jede Kachel trägt Doppel-Status (Sage / Point) und eine Erklärung.
         „Schlummert" = vorgebaut, springt bei Bedarf an — nicht leer.
       </p>
-      <div class="panel">
+
+      <!-- Was ist das hier? — menschlich erklärt, kein Jargon -->
+      <div class="explain" data-reveal>
+        <p>
+          <strong>Worum geht's?</strong> SBKIM ist eine Art Partnervermittlung für kleine
+          Web-Apps: Sie lernen sich kennen, verstehen sich über ihre Bedeutung (nicht nur
+          über Stichworte) und docken aneinander an — ganz ohne zentralen Server.
+        </p>
+        <p>
+          Die Kacheln unten sind die <strong>Bausteine</strong> dafür. Module mit dem grünen
+          Knopf <em>„⧉ Code kopieren / ⬇ Datei laden"</em> sind <strong>echt</strong> und
+          <strong>1:1 aus dem getesteten Sage-Protokoll</strong> übernommen — du kannst sie
+          direkt in deine eigene App einbauen. Manche brauchen Internet (z.&nbsp;B. das
+          Verstehen von Texten oder der Handschlag zwischen zwei Apps); das steht ehrlich an
+          der jeweiligen Kachel.
+        </p>
+      </div>
+      <!-- Stufen-Legende (aus werkzeugkiste.json befüllt) -->
+      <div class="tier-legend" id="tier-legend"></div>
+
+      <!-- Werkstatt: echte Selbst-Prüfung der offline-Werkzeuge (siehe docs/LIVE-MODELL.md) -->
+      <div class="panel werkstatt" data-reveal>
+        <h3 class="werkstatt-titel">Werkstatt — Werkzeuge wirklich prüfen</h3>
+        <p class="werkstatt-sub">
+          Erster echter Schritt Richtung Live-Modell: Klick lädt die echten Module und lässt
+          sie eine kleine Selbst-Prüfung rechnen. Hier laufen die <strong>offline</strong>-Werkzeuge
+          (04 Match, 16 Siegel) — was grün wird, rechnet wirklich.
+        </p>
+        <button class="ctl werkstatt-run" id="werkstatt-run">▶ Werkzeuge prüfen</button>
+        <div class="werkstatt-out" id="werkstatt-out"></div>
+
+        <!-- Live-Match: zwei "das kann ich"-Profile vergleichen -->
+        <div class="livematch">
+          <h4 class="livematch-titel">Live-Match — zwei Profile vergleichen</h4>
+          <p class="livematch-sub">
+            Zwei „das kann ich / das suche ich"-Texte → Embedding (03) → Match (04). Der echte
+            semantische Vergleich läuft in deinem Browser, sobald das Sprachmodell geladen ist;
+            sonst ein klar markierter Demo-Vergleich (zählt gemeinsame Wörter).
+          </p>
+          <textarea id="lm-a" class="lm-feld" rows="2" placeholder="Profil A — z. B. „Ich koche vegetarische Suppen und Eintöpfe"">Ich koche vegetarische Suppen, Eintöpfe und Gemüsegerichte</textarea>
+          <textarea id="lm-b" class="lm-feld" rows="2" placeholder="Profil B — z. B. „Suche Rezepte für vegetarische Suppen"">Suche Rezepte für vegetarische Suppen und Gemüse</textarea>
+          <button class="ctl" id="lm-run">▶ Profile vergleichen</button>
+          <div class="lm-out" id="lm-out"></div>
+        </div>
+
+        <!-- End-to-End: ein Protokoll-Lauf über mehrere Module -->
+        <div class="protokoll">
+          <h4 class="livematch-titel">Protokoll-Lauf — die ganze Kette auf einmal</h4>
+          <p class="livematch-sub">
+            Erstmals greifen die Bausteine als Kette ineinander: Identität (02) → Passung
+            (03+04) → bei Treffer Vertrauen prüfen (02) → Siegel-Stand (16). Jeder Schritt
+            zeigt ehrlich, ob er hier rechnet oder erst in deinem Browser läuft.
+          </p>
+          <button class="ctl" id="pr-run">▶ Protokoll-Lauf starten</button>
+          <div class="lm-out" id="pr-out"></div>
+        </div>
+      </div>
+
+      <div class="panel" data-reveal>
+        <!-- Reife-Schlüssel: was die Spine-Farbe links an jeder Kachel meint -->
+        <div class="maturity-key" aria-hidden="true">
+          <span><span class="mk-dot mk-fertig"></span>reif</span>
+          <span><span class="mk-dot mk-schlummert"></span>schlummert / kopierbar</span>
+          <span><span class="mk-dot mk-teil"></span>teil-fertig</span>
+          <span><span class="mk-dot mk-stub"></span>stub</span>
+        </div>
         <div class="tabs" id="tabs"></div>
         <div class="grid" id="tools"></div>
       </div>
@@ -62,8 +154,25 @@
 
   <footer>
     Schicht 2 von 3 · <a href="index.html">zurück zur Startseite</a>
+    · <a href="impressum.html">Impressum &amp; Datenschutz</a>
   </footer>
 
+  <!-- Werkzeuge laden sich selbst auf window.Sbkim* (IIFE), dann die Werkstatt-Brücke.
+       01 Storage zuerst (02/06/07 haengen daran); 03/05/06 fuer die Netz-Bereitschaftsprobe. -->
+  <script src="web/tools/sbkim-storage.js"></script>
+  <script src="web/tools/sbkim-match.js"></script>
+  <script src="web/tools/sbkim-siegel.js"></script>
+  <script src="web/tools/sbkim-embedding.js"></script>
+  <script src="web/tools/sbkim-spore.js"></script>
+  <script src="web/tools/sbkim-anastomose.js"></script>
+  <script src="web/tools/sbkim-heterokaryose.js"></script>
+  <!-- Modul 22 Such-Werkzeug: nach 03 Embedding + 04 Match laden, dann init. -->
+  <script src="web/tools/sbkim-such-widget.js"></script>
+  <script src="assets/werkstatt.js"></script>
   <script src="assets/app.js"></script>
+  <script src="assets/fx.js"></script>
+  <script src="assets/sbkim-siegel.js"></script>
+  <script src="assets/netz-briefkasten.js"></script>
+  <script src="assets/such-widget-init.js"></script>
 </body>
 </html>

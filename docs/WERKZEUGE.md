@@ -9,14 +9,66 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 
 ---
 
+## Eigenständige Werkzeuge (verteilbare Einzeldatei-Apps)
+
+### ▤ Jasons-Bibliothek  ◐ (Scheibe 1+2+3 fertig, headless + echter Browser bewiesen)
+- **Was:** Offline-Einzeldatei (`jasons-bibliothek/index.html`) zum Sammeln, Benennen,
+  Ordnen, Exportieren und Wieder-Einlesen beliebiger `.json`-Dateien — wie eine eigene
+  Bibliothek; verschenkbar; von außen ein Tresor; ein eigener SBKIM-Knoten.
+- **Nutzen:** JSON-Dateien als eigene Arbeit/Wert aufheben; ganze Bibliothek als eine Datei
+  sichern. **Tresor (Scheibe 2):** „🔒 Verschlüsselt sichern" / „Verschenken 🔒" mit Passwort
+  (AES-256-GCM/PBKDF2 600k) — gleicher Umschlag wie Modul 02. **Identität (Scheibe 3):**
+  Modul 01+02 eingebettet → eigene SBKIM-nodeId anlegen/sichern/wiederherstellen; verschlüsselt
+  bleibt verschlüsselt im Schrank (Öffnen nur per Passwort).
+- **Verwendung:** Seite öffnen → „＋ Jason laden" → benennen/ordnen → „Exportieren" /
+  „Bibliothek sichern" / „Bibliothek einlesen".
+- **Einbau:** Reine Datei, keine Abhängigkeiten; auf Pages unter `…/jasons-bibliothek/`.
+- **Aktiviert durch:** Klaus' Knopfdruck (läuft komplett im Browser).
+- **Volle Doku + Datenvertrag:** `docs/JASONS-BIBLIOTHEK.md`.
+
+### ▣ Komplett-Werkzeuge von Sage (1:1 gespiegelt, byte-kompatibel)
+
+Vollständige Ein-Datei-PWAs, gepflegt von **Sage-Protokol** (Spec-Hub). Hier **1:1 lokal
+gespiegelt** (`web/tools/`, Offline-Default) **plus Live-Link** zur Sage-Quelle. Nicht
+verändert (per `sha256` gegenprüfbar). Geholt 2026-06-20 aus Sage `docs/observatorium/tools/`
+(PR #318). Konventionen (von Sage): generisch (`MeinKnoten`-Platzhalter), **Siegel-Band leer**
+(netzweite Regel 2026-06-20), kein PII, kein Netz von selbst.
+
+#### Andock-Werkzeug  ✅ (browser-tauglich · extern, von Sage gepflegt)
+- Datei: `web/tools/andock.html` · sha256 `af8a265b…110816`
+- **Was:** Erzeugt im Browser eine eigene Ed25519-Identität, eine signierte `spore.json`
+  (byte-kompatibel mit Sages Verifizierer), ein echtes `e5-small`-Domain-Embedding (384-dim),
+  das SBKIM-Siegel (SVG + PNG) und die Briefkasten-Dateien (`SIGNAL.json` + `AUSTAUSCH-Sage.md`).
+- **Nutzen:** Ein Forker wird in einem Rutsch andock-fähig — Identität, Visitenkarte, Siegel,
+  serverloser Briefkasten, ohne Build und ohne Abhängigkeiten.
+- **Verwendung:** Datei öffnen → Eckdaten ausfüllen → vier Schritte durchklicken → Dateien
+  herunterladen → ins eigene Repo legen → veröffentlichen.
+- **Einbau:** Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffähig
+  (einzige optionale Netz-Aktion: Modell-Download im Embedding-Schritt).
+- **Aktiviert durch:** Erstkontakt / Andocken eines neuen Knotens.
+
+#### Komplett-Knoten  ✅ (browser-tauglich · extern, von Sage gepflegt)
+- Datei: `web/tools/mycelknoten.html` · sha256 `297b7638…a7a4d5`
+- **Was:** Bündelt die echten, unveränderten Sage-Module 01/02/03/04/05/07/15/16/17 in einer
+  Datei, inkl. Live-Lampen-Widget (LEBT / VERKEHR / FREMD / SIEGEL).
+- **Nutzen:** Referenz-Knoten zum Anschauen und Andocken — zeigt die echten Module live.
+- **Verwendung:** Datei öffnen; das schwebende Panel unten rechts zeigt den Live-Zustand.
+- **Einbau:** Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffähig
+  (Modelle/CDN nur im Embedding-Schritt).
+- **Aktiviert durch:** Öffnen der Datei (Live-Lampen springen an); FREMD-Lampe bei Angriff (15).
+- **Herkunft/Pflege:** `web/tools/KOMPLETT-WERKZEUGE.herkunft.md` (Sage-README, mitgespiegelt).
+
+---
+
 ## BASIC — Pflicht
 
-### 02 · Spore  ○(Sage code-stub) · Modell-Prototyp
+### 02 · Spore  ○(Sage code-stub) · kopiert · headless getestet
 - **Was:** Kryptografische Identität eines Knotens (Ed25519, `node_id = SHA-256(pubkey)`).
 - **Nutzen:** Ohne Identität keine Teilnahme; jede Aussage/Stimme ist signiert & prüfbar.
 - **Verwendung:** Einmal pro Knoten erzeugen; öffentliche Spore-JSON teilen, privaten Schlüssel geheim halten.
 - **Einbau:** Beim Start anlegen und im Storage (01) ablegen.
 - **Aktiviert durch:** Immer aktiv (Grundbaustein).
+- **Echte Datei:** `web/tools/sbkim-spore.js` (siehe unten) — eine Datei, keine Abhängigkeiten.
 
 ### 01 · Storage  ○
 - **Was:** Speicher-Wrapper (Browser: IndexedDB; headless: Node-Mock) für alle `sbkim_*` Daten.
@@ -151,3 +203,90 @@ Status-Legende: ✅ fertig in Sage · ◐ stub/teil-fertig · ⏾ vorgebaut-schl
 - **Verwendung:** Werkzeug in den Container legen; als PWA ausliefern/kopieren.
 - **Einbau:** Nutzt Membran (15) als Außenhülle.
 - **Aktiviert durch:** Auslieferung eines selbstgebauten Tools.
+
+### 22 · Such-Werkzeug (semantische Suche)  ◐ · 1:1 aus Sage · `web/tools/sbkim-such-widget.js`
+- **Was:** Frei bewegliches Floating-Such-Tool (🔍-Blase → Panel): **semantische,
+  server-lose Bedeutungs-Suche** über drei Bereiche — **App**-Korpus, verbundene **Knoten**
+  und **Internet** (KI-Such-Brücke, BYOK). Eigener Schlüssel-Tresor (Shamir 2/3), Treffer als
+  Prozent + Block-Kopieren, Fortschrittsbalken.
+- **Nutzen:** Findet nach **Bedeutung/Absicht** statt nach Stichwörtern; läuft auch
+  **eigenständig** ohne Mycel-Anschluss.
+- **Verwendung:** 🔍-Blase öffnen, Frage in eigenen Worten eingeben; Treffer nach Bedeutungs-
+  Nähe sortiert. Das Panel ist an der unteren rechten Ecke **größer ziehbar** (Größe gemerkt).
+- **Einbau:** Drei Skript-Tags (`sbkim-embedding.js` 03, `sbkim-match.js` 04,
+  `sbkim-such-widget.js` 22) **nach** den Abhängigkeiten laden (KEIN Auto-Init), dann
+  `SbkimSearchWidget.init({ … })` rufen — das Widget self-mountet. Tresor-Krypto self-contained;
+  optional 21 Spracheingabe. Standalone als eine Datei: `such-werkzeug.html`.
+- **Aktiviert durch:** Nutzer öffnet die Such-Blase (semantische Suche on demand).
+- **Ehrlich:** Headless-Smoke `tests/smoke_bau22_such_widget.mjs` **148/148**; semantische
+  Hälfte (verstehen + sortieren) bewiesen. Die volle **bidirektionale Cross-Knoten-Suche
+  server-los** ist noch NICHT end-to-end gezeigt (siehe `docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md`).
+  Sichtbares Panel im Browser: **wartet auf Klaus' Browser-Lauf**.
+
+---
+
+## Echte, einbaubare Dateien (nicht nur Anzeige)
+
+Module mit dem JSON-Feld `datei` haben eine **echte, offline einbaubare Datei** in
+diesem Repo. Die Werkzeuge-Seite bietet dafür **„⧉ Code kopieren"** und **„⬇ Datei
+laden"** an (kein externer Abruf, kein Sage-Hotlink — die Datei wohnt hier). Module
+ohne `datei` zeigen bewusst **keinen** solchen Knopf — ehrlich statt leerer Versprechen.
+
+### 01 · Storage — `web/tools/sbkim-storage.js`
+
+Eine einzige, abhängigkeitsfreie Datei (klassisches `<script>`-Modul, UMD-Muster).
+**Browser:** IndexedDB (überlebt Neustart). **Headless/Node:** automatischer In-Memory-
+Fallback; `store.backend` zeigt `"indexeddb"` bzw. `"memory"`.
+
+```html
+<script src="sbkim-storage.js"></script>
+<script>
+  const store = await SBKIMStorage.open("sbkim");
+  await store.set("spore", { nodeId: "…" });
+  const spore = await store.get("spore");   // -> {nodeId:"…"} oder null
+</script>
+```
+
+**Ehrlichkeit:** In-Memory-Pfad + API sind durch `test/storage.test.js` belegt (9/9);
+der **IndexedDB-Pfad ist ungeprüft — wartet auf Klaus' Browser-Lauf**.
+
+### 02 · Spore — `web/tools/sbkim-spore.js`
+
+Eine einzige, abhängigkeitsfreie Datei (UMD-Muster wie 01). Echte Krypto:
+**Ed25519 über WebCrypto** (`crypto.subtle`). `nodeId = SHA-256(roher öffentlicher
+Schlüssel)`. Der **private Schlüssel bleibt im Modul** — nur der öffentliche Teil
+verlässt es (`exportPublic()`).
+
+```html
+<script src="sbkim-spore.js"></script>
+<script>
+  if (!(await SBKIMSpore.isSupported())) {     // ehrlicher Hinweis statt Bruch
+    alert("Dieser Browser kann Ed25519 noch nicht."); 
+  } else {
+    const spore = await SBKIMSpore.create();
+    const sig   = await spore.sign("hallo");          // Hex-Signatur
+    const ok    = await spore.verify("hallo", sig);   // true
+    const pub   = spore.exportPublic();                // {nodeId, alg, publicKey}
+    // teilbar; ohne privaten Schlüssel. Fremd prüfen:
+    await SBKIMSpore.verify(pub, "hallo", sig);        // true
+  }
+</script>
+```
+
+**WebCrypto-Anforderung (ehrlich):** Ed25519 in WebCrypto ist jung; ältere Browser
+(u. a. manche Tablet-Browser) können es noch nicht. `isSupported()` meldet das vorab
+**ehrlich** (true/false), `create()` wirft sonst eine **klare Meldung statt still zu
+brechen**.
+
+**Ehrlichkeit:** Sign/Verify + Identitäts-Bindung sind durch `test/spore.test.js`
+belegt (10/10, gegen Node-WebCrypto); der **Browser-Pfad ist ungeprüft — wartet auf
+Klaus' Browser-Lauf**.
+
+## Truhe ↔ `werkzeugkiste.json` (Mapping-Hinweis)
+
+`werkzeugkiste.json` bleibt die **maschinenlesbare Quelle** (id/name/stufe/sage_status/
+point_status/was/nutzen/verwendung/einbau/aktiviert_durch, optional `datei`/
+`point_hinweis`). Eine evtl. reichere „Truhe"-Ansicht (offener Draft-PR #11) trägt eine
+eigene inline Tool-Liste; **wer beide zusammenführt, schreibt zuerst den Mapping-Vertrag
+hier fest, dann Code** (Spec vor Code). Tier-Namen nicht stillschweigend mischen
+(`basic/pro/profi`).

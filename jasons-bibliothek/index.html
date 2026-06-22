@@ -1,0 +1,2913 @@
+<!doctype html>
+<!--
+  Jasons-Bibliothek — SBKIM Tool-Point
+  Version 0.3.0 (Scheibe 3) · 2026 · Quelle: SB-KIMTool-Point
+  Eine offline-taugliche Einzeldatei: beliebige .json laden, benennen, ordnen,
+  exportieren, wieder einlesen, mit Passwort verschluesseln (Tresor) und als
+  eigener SBKIM-Knoten eine Identitaet anlegen/sichern/wiederherstellen.
+  Keine externen Abhaengigkeiten. Eingebettet: Modul 01 Storage + Modul 02 Spore.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Jasons-Bibliothek</title>
+<meta name="description" content="Deine Bibliothek fuer JSON-Dateien: laden, benennen, ordnen, exportieren, wieder einlesen. Offline." />
+<meta name="theme-color" content="#0b1416" />
+<meta name="color-scheme" content="dark" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Jasons-Bibliothek" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1416'/%3E%3Cpath d='M16 18h22a6 6 0 0 1 6 6v22H22a6 6 0 0 1-6-6z' fill='none' stroke='%232dd4bf' stroke-width='3'/%3E%3Cpath d='M24 26h14M24 32h14M24 38h9' stroke='%232dd4bf' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="manifest" href='data:application/manifest+json,{"name":"Jasons-Bibliothek","short_name":"Jasons","start_url":".","scope":".","display":"standalone","background_color":"%230b1416","theme_color":"%230b1416","lang":"de","icons":[{"src":"data:image/svg+xml,%253Csvg xmlns=%2527http://www.w3.org/2000/svg%2527 viewBox=%25270 0 64 64%2527%253E%253Crect width=%252764%2527 height=%252764%2527 rx=%252714%2527 fill=%2527%25230b1416%2527/%253E%253Cpath d=%2527M16 18h22a6 6 0 0 1 6 6v22H22a6 6 0 0 1-6-6z%2527 fill=%2527none%2527 stroke=%2527%25232dd4bf%2527 stroke-width=%25273%2527/%253E%253C/svg%253E","sizes":"any","type":"image/svg+xml"}]}' />
+<style>
+  :root{
+    --bg:#0b1416; --bg2:#0f1b1e; --card:#11252a; --card2:#0e1f23;
+    --ink:#e6f2f1; --muted:#8fb3b1; --line:#1f3d42;
+    --accent:#2dd4bf; --accent-ink:#04201d; --warn:#f0b429; --bad:#f87171;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:radial-gradient(1100px 600px at 80% -10%, #123 0%, transparent 60%), var(--bg);
+    color:var(--ink); padding:0 0 64px; -webkit-text-size-adjust:100%;
+  }
+  header{padding:22px 18px 10px; max-width:920px; margin:0 auto}
+  h1{margin:0; font-size:1.5rem; letter-spacing:.2px}
+  h1 .glyph{color:var(--accent)}
+  .sub{color:var(--muted); margin:4px 0 0; font-size:.95rem}
+  .chip{display:inline-block; font-size:.72rem; padding:2px 8px; border-radius:999px;
+    border:1px solid var(--line); color:var(--muted); background:var(--card2)}
+  .chip.warn{color:var(--warn); border-color:#5a4a17}
+  main{max-width:920px; margin:0 auto; padding:0 18px}
+  .bar{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0}
+  button, .btn, select, input[type=text], textarea{
+    font:inherit; color:var(--ink); background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:9px 12px;
+  }
+  button, .btn{cursor:pointer; transition:transform .08s ease, border-color .15s ease, background .15s ease}
+  button:hover, .btn:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600}
+  .btn-ghost{background:transparent}
+  .btn-bad:hover{border-color:var(--bad); color:var(--bad)}
+  .tools{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0 4px}
+  .tools input[type=text]{flex:1 1 200px; min-width:140px}
+  .count{color:var(--muted); font-size:.85rem; margin:6px 2px 12px}
+  .empty{border:1px dashed var(--line); border-radius:var(--radius); padding:28px 18px;
+    text-align:center; color:var(--muted); background:var(--card2)}
+  ul.list{list-style:none; padding:0; margin:0; display:grid; gap:10px}
+  li.item{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px}
+  .item-head{display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap}
+  .item-name{font-weight:600; font-size:1.05rem}
+  .meta{color:var(--muted); font-size:.8rem; display:flex; gap:10px; flex-wrap:wrap; margin-top:4px}
+  .tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+  .tag{font-size:.72rem; padding:2px 8px; border-radius:999px; background:var(--card2);
+    border:1px solid var(--line); color:var(--accent)}
+  .cat{font-size:.72rem; padding:2px 8px; border-radius:6px; background:#0a2c2a;
+    border:1px solid #1c4a47; color:var(--accent)}
+  .item-actions{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px}
+  .item-actions button{padding:6px 10px; font-size:.85rem}
+  pre.view{background:#06100f; border:1px solid var(--line); border-radius:10px; padding:12px;
+    overflow:auto; max-height:340px; font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; margin:10px 0 0}
+  dialog{border:1px solid var(--line); border-radius:var(--radius); background:var(--bg2); color:var(--ink);
+    max-width:520px; width:92%; padding:18px}
+  dialog::backdrop{background:rgba(0,0,0,.6)}
+  .field{display:block; margin:10px 0}
+  .field span{display:block; font-size:.82rem; color:var(--muted); margin-bottom:4px}
+  .field input{width:100%}
+  .row-end{display:flex; justify-content:flex-end; gap:8px; margin-top:14px}
+  footer{max-width:920px; margin:26px auto 0; padding:0 18px; color:var(--muted); font-size:.82rem}
+  footer p{border-top:1px solid var(--line); padding-top:14px}
+  .ok{color:var(--accent)} .danger{color:var(--bad)}
+  .toast{position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+    background:var(--card); border:1px solid var(--accent); color:var(--ink);
+    padding:10px 16px; border-radius:10px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:50}
+  .toast.show{opacity:1}
+  .ident{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:6px 0}
+  .ident-box{flex-basis:100%; font-size:.82rem; color:var(--muted); background:var(--card2);
+    border:1px solid var(--line); border-radius:10px; padding:8px 10px; word-break:break-all}
+  .ident-box code{color:var(--accent)}
+  .lock{font-size:.72rem; padding:2px 8px; border-radius:6px; background:#2a210a;
+    border:1px solid #4a3c12; color:var(--warn)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="glyph">▤</span> Jasons-Bibliothek</h1>
+  <p class="sub">Deine Bibliothek fuer JSON-Dateien — laden, benennen, ordnen, exportieren, wieder einlesen.</p>
+  <p><span class="chip">offline</span> <span class="chip">Scheibe 3</span>
+     <span class="chip">🔒 Tresor: Passwort-Schutz</span>
+     <span class="chip">🪪 SBKIM-Identität</span></p>
+</header>
+
+<main>
+  <div class="bar">
+    <button id="btn-add" class="btn-primary">＋ Jason laden (.json)</button>
+    <button id="btn-export-all" class="btn-ghost">⤓ Bibliothek sichern</button>
+    <button id="btn-export-enc" class="btn-ghost">🔒 Verschlüsselt sichern</button>
+    <button id="btn-import-lib" class="btn-ghost">⤒ Einlesen / Tresor öffnen</button>
+    <input id="file-add" type="file" accept=".json,application/json" class="hidden" />
+    <input id="file-import" type="file" accept=".json,application/json" class="hidden" />
+  </div>
+
+  <section id="ident-panel" class="ident">
+    <button id="btn-ident" class="btn-ghost">🪪 SBKIM-Identität anzeigen/anlegen</button>
+    <button id="btn-ident-backup" class="btn-ghost">🔒 Identität sichern</button>
+    <div id="ident-box" class="ident-box hidden">
+      <span>Dieser Tresor ist ein SBKIM-Knoten · nodeId:</span> <code id="ident-id"></code>
+    </div>
+  </section>
+
+  <div class="tools">
+    <input id="q" type="text" placeholder="Suchen (Name, Kategorie, Schlagwort) …" />
+    <select id="f-cat"><option value="">alle Kategorien</option></select>
+    <select id="f-tag"><option value="">alle Schlagworte</option></select>
+    <select id="f-sort">
+      <option value="updated-desc">zuletzt geaendert</option>
+      <option value="created-desc">zuletzt hinzugefuegt</option>
+      <option value="name-asc">Name A→Z</option>
+      <option value="name-desc">Name Z→A</option>
+    </select>
+  </div>
+  <div class="count" id="count"></div>
+
+  <div id="empty" class="empty hidden">
+    Noch nichts in der Bibliothek. Lade deine erste Jason mit <b>„＋ Jason laden"</b>.
+  </div>
+  <ul class="list" id="list"></ul>
+</main>
+
+<footer>
+  <p>
+    Gespeichert wird <b>in diesem Browser</b> (pro Geraet). Der Export als <code>.json</code>
+    ist deine echte, mitnehmbare Sicherung — zum Aufheben und Verschenken.
+    <b>🔒 Verschlüsselt sichern</b> schützt mit Passwort (AES-256-GCM / PBKDF2 600k — gleicher
+    Umschlag wie Modul 02). Zum Verschenken das Passwort <b>getrennt</b> mitteilen.
+    Passwort vergessen = Inhalt weg (kein Hintertürchen).
+    <b>🪪 SBKIM-Identität:</b> dieser Tresor ist ein eigener SBKIM-Knoten (Ed25519) — „Identität
+    sichern" legt ein verschlüsseltes Backup an; verschlüsselte Tresore bleiben <b>verschlüsselt
+    im Schrank</b> und werden nur per „Öffnen 🔓" mit Passwort gelesen.
+  </p>
+</footer>
+
+<!-- Bearbeiten-Dialog -->
+<dialog id="dlg-edit">
+  <h3 style="margin:0 0 6px">Jason bearbeiten</h3>
+  <label class="field"><span>Name</span><input id="e-name" type="text" /></label>
+  <label class="field"><span>Kategorie</span><input id="e-cat" type="text" placeholder="z. B. Rezepte" /></label>
+  <label class="field"><span>Schlagworte (mit Komma trennen)</span><input id="e-tags" type="text" placeholder="z. B. test, wichtig" /></label>
+  <div class="row-end">
+    <button id="e-cancel" class="btn-ghost">Abbrechen</button>
+    <button id="e-save" class="btn-primary">Speichern</button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast"></div>
+
+<!-- ============================================================
+     SBKIM-MODULE (1:1 aus web/tools/, fuer eigene Knoten-Identitaet):
+     01 Storage (IndexedDB) -> 02 Spore (Ed25519/WebCrypto, exportBackup/importBackup).
+     Vom headless Test byte-gleich gegen die Originale geprueft; voller Lauf
+     braucht echtes IndexedDB (Browser/HTTP-Origin).
+     ============================================================ -->
+<script>
+// SBKIM-STORAGE-EMBED-START
+/*
+ * SBKIM — Modul 01 — Storage
+ *
+ * IndexedDB wrapper for all sbkim_* stores. Promise-based API, no
+ * callbacks. Default database name: "sbkim", current version: 4
+ * (additive migrations: v=2 Bau-Sitzung 06 added `sbkim_hetero_inbox`,
+ * v=3 Pflege Bau 06.1 added `sbkim_hetero_outbox` — Spec-Sitzung 08
+ * specified the store; Pflege Bau 06.1 follows up the code anmelden;
+ * v=4 Bau 01.Y 2026-05-19 opens the dynamic-store path via
+ * `ensureStore` — no new mandatory stores in v=4, `STORES_V4 = []`).
+ *
+ * Bau 01.Y (2026-05-19) — `ensureStore(name) → Promise<void>` als
+ *   öffentlicher Helfer (INTERFACES.md § 9.5 Option A). Modul 01 kennt
+ *   Identität NICHT — der Aufrufer (Bau 02.Y Folge-Sitzung in Modul 02)
+ *   liefert den identitäts-spezifischen `_<key>`-Suffix. Pattern-Check
+ *   synchron via STORE_NAME_PATTERN (^sbkim_[a-z0-9_]+$); Idempotenz
+ *   via `db.objectStoreNames.contains(name)` vor jedem Versions-Bump;
+ *   Versions-Bump-Choreografie linear über `db.version + 1` (entkoppelt
+ *   von der Build-Konstante DB_VERSION, damit zwei parallele
+ *   ensureStore-Aufrufe sich nicht in die Versionssequenz schreiben);
+ *   onversionchange-Handler auf der NEUEN Verbindung fail-soft
+ *   schließen, damit ein Folge-Bump im selben Tab durchgeht.
+ *
+ * Pflege „Versions-Bump-Race in openProbe" (2026-05-21) — additive
+ *   Race-Auflösung in der `openProbe` → `init` → `ensureStore`-Achse.
+ *   Klaus' Sichttest-Befund 2026-05-21 (DeX-Chrome auf Galaxy Tab S6):
+ *   `ensureStore('sbkim_meta') Versions-Bump blockiert` reproduzierbar
+ *   auf frischer DB nach `tests/manual_check.html` Notfall-Reset + Hard-
+ *   Reload + Panel-06-Setup. Ursache: `db.close()` ist synchron in JS,
+ *   aber IndexedDB schließt die Verbindung intern asynchron — ein direkt
+ *   nachfolgender `indexedDB.open(name, newVersion)` trifft auf eine
+ *   noch nicht geschlossene Vorgänger-Verbindung und hängt in
+ *   `onblocked`. Manifestiert sich nur in `manual_check.html` bei
+ *   wiederholtem Modul-Wechsel (mehrere init()-Ketten pro Tab) —
+ *   Endknoten-PWAs sind nicht betroffen (nur eine init()-Kette pro
+ *   Tab-Lebenszeit). Drei Eingriffe: (1) neuer Helper
+ *   `closeConnectionAndWait(db)` wartet auf `db.onclose`-Feuer ODER auf
+ *   einen 50-ms-Timeout-Fallback (Chrome feuert `onclose` nicht
+ *   zuverlässig auf Android); (2) beide `probedDb.close()`-Stellen in
+ *   `init()` (Fail-soft-Pfad + Initial-Pfad) und der `db.close()` vor
+ *   dem Versions-Bump in `ensureStore` nutzen jetzt
+ *   `closeConnectionAndWait` async-await statt synchroner Aufruf;
+ *   (3) `openProbe` installiert `attachVersionChangeHandler` AUF der
+ *   Probe-Verbindung — die Probe ist zwar transient, aber muss im
+ *   IDB-Worker-Thread sicher schließen können, falls ein späterer Bump
+ *   das `onversionchange`-Event auslöst. KEIN `DB_VERSION`-Bump,
+ *   KEIN INTERFACES-Bietet-Eingriff (nur additive Race-frei-Garantie),
+ *   KEIN `ensureStore`-Verhalten-Bruch von außen.
+ *
+ * Pflege „init() versions-fail-soft" (2026-05-19) — DB_VERSION ist
+ *   jetzt Mindest-Schema-Version, nicht Ziel-Version. init() öffnet
+ *   die DB erst via openProbe(name) ohne Version-Parameter (liefert
+ *   existing Version), prüft Pflicht-Stores sync via
+ *   checkRequiredStores(db), und entscheidet:
+ *     - existing === 0 oder existing < DB_VERSION → regulärer Bau-01.Y-
+ *       Pfad mit indexedDB.open(name, DB_VERSION) + onupgradeneeded +
+ *       applyMigration. Bestehender Pfad UNVERÄNDERT.
+ *     - existing >= DB_VERSION → fail-soft-Pfad: probedDb.close(),
+ *       Pflicht-Stores prüfen, KNOWN_STORES um dynamische Stores
+ *       erweitern, dann openExact(name, existing.version) ohne
+ *       onupgradeneeded.
+ *   Bei fehlendem Pflicht-Store: StorageOpenError mit Liste der
+ *   fehlenden Stores. Modul 01 repariert manuell zerstörte DBs NICHT.
+ *   Klaus' Bau-02.Y-Sichttest 2026-05-19 hat den Befund aufgedeckt
+ *   (Cleanup-Workaround „Browserdaten löschen + Storage init klicken"
+ *   bei jedem Sichttest, weil ensureStore-Bumps aus früheren
+ *   Sitzungen die DB-Version > DB_VERSION machen). Tafel-Evolutions-
+ *   konform: die Brief-02.Y-Tafel „KEIN Modul-01-Eingriff" war
+ *   scope-disziplin für die Bau-Sitzung 02.Y; diese Pflege ist die
+ *   explizite Folge-Sitzung (Brief PR #106, eigener PR).
+ *
+
+ * Pflege PWA-Suffix (2026-05-16) — additive Konfig im init-Pfad:
+ *   init({ dbSuffix }) öffnet die DB als "sbkim_<dbSuffix>" statt der
+ *   Default-DB "sbkim". Pflicht-Anwendungsfall: GitHub-Pages-Project-
+ *   Sites teilen Origin und damit IndexedDB; ohne Suffix kollidieren
+ *   zwei Endknoten unter `lausiklauskn-png.github.io` auf der DB
+ *   `sbkim` und teilen sich die Identität (siehe Übergabeprotokoll
+ *   2026-05-16 Andock Mein-Rezeptbuch). Aufruf-Pflicht VOR dem ersten
+ *   anderen init()-Aufruf (Modul 05, 06, 07, 00 rufen Storage.init()
+ *   intern; idempotent — wer dbSuffix setzen will, muss zuerst).
+ *
+ * Pflege Storage-Persist (2026-05-16) — Stufe (1) der drei-stufigen
+ *   Identitäts-Persistenz-Architektur (PULS § Offene Querschnitts-
+ *   Fragen „Identitäts-Persistenz"). Nach erfolgreichem DB-Open ruft
+ *   Modul 01 navigator.storage.persist() auf (fail-soft):
+ *     - API nicht verfügbar           → _meta.storagePersisted = null
+ *     - persist() resolved true|false → _meta.storagePersisted = bool
+ *     - persist() rejected            → _meta.storagePersisted = null
+ *   Persist-Verweigerung ist KEIN SBKIM-Bruchgrund — Knoten läuft auch
+ *   bei false weiter; persist() ist eine Bitte an den Browser,
+ *   IndexedDB beim normalen Aufräumen nicht zu löschen. Chrome
+ *   gewährt es bei installierten PWAs automatisch; Firefox prompted;
+ *   Safari ist restriktiv. Idempotenz beim Re-Init: dbPromise-Cache
+ *   deckt das ab — persist() wird automatisch nur einmal pro Tab-
+ *   Session gerufen.
+ *
+ * Public surface (registered on window.SbkimStorage):
+ *   init(options?) -> Promise<void>
+ *     options-Form: { dbSuffix?: string }   (^[a-z0-9_-]+$, sonst InvalidDbSuffixError sync)
+ *   getStore(name) -> StoreHandle   (sync; throws UnknownStoreError)
+ *   get(name, key) -> Promise<any | undefined>
+ *   put(name, key, value) -> Promise<void>
+ *   del(name, key) -> Promise<void>
+ *   all(name) -> Promise<Array<{key, value}>>
+ *   clear(name) -> Promise<void>
+ *   ensureStore(name) -> Promise<void>   (Bau 01.Y; sync InvalidStoreNameError bei Pattern-Verstoß; async EnsureStoreError bei Bump-Fehler)
+ *
+ * Self-check: emits a console.info line on script load. See INTERFACES.md
+ * and docs/components/01_storage.md for the binding spec.
+ */
+(function (global) {
+  "use strict";
+
+  var DB_NAME_DEFAULT = "sbkim";
+  var DB_VERSION = 4;
+  var SBKIM_STORE_PREFIX = "sbkim_";
+  var DB_SUFFIX_PATTERN = /^[a-z0-9_-]+$/;
+
+  // Bau 01.Y (2026-05-19): Modul-01-Pattern für ensureStore-Namen.
+  // Strenger als DB_SUFFIX_PATTERN: Store-Namen tragen den sbkim_-Präfix
+  // und dürfen kein '-' enthalten (Trenner-Konvention bleibt '_').
+  var STORE_NAME_PATTERN = /^sbkim_[a-z0-9_]+$/;
+
+  // Stores, die der initiale Migration-Pfad (v=1) anlegt.
+  var STORES_V1 = [
+    "sbkim_keys",
+    "sbkim_spore",
+    "sbkim_siblings",
+    "sbkim_anastomosis_log",
+    "sbkim_legacy_inbox",
+    "sbkim_doku_meta",
+  ];
+
+  // Stores, die in v=2 additiv hinzukommen (Bau-Sitzung 06).
+  var STORES_V2 = [
+    "sbkim_hetero_inbox",
+  ];
+
+  // Stores, die in v=3 additiv hinzukommen (Spec-Sitzung 08 spezifiziert,
+  // Pflege Bau 06.1 meldet den Store im Code an — Modul 08 ist Schreiber,
+  // Modul 06 ist Leser über den Outbox-Lese-Pfad).
+  var STORES_V3 = [
+    "sbkim_hetero_outbox",
+  ];
+
+  // Bau 01.Y (2026-05-19): v=4 öffnet den Pfad „dynamische Stores via
+  // ensureStore" (INTERFACES.md § 9.5 Option A). KEINE festen Pflicht-
+  // Stores in v=4 — die identitäts-spezifischen Stores entstehen erst
+  // durch ensureStore-Aufrufe aus den späteren Bau-Sitzungen (02.Y /
+  // 05.Y / 06.Y / 07.Y). Liste bleibt leer; applyMigration(db, 4) ist
+  // ein no-op-Marker.
+  var STORES_V4 = [];
+
+  // KNOWN_STORES wird ab Bau 01.Y zur Laufzeit erweitert (jeder
+  // erfolgreiche ensureStore-Aufruf pusht den neuen Namen hinten an).
+  // Die initiale Pflicht-Liste sind die Pflicht-Stores aus v=1/v=2/v=3.
+  var KNOWN_STORES = STORES_V1.concat(STORES_V2).concat(STORES_V3).concat(STORES_V4);
+
+  function makeError(name, message, cause) {
+    var e = new Error(message);
+    e.name = name;
+    if (cause !== undefined) e.cause = cause;
+    return e;
+  }
+
+  // Bau 01.Y (2026-05-19): Fehler-Factories für den ensureStore-Pfad,
+  // Factory-Stil analog Modul 02 / 08. Auf window.SbkimStorage.<Error>
+  // exportiert; intern bevorzugt makeError("Name", ...) für sprechende
+  // cause-Pfade.
+  function InvalidStoreNameError(message) { return makeError("InvalidStoreNameError", message); }
+  function EnsureStoreError(message, cause) { return makeError("EnsureStoreError", message, cause); }
+
+  function assertKnownStore(storeName) {
+    if (KNOWN_STORES.indexOf(storeName) === -1) {
+      throw makeError(
+        "UnknownStoreError",
+        "Unbekannter Store: '" + storeName + "'. Erlaubt sind: " + KNOWN_STORES.join(", ") + ".",
+      );
+    }
+  }
+
+  function applyMigration(db, version) {
+    if (version === 1) {
+      for (var i = 0; i < STORES_V1.length; i++) {
+        var name = STORES_V1[i];
+        if (!db.objectStoreNames.contains(name)) {
+          db.createObjectStore(name);
+        }
+      }
+      return;
+    }
+    if (version === 2) {
+      // Bau-Sitzung 06: sbkim_hetero_inbox additiv.
+      // Schlüssel-Form: "<peerNodeId>|<ts>" (Komposit, Drift-Spur).
+      for (var j = 0; j < STORES_V2.length; j++) {
+        var name2 = STORES_V2[j];
+        if (!db.objectStoreNames.contains(name2)) {
+          db.createObjectStore(name2);
+        }
+      }
+      return;
+    }
+    if (version === 3) {
+      // Pflege Bau 06.1 (2026-05-15): sbkim_hetero_outbox additiv.
+      // Schlüssel-Form: `label` (string ≤ 64 Zeichen).
+      // Schreiber: Modul 08 (UI-Demo). Leser: Modul 06 (Heterokaryose).
+      for (var k = 0; k < STORES_V3.length; k++) {
+        var name3 = STORES_V3[k];
+        if (!db.objectStoreNames.contains(name3)) {
+          db.createObjectStore(name3);
+        }
+      }
+      return;
+    }
+    if (version === 4) {
+      // Bau 01.Y (2026-05-19): v=4 öffnet den Pfad „dynamische Stores
+      // via ensureStore" (INTERFACES.md § 9.5 Option A). STORES_V4 ist
+      // leer — kein Pflicht-Store wird in v=4 additiv angelegt; der
+      // Sprung v=3 → v=4 ist ein reiner Marker für bestehende PWAs.
+      // Dynamische Stores entstehen erst durch ensureStore-Aufrufe aus
+      // den späteren Bau-Sitzungen, die linear weiter bumpen
+      // (db.version + 1 pro neuem Store).
+      for (var m = 0; m < STORES_V4.length; m++) {
+        var name4 = STORES_V4[m];
+        if (!db.objectStoreNames.contains(name4)) {
+          db.createObjectStore(name4);
+        }
+      }
+      return;
+    }
+    // Future migrations: branch on `version` and add stores additively.
+    // Never deleteObjectStore here without an explicit spec update.
+  }
+
+  var dbPromise = null;
+  var dbNameInUse = DB_NAME_DEFAULT;
+  // currentDb (Bau 01.Y 2026-05-19): sync-lesbarer Anker auf die aktuelle
+  // IDBDatabase-Verbindung. Wird in req.onsuccess (init) und in
+  // openReq.onsuccess (ensureStore) gesetzt, in onversionchange auf null
+  // zurückgesetzt. Trägt _meta.dbVersion als Live-Zustand (statt der
+  // Build-Konstante DB_VERSION).
+  var currentDb = null;
+  // navigator.storage.persist()-Status nach init. Werte:
+  //   null  — vor init / API nicht verfügbar / persist() rejected (fail-soft)
+  //   true  — Browser hat den Speicher als persistent markiert
+  //   false — Browser hat verweigert (z.B. Safari restriktiv)
+  // Knoten bleibt in allen drei Fällen lauffähig.
+  var storagePersisted = null;
+
+  // Bau 01.Y (2026-05-19): gemeinsamer onversionchange-Handler für jede
+  // frisch geöffnete Verbindung. Wird ein Versions-Bump auf einer
+  // ANDEREN Verbindung derselben DB ausgelöst (anderer Tab oder ein
+  // ensureStore-Folgeruf im selben Tab — siehe brackets im ensureStore-
+  // Pfad, wo wir db.close() vor dem Bump explizit selbst rufen),
+  // schließt dieser Handler fail-soft die alte Verbindung. dbPromise
+  // wird invalidiert, damit nachfolgende init()-Aufrufe eine frische
+  // Verbindung mit der neuen Version aufbauen.
+  function attachVersionChangeHandler(db) {
+    db.onversionchange = function () {
+      try { db.close(); } catch (e) { /* ignore — fail-soft */ }
+      if (currentDb === db) {
+        currentDb = null;
+        dbPromise = null;
+      }
+    };
+  }
+
+  // Pflege „Versions-Bump-Race in openProbe" (2026-05-21): Close-Wait-
+  // Helper. `db.close()` ist synchron in JS, aber IndexedDB schließt
+  // die Verbindung intern asynchron (im DB-Worker-Thread). Ein direkt
+  // nachfolgender `indexedDB.open(name, newVersion)` kann auf eine
+  // noch nicht vollständig geschlossene Vorgänger-Verbindung treffen
+  // und in `onblocked` hängen. Manifestiert sich besonders auf Android-
+  // Chrome (Klaus' Galaxy Tab S6 / DeX-Chrome) bei wiederholten Modul-
+  // Wechseln in `tests/manual_check.html`. Helper wartet auf
+  // `db.onclose`-Feuer ODER auf einen 50-ms-Timeout-Fallback (Chrome
+  // feuert `onclose` nicht zuverlässig in allen Fällen).
+  function closeConnectionAndWait(db) {
+    return new Promise(function (resolve) {
+      db.onclose = resolve;
+      setTimeout(resolve, 50);
+      try { db.close(); } catch (e) { resolve(); }
+    });
+  }
+
+  function requestStoragePersist() {
+    if (
+      typeof navigator === "undefined" ||
+      !navigator.storage ||
+      typeof navigator.storage.persist !== "function"
+    ) {
+      storagePersisted = null;
+      if (typeof console !== "undefined" && console.info) {
+        console.info(
+          "Storage persist-Status: navigator.storage.persist nicht verfuegbar, fail-soft (null).",
+        );
+      }
+      return Promise.resolve(null);
+    }
+    var persistPromise;
+    try {
+      persistPromise = navigator.storage.persist();
+    } catch (e) {
+      storagePersisted = null;
+      if (typeof console !== "undefined" && console.info) {
+        console.info(
+          "Storage persist-Status: persist() warf synchron, fail-soft (null).",
+        );
+      }
+      return Promise.resolve(null);
+    }
+    return Promise.resolve(persistPromise).then(
+      function (result) {
+        if (result === true) {
+          storagePersisted = true;
+        } else if (result === false) {
+          storagePersisted = false;
+        } else {
+          storagePersisted = null;
+        }
+        if (typeof console !== "undefined" && console.info) {
+          console.info("Storage persist-Status: " + storagePersisted);
+        }
+        return storagePersisted;
+      },
+      function () {
+        // Persist-Rejection ist kein SBKIM-Bruchgrund — fail-soft.
+        storagePersisted = null;
+        if (typeof console !== "undefined" && console.info) {
+          console.info(
+            "Storage persist-Status: persist-Promise rejected, fail-soft (null).",
+          );
+        }
+        return null;
+      },
+    );
+  }
+
+  function init(options) {
+    // dbSuffix muss synchron, VOR dem Promise-Aufbau geprüft werden — sonst
+    // verschluckt das Promise einen Programmier-Fehler bis zur ersten
+    // `await SbkimStorage.init(...)`-Auswertung.
+    var explicitSuffix = null;
+    if (options && options.dbSuffix !== undefined && options.dbSuffix !== null) {
+      var suffix = options.dbSuffix;
+      if (typeof suffix !== "string" || !DB_SUFFIX_PATTERN.test(suffix)) {
+        throw makeError(
+          "InvalidDbSuffixError",
+          "Ungueltiger dbSuffix: '" + suffix + "'. Erlaubt sind nur Kleinbuchstaben, Ziffern, '_' und '-' (Pattern ^[a-z0-9_-]+$).",
+        );
+      }
+      explicitSuffix = SBKIM_STORE_PREFIX + suffix;
+    }
+    if (dbPromise) {
+      // Idempotenz: zweite init()-Aufrufe geben die gleiche DB-Promise zurück.
+      // Konflikt-Wurf nur, wenn der Folge-Aufruf EXPLIZIT einen abweichenden
+      // dbSuffix mitgibt — sonst (ohne Optionen, Module 05/06/07/00 rufen so
+      // intern nach) bleibt der zuerst gesetzte DB-Name aktiv. Wer den
+      // PWA-Suffix setzen will, muss zuerst kommen — das ist genau der
+      // Andocker-Pfad in Karte 09 Schritt 4.
+      if (explicitSuffix !== null && explicitSuffix !== dbNameInUse) {
+        return Promise.reject(makeError(
+          "InvalidDbSuffixError",
+          "Storage.init bereits mit DB-Namen '" + dbNameInUse +
+            "' geoeffnet — Folgeaufruf mit '" + explicitSuffix +
+            "' wuerde stillschweigend ignoriert. dbSuffix muss beim ERSTEN init-Aufruf gesetzt werden.",
+        ));
+      }
+      return dbPromise;
+    }
+    dbNameInUse = explicitSuffix !== null ? explicitSuffix : DB_NAME_DEFAULT;
+    dbPromise = new Promise(function (resolve, reject) {
+      if (typeof indexedDB === "undefined" || indexedDB === null) {
+        reject(makeError(
+          "StorageUnavailableError",
+          "IndexedDB ist in dieser Umgebung nicht verfuegbar (Privatmodus / blockiert).",
+        ));
+        return;
+      }
+
+      // Pflege „init() versions-fail-soft" (2026-05-19): zweiphasiger
+      // Pfad. Phase 1 probiert die DB ohne Version-Parameter — das
+      // liefert die existing Version, ohne einen Versions-Bump zu
+      // erzwingen und ohne VersionError zu werfen, wenn existing >
+      // DB_VERSION (häufiger Fall nach ensureStore-Bumps aus früheren
+      // Sitzungen / Sichttests). Phase 2 entscheidet:
+      //   existing === 0 oder existing < DB_VERSION: regulärer
+      //     Bau-01.Y-Pfad mit onupgradeneeded + applyMigration.
+      //   existing >= DB_VERSION: Pflicht-Stores sync prüfen, dann
+      //     Re-Open mit existing Version ohne onupgradeneeded.
+      // Bei fehlendem Pflicht-Store: StorageOpenError (Modul 01
+      // repariert manuell zerstörte DBs NICHT — Klaus' Verantwortung).
+      // Tafel-Evolutions-konform: die Brief-02.Y-Tafel „KEIN
+      // Modul-01-Eingriff" war scope-disziplin; diese Pflege ist die
+      // explizite Folge-Sitzung (PR #106 Brief gemerged, eigener PR).
+      openProbe(dbNameInUse).then(function (probeResult) {
+        var probedDb = probeResult.db;
+        var wasCreated = probeResult.wasCreated;
+        var existingVersion = probedDb ? probedDb.version : 0;
+
+        if (probedDb && !wasCreated && existingVersion >= DB_VERSION) {
+          // Fail-soft-Pfad: existing DB ist auf Mindest-Schema oder
+          // höher (durch frühere ensureStore-Bumps). Pflicht-Stores
+          // prüfen, KNOWN_STORES um dynamische Stores erweitern,
+          // dann Re-Open mit existing Version ohne onupgradeneeded.
+          var missing = checkRequiredStores(probedDb);
+          // KNOWN_STORES um alle existing object-stores erweitern,
+          // damit get/put/del/all/clear sie akzeptieren (Bau-01.Y-
+          // konform: bei jedem ensureStore wird der Name gepusht; nach
+          // Tab-Reload müssen wir den Stand aus der DB rekonstruieren).
+          if (probedDb.objectStoreNames && probedDb.objectStoreNames.length) {
+            for (var i = 0; i < probedDb.objectStoreNames.length; i++) {
+              var existingStore = probedDb.objectStoreNames[i];
+              if (KNOWN_STORES.indexOf(existingStore) === -1) {
+                KNOWN_STORES.push(existingStore);
+              }
+            }
+          }
+          // Pflege „Versions-Bump-Race in openProbe" (2026-05-21):
+          // statt synchronem `probedDb.close()` async-Wait via
+          // `closeConnectionAndWait` — die Probe-Verbindung muss im
+          // IDB-Worker-Thread vollständig geschlossen sein, bevor der
+          // Re-Open mit existing Version startet. Sonst trifft
+          // `openExact` auf eine noch nicht aufgelöste Vorgänger-
+          // Verbindung und kann in `onblocked` hängen (Android-Chrome-
+          // Quirk).
+          closeConnectionAndWait(probedDb).then(function () {
+            if (missing.length > 0) {
+              reject(makeError(
+                "StorageOpenError",
+                "Pflicht-Stores fehlen in existing DB (v=" + existingVersion + "): " +
+                  missing.join(", ") +
+                  ". Modul 01 repariert manuell zerstoerte DBs nicht — Klaus' Verantwortung " +
+                  "(Browser-Daten loeschen + Re-Init, oder Site-spezifischen Storage-Reset).",
+              ));
+              return;
+            }
+
+            // Re-Open mit existing Version, KEIN onupgradeneeded.
+            openExact(dbNameInUse, existingVersion).then(function (db) {
+              currentDb = db;
+              attachVersionChangeHandler(db);
+              requestStoragePersist().then(function () { resolve(db); });
+            }, reject);
+          });
+          return;
+        }
+
+        // Initial-Pfad: existing < DB_VERSION (Migration nötig) ODER
+        // existing === 0 (DB existiert nicht) ODER probeResult.wasCreated
+        // (openProbe hat die DB versehentlich mit Version 1 ohne Stores
+        // angelegt). Regulärer Bau-01.Y-Pfad mit onupgradeneeded +
+        // applyMigration.
+        //
+        // Pflege „Versions-Bump-Race in openProbe" (2026-05-21):
+        // async-Wait auf das Close-Event der Probe-Verbindung, bevor
+        // der reguläre Initial-Open startet. Verhindert
+        // `onblocked`-Race auf Android-Chrome.
+        var closePromise = probedDb
+          ? closeConnectionAndWait(probedDb)
+          : Promise.resolve();
+
+        closePromise.then(function () {
+        // Wenn die DB von openProbe versehentlich angelegt wurde, vor
+        // dem Initial-Open sofort löschen — sonst würde
+        // indexedDB.open(name, DB_VERSION) mit oldVersion=1
+        // starten und applyMigration(db, 1) wird im Loop nicht
+        // gerufen (Loop startet bei v=2). Pflicht-Stores aus v=1
+        // wären dann nie angelegt.
+        var preInitial = wasCreated ? deleteDb(dbNameInUse) : Promise.resolve();
+
+        preInitial.then(function () {
+          var req;
+          try {
+            req = indexedDB.open(dbNameInUse, DB_VERSION);
+          } catch (err) {
+            reject(makeError(
+              "StorageOpenError",
+              "IndexedDB.open() warf synchron: " + (err && err.message),
+              err,
+            ));
+            return;
+          }
+          req.onupgradeneeded = function (ev) {
+            var db = req.result;
+            var oldV = ev.oldVersion || 0;
+            var newV = ev.newVersion || DB_VERSION;
+            for (var v = oldV + 1; v <= newV; v++) {
+              applyMigration(db, v);
+            }
+          };
+          req.onsuccess = function () {
+            var db = req.result;
+            currentDb = db;
+            // Bau 01.Y (2026-05-19): fail-soft onversionchange-Handler
+            // installieren, damit ein späterer ensureStore-Bump (oder ein
+            // Bump aus einem anderen Tab) unsere Verbindung sauber schließen
+            // kann statt in onblocked zu hängen.
+            attachVersionChangeHandler(db);
+            // Pflege Storage-Persist (2026-05-16): persist()-Bitte nach
+            // erfolgreichem DB-Open, fail-soft. requestStoragePersist
+            // resolved IMMER (kein Throw, kein Reject) — Knoten bleibt
+            // lauffähig auch bei Verweigerung oder fehlender API.
+            requestStoragePersist().then(function () {
+              resolve(db);
+            });
+          };
+          req.onerror = function () {
+            var err = req.error;
+            reject(makeError(
+              "StorageOpenError",
+              "IndexedDB-Open scheiterte: " + (err && err.message),
+              err,
+            ));
+          };
+          req.onblocked = function () {
+            reject(makeError(
+              "StorageOpenError",
+              "IndexedDB-Open blockiert (andere Tabs der App offen?).",
+            ));
+          };
+        }, reject);
+        });
+      }, reject);
+    });
+    return dbPromise;
+  }
+
+  // Pflege „init() versions-fail-soft" (2026-05-19): Probe-Open ohne
+  // Version-Parameter. Liefert {db, wasCreated}: existing DB-Verbindung
+  // mit der existing Version, plus Flag ob die DB GERADE NEU angelegt
+  // wurde (IndexedDB-Spec: indexedDB.open(name) ohne Version legt die
+  // DB mit Version 1 an, falls sie nicht existiert; onupgradeneeded
+  // feuert dann mit oldVersion=0). Der Aufrufer (init) nutzt
+  // wasCreated, um zwischen „echter existierender DB" und „durch
+  // Probe-Open neu angelegter Leer-DB" zu unterscheiden — Leer-DB
+  // muss vor dem regulären Initial-Open gelöscht werden, damit
+  // applyMigration(db, 1) im onupgradeneeded-Loop greift (oldVersion=0
+  // → newVersion=DB_VERSION).
+  // Pflege „Versions-Bump-Race in openProbe" (2026-05-21):
+  // `onversionchange`-Handler AUF der Probe-Verbindung installieren
+  // (Race-Auflösung). Die Probe-Verbindung ist zwar transient und wird
+  // vom Aufrufer sofort wieder geschlossen, aber `db.close()` ist
+  // synchron in JS während IndexedDB die Verbindung im DB-Worker-Thread
+  // asynchron schließt. Ein späterer `ensureStore`-Bump im selben Tab
+  // (oder aus einem anderen Tab) muss die Verbindung im Worker-Thread
+  // ebenfalls schließen können — der Handler ist die Fail-soft-
+  // Versicherung, damit der Bump nicht in `onblocked` hängt, falls die
+  // Probe-Verbindung im DB-Worker noch nicht aufgelöst ist.
+  function openProbe(name) {
+    return new Promise(function (resolve, reject) {
+      var req;
+      var wasCreated = false;
+      try {
+        req = indexedDB.open(name);
+      } catch (err) {
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB.open() (Probe) warf synchron: " + (err && err.message),
+          err,
+        ));
+        return;
+      }
+      req.onupgradeneeded = function () {
+        // Wenn dieser Handler feuert, hat IndexedDB die DB GERADE
+        // angelegt (oldVersion=0 → newVersion=1). KEIN
+        // createObjectStore — wir wollen die DB sofort wieder
+        // löschen, damit der Initial-Pfad sie regulär aufbaut.
+        wasCreated = true;
+      };
+      req.onsuccess = function () {
+        // Pflege „Versions-Bump-Race in openProbe" (2026-05-21):
+        // Fail-soft-`onversionchange`-Handler auf der Probe-Verbindung,
+        // damit ein späterer Bump (selber Tab via `ensureStore` oder
+        // anderer Tab) die Verbindung sicher schließen kann statt im
+        // IDB-Worker-Thread offen weiterzuleben.
+        attachVersionChangeHandler(req.result);
+        resolve({ db: req.result, wasCreated: wasCreated });
+      };
+      req.onerror = function () {
+        var err = req.error;
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB-Probe-Open scheiterte: " + (err && err.message),
+          err,
+        ));
+      };
+      req.onblocked = function () {
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB-Probe-Open blockiert (andere Tabs der App offen?).",
+        ));
+      };
+    });
+  }
+
+  // Pflege „init() versions-fail-soft" (2026-05-19): Helper zum
+  // Löschen der DB, falls openProbe sie versehentlich neu angelegt
+  // hat. Wird vor dem Initial-Pfad gerufen.
+  function deleteDb(name) {
+    return new Promise(function (resolve, reject) {
+      var req;
+      try {
+        req = indexedDB.deleteDatabase(name);
+      } catch (err) {
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB.deleteDatabase() warf synchron: " + (err && err.message),
+          err,
+        ));
+        return;
+      }
+      req.onsuccess = function () { resolve(); };
+      req.onerror = function () {
+        var err = req.error;
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB.deleteDatabase() scheiterte: " + (err && err.message),
+          err,
+        ));
+      };
+      req.onblocked = function () {
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB.deleteDatabase() blockiert (andere Tabs offen).",
+        ));
+      };
+    });
+  }
+
+  // Pflege „init() versions-fail-soft" (2026-05-19): synchroner Check,
+  // ob alle Pflicht-Stores aus STORES_V1/V2/V3/V4 in der existing DB
+  // vorhanden sind. Returns Array der fehlenden Store-Namen (leer →
+  // alles da). Sicherheits-Anker für „manuell zerstörte DB".
+  function checkRequiredStores(db) {
+    var required = STORES_V1.concat(STORES_V2).concat(STORES_V3).concat(STORES_V4);
+    var missing = [];
+    for (var i = 0; i < required.length; i++) {
+      if (!db.objectStoreNames.contains(required[i])) {
+        missing.push(required[i]);
+      }
+    }
+    return missing;
+  }
+
+  // Pflege „init() versions-fail-soft" (2026-05-19): Re-Open der DB mit
+  // einer expliziten Version (= existing Version aus der Probe).
+  // Erwartung: Version exakt gleich → KEIN onupgradeneeded. Wenn ein
+  // anderer Tab zwischen Probe und Re-Open einen ensureStore-Bump
+  // gemacht hat (bekanntes Multi-Tab-Race-Risiko, Karte 01 § Risiken),
+  // schlägt das Re-Open mit VersionError fehl — dann wird der Aufruf
+  // mit StorageOpenError rejected. Klaus' Retry (init() nochmal) löst
+  // das in der Praxis.
+  function openExact(name, version) {
+    return new Promise(function (resolve, reject) {
+      var req;
+      try {
+        req = indexedDB.open(name, version);
+      } catch (err) {
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB.open() (Re-Open mit Version " + version + ") warf synchron: " + (err && err.message),
+          err,
+        ));
+        return;
+      }
+      req.onupgradeneeded = function () {
+        // Sollte nicht passieren, wenn Version === existing. Wenn doch,
+        // ist es ein Race (anderer Tab hat zwischen Probe und Re-Open
+        // gebumpt). Wir loggen nichts hier und überlassen das
+        // onsuccess-/onerror-Pfad.
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () {
+        var err = req.error;
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB-Re-Open mit Version " + version + " scheiterte: " + (err && err.message) +
+            ". Moeglicher Multi-Tab-Race zwischen Probe und Re-Open (siehe Karte 01 § Risiken).",
+          err,
+        ));
+      };
+      req.onblocked = function () {
+        reject(makeError(
+          "StorageOpenError",
+          "IndexedDB-Re-Open mit Version " + version + " blockiert (andere Tabs der App offen?).",
+        ));
+      };
+    });
+  }
+
+  function wrapRequest(req, opLabel) {
+    return new Promise(function (resolve, reject) {
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () {
+        var err = req.error;
+        var name = (err && err.name) || "StorageOpenError";
+        if (name === "QuotaExceededError") {
+          reject(makeError(
+            "QuotaExceededError",
+            "Speicher-Quota ueberschritten bei " + opLabel + ".",
+            err,
+          ));
+        } else if (name === "DataCloneError") {
+          reject(makeError(
+            "DataCloneError",
+            "Wert nicht strukturiert klonbar bei " + opLabel + ".",
+            err,
+          ));
+        } else {
+          reject(makeError(
+            "StorageOpenError",
+            opLabel + " scheiterte: " + (err && err.message),
+            err,
+          ));
+        }
+      };
+    });
+  }
+
+  function get(storeName, key) {
+    assertKnownStore(storeName);
+    return init().then(function (db) {
+      var tx = db.transaction(storeName, "readonly");
+      var store = tx.objectStore(storeName);
+      return wrapRequest(store.get(key), "get(" + storeName + ", " + key + ")");
+    });
+  }
+
+  function put(storeName, key, value) {
+    assertKnownStore(storeName);
+    return init().then(function (db) {
+      var tx = db.transaction(storeName, "readwrite");
+      var store = tx.objectStore(storeName);
+      var req;
+      try {
+        req = store.put(value, key);
+      } catch (err) {
+        if (err && err.name === "DataCloneError") {
+          return Promise.reject(makeError(
+            "DataCloneError",
+            "Wert nicht strukturiert klonbar bei put(" + storeName + ", " + key + ").",
+            err,
+          ));
+        }
+        return Promise.reject(makeError(
+          "StorageOpenError",
+          "put(" + storeName + ", " + key + ") warf synchron: " + (err && err.message),
+          err,
+        ));
+      }
+      return wrapRequest(req, "put(" + storeName + ", " + key + ")").then(function () { /* void */ });
+    });
+  }
+
+  function del(storeName, key) {
+    assertKnownStore(storeName);
+    return init().then(function (db) {
+      var tx = db.transaction(storeName, "readwrite");
+      var store = tx.objectStore(storeName);
+      return wrapRequest(store.delete(key), "del(" + storeName + ", " + key + ")").then(function () { /* void */ });
+    });
+  }
+
+  function all(storeName) {
+    assertKnownStore(storeName);
+    return init().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(storeName, "readonly");
+        var store = tx.objectStore(storeName);
+        var results = [];
+        var cursorReq = store.openCursor();
+        cursorReq.onsuccess = function () {
+          var cursor = cursorReq.result;
+          if (cursor) {
+            results.push({ key: cursor.key, value: cursor.value });
+            cursor.continue();
+          } else {
+            resolve(results);
+          }
+        };
+        cursorReq.onerror = function () {
+          var err = cursorReq.error;
+          reject(makeError(
+            "StorageOpenError",
+            "all(" + storeName + ") scheiterte: " + (err && err.message),
+            err,
+          ));
+        };
+      });
+    });
+  }
+
+  function clear(storeName) {
+    assertKnownStore(storeName);
+    return init().then(function (db) {
+      var tx = db.transaction(storeName, "readwrite");
+      var store = tx.objectStore(storeName);
+      return wrapRequest(store.clear(), "clear(" + storeName + ")").then(function () { /* void */ });
+    });
+  }
+
+  // Bau 01.Y (2026-05-19) — INTERFACES.md § 9.5 Option A: dynamische
+  // Store-Erzeugung ab DB-Version 4. Aufrufer (Bau 02.Y in Modul 02)
+  // liefert den identitäts-spezifischen Store-Namen; Modul 01 kennt
+  // Identität NICHT und prüft nur das Modul-01-Pattern. Idempotent:
+  // existierender Store → no-op. KEINE Datenmigration alter Stores.
+  function ensureStore(storeName) {
+    // Pattern-Check SYNCHRON — vor jedem Promise-Aufbau, damit ein
+    // Programmier-Fehler nicht erst beim ersten await sichtbar wird.
+    if (typeof storeName !== "string" || !STORE_NAME_PATTERN.test(storeName)) {
+      throw makeError(
+        "InvalidStoreNameError",
+        "Ungueltiger Store-Name: '" + storeName +
+          "'. Erlaubt sind nur Kleinbuchstaben, Ziffern und '_' nach dem 'sbkim_'-Praefix (Pattern ^sbkim_[a-z0-9_]+$).",
+      );
+    }
+    return init().then(function (db) {
+      // Idempotenz: existierender Store → no-op-Promise. Kein Versions-
+      // Bump, keine Resource-Leakage. Falls der Store schon in der DB
+      // ist (z.B. von einem anderen Tab dynamisch angelegt), aber noch
+      // nicht in KNOWN_STORES, ziehen wir die Allow-List synchron nach,
+      // damit get/put/del/all/clear ihn akzeptieren.
+      if (db.objectStoreNames.contains(storeName)) {
+        if (KNOWN_STORES.indexOf(storeName) === -1) {
+          KNOWN_STORES.push(storeName);
+        }
+        return undefined;
+      }
+      return new Promise(function (resolve, reject) {
+        if (typeof indexedDB === "undefined" || indexedDB === null) {
+          reject(makeError(
+            "EnsureStoreError",
+            "IndexedDB nicht verfuegbar fuer ensureStore('" + storeName + "').",
+          ));
+          return;
+        }
+        var newVersion = db.version + 1;
+        // Aktuelle Verbindung schließen, damit der Versions-Bump
+        // durchgehen kann. dbPromise invalidieren, damit nachfolgende
+        // init()-Aufrufe auf der neuen Verbindung landen.
+        //
+        // Pflege „Versions-Bump-Race in openProbe" (2026-05-21): statt
+        // synchronem `db.close()` async-Wait via
+        // `closeConnectionAndWait` — der `indexedDB.open(name,
+        // newVersion)` muss erst starten, wenn die alte Verbindung im
+        // IDB-Worker-Thread vollständig geschlossen ist. Sonst hängt
+        // der Bump in `onblocked` (manifestiert sich auf Android-
+        // Chrome / Galaxy Tab S6 stärker als auf Desktop-Chrome).
+        if (currentDb === db) currentDb = null;
+        dbPromise = null;
+        closeConnectionAndWait(db).then(function () {
+          var openReq;
+          try {
+            openReq = indexedDB.open(dbNameInUse, newVersion);
+          } catch (err) {
+            reject(makeError(
+              "EnsureStoreError",
+              "indexedDB.open() warf synchron beim Versions-Bump fuer ensureStore('" + storeName + "'): " + (err && err.message),
+              err,
+            ));
+            return;
+          }
+          openReq.onupgradeneeded = function () {
+            var upDb = openReq.result;
+            // Nur den einen neuen Store anlegen — strict additiv. KEINE
+            // Schemata-Migration alter Stores, KEINE neuen Indices auf
+            // bestehenden Stores.
+            if (!upDb.objectStoreNames.contains(storeName)) {
+              upDb.createObjectStore(storeName);
+            }
+          };
+          openReq.onsuccess = function () {
+            var newDb = openReq.result;
+            // Fail-soft onversionchange-Handler auf der NEUEN Verbindung,
+            // damit ein Folge-Bump (weiterer ensureStore-Aufruf, anderer
+            // Tab) durchgeht statt in onblocked zu hängen.
+            attachVersionChangeHandler(newDb);
+            currentDb = newDb;
+            dbPromise = Promise.resolve(newDb);
+            if (KNOWN_STORES.indexOf(storeName) === -1) {
+              KNOWN_STORES.push(storeName);
+            }
+            resolve(undefined);
+          };
+          openReq.onerror = function () {
+            var err = openReq.error;
+            reject(makeError(
+              "EnsureStoreError",
+              "ensureStore('" + storeName + "') Versions-Bump scheiterte: " + (err && err.message),
+              err,
+            ));
+          };
+          openReq.onblocked = function () {
+            reject(makeError(
+              "EnsureStoreError",
+              "ensureStore('" + storeName + "') Versions-Bump blockiert — ein anderer Tab haelt die DB offen und ignoriert onversionchange.",
+            ));
+          };
+        });
+      });
+    });
+  }
+
+  function getStore(storeName) {
+    assertKnownStore(storeName);
+    return {
+      get: function (key) { return get(storeName, key); },
+      put: function (key, value) { return put(storeName, key, value); },
+      del: function (key) { return del(storeName, key); },
+      all: function () { return all(storeName); },
+      clear: function () { return clear(storeName); },
+    };
+  }
+
+  var SbkimStorage = {
+    init: init,
+    getStore: getStore,
+    get: get,
+    put: put,
+    del: del,
+    all: all,
+    clear: clear,
+    ensureStore: ensureStore,
+    // Bau 01.Y (2026-05-19): Fehler-Factories als Export, analog Modul
+    // 02 / 08. Tests können sowohl `err.name === "InvalidStoreNameError"`
+    // als auch `err instanceof SbkimStorage.InvalidStoreNameError`-artige
+    // Vergleiche fahren — die Factory liefert Error-Instanzen mit
+    // sprechendem `name`-Feld.
+    InvalidStoreNameError: InvalidStoreNameError,
+    EnsureStoreError: EnsureStoreError,
+    _meta: {
+      // dbName: Live-Zustand. Vor dem ersten init()-Aufruf identisch mit
+      // dem Default; nach init({dbSuffix}) zeigt das Getter den effektiv
+      // verwendeten Namen ("sbkim_<dbSuffix>").
+      get dbName() { return dbNameInUse; },
+      dbNameDefault: DB_NAME_DEFAULT,
+      // Bau 01.Y (2026-05-19): dbVersion als Getter — Live-Zustand statt
+      // Build-Konstante. Kann nach ensureStore-Aufrufen > DB_VERSION
+      // sein (db.version + 1 pro neuem Store).
+      get dbVersion() { return currentDb ? currentDb.version : DB_VERSION; },
+      dbVersionInitial: DB_VERSION,
+      storePrefix: SBKIM_STORE_PREFIX,
+      // Bau 01.Y (2026-05-19): knownStores als Getter — KNOWN_STORES
+      // wird zur Laufzeit erweitert (jeder erfolgreiche ensureStore-
+      // Aufruf pusht den neuen Namen hinten an). Snapshot pro Lese-
+      // Aufruf.
+      get knownStores() { return KNOWN_STORES.slice(); },
+      // Bau 01.Y (2026-05-19): Pattern als Read-Anker für Tests.
+      ensureStorePattern: STORE_NAME_PATTERN,
+      // Pflege „init() versions-fail-soft" (2026-05-19): Read-Anker für
+      // Tests, dass der Pflege-Stand aktiv ist. Wert "fail-soft-min-
+      // schema" bedeutet: init() respektiert existing > DB_VERSION
+      // (alter Stand wäre "strict": init() würde mit VersionError
+      // scheitern bei existing > DB_VERSION).
+      dbVersionPolicy: "fail-soft-min-schema",
+      // storagePersisted: null vor init bzw. wenn navigator.storage.persist
+      // nicht verfügbar / Promise rejected (fail-soft). true|false zeigt
+      // den Browser-Entscheid (Chrome auto-bei-PWA, Firefox prompt, Safari
+      // restriktiv). Pflege Storage-Persist 2026-05-16.
+      get storagePersisted() { return storagePersisted; },
+    },
+  };
+
+  global.SbkimStorage = SbkimStorage;
+
+  // Self-check: emitted on script load (synchronous, before init()).
+  // Format is uniform across all SBKIM modules — see INTERFACES.md.
+  if (typeof console !== "undefined" && console.info) {
+    console.info("MODUL 01 STORAGE bereit, Funktionen: init/getStore/get/put/del/all/clear/ensureStore");
+  }
+})(typeof window !== "undefined" ? window : globalThis);
+
+// SBKIM-STORAGE-EMBED-END
+</script>
+<script>
+// SBKIM-SPORE-EMBED-START
+/*
+ * SBKIM — Modul 02 — Spore
+ *
+ * Multi-Identity Ed25519 owner per PWA (Bau 02.Y, 2026-05-19). Persists
+ * an arbitrary number of identity slots via window.SbkimStorage (keys
+ * "main" plus free-form Slot-Keys in sbkim_keys), derives each node_id
+ * as base64url(sha256(rawPublicKey)) without padding, builds and signs
+ * the spore JSON per slot, verifies foreign spores. The active slot is
+ * tracked in sbkim_meta["active-identity"] (default "main"). No direct
+ * IndexedDB access, no polyfill.
+ *
+ * Public surface (registered on window.SbkimSpore):
+ *   init() -> Promise<void>
+ *   getOrCreateIdentity(key?) -> Promise<{ nodeId, publicKeyJwk }>
+ *   getNodeId() -> Promise<string>
+ *   getPublicKeyJwk() -> Promise<JsonWebKey>
+ *   generateOwnSpore(meta, key?) -> Promise<SporeJson>
+ *   getOwnSpore(key?) -> Promise<SporeJson | null>
+ *   verifyForeignSpore(spore) -> Promise<{ valid, reason? }>
+ *   setActiveIdentity(key) -> Promise<void>
+ *   getActiveIdentityKey() -> Promise<string>
+ *   listIdentities() -> Promise<string[]>
+ *   removeIdentity(key, options?) -> Promise<boolean>
+ *   resetIdentityCache() -> void
+ *   exportBackup(password) -> Promise<SbkimBackupBlob>
+ *   importBackup(blob, password, options?) -> Promise<{ restored, reason? }>
+ *
+ * Self-check: emits a console.info line on script load (synchronous,
+ * before any call). Key generation is lazy and happens on the first
+ * getOrCreateIdentity(key) call for the given slot. See INTERFACES.md
+ * § 1 Modul 02 + § 9 Identitäts-Map and docs/components/02_spore.md.
+ *
+ * Bau 02.X Backup-Export (2026-05-16): added the AES-GCM+PBKDF2 backup
+ * path (BACKUP_FORMAT_VERSION 1, payload schema 1).
+ *
+ * Bau 02.Y Multi-Identitäts-API + Backup-Schema-Bump (2026-05-19):
+ * additive expansion to multi-slot identities. New API:
+ * setActiveIdentity / getActiveIdentityKey / listIdentities /
+ * removeIdentity, plus optional key parameter on getOrCreateIdentity /
+ * generateOwnSpore / getOwnSpore. Identity-specific stores are created
+ * via SbkimStorage.ensureStore (Bau 01.Y) on first write per slot.
+ * Backup wrapper is bumped to BACKUP_FORMAT_VERSION 2 with new payload
+ * field identities[]; v=1 backups remain importable (Rückwärts-Kompat
+ * to Klaus' Mein-Mixarium/Mein-Rezeptbuch backups vom 2026-05-16).
+ */
+(function (global) {
+  "use strict";
+
+  var PROTOCOL_VERSION = "0.1";
+  var EMBEDDING_MODEL = "Xenova/multilingual-e5-small";
+  var DEFAULT_IDENTITY_KEY = "main";
+  var KEYS_STORE = "sbkim_keys";
+  var SPORE_STORE = "sbkim_spore";
+  var META_STORE = "sbkim_meta";
+  var ACTIVE_IDENTITY_META_KEY = "active-identity";
+  var VALID_NODE_TYPES = ["provider", "seeker", "hybrid"];
+  var REQUIRED_SPORE_FIELDS = [
+    "createdAt",
+    "domain",
+    "embeddingModel",
+    "endpoint",
+    "id",
+    "nodeType",
+    "protocolVersion",
+    "publicKey",
+    "signature",
+  ];
+
+  // Bau 02.Y: identitäts-spezifische Store-Basen. Pro Persona ein Store
+  // pro Basis; Modul 02 ruft ensureStore("<base>_<key>") für alle fünf,
+  // BEVOR er den ersten Schreibvorgang in einen davon macht.
+  // Spec-Quelle INTERFACES.md § 9.2 (Brief 04 + Bau 02.Y).
+  var IDENTITY_STORE_BASES = [
+    "sbkim_siblings",
+    "sbkim_anastomosis_log",
+    "sbkim_legacy_inbox",
+    "sbkim_hetero_inbox",
+    "sbkim_hetero_outbox",
+  ];
+
+  // §0-Konstanten, hier gespiegelt (Sage-Protokol hat noch kein
+  // konfig-Modul-System — INTERFACES.md §0 trägt den „sobald
+  // angelegt"-Hinweis; Bau 02.Y bumpt BACKUP_FORMAT_VERSION 1 → 2).
+  var BACKUP_FORMAT_VERSION = 2;
+  // Bau 02.Y: Lesen ist asymmetrisch zum Schreiben — alte v=1-Backups
+  // (Bau 02.X, Klaus' Backup vom 2026-05-16) bleiben importierbar.
+  var BACKUP_FORMAT_VERSION_READ_OK = [1, 2];
+  var BACKUP_KDF_ITERATIONS = 600000;
+  var BACKUP_PASSWORD_MIN_LEN = 8;
+
+  // Modul-lokale Backup-Konstanten (Karte 02 § Konfigurationswerte).
+  // Bau 02.Y bumpt das Klartext-Payload-Schema von 1 auf 2 (neues
+  // Pflicht-Feld payload.identities[]).
+  var BACKUP_PAYLOAD_SCHEMA_VERSION = 2;
+  var BACKUP_KDF_SALT_BYTES = 16;
+  var BACKUP_CIPHER_IV_BYTES = 12;
+
+  function makeError(name, message, cause) {
+    var e = new Error(message);
+    e.name = name;
+    if (cause !== undefined) e.cause = cause;
+    return e;
+  }
+
+  // Fünf Error-Klassen für den Backup-Pfad (Bau 02.X) + zwei für die
+  // Multi-Identitäts-API (Bau 02.Y). Auf window.SbkimSpore.<Error>
+  // exportiert; intern bevorzugt makeError("Name", ...).
+  function InvalidBackupPasswordError(message) { return makeError("InvalidBackupPasswordError", message); }
+  function BackupDecryptError(message, cause) { return makeError("BackupDecryptError", message, cause); }
+  function BackupVersionMismatchError(message) { return makeError("BackupVersionMismatchError", message); }
+  function BackupSchemaError(message) { return makeError("BackupSchemaError", message); }
+  function BackupOverwriteError(message) { return makeError("BackupOverwriteError", message); }
+  function UnknownIdentityError(message) { return makeError("UnknownIdentityError", message); }
+  function RemoveActiveIdentityError(message) { return makeError("RemoveActiveIdentityError", message); }
+
+  function getSubtle() {
+    var c = global.crypto || (typeof crypto !== "undefined" ? crypto : null);
+    if (!c || !c.subtle) {
+      throw makeError(
+        "CryptoUnavailableError",
+        "WebCrypto (crypto.subtle) ist nicht verfügbar. Modul 02 braucht moderne Browser " +
+          "(Chrome ≥ 113, Firefox ≥ 130, Safari ≥ 17). Kein Polyfill.",
+      );
+    }
+    return c.subtle;
+  }
+
+  function getStorage() {
+    if (!global.SbkimStorage) {
+      throw makeError(
+        "StorageUnavailableError",
+        "window.SbkimStorage nicht geladen. Modul 02 persistiert ausschließlich über Modul 01 — " +
+          "lade src/modules/01_storage.js vor 02_spore.js.",
+      );
+    }
+    return global.SbkimStorage;
+  }
+
+  // base64url ohne Padding (RFC 4648 §5).
+  function base64urlEncode(bytes) {
+    var bin = "";
+    var view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    for (var i = 0; i < view.length; i++) bin += String.fromCharCode(view[i]);
+    var b64 = (global.btoa || btoa)(bin);
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function base64urlDecode(str) {
+    var pad = str.length % 4 === 0 ? "" : "====".slice(str.length % 4);
+    var b64 = str.replace(/-/g, "+").replace(/_/g, "/") + pad;
+    var bin = (global.atob || atob)(b64);
+    var out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function utf8Encode(str) {
+    return new TextEncoder().encode(str);
+  }
+
+  // Backup-Pfad: leitet den AES-GCM-Key aus dem Passwort ab. KDF-Pfad
+  // verbindlich aus Karte 02 § Datenformat „Backup-Format" — PBKDF2-
+  // SHA-256 mit BACKUP_KDF_ITERATIONS Runden gegen einen 16-Byte-Salt.
+  async function derivePbkdf2AesGcmKey(password, salt, iterations) {
+    var subtle = getSubtle();
+    var material = utf8Encode(password);
+    var baseKey = await subtle.importKey(
+      "raw",
+      material,
+      { name: "PBKDF2" },
+      false,
+      ["deriveKey"],
+    );
+    return await subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: iterations, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"],
+    );
+  }
+
+  // Recursive lexicographic key sort. Returns a new object so the
+  // caller's input is never mutated.
+  function canonicalize(value) {
+    if (value === null) return null;
+    if (Array.isArray(value)) return value.map(canonicalize);
+    if (typeof value === "object") {
+      var keys = Object.keys(value).sort();
+      var out = {};
+      for (var i = 0; i < keys.length; i++) out[keys[i]] = canonicalize(value[keys[i]]);
+      return out;
+    }
+    return value;
+  }
+
+  function canonicalJsonBytes(obj) {
+    return utf8Encode(JSON.stringify(canonicalize(obj)));
+  }
+
+  // node_id = base64url(sha256(rawPublicKey)) without padding.
+  async function deriveNodeIdFromPublicKey(publicKey) {
+    var subtle = getSubtle();
+    var raw = await subtle.exportKey("raw", publicKey);
+    var hash = await subtle.digest("SHA-256", raw);
+    return base64urlEncode(hash);
+  }
+
+  async function deriveNodeIdFromJwk(publicJwk) {
+    var subtle = getSubtle();
+    var pub = await subtle.importKey(
+      "jwk",
+      publicJwk,
+      { name: "Ed25519" },
+      true,
+      ["verify"],
+    );
+    return await deriveNodeIdFromPublicKey(pub);
+  }
+
+  // ---- module state (lazy) ----
+
+  var ready = false;
+  // Bau 02.Y: Map key → IdentitySnapshot. Vor Brief 04 ein Singleton;
+  // additive Erweiterung — resetIdentityCache() leert die ganze Map.
+  // Snapshot-Form: { nodeId, publicKeyJwk, privateKey, publicKey }.
+  var identityCache = new Map();
+  // Bau 02.Y: Lese-Cache für den active-identity-Marker. Sync-Read-Anker
+  // für getActiveIdentityKey nach dem ersten Storage-Lookup; null = noch
+  // nicht gelesen. setActiveIdentity / removeIdentity / resetIdentityCache
+  // invalidieren bzw. setzen ihn.
+  var activeIdentityKeyCache = null;
+  // Bau 17: sbkim:alive-Custom-Event wird nach erfolgreichem
+  // getOrCreateIdentity() einmal pro Sitzung gefeuert (Karte 17 §
+  // Event-Bus-Schema). Flag-Schutz, damit jeder weitere
+  // getOrCreateIdentity-Aufruf (z.B. für Sekundär-Persona) den Event
+  // NICHT erneut dispatcht — Modul 17 LEBT-Slot reagiert auf den ersten.
+  var aliveDispatched = false;
+
+  function dispatchAliveOnce(nodeId) {
+    if (aliveDispatched) return;
+    aliveDispatched = true;
+    try {
+      if (typeof global.dispatchEvent === "function" && typeof global.CustomEvent === "function") {
+        global.dispatchEvent(new global.CustomEvent("sbkim:alive", {
+          detail: {
+            since:  new Date().toISOString(),
+            nodeId: nodeId,
+          },
+          bubbles:    false,
+          cancelable: false,
+        }));
+      }
+    } catch (_e) {
+      // fail-soft — Render-Schicht (Modul 17) ist optional.
+    }
+  }
+
+  async function init() {
+    // Probe WebCrypto and storage but do not generate keys.
+    getSubtle();
+    var storage = getStorage();
+    await storage.init();
+    ready = true;
+  }
+
+  async function ensureReady() {
+    if (!ready) await init();
+  }
+
+  // Bau 02.Y: ruft SbkimStorage.ensureStore für alle fünf identitäts-
+  // spezifischen Store-Basen mit dem Slot-Suffix. Aufrufer (Modul 02 in
+  // getOrCreateIdentity / importBackup) ruft das BEVOR der erste
+  // Schreibvorgang in einen davon stattfindet. Idempotent dank
+  // ensureStore's Idempotenz-Garantie (Bau 01.Y).
+  async function ensureIdentityStores(key) {
+    var storage = getStorage();
+    if (typeof storage.ensureStore !== "function") {
+      // Modul 01 vor Bau 01.Y geladen — Multi-Identitäts-Pfad braucht
+      // den ensureStore-Helper. Sprechende Fehler-Message.
+      throw makeError(
+        "StorageUnavailableError",
+        "SbkimStorage.ensureStore fehlt — Bau 01.Y nicht eingespielt. " +
+          "Multi-Identitäts-Pfad in Modul 02 (Bau 02.Y) braucht die achte öffentliche " +
+          "Modul-01-Funktion.",
+      );
+    }
+    // Bewusst seriell: jede ensureStore-Iteration bumpt db.version um 1,
+    // schließt die aktuelle Verbindung und öffnet eine neue. Parallel-
+    // Aufrufe würden alle gegen dieselbe alte db.version racen und sich
+    // gegenseitig blockieren (mehrfache Versions-Bumps auf die gleiche
+    // Ziel-Version). Bau 01.Y dokumentiert die lineare Choreografie.
+    for (var i = 0; i < IDENTITY_STORE_BASES.length; i++) {
+      await storage.ensureStore(IDENTITY_STORE_BASES[i] + "_" + key);
+    }
+  }
+
+  // Bau 02.Y: sbkim_meta wird in Modul 01 nicht als Pflicht-Store
+  // deklariert — der active-identity-Marker entsteht erst mit Brief 04 /
+  // Bau 02.Y. Modul 02 legt den Store via ensureStore (Bau 01.Y, Option A
+  // aus INTERFACES.md § 9.5) dynamisch an, bevor er ihn liest/schreibt.
+  // Idempotent. KEIN Modul-01-Eingriff nötig.
+  var metaStoreEnsured = false;
+  async function ensureMetaStore() {
+    if (metaStoreEnsured) return;
+    var storage = getStorage();
+    if (typeof storage.ensureStore !== "function") {
+      throw makeError(
+        "StorageUnavailableError",
+        "SbkimStorage.ensureStore fehlt — Bau 01.Y nicht eingespielt. " +
+          "Multi-Identitäts-Marker (sbkim_meta) braucht die achte öffentliche Modul-01-Funktion.",
+      );
+    }
+    await storage.ensureStore(META_STORE);
+    metaStoreEnsured = true;
+  }
+
+  async function loadIdentity(key) {
+    var slotKey = key || DEFAULT_IDENTITY_KEY;
+    if (identityCache.has(slotKey)) {
+      var cached = identityCache.get(slotKey);
+      // Pflege 17 Heartbeat 2026-05-26: jeder Pfad, der eine geladene
+      // Identität liefert, soll `sbkim:alive` dispatchen. Bisher war
+      // das nur in getOrCreateIdentity — Aufrufer wie generateOwnSpore
+      // mit existing-Identity oder getNodeId/getPublicKeyJwk lösten das
+      // nicht aus. Klaus' Sichttest 2026-05-26: LEBT bleibt grau wenn
+      // die Identität schon im Storage liegt. Once-Flag im
+      // dispatchAliveOnce schützt vor Doppel-Feuer.
+      dispatchAliveOnce(cached.nodeId);
+      return cached;
+    }
+    await ensureReady();
+    var storage = getStorage();
+    var subtle = getSubtle();
+    var stored = await storage.get(KEYS_STORE, slotKey);
+    if (!stored) return null;
+
+    var privateKey = await subtle.importKey(
+      "jwk",
+      stored.privateKey,
+      { name: "Ed25519" },
+      true,
+      ["sign"],
+    );
+    var publicKey = await subtle.importKey(
+      "jwk",
+      stored.publicKey,
+      { name: "Ed25519" },
+      true,
+      ["verify"],
+    );
+    var nodeId = await deriveNodeIdFromPublicKey(publicKey);
+    var snapshot = {
+      nodeId: nodeId,
+      publicKeyJwk: stored.publicKey,
+      privateKey: privateKey,
+      publicKey: publicKey,
+    };
+    identityCache.set(slotKey, snapshot);
+    dispatchAliveOnce(nodeId);
+    return snapshot;
+  }
+
+  async function getOrCreateIdentity(key) {
+    var slotKey = key || DEFAULT_IDENTITY_KEY;
+    var existing = await loadIdentity(slotKey);
+    if (existing) {
+      dispatchAliveOnce(existing.nodeId);
+      return { nodeId: existing.nodeId, publicKeyJwk: existing.publicKeyJwk };
+    }
+
+    var subtle = getSubtle();
+    var keyPair;
+    try {
+      keyPair = await subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+    } catch (err) {
+      throw makeError(
+        "CryptoUnavailableError",
+        "Ed25519-Schlüsselerzeugung fehlgeschlagen: " + (err && err.message ? err.message : err) +
+          ". Modul 02 braucht moderne WebCrypto-Unterstützung. Kein Polyfill.",
+        err,
+      );
+    }
+
+    var privateKeyJwk = await subtle.exportKey("jwk", keyPair.privateKey);
+    var publicKeyJwk = await subtle.exportKey("jwk", keyPair.publicKey);
+    var nodeId = await deriveNodeIdFromPublicKey(keyPair.publicKey);
+
+    var storage = getStorage();
+
+    // Bau 02.Y: identitäts-spezifische Stores ZUERST anlegen, BEVOR
+    // sbkim_keys[slotKey] geschrieben wird. Bei EnsureStoreError-Reject
+    // (z.B. Multi-Tab-onblocked-Befund, Sichttest 2026-05-19) bleibt
+    // KEIN verwaister sbkim_keys-Eintrag zurück — kein Rollback nötig.
+    // ensureStore ist idempotent (Bau 01.Y); ein nachfolgender retry
+    // mit demselben slotKey überspringt existierende Stores.
+    await ensureIdentityStores(slotKey);
+
+    await storage.put(KEYS_STORE, slotKey, {
+      keyId: slotKey,
+      privateKey: privateKeyJwk,
+      publicKey: publicKeyJwk,
+    });
+
+    identityCache.set(slotKey, {
+      nodeId: nodeId,
+      publicKeyJwk: publicKeyJwk,
+      privateKey: keyPair.privateKey,
+      publicKey: keyPair.publicKey,
+    });
+    dispatchAliveOnce(nodeId);
+    return { nodeId: nodeId, publicKeyJwk: publicKeyJwk };
+  }
+
+  async function getActiveIdentityKey() {
+    if (typeof activeIdentityKeyCache === "string") return activeIdentityKeyCache;
+    await ensureReady();
+    await ensureMetaStore();
+    var storage = getStorage();
+    var stored = await storage.get(META_STORE, ACTIVE_IDENTITY_META_KEY);
+    if (typeof stored === "string" && stored.length > 0) {
+      activeIdentityKeyCache = stored;
+      return stored;
+    }
+    // Default-Slot — Rückwärts-Kompat zum Singleton-Vertrag aus
+    // Spec-Sitzung 02 (2026-05-14). Cache schreiben, damit der nächste
+    // Aufruf nicht erneut den Storage liest.
+    activeIdentityKeyCache = DEFAULT_IDENTITY_KEY;
+    return DEFAULT_IDENTITY_KEY;
+  }
+
+  async function setActiveIdentity(key) {
+    if (typeof key !== "string") {
+      throw makeError(
+        "TypeError",
+        "setActiveIdentity erwartet einen String-Schlüssel; bekommen: " + typeof key + ".",
+      );
+    }
+    await ensureReady();
+    var storage = getStorage();
+    var stored = await storage.get(KEYS_STORE, key);
+    if (!stored) {
+      throw UnknownIdentityError(
+        "setActiveIdentity('" + key + "'): kein Eintrag in sbkim_keys. " +
+          "Erst getOrCreateIdentity('" + key + "') aufrufen.",
+      );
+    }
+    var current = await getActiveIdentityKey();
+    if (current === key) {
+      // Idempotent — kein Storage-Schreibvorgang, aber Cache-Pflege
+      // (resetIdentityCache invalidiert Map, damit nachfolgende
+      // getNodeId-Aufrufe sauber auf dem neuen Slot stehen — auch wenn
+      // Slot bereits aktiv war, schadet das nicht).
+      return;
+    }
+    await ensureMetaStore();
+    await storage.put(META_STORE, ACTIVE_IDENTITY_META_KEY, key);
+    activeIdentityKeyCache = key;
+    resetIdentityCache();
+  }
+
+  async function listIdentities() {
+    await ensureReady();
+    var storage = getStorage();
+    var rows = await storage.all(KEYS_STORE);
+    if (!Array.isArray(rows)) return [];
+    var keys = rows.map(function (r) { return r.key; }).filter(function (k) {
+      return typeof k === "string" && k.length > 0;
+    });
+    // Lexikographisch sortieren — Spec-Pflicht aus INTERFACES.md § 1
+    // Modul 02 listIdentities-Block. Array.prototype.sort() ist der
+    // JS-Default für Strings (Codeunit-Vergleich).
+    keys.sort();
+    return keys;
+  }
+
+  async function removeIdentity(key, options) {
+    if (typeof key !== "string" || key.length === 0) {
+      throw makeError(
+        "TypeError",
+        "removeIdentity erwartet einen nicht-leeren String-Schlüssel; bekommen: " + typeof key + ".",
+      );
+    }
+    var opts = options || {};
+    var force = opts.force === true;
+
+    await ensureReady();
+    var storage = getStorage();
+    var stored = await storage.get(KEYS_STORE, key);
+    if (!stored) {
+      // Idempotent — wie forgetSibling. Kein Throw.
+      return false;
+    }
+
+    var activeKey = await getActiveIdentityKey();
+    if (key === activeKey && !force) {
+      throw RemoveActiveIdentityError(
+        "removeIdentity('" + key + "') ohne {force:true} verweigert: '" + key +
+          "' ist die aktive Identität. " +
+          "Aufrufer muss erst setActiveIdentity(<anderer Slot>) rufen oder force:true setzen — " +
+          "force triggert per-Persona-Apoptose mit Vermächtnis-Versand (Modul 07).",
+      );
+    }
+
+    if (key === activeKey && force) {
+      // Bau 02.Y: Vermächtnis-Versand pro Persona. Modul 07 bekommt
+      // _sendLegacyForIdentity erst in Bau 07.Y implementiert; bis
+      // dahin fail-soft (typeof-check, console.warn, kein Throw).
+      // Heilige Tafel aus dem Brief: 07.Y und 02.Y können in beliebiger
+      // Reihenfolge gemerged werden.
+      if (
+        global.SbkimApoptose &&
+        typeof global.SbkimApoptose._sendLegacyForIdentity === "function"
+      ) {
+        try {
+          await global.SbkimApoptose._sendLegacyForIdentity(key);
+        } catch (err) {
+          // Fail-soft: Vermächtnis-Versand-Fehler hält die per-Persona-
+          // Apoptose nicht auf. Modul 07 ist Aufrufer-Pflicht-Trennung
+          // (Bau 07.Y wird die genauen Fehler-Pfade spec'en).
+          if (typeof console !== "undefined" && console.warn) {
+            console.warn(
+              "SbkimApoptose._sendLegacyForIdentity('" + key + "') warf: " +
+                (err && err.message ? err.message : err) +
+                " — Persona-Apoptose läuft trotzdem weiter.",
+            );
+          }
+        }
+      } else {
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn(
+            "SbkimApoptose._sendLegacyForIdentity nicht verfügbar (Bau 07.Y noch nicht eingespielt) — " +
+              "Persona-Apoptose für '" + key + "' läuft ohne Vermächtnis-Versand. Aufrufer-" +
+              "Konvention für die Übergangszeit (siehe Bau 02.Y Brief).",
+          );
+        }
+      }
+    }
+
+    // Lösch-Pfad in INTERFACES § 1 Modul 02-konformer Reihenfolge:
+    // sbkim_keys → sbkim_spore → fünf identitäts-spezifische Stores.
+    // Die clear-Aufrufe sind fail-soft (try/catch um UnknownStoreError),
+    // weil ein Slot nicht alle Stores haben muss — z.B. wenn die Persona
+    // nie ein Heterokaryose-Pull oder Anastomose-Handshake bekommen hat.
+    // KEIN dropStore-Pfad (Modul 01 bietet keinen, Karte 02 § Risiken
+    // benennt das); die Stores bleiben als leere Stores in IndexedDB.
+    await storage.del(KEYS_STORE, key);
+    try { await storage.del(SPORE_STORE, key); }
+    catch (e) { /* fail-soft */ }
+
+    for (var i = 0; i < IDENTITY_STORE_BASES.length; i++) {
+      var storeName = IDENTITY_STORE_BASES[i] + "_" + key;
+      try {
+        await storage.clear(storeName);
+      } catch (err) {
+        // UnknownStoreError ist erwartet, wenn der Slot diese Store-Basis
+        // nie genutzt hat (siehe Brief: removeIdentity-Block fail-soft).
+        if (err && err.name === "UnknownStoreError") continue;
+        // Andere Fehler werden hochgereicht — das ist ein echtes
+        // Storage-Problem.
+        throw err;
+      }
+    }
+
+    // Cache-Map: den Eintrag für key löschen (sauberer als die ganze
+    // Map zu invalidieren, weil andere Slots im Cache bleiben sollen).
+    identityCache.delete(key);
+
+    if (key === activeKey) {
+      // Neue aktive Identität wählen — "main" hat Vorrang, sonst
+      // erster Slot aus listIdentities() (lexikographisch), sonst
+      // Marker löschen.
+      await ensureMetaStore();
+      var mainStored = await storage.get(KEYS_STORE, DEFAULT_IDENTITY_KEY);
+      if (mainStored) {
+        await storage.put(META_STORE, ACTIVE_IDENTITY_META_KEY, DEFAULT_IDENTITY_KEY);
+        activeIdentityKeyCache = DEFAULT_IDENTITY_KEY;
+      } else {
+        var remaining = await listIdentities();
+        if (remaining.length > 0) {
+          await storage.put(META_STORE, ACTIVE_IDENTITY_META_KEY, remaining[0]);
+          activeIdentityKeyCache = remaining[0];
+        } else {
+          try { await storage.del(META_STORE, ACTIVE_IDENTITY_META_KEY); }
+          catch (e) { /* fail-soft */ }
+          activeIdentityKeyCache = null;
+        }
+      }
+    }
+
+    resetIdentityCache();
+    return true;
+  }
+
+  async function getNodeId() {
+    var activeKey = await getActiveIdentityKey();
+    var id = await loadIdentity(activeKey);
+    if (!id) {
+      throw makeError(
+        "NoIdentityError",
+        "Es existiert noch keine Identität für Slot '" + activeKey + "'. " +
+          "Erst getOrCreateIdentity('" + activeKey + "') aufrufen.",
+      );
+    }
+    return id.nodeId;
+  }
+
+  async function getPublicKeyJwk() {
+    var activeKey = await getActiveIdentityKey();
+    var id = await loadIdentity(activeKey);
+    if (!id) {
+      throw makeError(
+        "NoIdentityError",
+        "Es existiert noch keine Identität für Slot '" + activeKey + "'. " +
+          "Erst getOrCreateIdentity('" + activeKey + "') aufrufen.",
+      );
+    }
+    return id.publicKeyJwk;
+  }
+
+  function validateSporeMeta(meta) {
+    var missing = [];
+    if (!meta || typeof meta !== "object") {
+      throw makeError("InvalidSporeMetaError", "meta-Objekt fehlt oder ist kein Objekt.");
+    }
+    if (typeof meta.domain !== "string" || meta.domain.length === 0) missing.push("domain");
+    if (typeof meta.endpoint !== "string" || meta.endpoint.length === 0) missing.push("endpoint");
+    if (typeof meta.nodeType !== "string") missing.push("nodeType");
+    if (missing.length > 0) {
+      throw makeError(
+        "InvalidSporeMetaError",
+        "Pflichtfelder fehlen oder leer: " + missing.join(", ") + ".",
+      );
+    }
+    if (VALID_NODE_TYPES.indexOf(meta.nodeType) === -1) {
+      throw makeError(
+        "InvalidSporeMetaError",
+        "nodeType '" + meta.nodeType + "' ungültig. Erlaubt: " + VALID_NODE_TYPES.join(", ") + ".",
+      );
+    }
+  }
+
+  async function generateOwnSpore(meta, key) {
+    validateSporeMeta(meta);
+    var slotKey = key || await getActiveIdentityKey();
+    var identity = await loadIdentity(slotKey);
+    if (!identity) {
+      await getOrCreateIdentity(slotKey);
+      identity = await loadIdentity(slotKey);
+    }
+    // Bau 02.Y: identitäts-spezifische Stores sicherstellen — der
+    // typische Fall ist „Slot kam frisch aus getOrCreateIdentity, alles
+    // angelegt", aber ein Slot aus importBackup kann aus einer
+    // Backup-Migration stammen, wo der getOrCreateIdentity-Pfad nicht
+    // gerufen wurde. ensureIdentityStores ist idempotent.
+    await ensureIdentityStores(slotKey);
+
+    var unsigned = {
+      createdAt: new Date().toISOString(),
+      domain: meta.domain,
+      embeddingModel: typeof meta.embeddingModel === "string" ? meta.embeddingModel : EMBEDDING_MODEL,
+      endpoint: meta.endpoint,
+      id: identity.nodeId,
+      nodeType: meta.nodeType,
+      protocolVersion: typeof meta.protocolVersion === "string" ? meta.protocolVersion : PROTOCOL_VERSION,
+      publicKey: identity.publicKeyJwk,
+    };
+    if (typeof meta.nodeName === "string") unsigned.nodeName = meta.nodeName;
+    if (typeof meta.domainDescription === "string") unsigned.domainDescription = meta.domainDescription;
+    if (Array.isArray(meta.domainKeywords)) unsigned.domainKeywords = meta.domainKeywords.slice();
+    if (Array.isArray(meta.domainVector)) unsigned.domainVector = meta.domainVector.slice();
+    if (Array.isArray(meta.stammCategories)) unsigned.stammCategories = meta.stammCategories.slice();
+    if (Array.isArray(meta.guestCategories)) unsigned.guestCategories = meta.guestCategories.slice();
+    if (meta.endpointPaths && typeof meta.endpointPaths === "object") {
+      unsigned.endpointPaths = meta.endpointPaths;
+    }
+
+    var subtle = getSubtle();
+    var bytes = canonicalJsonBytes(unsigned);
+    var sigBuf = await subtle.sign({ name: "Ed25519" }, identity.privateKey, bytes);
+    var signature = base64urlEncode(sigBuf);
+
+    var spore = canonicalize(unsigned);
+    spore.signature = signature;
+    spore = canonicalize(spore);
+
+    var storage = getStorage();
+    await storage.put(SPORE_STORE, slotKey, {
+      nodeId: identity.nodeId,
+      sporeJson: spore,
+      signature: signature,
+    });
+    return spore;
+  }
+
+  async function getOwnSpore(key) {
+    await ensureReady();
+    var slotKey = key || await getActiveIdentityKey();
+    var storage = getStorage();
+    var stored = await storage.get(SPORE_STORE, slotKey);
+    if (!stored) return null;
+    return stored.sporeJson || null;
+  }
+
+  function checkRequiredFields(spore) {
+    for (var i = 0; i < REQUIRED_SPORE_FIELDS.length; i++) {
+      var f = REQUIRED_SPORE_FIELDS[i];
+      if (spore[f] === undefined || spore[f] === null) return f;
+    }
+    return null;
+  }
+
+  function majorVersion(v) {
+    if (typeof v !== "string") return null;
+    var dot = v.indexOf(".");
+    return dot === -1 ? v : v.slice(0, dot);
+  }
+
+  async function verifyForeignSpore(spore) {
+    try {
+      if (!spore || typeof spore !== "object") {
+        return { valid: false, reason: "Spore ist kein Objekt." };
+      }
+      var missing = checkRequiredFields(spore);
+      if (missing) return { valid: false, reason: "Pflichtfeld fehlt: " + missing };
+
+      var ourMajor = majorVersion(PROTOCOL_VERSION);
+      var theirMajor = majorVersion(spore.protocolVersion);
+      if (ourMajor !== theirMajor) {
+        return {
+          valid: false,
+          reason: "Inkompatible Hauptversion: " + spore.protocolVersion + " (wir: " + PROTOCOL_VERSION + ")",
+        };
+      }
+
+      if (VALID_NODE_TYPES.indexOf(spore.nodeType) === -1) {
+        return { valid: false, reason: "nodeType ungültig: " + spore.nodeType };
+      }
+
+      var derivedId;
+      try {
+        derivedId = await deriveNodeIdFromJwk(spore.publicKey);
+      } catch (err) {
+        return { valid: false, reason: "publicKey nicht importierbar: " + (err && err.message ? err.message : err) };
+      }
+      if (derivedId !== spore.id) {
+        return { valid: false, reason: "nodeId stimmt nicht zum Public Key" };
+      }
+
+      var subtle = getSubtle();
+      var pub = await subtle.importKey("jwk", spore.publicKey, { name: "Ed25519" }, true, ["verify"]);
+
+      var unsigned = {};
+      var keys = Object.keys(spore);
+      for (var i = 0; i < keys.length; i++) {
+        if (keys[i] === "signature") continue;
+        unsigned[keys[i]] = spore[keys[i]];
+      }
+      var bytes = canonicalJsonBytes(unsigned);
+
+      var sigBytes;
+      try {
+        sigBytes = base64urlDecode(spore.signature);
+      } catch (err) {
+        return { valid: false, reason: "Signatur nicht dekodierbar (kein base64url)" };
+      }
+
+      var ok = await subtle.verify({ name: "Ed25519" }, pub, sigBytes, bytes);
+      if (!ok) return { valid: false, reason: "Signatur ungültig" };
+      return { valid: true };
+    } catch (err) {
+      return { valid: false, reason: "Verifikationsfehler: " + (err && err.message ? err.message : err) };
+    }
+  }
+
+  // Sync, idempotent. Leert In-Memory-identityCache + activeIdentityKey-
+  // Cache, ohne den Storage anzufassen. Pflicht-Aufruf für externe
+  // Cleanup-Pfade, die sbkim_keys/sbkim_spore/sbkim_meta selbst leeren
+  // (z.B. Modul 07 confirmSelfApoptose). Bau 02.Y erweitert um den
+  // active-identity-Lese-Cache.
+  function resetIdentityCache() {
+    identityCache.clear();
+    activeIdentityKeyCache = null;
+    // metaStoreEnsured wird NICHT zurückgesetzt — der ensureStore-Status
+    // ist ein DB-Schema-Fakt (Store existiert), nicht ein Cache-Wert.
+  }
+
+  // ---- Backup-Pfad (Bau 02.X, 2026-05-16 / Bau 02.Y, 2026-05-19) ----
+  //
+  // exportBackup: schreibt IMMER version: 2 (Bau 02.Y), payload-schema-
+  // version: 2 mit Pflicht-Feld identities[]. Top-Level-Felder
+  // nodeId/keys/spore/siblings bleiben mit aktivem Slot befüllt
+  // (konservative Down-Grade-Kompat).
+
+  async function buildIdentityEntry(slotKey) {
+    var storage = getStorage();
+    var identity = await loadIdentity(slotKey);
+    if (!identity) {
+      throw makeError(
+        "NoIdentityError",
+        "Slot '" + slotKey + "' aus sbkim_keys liefert keine ladbare Identität. " +
+          "Inkonsistenter Storage-Zustand.",
+      );
+    }
+    var keysWrap = await storage.get(KEYS_STORE, slotKey);
+    if (!keysWrap) {
+      throw makeError(
+        "NoIdentityError",
+        "sbkim_keys['" + slotKey + "'] fehlt — Slot zwischen listIdentities und get verschwunden?",
+      );
+    }
+    var sporeWrap = await storage.get(SPORE_STORE, slotKey);
+
+    var siblingValues = [];
+    var siblingsStore = "sbkim_siblings_" + slotKey;
+    try {
+      var rows = await storage.all(siblingsStore);
+      if (Array.isArray(rows)) {
+        siblingValues = rows.map(function (r) { return r.value; });
+      }
+    } catch (e) {
+      // Fail-soft (Karte 02 § Storage „Backup-Inhalt"). Häufigster Fall:
+      // UnknownStoreError, wenn der Slot nie Geschwister bekommen hat
+      // (Stores sind nur via ensureStore in getOrCreateIdentity entstanden,
+      // beim Modul-02-Singleton-Pfad gab es nicht-suffixed sbkim_siblings).
+      siblingValues = [];
+    }
+
+    return {
+      key: slotKey,
+      nodeId: identity.nodeId,
+      keys: {
+        keyId: slotKey,
+        privateKey: keysWrap.privateKey,
+        publicKey: keysWrap.publicKey,
+      },
+      spore: sporeWrap && sporeWrap.sporeJson ? sporeWrap.sporeJson : null,
+      siblings: siblingValues,
+    };
+  }
+
+  async function exportBackup(password) {
+    if (typeof password !== "string" || password.length < BACKUP_PASSWORD_MIN_LEN) {
+      throw makeError(
+        "InvalidBackupPasswordError",
+        "Passwort muss mindestens " + BACKUP_PASSWORD_MIN_LEN + " Zeichen lang sein.",
+      );
+    }
+
+    // Sicherstellen, dass mindestens eine Identität existiert.
+    // getOrCreateIdentity legt fehlende Default-Identität an.
+    await getOrCreateIdentity(DEFAULT_IDENTITY_KEY);
+
+    var slotKeys = await listIdentities();
+    if (slotKeys.length === 0) {
+      // Sollte nach getOrCreateIdentity(DEFAULT_IDENTITY_KEY) nicht
+      // passieren; defensiv.
+      throw makeError(
+        "NoIdentityError",
+        "Keine Identitäten in sbkim_keys — exportBackup nicht möglich.",
+      );
+    }
+
+    var activeKey = await getActiveIdentityKey();
+    var identities = [];
+    var activeEntry = null;
+    for (var i = 0; i < slotKeys.length; i++) {
+      var entry = await buildIdentityEntry(slotKeys[i]);
+      identities.push(entry);
+      if (entry.key === activeKey) activeEntry = entry;
+    }
+    // Fallback: wenn der active-identity-Marker auf einen Slot zeigt,
+    // den listIdentities nicht enthält (sollte nicht passieren, weil
+    // setActiveIdentity validiert), nehmen wir den ersten Slot.
+    if (!activeEntry) activeEntry = identities[0];
+
+    var payload = {
+      "active-identity": activeEntry.key,
+      createdAt: new Date().toISOString(),
+      identities: identities,
+      // Konservative Down-Grade-Kompat: alte Bau-02.X-Code-Pfade lesen
+      // diese Top-Level-Felder direkt (kein identities[]-Verständnis).
+      // Karte 02 § Datenformat „Backup-Format" dokumentiert beide
+      // Pfade. KEINE Pflicht aus Brief 04 — bewusste Wahl Bau 02.Y.
+      keys: activeEntry.keys,
+      nodeId: activeEntry.nodeId,
+      siblings: activeEntry.siblings,
+      spore: activeEntry.spore,
+    };
+
+    var subtle = getSubtle();
+    var plaintext = canonicalJsonBytes(payload);
+    var salt = global.crypto.getRandomValues(new Uint8Array(BACKUP_KDF_SALT_BYTES));
+    var iv = global.crypto.getRandomValues(new Uint8Array(BACKUP_CIPHER_IV_BYTES));
+    var aesKey = await derivePbkdf2AesGcmKey(password, salt, BACKUP_KDF_ITERATIONS);
+    var cipherBuf = await subtle.encrypt({ name: "AES-GCM", iv: iv }, aesKey, plaintext);
+
+    return {
+      version: BACKUP_FORMAT_VERSION,
+      kdf: {
+        algorithm: "PBKDF2",
+        hash: "SHA-256",
+        iterations: BACKUP_KDF_ITERATIONS,
+        salt: base64urlEncode(salt),
+      },
+      cipher: {
+        algorithm: "AES-GCM-256",
+        iv: base64urlEncode(iv),
+      },
+      ciphertext: base64urlEncode(new Uint8Array(cipherBuf)),
+      "payload-schema-version": BACKUP_PAYLOAD_SCHEMA_VERSION,
+    };
+  }
+
+  // importBackup: liest beide Wrapper-Versionen (1 und 2). v=1 wird
+  // intern in eine identities[]-Liste mit einem main-Eintrag migriert.
+  // BackupOverwriteError pro Slot (Bau 02.Y), nicht mehr global.
+  async function importBackup(blob, password, options) {
+    var opts = options || {};
+    var force = opts.force === true;
+
+    if (typeof password !== "string" || password.length < BACKUP_PASSWORD_MIN_LEN) {
+      throw makeError(
+        "InvalidBackupPasswordError",
+        "Passwort muss mindestens " + BACKUP_PASSWORD_MIN_LEN + " Zeichen lang sein.",
+      );
+    }
+    if (!blob || typeof blob !== "object") {
+      throw makeError("BackupSchemaError", "Backup-Blob fehlt oder ist kein Objekt.");
+    }
+    if (BACKUP_FORMAT_VERSION_READ_OK.indexOf(blob.version) === -1) {
+      throw makeError(
+        "BackupVersionMismatchError",
+        "Backup-Hauptversion " + blob.version + " unbekannt (Modul 02 versteht " +
+          BACKUP_FORMAT_VERSION_READ_OK.join("/") + ").",
+      );
+    }
+    if (!blob.kdf || !blob.cipher || typeof blob.ciphertext !== "string") {
+      throw makeError(
+        "BackupSchemaError",
+        "Backup-Pflichtfeld fehlt im Wrapper: kdf / cipher / ciphertext.",
+      );
+    }
+
+    await ensureReady();
+    var storage = getStorage();
+
+    var iterations = blob.kdf.iterations;
+    if (typeof iterations !== "number" || !(iterations > 0)) {
+      throw makeError("BackupSchemaError", "Backup-kdf.iterations ungültig.");
+    }
+
+    var payload;
+    try {
+      var salt = base64urlDecode(blob.kdf.salt);
+      var iv = base64urlDecode(blob.cipher.iv);
+      var ct = base64urlDecode(blob.ciphertext);
+      var aesKey = await derivePbkdf2AesGcmKey(password, salt, iterations);
+      var subtle = getSubtle();
+      var plainBuf = await subtle.decrypt({ name: "AES-GCM", iv: iv }, aesKey, ct);
+      var plainText = new TextDecoder().decode(plainBuf);
+      payload = JSON.parse(plainText);
+    } catch (e) {
+      // Sammel-Klasse — kein Oracle.
+      throw makeError(
+        "BackupDecryptError",
+        "Falsches Passwort oder korruptes Backup.",
+        e,
+      );
+    }
+
+    var payloadSchemaVersion = blob["payload-schema-version"];
+    if (typeof payloadSchemaVersion === "number" && payloadSchemaVersion > BACKUP_PAYLOAD_SCHEMA_VERSION) {
+      throw makeError(
+        "BackupSchemaError",
+        "Payload-Schema-Version " + payloadSchemaVersion + " ist neuer als Modul 02 kennt (" +
+          BACKUP_PAYLOAD_SCHEMA_VERSION + ").",
+      );
+    }
+    if (!payload || typeof payload !== "object") {
+      throw makeError("BackupSchemaError", "Backup-Klartext-Payload ist kein Objekt.");
+    }
+
+    // Migrations-Pfad: v=1-Backups (Bau 02.X) tragen kein identities[];
+    // sie haben Top-Level-nodeId/keys/spore/siblings für den main-Slot.
+    var identitiesList;
+    if (blob.version === 1) {
+      if (typeof payload.nodeId !== "string" || payload.nodeId.length === 0) {
+        throw makeError("BackupSchemaError", "Payload-Pflichtfeld fehlt: nodeId (v=1).");
+      }
+      if (!payload.keys || typeof payload.keys !== "object") {
+        throw makeError("BackupSchemaError", "Payload-Pflichtfeld fehlt: keys (v=1).");
+      }
+      identitiesList = [{
+        key: DEFAULT_IDENTITY_KEY,
+        nodeId: payload.nodeId,
+        keys: payload.keys,
+        spore: payload.spore,
+        siblings: Array.isArray(payload.siblings) ? payload.siblings : [],
+      }];
+    } else {
+      // v=2-Pfad — payload.identities[] ist Pflicht.
+      if (!Array.isArray(payload.identities) || payload.identities.length === 0) {
+        throw makeError(
+          "BackupSchemaError",
+          "leere identities[]-Liste nach Decrypt — Multi-Identitäts-Backup muss mindestens " +
+            "einen Slot enthalten.",
+        );
+      }
+      identitiesList = payload.identities;
+    }
+
+    // Pro-Slot-Schema-Check vor irgendeinem Schreibvorgang.
+    for (var iE = 0; iE < identitiesList.length; iE++) {
+      var entry = identitiesList[iE];
+      if (!entry || typeof entry !== "object") {
+        throw makeError("BackupSchemaError", "identities[" + iE + "] ist kein Objekt.");
+      }
+      if (typeof entry.key !== "string" || entry.key.length === 0) {
+        throw makeError("BackupSchemaError", "identities[" + iE + "].key fehlt oder leer.");
+      }
+      if (typeof entry.nodeId !== "string" || entry.nodeId.length === 0) {
+        throw makeError("BackupSchemaError", "identities[" + iE + "].nodeId fehlt.");
+      }
+      if (!entry.keys || typeof entry.keys !== "object") {
+        throw makeError("BackupSchemaError", "identities[" + iE + "].keys fehlt.");
+      }
+      if (!entry.keys.privateKey || typeof entry.keys.privateKey !== "object") {
+        throw makeError("BackupSchemaError", "identities[" + iE + "].keys.privateKey fehlt.");
+      }
+      if (!entry.keys.publicKey || typeof entry.keys.publicKey !== "object") {
+        throw makeError("BackupSchemaError", "identities[" + iE + "].keys.publicKey fehlt.");
+      }
+      if (!entry.spore || typeof entry.spore !== "object") {
+        throw makeError("BackupSchemaError", "identities[" + iE + "].spore fehlt.");
+      }
+    }
+
+    // Pro-Slot BackupOverwriteError-Check (Bau 02.Y) — Sammel-Error
+    // mit Hinweis auf alle kollidierenden Slot-Keys. Kein
+    // Storage-Schreibvorgang bis der ganze Container überschreibbar
+    // ist.
+    if (!force) {
+      var collisions = [];
+      for (var iC = 0; iC < identitiesList.length; iC++) {
+        var slot = identitiesList[iC].key;
+        var existing = await storage.get(KEYS_STORE, slot);
+        if (existing) collisions.push(slot);
+      }
+      if (collisions.length > 0) {
+        throw makeError(
+          "BackupOverwriteError",
+          "Bestehende Identitäten in sbkim_keys für Slot(s): " + collisions.join(", ") +
+            ". {force:true} setzen, um sie bewusst zu ersetzen — die alten nodeIds werden damit " +
+            "verworfen, Geschwister behandeln den/die Knoten danach als unbekannt.",
+        );
+      }
+    }
+
+    // Schreib-Pfad pro Slot — ensureStore + put.
+    for (var iW = 0; iW < identitiesList.length; iW++) {
+      var entryW = identitiesList[iW];
+      await ensureIdentityStores(entryW.key);
+      await storage.put(KEYS_STORE, entryW.key, {
+        keyId: entryW.key,
+        privateKey: entryW.keys.privateKey,
+        publicKey: entryW.keys.publicKey,
+      });
+      await storage.put(SPORE_STORE, entryW.key, {
+        nodeId: entryW.nodeId,
+        sporeJson: entryW.spore,
+        signature: entryW.spore.signature,
+      });
+      var siblingArr = Array.isArray(entryW.siblings) ? entryW.siblings : [];
+      var siblingStore = "sbkim_siblings_" + entryW.key;
+      for (var iS = 0; iS < siblingArr.length; iS++) {
+        var s = siblingArr[iS];
+        if (!s || typeof s !== "object" || typeof s.nodeId !== "string" || s.nodeId.length === 0) continue;
+        await storage.put(siblingStore, s.nodeId, s);
+      }
+    }
+
+    // Active-identity-Marker setzen. v=2-Backups tragen evtl. ein
+    // optionales Top-Level-Feld "active-identity"; sonst "main"
+    // (Default), falls "main" im Container ist, sonst der erste Slot.
+    var requestedActive = typeof payload["active-identity"] === "string" ? payload["active-identity"] : null;
+    var newActive = null;
+    if (requestedActive) {
+      for (var iA = 0; iA < identitiesList.length; iA++) {
+        if (identitiesList[iA].key === requestedActive) {
+          newActive = requestedActive;
+          break;
+        }
+      }
+    }
+    if (!newActive) {
+      for (var iD = 0; iD < identitiesList.length; iD++) {
+        if (identitiesList[iD].key === DEFAULT_IDENTITY_KEY) {
+          newActive = DEFAULT_IDENTITY_KEY;
+          break;
+        }
+      }
+    }
+    if (!newActive) newActive = identitiesList[0].key;
+    await ensureMetaStore();
+    await storage.put(META_STORE, ACTIVE_IDENTITY_META_KEY, newActive);
+
+    resetIdentityCache();
+    return { restored: true };
+  }
+
+  var SbkimSpore = {
+    init: init,
+    getOrCreateIdentity: getOrCreateIdentity,
+    getNodeId: getNodeId,
+    getPublicKeyJwk: getPublicKeyJwk,
+    generateOwnSpore: generateOwnSpore,
+    getOwnSpore: getOwnSpore,
+    verifyForeignSpore: verifyForeignSpore,
+    setActiveIdentity: setActiveIdentity,
+    getActiveIdentityKey: getActiveIdentityKey,
+    listIdentities: listIdentities,
+    removeIdentity: removeIdentity,
+    resetIdentityCache: resetIdentityCache,
+    exportBackup: exportBackup,
+    importBackup: importBackup,
+    InvalidBackupPasswordError: InvalidBackupPasswordError,
+    BackupDecryptError: BackupDecryptError,
+    BackupVersionMismatchError: BackupVersionMismatchError,
+    BackupSchemaError: BackupSchemaError,
+    BackupOverwriteError: BackupOverwriteError,
+    UnknownIdentityError: UnknownIdentityError,
+    RemoveActiveIdentityError: RemoveActiveIdentityError,
+    _meta: {
+      // Pflege 17 Self-Heartbeat 2026-05-26: `ready`-Getter exponiert
+      // den internen Closure-Flag — Modul 17 prüft das beim Self-
+      // Heartbeat-Fallback (Karte 17 § Anti-Greenwashing-Klausel).
+      get ready() { return ready; },
+      protocolVersion: PROTOCOL_VERSION,
+      defaultIdentityKey: DEFAULT_IDENTITY_KEY,
+      keysStore: KEYS_STORE,
+      sporeStore: SPORE_STORE,
+      metaStore: META_STORE,
+      activeIdentityMetaKey: ACTIVE_IDENTITY_META_KEY,
+      identityStoreBases: IDENTITY_STORE_BASES.slice(),
+      requiredSporeFields: REQUIRED_SPORE_FIELDS.slice(),
+      backupFormatVersion: BACKUP_FORMAT_VERSION,
+      backupFormatVersionReadOk: BACKUP_FORMAT_VERSION_READ_OK.slice(),
+      backupKdfIterations: BACKUP_KDF_ITERATIONS,
+      backupPasswordMinLen: BACKUP_PASSWORD_MIN_LEN,
+      backupPayloadSchemaVersion: BACKUP_PAYLOAD_SCHEMA_VERSION,
+    },
+  };
+
+  global.SbkimSpore = SbkimSpore;
+
+  // Self-check: emitted on script load (synchronous, no async load step).
+  // Format is uniform across all SBKIM modules — see INTERFACES.md.
+  if (typeof console !== "undefined" && console.info) {
+    console.info(
+      "MODUL 02 SPORE bereit, Funktionen: " +
+        "init/getOrCreateIdentity/getNodeId/getPublicKeyJwk/generateOwnSpore/getOwnSpore/" +
+        "verifyForeignSpore/setActiveIdentity/getActiveIdentityKey/listIdentities/" +
+        "removeIdentity/resetIdentityCache/exportBackup/importBackup",
+    );
+  }
+})(typeof window !== "undefined" ? window : globalThis);
+
+// SBKIM-SPORE-EMBED-END
+</script>
+
+<!-- ============================================================
+     KERN-LOGIK (browser- UND node-tauglich; vom headless Test
+     zwischen den Markern geprueft). Keine DOM-Abhaengigkeit hier.
+     ============================================================ -->
+<script>
+// JASONLIB-CORE-START
+(function (root) {
+  "use strict";
+  var SCHEMA = 1;
+
+  function genId() {
+    try { if (root.crypto && root.crypto.randomUUID) return root.crypto.randomUUID(); } catch (e) {}
+    return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  }
+  function nowIso() { return new Date().toISOString(); }
+
+  function validateAndParse(text) {
+    if (typeof text !== "string" || text.trim() === "") return { ok: false, error: "leer" };
+    try { return { ok: true, value: JSON.parse(text) }; }
+    catch (e) { return { ok: false, error: String((e && e.message) || e) }; }
+  }
+
+  function byteSize(value) {
+    var s;
+    try { s = JSON.stringify(value); } catch (e) { s = ""; }
+    if (s == null) s = "";
+    try { return new TextEncoder().encode(s).length; } catch (e2) { return s.length; }
+  }
+
+  function normalizeTags(tags) {
+    if (typeof tags === "string") tags = tags.split(",");
+    if (!Array.isArray(tags)) return [];
+    var out = [];
+    for (var i = 0; i < tags.length; i++) {
+      var t = String(tags[i]).trim().toLowerCase();
+      if (t && out.indexOf(t) === -1) out.push(t);
+    }
+    return out;
+  }
+
+  function makeEntry(input) {
+    input = input || {};
+    var name = String(input.name || "").trim() || "Unbenannte Jason";
+    return {
+      schemaVersion: SCHEMA,
+      kind: "jason-eintrag",
+      id: input.id || genId(),
+      name: name,
+      tags: normalizeTags(input.tags),
+      category: String(input.category || "").trim(),
+      origin: input.origin ? String(input.origin) : "",
+      createdAt: input.createdAt || nowIso(),
+      updatedAt: nowIso(),
+      size: byteSize(input.payload),
+      payload: input.payload
+    };
+  }
+
+  function buildLibraryExport(entries) {
+    return {
+      schemaVersion: SCHEMA,
+      kind: "jason-bibliothek",
+      exportedAt: nowIso(),
+      count: entries.length,
+      eintraege: entries
+    };
+  }
+
+  function asEntry(obj, fallbackName) {
+    if (obj && obj.kind === "jason-eintrag" && Object.prototype.hasOwnProperty.call(obj, "payload")) {
+      return makeEntry({
+        id: obj.id, name: obj.name, tags: obj.tags, category: obj.category,
+        origin: obj.origin, createdAt: obj.createdAt, payload: obj.payload
+      });
+    }
+    return makeEntry({ name: fallbackName, payload: obj });
+  }
+
+  function parseLibraryImport(text, fallbackName) {
+    var p = validateAndParse(text);
+    if (!p.ok) return { ok: false, error: p.error, entries: [] };
+    var v = p.value, entries = [], i;
+    if (v && v.kind === "jason-bibliothek" && Array.isArray(v.eintraege)) {
+      for (i = 0; i < v.eintraege.length; i++) entries.push(asEntry(v.eintraege[i]));
+    } else if (v && v.kind === "jason-eintrag") {
+      entries.push(asEntry(v));
+    } else {
+      entries.push(asEntry(v, fallbackName));
+    }
+    return { ok: true, entries: entries, error: "" };
+  }
+
+  function mergeEntries(existing, incoming) {
+    var map = {}, order = [];
+    function put(e) {
+      if (!map[e.id]) order.push(e.id);
+      else if (String(e.updatedAt) < String(map[e.id].updatedAt)) return;
+      map[e.id] = e;
+    }
+    var i;
+    for (i = 0; i < existing.length; i++) put(existing[i]);
+    for (i = 0; i < incoming.length; i++) put(incoming[i]);
+    return order.map(function (id) { return map[id]; });
+  }
+
+  function filterSort(entries, opts) {
+    opts = opts || {};
+    var q = String(opts.query || "").trim().toLowerCase();
+    var cat = String(opts.category || "").trim().toLowerCase();
+    var tag = String(opts.tag || "").trim().toLowerCase();
+    var out = entries.filter(function (e) {
+      if (cat && String(e.category).toLowerCase() !== cat) return false;
+      if (tag && e.tags.indexOf(tag) === -1) return false;
+      if (q) {
+        var hay = (e.name + " " + e.category + " " + e.tags.join(" ")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    var sort = opts.sort || "updated-desc";
+    out.sort(function (a, b) {
+      if (sort === "name-asc") return a.name.localeCompare(b.name);
+      if (sort === "name-desc") return b.name.localeCompare(a.name);
+      if (sort === "created-asc") return String(a.createdAt).localeCompare(String(b.createdAt));
+      if (sort === "created-desc") return String(b.createdAt).localeCompare(String(a.createdAt));
+      if (sort === "updated-asc") return String(a.updatedAt).localeCompare(String(b.updatedAt));
+      return String(b.updatedAt).localeCompare(String(a.updatedAt));
+    });
+    return out;
+  }
+
+  function allCategories(entries) {
+    var s = [];
+    entries.forEach(function (e) { if (e.category && s.indexOf(e.category) === -1) s.push(e.category); });
+    return s.sort();
+  }
+  function allTags(entries) {
+    var s = [];
+    entries.forEach(function (e) { e.tags.forEach(function (t) { if (s.indexOf(t) === -1) s.push(t); }); });
+    return s.sort();
+  }
+
+  // ---- Tresor (Scheibe 2): Passwort-Verschluesselung. GLEICHER Umschlag wie
+  //      Modul 02 (sbkim-spore.js exportBackup) und sbkim/node_key.enc.json:
+  //      PBKDF2-SHA256 600k -> AES-GCM-256. Browser UND Node (>=20) tauglich.
+  var TRESOR_ITER = 600000;
+
+  function cryptoObj() {
+    var c = root.crypto || (typeof globalThis !== "undefined" ? globalThis.crypto : null);
+    if (!c || !c.subtle) throw new Error("WebCrypto nicht verfuegbar (crypto.subtle fehlt).");
+    return c;
+  }
+  function b64uFromBytes(bytes) {
+    var bin = "", i;
+    for (i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    var enc = root.btoa || (typeof globalThis !== "undefined" && globalThis.btoa) || null;
+    var b64 = enc ? enc(bin) : Buffer.from(bytes).toString("base64");
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function bytesFromB64u(s) {
+    var b64 = String(s).replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    var dec = root.atob || (typeof globalThis !== "undefined" && globalThis.atob) || null;
+    var bin = dec ? dec(b64) : Buffer.from(b64, "base64").toString("binary");
+    var out = new Uint8Array(bin.length), i;
+    for (i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  async function deriveAesKey(password, salt, iterations, usages) {
+    var c = cryptoObj();
+    var mat = await c.subtle.importKey("raw", new TextEncoder().encode(String(password)),
+      { name: "PBKDF2" }, false, ["deriveKey"]);
+    return await c.subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: iterations, hash: "SHA-256" },
+      mat, { name: "AES-GCM", length: 256 }, false, usages);
+  }
+  async function encryptTresor(plainObj, password) {
+    if (typeof password !== "string" || password.length < 8) throw new Error("Passwort zu kurz (mind. 8 Zeichen).");
+    var c = cryptoObj();
+    var salt = c.getRandomValues(new Uint8Array(16));
+    var iv = c.getRandomValues(new Uint8Array(12));
+    var key = await deriveAesKey(password, salt, TRESOR_ITER, ["encrypt"]);
+    var pt = new TextEncoder().encode(JSON.stringify(plainObj));
+    var ctBuf = await c.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, pt);
+    return {
+      schemaVersion: SCHEMA, kind: "jason-tresor", version: 2,
+      kdf: { algorithm: "PBKDF2", hash: "SHA-256", iterations: TRESOR_ITER, salt: b64uFromBytes(salt) },
+      cipher: { algorithm: "AES-GCM-256", iv: b64uFromBytes(iv) },
+      ciphertext: b64uFromBytes(new Uint8Array(ctBuf))
+    };
+  }
+  async function decryptTresor(blob, password) {
+    var c = cryptoObj();
+    var salt = bytesFromB64u(blob.kdf.salt);
+    var iv = bytesFromB64u(blob.cipher.iv);
+    var ct = bytesFromB64u(blob.ciphertext);
+    var key = await deriveAesKey(password, salt, blob.kdf.iterations || TRESOR_ITER, ["decrypt"]);
+    var plainBuf = await c.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct); // wirft bei falschem PW/Manipulation
+    return JSON.parse(new TextDecoder().decode(plainBuf));
+  }
+  function isTresor(v) {
+    return !!(v && v.kdf && v.cipher && typeof v.ciphertext === "string" &&
+      v.kdf.algorithm === "PBKDF2" && /AES-GCM/.test(String(v.cipher.algorithm)));
+  }
+  function tresorPayloadKind(plainObj) {
+    if (plainObj && plainObj.kind === "jason-bibliothek" && Array.isArray(plainObj.eintraege)) return "bibliothek";
+    if (plainObj && Array.isArray(plainObj.identities)) return "identitaeten";
+    return "roh";
+  }
+  function payloadToEntries(plainObj, fallbackName) {
+    var kind = tresorPayloadKind(plainObj), entries = [];
+    if (kind === "bibliothek") {
+      plainObj.eintraege.forEach(function (e) { entries.push(asEntry(e)); });
+    } else if (kind === "identitaeten") {
+      entries.push(makeEntry({
+        name: fallbackName || "SBKIM Schluessel-Backup",
+        category: "SBKIM-Schluessel", tags: "schluessel, identitaet", payload: plainObj
+      }));
+    } else {
+      entries.push(asEntry(plainObj, fallbackName));
+    }
+    return { kind: kind, entries: entries };
+  }
+
+  // Legt einen verschluesselten Tresor-Blob VERSCHLUESSELT als Eintrag ab
+  // (kein Klartext, keine privaten Schluessel im Speicher). Geoeffnet wird
+  // erst per Knopf + Passwort. Ein verschluesselter Eintrag ist an
+  // isTresor(entry.payload) erkennbar.
+  function wrapTresorEntry(blob, name) {
+    // Kategorie ehrlich "Verschluesselt": ohne Passwort sehen wir nicht hinein.
+    return makeEntry({
+      name: name || "Verschluesselter Tresor",
+      category: "Verschluesselt",
+      tags: "tresor, verschluesselt",
+      payload: blob
+    });
+  }
+
+  var api = {
+    SCHEMA: SCHEMA, genId: genId, nowIso: nowIso, validateAndParse: validateAndParse,
+    byteSize: byteSize, normalizeTags: normalizeTags, makeEntry: makeEntry,
+    buildLibraryExport: buildLibraryExport, parseLibraryImport: parseLibraryImport,
+    mergeEntries: mergeEntries, filterSort: filterSort,
+    allCategories: allCategories, allTags: allTags,
+    encryptTresor: encryptTresor, decryptTresor: decryptTresor, isTresor: isTresor,
+    tresorPayloadKind: tresorPayloadKind, payloadToEntries: payloadToEntries,
+    wrapTresorEntry: wrapTresorEntry
+  };
+  root.JasonLib = api;
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this));
+// JASONLIB-CORE-END
+</script>
+
+<!-- ============================================================
+     OBERFLAECHE (nur Browser): Knoepfe, Liste, Speicher.
+     ============================================================ -->
+<script>
+(function () {
+  "use strict";
+  var L = window.JasonLib;
+  var KEY = "jasons-bibliothek-v1";
+  var entries = load();
+  var editingId = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return [];
+      var v = JSON.parse(raw);
+      return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
+  }
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(entries)); }
+    catch (e) { toast("Speichern fehlgeschlagen (Browser-Speicher voll?)", true); }
+  }
+
+  function toast(msg, bad) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.style.borderColor = bad ? "var(--bad)" : "var(--accent)";
+    t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.classList.remove("show"); }, 2400);
+  }
+
+  function fmtSize(n) {
+    if (n == null) return "";
+    if (n < 1024) return n + " B";
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+    return (n / 1024 / 1024).toFixed(1) + " MB";
+  }
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }); }
+    catch (e) { return iso; }
+  }
+
+  function download(filename, obj) {
+    var blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function safeName(name) {
+    return (String(name || "jason").replace(/[^a-z0-9-_]+/gi, "_").replace(/^_+|_+$/g, "") || "jason");
+  }
+
+  function readFile(file, cb) {
+    var r = new FileReader();
+    r.onload = function () { cb(null, String(r.result)); };
+    r.onerror = function () { cb(r.error || new Error("Lesefehler")); };
+    r.readAsText(file);
+  }
+
+  // ---- Render ----
+  function fillSelect(sel, values, keep) {
+    var first = sel.options[0];
+    sel.innerHTML = "";
+    sel.appendChild(first);
+    values.forEach(function (v) {
+      var o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+    if (keep && values.indexOf(keep) !== -1) sel.value = keep;
+  }
+
+  function render() {
+    fillSelect($("f-cat"), L.allCategories(entries), $("f-cat").value);
+    fillSelect($("f-tag"), L.allTags(entries), $("f-tag").value);
+
+    var shown = L.filterSort(entries, {
+      query: $("q").value, category: $("f-cat").value,
+      tag: $("f-tag").value, sort: $("f-sort").value
+    });
+
+    var list = $("list");
+    list.innerHTML = "";
+    $("empty").classList.toggle("hidden", entries.length !== 0);
+    $("count").textContent = entries.length === 0 ? ""
+      : (shown.length + " von " + entries.length + " angezeigt");
+
+    shown.forEach(function (e) {
+      var li = document.createElement("li");
+      li.className = "item";
+
+      var head = document.createElement("div");
+      head.className = "item-head";
+      var nm = document.createElement("div");
+      nm.className = "item-name"; nm.textContent = e.name;
+      head.appendChild(nm);
+      if (e.category) {
+        var c = document.createElement("span");
+        c.className = "cat"; c.textContent = e.category;
+        head.appendChild(c);
+      }
+      if (L.isTresor(e.payload)) {
+        var lk = document.createElement("span");
+        lk.className = "lock"; lk.textContent = "🔒 verschlüsselt";
+        head.appendChild(lk);
+      }
+      li.appendChild(head);
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      meta.appendChild(span(fmtSize(e.size)));
+      meta.appendChild(span("hinzugefuegt " + fmtDate(e.createdAt)));
+      if (e.origin) meta.appendChild(span("aus " + e.origin));
+      li.appendChild(meta);
+
+      if (e.tags && e.tags.length) {
+        var tg = document.createElement("div");
+        tg.className = "tags";
+        e.tags.forEach(function (t) {
+          var s = document.createElement("span");
+          s.className = "tag"; s.textContent = t;
+          tg.appendChild(s);
+        });
+        li.appendChild(tg);
+      }
+
+      var act = document.createElement("div");
+      act.className = "item-actions";
+      var enc = L.isTresor(e.payload);
+      if (enc) {
+        act.appendChild(btn("Öffnen 🔓", function () { openEntry(e); }));
+      } else {
+        act.appendChild(btn("Ansehen", function () { toggleView(li, e); }));
+      }
+      act.appendChild(btn("Bearbeiten", function () { openEdit(e); }));
+      act.appendChild(btn("Exportieren", function () { exportOne(e); }));
+      if (!enc) act.appendChild(btn("Verschenken 🔒", function () { giftEncrypted(e); }));
+      act.appendChild(btn("Loeschen", function () { removeOne(e); }, "btn-bad"));
+      li.appendChild(act);
+
+      list.appendChild(li);
+    });
+  }
+  function span(txt) { var s = document.createElement("span"); s.textContent = txt; return s; }
+  function btn(txt, fn, cls) {
+    var b = document.createElement("button");
+    b.textContent = txt; if (cls) b.className = cls;
+    b.addEventListener("click", fn); return b;
+  }
+
+  function toggleView(li, e) {
+    var existing = li.querySelector("pre.view");
+    if (existing) { existing.remove(); return; }
+    var pre = document.createElement("pre");
+    pre.className = "view";
+    pre.textContent = JSON.stringify(e.payload, null, 2);
+    li.appendChild(pre);
+  }
+
+  // ---- Actions ----
+  function ingestFile(file) {
+    readFile(file, function (err, text) {
+      if (err) { toast("Datei konnte nicht gelesen werden", true); return; }
+      var p = L.validateAndParse(text);
+      if (!p.ok) { toast("Keine gueltige JSON-Datei: " + p.error, true); return; }
+      var base = file.name.replace(/\.json$/i, "");
+      if (L.isTresor(p.value)) {
+        // Verschluesselt bleibt verschluesselt im Schrank — kein Klartext, keine
+        // privaten Schluessel im Speicher. Geoeffnet wird erst per „Öffnen 🔓".
+        var te = L.wrapTresorEntry(p.value, base);
+        entries = L.mergeEntries(entries, [te]);
+        persist(); render();
+        toast("Verschluesselt abgelegt — zum Oeffnen Passwort noetig");
+        return;
+      }
+      var r = L.parseLibraryImport(text, base);
+      var isWrapped = p.value && (p.value.kind === "jason-bibliothek" || p.value.kind === "jason-eintrag");
+      if (r.entries.length === 1 && !isWrapped) r.entries[0].origin = file.name; // rohe Datei: Herkunft merken
+      entries = L.mergeEntries(entries, r.entries);
+      persist(); render();
+      toast("Eingelesen: " + r.entries.length + " (Bibliothek jetzt " + entries.length + ")");
+    });
+  }
+
+  function exportEncrypted() {
+    if (entries.length === 0) { toast("Bibliothek ist leer", true); return; }
+    var pw = window.prompt("Passwort zum Verschluesseln (mind. 8 Zeichen):");
+    if (pw == null) return;
+    L.encryptTresor(L.buildLibraryExport(entries), pw).then(function (blob) {
+      download("jasons-tresor_" + new Date().toISOString().slice(0, 10) + ".json", blob);
+      toast("Verschluesselt gesichert (" + entries.length + " Eintraege)");
+    }).catch(function (e) { toast(String((e && e.message) || e), true); });
+  }
+
+  function giftEncrypted(e) {
+    var pw = window.prompt("Passwort fuer „" + e.name + "“ (mind. 8 Zeichen):");
+    if (pw == null) return;
+    L.encryptTresor(L.buildLibraryExport([e]), pw).then(function (blob) {
+      download(safeName(e.name) + ".tresor.json", blob);
+      toast("„" + e.name + "“ verschluesselt — Passwort getrennt weitergeben");
+    }).catch(function (err) { toast(String((err && err.message) || err), true); });
+  }
+
+  function exportOne(e) {
+    download(safeName(e.name) + ".json", e.payload);
+    toast("„" + e.name + "“ exportiert");
+  }
+
+  function removeOne(e) {
+    if (!confirm("„" + e.name + "“ wirklich aus der Bibliothek loeschen?\n(Der Browser-Eintrag wird entfernt; bereits exportierte Dateien bleiben.)")) return;
+    entries = entries.filter(function (x) { return x.id !== e.id; });
+    persist(); render();
+    toast("Geloescht");
+  }
+
+  function exportAll() {
+    if (entries.length === 0) { toast("Bibliothek ist leer", true); return; }
+    download("jasons-bibliothek_" + new Date().toISOString().slice(0, 10) + ".json",
+      L.buildLibraryExport(entries));
+    toast("Bibliothek gesichert (" + entries.length + " Eintraege)");
+  }
+
+  // Öffnet einen verschluesselten Eintrag NUR auf Anforderung (Passwort).
+  function openEntry(e) {
+    var pw = window.prompt("Passwort fuer „" + e.name + "“:");
+    if (pw == null) return;
+    L.decryptTresor(e.payload, pw).then(function (plain) {
+      if (L.tresorPayloadKind(plain) === "identitaeten") {
+        if (sporeReady() && window.confirm("Das ist ein SBKIM-Schluessel-Backup. Identitaet(en) auf DIESEM Geraet wiederherstellen?")) {
+          return window.SbkimSpore.importBackup(e.payload, pw).then(function (res) {
+            toast("Identitaet wiederhergestellt (" + (res && res.restored != null ? res.restored : "ok") + ")");
+          });
+        }
+        toast("Enthaelt SBKIM-Schluessel — nichts veraendert.");
+        return;
+      }
+      var r = L.payloadToEntries(plain, e.name);
+      entries = L.mergeEntries(entries, r.entries);
+      persist(); render();
+      toast("Geoeffnet: " + r.entries.length + " Eintrag(e) hinzugefuegt");
+    }).catch(function () { toast("Falsches Passwort oder Tresor beschaedigt.", true); });
+  }
+
+  // ---- SBKIM-Identität (Modul 01+02; braucht echtes IndexedDB/WebCrypto) ----
+  function sporeReady() { return typeof window.SbkimSpore === "object" && !!window.SbkimSpore; }
+  function showIdentity() {
+    if (!sporeReady()) { toast("SBKIM-Modul nicht geladen", true); return; }
+    window.SbkimSpore.getOrCreateIdentity().then(function (id) {
+      $("ident-id").textContent = id.nodeId;
+      $("ident-box").classList.remove("hidden");
+      toast("SBKIM-Identitaet bereit");
+    }).catch(function (e) { toast("Identitaet: " + ((e && e.message) || e), true); });
+  }
+  function backupIdentity() {
+    if (!sporeReady()) { toast("SBKIM-Modul nicht geladen", true); return; }
+    var pw = window.prompt("Passwort fuer das Identitaets-Backup (mind. 8 Zeichen):");
+    if (pw == null) return;
+    window.SbkimSpore.getOrCreateIdentity()
+      .then(function () {
+        // Eine signierte Spore gehoert zur Identitaet (importBackup verlangt sie pro Slot).
+        return window.SbkimSpore.generateOwnSpore({
+          domain: location.hostname || "jasons-tresor",
+          endpoint: location.origin + location.pathname,
+          nodeType: "hybrid"
+        });
+      })
+      .then(function () { return window.SbkimSpore.exportBackup(pw); })
+      .then(function (blob) {
+        download("sbkim-identitaet.tresor.json", blob);
+        var e = L.wrapTresorEntry(blob, "SBKIM-Identitaet (Backup)");
+        entries = L.mergeEntries(entries, [e]);
+        persist(); render();
+        toast("Identitaet verschluesselt gesichert + abgelegt");
+      }).catch(function (e) { toast("Backup: " + ((e && e.message) || e), true); });
+  }
+
+  // ---- Edit dialog ----
+  function openEdit(e) {
+    editingId = e.id;
+    $("e-name").value = e.name;
+    $("e-cat").value = e.category || "";
+    $("e-tags").value = (e.tags || []).join(", ");
+    $("dlg-edit").showModal();
+  }
+  function saveEdit() {
+    var e = entries.filter(function (x) { return x.id === editingId; })[0];
+    if (!e) { $("dlg-edit").close(); return; }
+    e.name = $("e-name").value.trim() || "Unbenannte Jason";
+    e.category = $("e-cat").value.trim();
+    e.tags = L.normalizeTags($("e-tags").value);
+    e.updatedAt = L.nowIso();
+    persist(); render();
+    $("dlg-edit").close();
+    toast("Gespeichert");
+  }
+
+  // ---- Wiring ----
+  $("btn-add").addEventListener("click", function () { $("file-add").click(); });
+  $("file-add").addEventListener("change", function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (f) ingestFile(f);
+    ev.target.value = "";
+  });
+  $("btn-export-all").addEventListener("click", exportAll);
+  $("btn-export-enc").addEventListener("click", exportEncrypted);
+  $("btn-import-lib").addEventListener("click", function () { $("file-import").click(); });
+  $("file-import").addEventListener("change", function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (f) ingestFile(f);
+    ev.target.value = "";
+  });
+  ["q", "f-cat", "f-tag", "f-sort"].forEach(function (id) {
+    $(id).addEventListener("input", render);
+    $(id).addEventListener("change", render);
+  });
+  $("e-cancel").addEventListener("click", function () { $("dlg-edit").close(); });
+  $("e-save").addEventListener("click", saveEdit);
+  $("btn-ident").addEventListener("click", showIdentity);
+  $("btn-ident-backup").addEventListener("click", backupIdentity);
+
+  render();
+})();
+</script>
+</body>
+</html>

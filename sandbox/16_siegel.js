@@ -20,6 +20,9 @@ export const ZERTIFIKAT_ASPEKTE = [
   { date: "2026-05-29", modul: "12", text: "Blocklist: geflaggte Knoten ueber REP_DISTRUST_RATIO werden gemieden." },
   { date: "2026-05-29", modul: "07", text: "Apoptose: erzwungener Selbst-Tod mit signiertem Anklage-Vermaechtnis." },
   { date: "2026-05-29", modul: "14", text: "Diffusion: Verbreitung des Apoptose-Vermaechtnisses an Nachbarn (Modell-Logik)." },
+  { date: "2026-05-30", modul: "10", text: "Sybil-Abwehr im Lauf v0.2 als sichtbare Kette modelliert: Ingenieur->Bauer->Gate->Beobachter, Negativbauer (Sybil) als Angreifer; Logik unveraendert, nur benannt/visualisiert." },
+  { date: "2026-05-30", modul: "12", text: "Blocklist-Ausgang (geflaggt->Apoptose) als Animation gruen->orange->rot belegt; Schwelle/Quorum unveraendert." },
+  { date: "2026-05-30", modul: "15", text: "Membran (15) 1:1 aus Sage kopiert (web/tools/sbkim-membran.js): Aussenhuelle PWA<->Browser, read()-Snapshot + Fremdzugriff-Detektor; headless geladen, Browser-Wirkung ungeprueft." },
 ];
 
 /**

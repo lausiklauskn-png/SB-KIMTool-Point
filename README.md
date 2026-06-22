@@ -18,25 +18,33 @@ Der **Tool-Point** für das SBKIM-Protokoll: eine eigenständige, neutrale Heima
 
 ```bash
 npm run demo   # spielt das Modell einmal durch, druckt den Bericht, schreibt web/data/run.json
-npm test       # headless Smoke-Test (Beweis) — 5 Prüfungen
+npm test       # headless Smoke-Test (Beweis) — 34 Prüfungen (Modell + Module 01–18 + Werkstatt: Proben/live-match/protokoll-lauf)
+npm run verify # ECHTER Browser-Beweis (Playwright/Chromium): IndexedDB + WebCrypto +
+               # Startseiten-Puls + 2-Knoten-Handshake + Live-Match + Protokoll-Lauf — 16/16 grün (siehe docs/LIVE-MODELL.md)
 ```
 
-Keine Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto`, `node --test`).
+Kern ohne Abhängigkeiten. Node ≥ 20 (Ed25519/SHA-256 über `node:crypto` bzw. WebCrypto,
+`node --test`). `npm run verify` nutzt zusätzlich Playwright/Chromium (optional; fehlt es,
+endet der Lauf ehrlich mit Hinweis statt Fehlschlag).
 
 ## Die drei Schichten — je eine eigene Seite
 
 Eine Startseite (`index.html`) führt mit drei Knöpfen auf je eine eigene Seite.
 Oben auf jeder Seite eine Navigationsleiste, die zwischen allen Seiten wechselt.
 
-- **Schicht 1 · Modell** (`modell.html`) — Agenten-Board (Bauer → Gate/Arzt →
-  Beobachter), spielt `web/data/run.json` ab; Sybil-Knoten werden ausgegraut/apoptosiert.
+- **Schicht 1 · Modell** (`modell.html`) — **animierte Pipeline** der Rollen-Kette
+  (Ingenieur → Bauer → Gate/Arzt → Beobachter, Negativbauer als Angreifer). Spielt
+  `web/data/run.json` (Vertrag v0.2) ab: der aktive Agent leuchtet, das Artefakt wandert
+  als Lichtpunkt, ein Angriff läuft sichtbar grün→orange→rot bis zur Apoptose. Klartext-
+  Statusleiste + Detail-Karte mit Export. Zero-dependency, `prefers-reduced-motion`.
 - **Schicht 2 · Werkzeugkiste** (`werkzeuge.html`) — Reiter Basic/Pro/Profi aus
   `werkzeugkiste.json`, jede Kachel mit Erklärung und Status. Hier wachsen einzelne Tools.
 - **Schicht 3 · PWA-Markt** (`markt.html`) — Schaufenster aus `web/data/marktplatz.json`
   (Saat = echte Live-Endknoten). Suche bewusst noch nicht gebaut.
 
-Ein gemeinsames `assets/app.js` lädt pro Seite nur den passenden Teil
-(per Element-Erkennung), ein gemeinsames `assets/style.css` für die Optik.
+`assets/app.js` rendert Werkzeugkiste + Markt (per Element-Erkennung), die Modell-Seite
+nutzt das eigene `assets/model.js` für die Animation; ein gemeinsames `assets/style.css`
+trägt die Optik.
 
 ## Eigenständige App · `such-tool/`
 
@@ -54,6 +62,7 @@ sandbox/        # das headless Modell (reiner Node, keine Deps)
 test/           # Smoke-Test (der Beweis)
 docs/           # HERKUNFT, IMMUNSCHICHT, BAUTRUPP, WERKZEUGE, STUFEN, MODELL
 web/data/       # run.json (aufgezeichneter Lauf), marktplatz.json, nodes.json
+web/tools/      # echte SBKIM-Module, 1:1 aus Sage kopiert (01–08, 15–18 = zwölf Module)
 index.html      # Startseite mit drei Knöpfen
 modell.html     # Schicht 1 (Playback, kein Live-Node)
 werkzeuge.html  # Schicht 2 (Werkzeugkiste)

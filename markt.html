@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SB·KIMTool·Point — Markt</title>
+  <meta name="theme-color" content="#0c0f12" />
+  <link rel="icon" href="assets/img/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -15,15 +18,26 @@
       <a href="werkzeuge.html">Werkzeuge</a>
       <a href="markt.html" class="active">Markt</a>
     </nav>
+    <div class="lamps" title="Lampen — lebt / verkehr / fremd (Modul 15 Membran)">
+      <span class="lamp" id="lamp-alive" title="lebt — eigene SBKIM-Identität geladen"><span class="lamp-label">lebt</span></span>
+      <span class="lamp" id="lamp-traffic" title="verkehr — pulst bei echtem Netz-Verkehr (status/SIGNAL/spore)"><span class="lamp-label">verkehr</span></span>
+      <span class="lamp" id="lamp-fremd" title="fremd — rot nur bei echtem Fremdzugriff (Membran 15 warnt, zerstört nichts)"><span class="lamp-label">fremd</span></span>
+    </div>
     <span class="version">v0.2</span>
   </header>
 
   <main>
     <!-- Schicht 3 · PWA-MARKTPLATZ (präsentieren) -->
     <section class="layer" id="schicht-markt">
+      <div class="page-banner" style="--art:url('assets/img/banner-markt.png')">
+        <div class="pb-body">
+          <div class="pb-kicker">Schicht 3 · präsentieren</div>
+          <div class="pb-title">Das Schaufenster — Live-Endknoten zum Andocken</div>
+        </div>
+      </div>
       <h2>Schicht 3 · PWA-Markt (präsentieren)</h2>
       <p class="sub">Schaufenster der PWA-Tool-Vermittlung. Saat = echte Live-Endknoten. Suche bewusst noch nicht gebaut.</p>
-      <div class="panel">
+      <div class="panel" data-reveal>
         <div class="market" id="market"></div>
         <p class="note" id="market-note"></p>
       </div>
@@ -32,8 +46,17 @@
 
   <footer>
     Schicht 3 von 3 · <a href="index.html">zurück zur Startseite</a>
+    · <a href="impressum.html">Impressum &amp; Datenschutz</a>
   </footer>
 
+  <!-- Modul 22 Such-Werkzeug (semantische Suche) — Abhängigkeiten 03/04 zuerst. -->
+  <script src="web/tools/sbkim-embedding.js"></script>
+  <script src="web/tools/sbkim-match.js"></script>
+  <script src="web/tools/sbkim-such-widget.js"></script>
   <script src="assets/app.js"></script>
+  <script src="assets/fx.js"></script>
+  <script src="assets/sbkim-siegel.js"></script>
+  <script src="assets/netz-briefkasten.js"></script>
+  <script src="assets/such-widget-init.js"></script>
 </body>
 </html>
