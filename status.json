@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-29",
+  "lastUpdated": "2026-06-22",
   "repo": "SB-KIMTool-Point",
   "protocolVersion": "0.1",
   "prinzip": "Ehrlicher Real-Anteil (analog Sage 'X % real'). Trennt klar, was echt browser-tauglich ist, was nur Modell/Demo ist und was in Sage reif aber hier noch nicht eingebaut wurde.",
@@ -22,6 +22,7 @@
     { "name": "Werkzeugkiste: Profi (10,11,12,14,18)", "status": "vorgebaut-schlummert", "hinweis": "Sybil-Abwehr-Module, schlummern bis Angriff" },
     { "name": "Statische Seite (3 Schichten, Playback von run.json)", "status": "real-browser-tauglich", "hinweis": "zeigt das Modell, fuehrt es nicht live aus" },
     { "name": "Marktplatz Schicht 3 (Saat = echte Live-Endknoten)", "status": "real-browser-tauglich", "hinweis": "Suche bewusst noch NICHT gebaut" },
+    { "name": "Standalone-Such-Werkzeug (eigenstaendige PWA, such-tool/)", "status": "real-browser-tauglich", "echt": true, "hinweis": "Variante A: eigener Unterordner. Eigenes manifest+SW+Module (Kopien aus Sage 03/04/21/22). Installier-Sichttest wartet auf Klaus (Pages https noetig)." },
     { "name": "Reife Module tatsaechlich aus Sage kopieren", "status": "noch-nicht-gebaut" },
     { "name": "Browser-Transport / Server-Zeh-Entscheidung", "status": "noch-nicht-gebaut", "hinweis": "offene Wand, bewusst vertagt" }
   ],

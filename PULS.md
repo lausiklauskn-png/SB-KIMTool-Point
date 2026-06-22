@@ -1,6 +1,39 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-05-29 · Branch `claude/sbkimtool-founding-TXRdc`
+Stand: 2026-06-22 · Branch `claude/such-tool-pwa-standalone-sbgf2h`
+
+## Nachtrag 2026-06-22 — Such-Werkzeug als eigenständige, installierbare PWA
+
+Befund (Klaus/Sage): Der „Download" des Such-Tools wurde keine eigene App — es blieb
+unter dem Hub. Grund: eine lokal über `file://` geöffnete Datei darf keinen
+Service-Worker registrieren → keine Installation.
+
+Umgesetzt (Klaus' Wahl: **Variante A** — eigener Unterordner):
+- Neuer Ordner **`such-tool/`**, Inhalt 1:1 aus `Sage-Protokol/such-tool/` kopiert:
+  `index.html`, `manifest.json` (start_url/scope/id relativ `./` → läuft im
+  Unterordner), `sbkim-sw.js` (Service-Worker MIT `fetch`-Handler → installierbar),
+  `impressum.html` (Kontakt = **Platzhalter**, keine PII), `icon-192/512.png`,
+  `modules/` (Kopien **03/04/21/22** — die einzigen nötigen Module, kein 01/02).
+- **Scope-Falle geprüft:** Der Hub hat aktuell **gar keinen** Service-Worker →
+  keine Überschattung. Der Tool-SW registriert aus `/such-tool/` (Scope `/such-tool/`).
+- **Resize-Stand:** Modul 22 ist die Sage-Fassung **nach PR #388** (Griff unten
+  rechts zieht Breite + Lesefeld-Höhe, Größe persistiert in `localStorage`
+  `sbkim_search_widget_size`, Drag/Resize getrennt). Also bereits der grüne Stand.
+- Hub-Knopf: auf `werkzeuge.html` ein benannter Knopf **„→ Such-Werkzeug öffnen"**
+  (`such-tool/index.html`).
+- Doku: `docs/components/_standalone_such_tool.md` (Kern-Lehre + Aufbau + Drift-Guard,
+  für dieses Repo angepasst). `status.json` um den Standalone-Eintrag ergänzt.
+- JS aller kopierten Module `node --check`-sauber; `npm test` weiter **6/6 grün**
+  (sandbox unberührt).
+
+**Offen / wartet auf Klaus:**
+- **GitHub Pages** für dieses Repo aktivieren (über https), sonst keine Installation.
+- **Installations-Sichttest** am Tablet: `…/SB-KIMTool-Point/such-tool/` öffnen →
+  „App installieren" → eigene App (eigenes Fenster)? Offline-Start? Resize ok?
+- Impressum-Kontakt vor Veröffentlichung mit echten Pflichtangaben füllen (keine PII).
+- Drift: `modules/` sind Kopien — bei Änderung in Sage `src/modules` nachziehen.
+
+## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
 
 ## Nachtrag 2026-05-30 — Dokumentations- & Lesepflicht (Brief-Kette)
 
