@@ -46,6 +46,15 @@ Oben auf jeder Seite eine Navigationsleiste, die zwischen allen Seiten wechselt.
 nutzt das eigene `assets/model.js` für die Animation; ein gemeinsames `assets/style.css`
 trägt die Optik.
 
+## Eigenständige App · `such-tool/`
+
+Ein **installierbares** Such-Werkzeug als echte PWA (kein bloßer Download): eigenes
+`manifest.json`, eigener Service-Worker mit `fetch`-Handler, eigene Module (Kopien
+aus Sage 03/04/21/22). Über GitHub Pages erreichbar unter `…/such-tool/` und über den
+Knopf „→ Such-Werkzeug öffnen" auf der Werkzeuge-Seite. Kern-Lehre und Aufbau:
+`docs/components/_standalone_such_tool.md`. *Installations-Sichttest wartet auf Klaus
+(Pages über https nötig).*
+
 ## Aufbau
 
 ```
