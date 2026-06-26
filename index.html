@@ -4,57 +4,61 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SB·KIMTool·Point — Start</title>
+  <meta name="description" content="Toolpoint: gebündelte Werkzeuge und Apps rund um ein freies, server-armes Netzwerk. Netzwerk, Werkzeuge und Marktplatz an einem Ort." />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <!-- Schicht 0 · Status-Leiste + Seiten-Navigation -->
+  <!-- Kopf · Marke + Seiten-Navigation -->
   <header class="statusbar">
     <a class="brand" href="index.html">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</a>
     <nav class="nav">
       <a href="index.html" class="active">Start</a>
-      <a href="modell.html">Modell</a>
+      <a href="netzwerk.html">Netzwerk</a>
       <a href="werkzeuge.html">Werkzeuge</a>
-      <a href="markt.html">Markt</a>
+      <a href="markt.html">Marktplatz</a>
     </nav>
-    <span class="version">v0.2</span>
+    <span class="version">v0.3</span>
   </header>
 
   <main>
     <div class="hero">
-      <h1>SB·KIMTool·Point</h1>
+      <h1>Toolpoint</h1>
       <p>
-        Drei Schichten, drei Seiten. Wähle eine — du kannst jederzeit oben
-        wieder wechseln. Optik an Sage angelehnt, eigene neutrale Identität.
+        Ein Ort für brauchbare Werkzeuge und Apps rund um ein freies,
+        server-armes Netzwerk. Drei Bereiche, klar getrennt — wähle einen,
+        oben kannst du jederzeit wechseln.
       </p>
     </div>
 
     <div class="entries">
-      <a class="entry" href="modell.html">
-        <span class="step">Schicht 1</span>
-        <h2>Modell</h2>
+      <a class="entry" href="netzwerk.html">
+        <span class="step">Bereich 1</span>
+        <h2>Netzwerk</h2>
         <p>
-          Aufgezeichneter, headless Node-Lauf als Agenten-Board. Die Seite
-          <strong>spielt</strong> ihn ab — sie führt das Modell nicht live aus.
+          Geräte verbinden sich direkt miteinander — gratis und neutral.
+          Hier steht, wie das ehrlich funktioniert, und hier dockst du
+          eine eigene Seite an.
         </p>
-        <span class="go">→ ansehen</span>
+        <span class="go">→ verbinden</span>
       </a>
 
       <a class="entry" href="werkzeuge.html">
-        <span class="step">Schicht 2</span>
-        <h2>Werkzeugkiste</h2>
+        <span class="step">Bereich 2</span>
+        <h2>Werkzeuge</h2>
         <p>
-          Drei Stufen (Basic · Pro · Profi). Jede Kachel mit Doppel-Status und
-          Erklärung. Hier wachsen einzelne Tools heran.
+          Fertige, benannte Werkzeuge zum Ansehen und Herunterladen — vom
+          installierbaren Such-Werkzeug bis zu den einzelnen Bausteinen.
+          Jedes mit klarer Erklärung.
         </p>
         <span class="go">→ öffnen</span>
       </a>
 
       <a class="entry" href="markt.html">
-        <span class="step">Schicht 3</span>
-        <h2>Markt</h2>
+        <span class="step">Bereich 3</span>
+        <h2>Marktplatz</h2>
         <p>
-          PWA-Tool-Vermittlung. Schaufenster der Live-Endknoten zum Andocken.
-          Suche bewusst noch nicht gebaut.
+          Apps finden und anbieten. Such einfach, was du brauchst — oder
+          liste deine eigene Seite. Im Aufbau, die Struktur steht.
         </p>
         <span class="go">→ stöbern</span>
       </a>
@@ -62,8 +66,9 @@
   </main>
 
   <footer>
-    SB·KIMTool·Point — Werkzeugkiste + Modell. Ehrlicher Real-Anteil: siehe
-    <code>status.json</code>. Beweis der Modell-Logik: <code>npm test</code>.
+    SB·KIMTool·Point — ehrlicher Stand jederzeit in <code>status.json</code>.
+    Beweis der Modell-Logik: <code>npm test</code>.
+    <br />Hinter den Kulissen: <a href="modell.html">das Modell ansehen</a>.
   </footer>
 
   <script src="assets/app.js"></script>

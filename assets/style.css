@@ -160,3 +160,91 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 .note { color: var(--muted); font-size: 0.8rem; margin-top: 0.6rem; }
 
 footer { color: var(--muted); font-size: 0.78rem; text-align: center; padding: 1.5rem 1rem; border-top: 1px solid var(--line); }
+footer a { color: var(--accent); }
+
+/* --- gemeinsame Bausteine (Toolpoint v0.3) --- */
+.panel h3 { font-family: var(--mono); font-size: 0.92rem; margin: 0 0 0.6rem; color: var(--text); }
+.panel + .panel { margin-top: 0.9rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; }
+.chip {
+  font-family: var(--mono); font-size: 0.68rem; color: var(--muted);
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+}
+.tag {
+  font-family: var(--mono); font-size: 0.66rem; color: var(--accent);
+  border: 1px solid var(--accent-dim); border-radius: 4px; padding: 0.08rem 0.4rem;
+  margin-left: 0.3rem; white-space: nowrap;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.btn-primary, .btn-ghost {
+  font-family: var(--mono); font-size: 0.82rem; text-decoration: none;
+  border-radius: 6px; padding: 0.4rem 0.85rem; display: inline-block;
+}
+.btn-primary { background: var(--accent); color: var(--bg); border: 1px solid var(--accent); font-weight: 700; }
+.btn-primary:hover { background: #4ee6d4; }
+.btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); }
+.btn-ghost:hover { border-color: var(--accent); }
+.btn-disabled {
+  font-family: var(--mono); font-size: 0.82rem; color: var(--muted);
+  background: var(--bg-soft); border: 1px dashed var(--line); border-radius: 6px;
+  padding: 0.4rem 0.85rem; display: inline-block; cursor: not-allowed;
+}
+
+/* --- Netzwerk-Raum --- */
+.promise .promise-list { margin: 0; padding-left: 1.2rem; }
+.promise-list li { margin: 0 0 0.7rem; font-size: 0.9rem; color: var(--text); }
+.promise-list li strong { color: var(--accent); }
+.relay-facts { margin: 0; font-size: 0.86rem; }
+.relay-facts dt { color: var(--accent); font-family: var(--mono); font-size: 0.74rem; margin-top: 0.5rem; }
+.relay-facts dd { margin: 0.05rem 0 0; color: var(--text); }
+.andock-wizard .sbkim-aw-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.6rem; margin-bottom: 0.6rem; }
+.andock-wizard label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.78rem; color: var(--muted); font-family: var(--mono); }
+.andock-wizard input, .andock-wizard select {
+  background: var(--bg-soft); border: 1px solid var(--line); color: var(--text);
+  border-radius: 6px; padding: 0.45rem 0.55rem; font-size: 0.85rem; font-family: var(--sans);
+}
+.andock-wizard button {
+  font-family: var(--mono); font-size: 0.82rem; cursor: pointer; margin-top: 0.2rem;
+  background: var(--accent); color: var(--bg); border: 1px solid var(--accent);
+  border-radius: 6px; padding: 0.45rem 0.9rem; font-weight: 700;
+}
+.andock-wizard #sbkim-aw-status { display: inline-block; margin-left: 0.6rem; font-size: 0.8rem; color: var(--muted); font-family: var(--mono); }
+.andock-wizard pre {
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: 6px;
+  padding: 0.6rem; overflow: auto; font-size: 0.74rem; color: var(--text);
+}
+.andock-wizard h4 { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); margin: 0.7rem 0 0.3rem; }
+.andock-wizard a[id$="pr"] { font-family: var(--mono); font-size: 0.82rem; }
+
+/* --- Werkzeug-Raum: Angebote --- */
+.angebote { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8rem; }
+.angebot {
+  background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 1rem;
+  display: flex; flex-direction: column;
+}
+.angebot.featured { border-color: var(--accent-dim); box-shadow: 0 0 0 1px var(--accent-dim) inset; grid-column: 1 / -1; }
+.angebot-head { display: flex; align-items: center; gap: 0.5rem; justify-content: space-between; }
+.angebot .kind { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); letter-spacing: 0.05em; }
+.angebot h4 { margin: 0.5rem 0 0.2rem; font-size: 1.1rem; color: var(--text); }
+.angebot .tagline { color: var(--text); font-size: 0.92rem; margin: 0 0 0.5rem; }
+.angebot .was { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.5rem; }
+.angebot .einbau { color: var(--muted); font-size: 0.82rem; margin: 0 0 0.3rem; }
+.angebot .einbau strong { color: var(--text); }
+
+/* --- Marktplatz --- */
+.markt-suche input {
+  width: 100%; background: var(--bg-soft); border: 1px solid var(--line); color: var(--text);
+  border-radius: 8px; padding: 0.7rem 0.9rem; font-size: 0.95rem; font-family: var(--sans);
+}
+.markt-suche input:focus { outline: none; border-color: var(--accent); }
+.pwa-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.pwa .preis { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+.pwa .kat { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin: 0.15rem 0 0.3rem; }
+.offer-cta .offer-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; opacity: 0.6; }
+.offer-cta .offer-fields label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.78rem; color: var(--muted); font-family: var(--mono); }
+.offer-cta .offer-fields input {
+  background: var(--bg-soft); border: 1px solid var(--line); color: var(--muted);
+  border-radius: 6px; padding: 0.45rem 0.55rem; font-size: 0.85rem; font-family: var(--sans);
+}
+.haftung .note { color: var(--text); }

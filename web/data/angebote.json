@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "2026-06-26",
+  "hinweis": "Werkzeug-Raum — fertige, benannte Angebote zum Ansehen/Herunterladen. 'hosted' = liegt hier auf dem Toolpoint und ist direkt zu öffnen/installieren. 'quelle' = Quelltext zum Ansehen/Kopieren. Keine PII.",
+  "angebote": [
+    {
+      "id": "such-werkzeug",
+      "name": "Such-Werkzeug",
+      "kind": "App · installierbar",
+      "featured": true,
+      "tagline": "Sucht nach Bedeutung, nicht nach Stichwörtern.",
+      "was": "Ein kleines, eigenständiges Such-Tool, das die Absicht hinter einer Frage versteht. Läuft komplett im Browser — kein Server, kein Konto. Optional: Frage sprechen, eine KI mit Web-Suche die Quellen holen lassen, nach Bedeutung sortieren.",
+      "einbau": "Direkt öffnen und nutzen. Zum dauerhaften Installieren: im Browser-Menü „Zum Startbildschirm hinzufügen“. 1:1 in ein eigenes Repo kopierbar (Ordner such-tool/).",
+      "open": "such-tool/",
+      "quelle": "https://github.com/lausiklauskn-png/SB-KIMTool-Point/tree/main/such-tool",
+      "hosted": true,
+      "tags": ["Suche", "semantisch", "Sprache", "KI-Brücke", "offline", "PWA"]
+    },
+    {
+      "id": "andock-werkzeug",
+      "name": "Andock-Werkzeug",
+      "kind": "App · Vorlage",
+      "featured": false,
+      "tagline": "Erzeugt eine Netzwerk-Identität im Browser — ohne Server.",
+      "was": "Eine fertige Ein-Datei-App, die eine kryptografische Identität (Schlüsselpaar) erzeugt, eine signierte Identitäts-Datei ausstellt und die nötigen Andock-Dateien zusammenstellt. Alles lokal im Browser.",
+      "einbau": "Als Vorlage in ein eigenes Repo kopieren. Eine schlanke Schnell-Variante (nur Vorlage erzeugen, ohne Krypto) ist im Netzwerk-Bereich direkt eingebaut.",
+      "open": null,
+      "quelle": "https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/observatorium/tools/andock.html",
+      "hosted": false,
+      "tags": ["Andocken", "Identität", "Krypto", "offline", "PWA"]
+    },
+    {
+      "id": "knoten-werkzeug",
+      "name": "Knoten-Werkzeug",
+      "kind": "App · Vorlage",
+      "featured": false,
+      "tagline": "Ein vollständiger Beispiel-Knoten mit Live-Statusanzeige.",
+      "was": "Eine Ein-Datei-App, die die echten Bausteine bündelt und einen kompletten Netzwerk-Knoten mit schwebender Status-Anzeige (lebt / Verkehr / fremd / Siegel) zeigt. Gut zum Verstehen und als Ausgangspunkt.",
+      "einbau": "Als Vorlage in ein eigenes Repo kopieren und an die eigene App anpassen.",
+      "open": null,
+      "quelle": "https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/observatorium/tools/mycelknoten.html",
+      "hosted": false,
+      "tags": ["Knoten", "Beispiel", "Status", "offline", "PWA"]
+    }
+  ]
+}

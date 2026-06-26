@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SB·KIMTool·Point — Werkzeugkiste</title>
+  <title>SB·KIMTool·Point — Werkzeuge</title>
+  <meta name="description" content="Fertige, benannte Werkzeuge zum Ansehen und Herunterladen — vom installierbaren Such-Werkzeug bis zu den einzelnen Bausteinen." />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -11,20 +12,33 @@
     <a class="brand" href="index.html">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</a>
     <nav class="nav">
       <a href="index.html">Start</a>
-      <a href="modell.html">Modell</a>
+      <a href="netzwerk.html">Netzwerk</a>
       <a href="werkzeuge.html" class="active">Werkzeuge</a>
-      <a href="markt.html">Markt</a>
+      <a href="markt.html">Marktplatz</a>
     </nav>
-    <span class="version">v0.2</span>
+    <span class="version">v0.3</span>
   </header>
 
   <main>
-    <!-- Schicht 2 · WERKZEUGKISTE (herunterladen) -->
-    <section class="layer" id="schicht-werkzeuge">
-      <h2>Schicht 2 · Werkzeugkiste (herunterladen)</h2>
+    <!-- Fertige Angebote (zum Öffnen/Herunterladen) -->
+    <section class="layer">
+      <h2>Werkzeuge · fertige Angebote</h2>
       <p class="sub">
-        Drei Stufen. Jede Kachel trägt Doppel-Status (Sage / Point) und eine Erklärung.
-        „Schlummert" = vorgebaut, springt bei Bedarf an — nicht leer.
+        Eigenständige Apps und Vorlagen. „Öffnen“ startet das Werkzeug direkt
+        hier; „Quelle“ zeigt den Code zum Ansehen und Kopieren.
+      </p>
+      <div class="panel">
+        <div class="angebote" id="angebote"></div>
+      </div>
+    </section>
+
+    <!-- Bausteine (die Module) -->
+    <section class="layer">
+      <h2>Werkzeuge · Bausteine</h2>
+      <p class="sub">
+        Die einzelnen Bausteine, aus denen ein Knoten zusammengesetzt wird.
+        Drei Stufen. Jede Kachel trägt einen Doppel-Status und eine Erklärung.
+        „Schlummert“ = vorgebaut, springt bei Bedarf an — nicht leer.
       </p>
       <div class="panel">
         <div class="tabs" id="tabs"></div>
@@ -34,7 +48,7 @@
   </main>
 
   <footer>
-    Schicht 2 von 3 · <a href="index.html">zurück zur Startseite</a>
+    Werkzeug-Bereich · <a href="index.html">zurück zur Startseite</a>
   </footer>
 
   <script src="assets/app.js"></script>

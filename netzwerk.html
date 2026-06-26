@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SB·KIMTool·Point — Netzwerk</title>
+  <meta name="description" content="Das Netzwerk: Geräte verbinden sich direkt, gratis und neutral. Ehrliches, prüfbares Versprechen — und ein Wizard, um eine eigene Seite anzudocken." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="statusbar">
+    <a class="brand" href="index.html">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</a>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="netzwerk.html" class="active">Netzwerk</a>
+      <a href="werkzeuge.html">Werkzeuge</a>
+      <a href="markt.html">Marktplatz</a>
+    </nav>
+    <span class="version">v0.3</span>
+  </header>
+
+  <main>
+    <section class="layer">
+      <h2>Netzwerk · verbinden</h2>
+      <p class="sub">
+        Gratis und neutral. Geräte verbinden sich direkt miteinander; ein
+        einfacher, dummer Treffpunkt hilft ihnen nur, sich zu finden. Niemand
+        rankt, verkauft oder besitzt etwas dabei.
+      </p>
+
+      <!-- Das ehrliche, dreistufige Versprechen -->
+      <div class="panel promise">
+        <h3>Das Versprechen — und wie du es prüfst</h3>
+        <ol class="promise-list">
+          <li>
+            <strong>Deine App-Daten bleiben auf deinem Gerät.</strong>
+            Was du in einer App speicherst (Rezepte, Buchungen, ein Tresor),
+            liegt in deinem Browser. Es erreicht uns nie. <span class="tag">local-first</span>
+          </li>
+          <li>
+            <strong>Netz-Inhalte kann selbst der Betreiber nicht lesen.</strong>
+            Was du bewusst ins Netz schickst, ist Ende-zu-Ende verschlüsselt.
+            Der Treffpunkt sieht nur Geheimtext. <span class="tag">Ende-zu-Ende</span>
+          </li>
+          <li>
+            <strong>Der Treffpunkt ist protokoll-frei — und das ist nachprüfbar.</strong>
+            Die komplette Konfiguration ist offen einsehbar; du musst es nicht
+            glauben. Für volle Anonymität (auch der IP-Adresse) nutze Tor.
+            <span class="tag">offene Konfig</span>
+          </li>
+        </ol>
+        <p class="note">
+          Aus „vertrau mir" wird „prüf mich". Ehrliche Grenze: ein einzelner
+          Betreiber <em>könnte</em> theoretisch Verbindungs-Metadaten (wer, wann,
+          wie oft) mitschreiben. Inhalte sind durch Mathematik geschützt,
+          Metadaten nur durch offene Konfiguration und — später — durch Verteilung
+          auf viele unabhängige Betreiber.
+        </p>
+      </div>
+
+      <!-- Ehrliche Einordnung "server-los" -->
+      <div class="panel">
+        <h3>Ist das wirklich „server-los"?</h3>
+        <p class="sub" style="margin-left:0">
+          Für deine <strong>App-Daten</strong>: ja — die brauchen keinen Server,
+          sie bleiben am Gerät. Für die <strong>Netz-Botschaften</strong> trifft
+          es „herren-los" genauer: es gibt einen Treffpunkt, aber keinen
+          Vermittler, der mitverdient oder bestimmt. Wir behalten das Wort
+          „server-los" bewusst <em>mit</em> dieser Erklärung daneben, statt ein
+          falsches Versprechen zu geben.
+        </p>
+        <dl class="relay-facts">
+          <dt>Treffpunkt (Relay)</dt>
+          <dd><code id="relay-addr">wss://relay.family-projekt.de</code> — live und erreichbar.</dd>
+          <dt>Was er trägt</dt>
+          <dd>Nur, was Nutzer bewusst senden (z. B. eine Frage oder eine Netz-Suche). Nichts wird abgegraben.</dd>
+          <dt>Prüfbarkeit</dt>
+          <dd>Konfiguration offen, ohne Protokollierung betrieben. Wer mag, prüft selbst.</dd>
+        </dl>
+      </div>
+
+      <!-- Andock-Wizard (Modul 19) -->
+      <div class="panel">
+        <h3>Eigene Seite andocken</h3>
+        <p class="sub" style="margin-left:0">
+          Aus drei Angaben (Repo · Domäne · Knotentyp) erzeugt der Wizard eine
+          fertige Identitäts-Vorlage und den passenden Eintrag, um deine Seite
+          ins Netzwerk aufzunehmen. Es wird nichts heimlich verschickt — du
+          bekommst Text, den du selbst übernimmst.
+        </p>
+        <div id="andock-wizard" class="andock-wizard"></div>
+        <p class="note">
+          Reine Eingabe-zu-Text-Hilfe: kein Schlüssel wird hier erzeugt oder
+          gespeichert. Das echte Signieren und Andocken passiert in deiner App.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Netzwerk-Bereich · <a href="index.html">zurück zur Startseite</a>
+  </footer>
+
+  <script src="assets/modules/19_andock_wizard.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

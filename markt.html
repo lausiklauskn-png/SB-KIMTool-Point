@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SB·KIMTool·Point — Markt</title>
+  <title>SB·KIMTool·Point — Marktplatz</title>
+  <meta name="description" content="Apps finden und anbieten. Such, was du brauchst — oder liste deine eigene Seite. Marktplatz im Aufbau, die Struktur steht." />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -11,27 +12,84 @@
     <a class="brand" href="index.html">SB<span class="dot">·</span>KIMTOOL<span class="dot">·</span>POINT</a>
     <nav class="nav">
       <a href="index.html">Start</a>
-      <a href="modell.html">Modell</a>
+      <a href="netzwerk.html">Netzwerk</a>
       <a href="werkzeuge.html">Werkzeuge</a>
-      <a href="markt.html" class="active">Markt</a>
+      <a href="markt.html" class="active">Marktplatz</a>
     </nav>
-    <span class="version">v0.2</span>
+    <span class="version">v0.3</span>
   </header>
 
   <main>
-    <!-- Schicht 3 · PWA-MARKTPLATZ (präsentieren) -->
-    <section class="layer" id="schicht-markt">
-      <h2>Schicht 3 · PWA-Markt (präsentieren)</h2>
-      <p class="sub">Schaufenster der PWA-Tool-Vermittlung. Saat = echte Live-Endknoten. Suche bewusst noch nicht gebaut.</p>
+    <section class="layer">
+      <h2>Marktplatz · finden &amp; anbieten</h2>
+      <p class="sub">
+        Beschreib in eigenen Worten, was du brauchst — die Suche findet passende
+        Angebote und führt dich zur Seite des Anbieters. Im Aufbau: die Struktur
+        steht, die Bezahl-Abwicklung kommt später.
+      </p>
+
+      <!-- Entdeckung über Suche -->
       <div class="panel">
+        <div class="markt-suche">
+          <input type="search" id="markt-q" placeholder="z. B. „App zum Kochen“ oder „etwas, das meine Belege sortiert“" aria-label="Marktplatz durchsuchen" />
+        </div>
+        <p class="note" id="markt-suche-note">
+          Einfache Wort-Suche über alle Angebote. Für die volle, bedeutungs-basierte
+          Suche → <a href="such-tool/">das Such-Werkzeug öffnen</a>.
+        </p>
+      </div>
+
+      <!-- Angebote / Listings -->
+      <div class="panel">
+        <h3>Angebote</h3>
         <div class="market" id="market"></div>
         <p class="note" id="market-note"></p>
+      </div>
+
+      <!-- Tool anbieten (Platzhalter / Vorbereitung) -->
+      <div class="panel offer-cta">
+        <h3>Eigenes Tool anbieten</h3>
+        <p class="sub" style="margin-left:0">
+          Du hast eine eigene App, PWA oder Seite? Bald kannst du sie hier listen.
+          Der Marktplatz gibt dir einen Ort zum Anbieten; verlinkt wird auf
+          <strong>deine</strong> Seite — hier steht nur der Eintrag. Geplant: ein
+          kleiner Monatsbeitrag (Richtwert ~1 €), bewusst niedrig gehalten.
+        </p>
+        <div class="offer-fields" aria-hidden="true">
+          <label>Name<input type="text" placeholder="Name deiner App" disabled /></label>
+          <label>Ein Satz dazu<input type="text" placeholder="Was kann sie?" disabled /></label>
+          <label>Link zu deiner Seite<input type="url" placeholder="https://…" disabled /></label>
+          <label>Stichwörter<input type="text" placeholder="z. B. Notizen, Termine, …" disabled /></label>
+        </div>
+        <button type="button" class="btn-disabled" disabled>Anbieten — kommt bald</button>
+        <p class="note">
+          Platzhalter: das Formular ist noch nicht aktiv. Die Eintrags-Struktur
+          (Name · ein Satz · Link · Stichwörter · Anbieter) steht bereits und
+          fließt direkt in die Suche oben ein.
+        </p>
+      </div>
+
+      <!-- Herunterladen gegen Gebühr (Platzhalter) -->
+      <div class="panel">
+        <h3>Zum eigenen Rechner herunterladen</h3>
+        <p class="sub" style="margin-left:0">
+          Für manche Werkzeuge ist später ein Download zur lokalen Nutzung geplant
+          — gegen eine kleine Gebühr. Auch das ist noch nicht aktiv; die Werkzeuge
+          im <a href="werkzeuge.html">Werkzeug-Bereich</a> sind frei zu öffnen und
+          zu kopieren.
+        </p>
+      </div>
+
+      <!-- Haftungs-/Garantie-Hinweis -->
+      <div class="panel haftung">
+        <h3>Hinweis zu fremden Angeboten</h3>
+        <p class="note" id="haftung-text"></p>
       </div>
     </section>
   </main>
 
   <footer>
-    Schicht 3 von 3 · <a href="index.html">zurück zur Startseite</a>
+    Marktplatz-Bereich · <a href="index.html">zurück zur Startseite</a>
   </footer>
 
   <script src="assets/app.js"></script>

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-29",
+  "lastUpdated": "2026-06-26",
   "repo": "SB-KIMTool-Point",
   "protocolVersion": "0.1",
   "prinzip": "Ehrlicher Real-Anteil (analog Sage 'X % real'). Trennt klar, was echt browser-tauglich ist, was nur Modell/Demo ist und was in Sage reif aber hier noch nicht eingebaut wurde.",
@@ -20,10 +20,15 @@
     { "name": "Werkzeugkiste: Basic (02,01,19,03,04,05,09)", "status": "reif-in-sage", "hinweis": "03/04/05/09 in Sage fertig; im Point noch nicht kopiert" },
     { "name": "Werkzeugkiste: Pro (00,06,07,08,15,16,17)", "status": "vorgebaut-schlummert", "hinweis": "15 Membran fertig; springt bei Angriff an" },
     { "name": "Werkzeugkiste: Profi (10,11,12,14,18)", "status": "vorgebaut-schlummert", "hinweis": "Sybil-Abwehr-Module, schlummern bis Angriff" },
-    { "name": "Statische Seite (3 Schichten, Playback von run.json)", "status": "real-browser-tauglich", "hinweis": "zeigt das Modell, fuehrt es nicht live aus" },
-    { "name": "Marktplatz Schicht 3 (Saat = echte Live-Endknoten)", "status": "real-browser-tauglich", "hinweis": "Suche bewusst noch NICHT gebaut" },
-    { "name": "Reife Module tatsaechlich aus Sage kopieren", "status": "noch-nicht-gebaut" },
+    { "name": "Toolpoint-Seite v0.3 (drei Raeume: Netzwerk/Werkzeuge/Marktplatz)", "status": "real-browser-tauglich", "hinweis": "neu strukturiert 2026-06-26; Modell-Seite zurueckgestuft (hinter den Kulissen). Browser-Sichttest wartet auf Klaus." },
+    { "name": "Netzwerk-Raum: dreistufiges pruefbares Versprechen + Relay-Erklaerung", "status": "real-browser-tauglich", "hinweis": "Relay wss://relay.family-projekt.de live; ehrliche server-los-Einordnung" },
+    { "name": "Netzwerk-Raum: Andock-Wizard (Modul 19, byte-kopiert aus Sage)", "status": "real-browser-tauglich", "echt": true, "hinweis": "assets/modules/19_andock_wizard.js; reine Eingabe->Text, kein Krypto/Netz" },
+    { "name": "Werkzeug-Raum: Such-Werkzeug (such-tool/, byte-kopiert aus Sage)", "status": "real-browser-tauglich", "echt": true, "hinweis": "eigenstaendige installierbare PWA, hier gehostet; Module 03/04/21/22 byte-identisch" },
+    { "name": "Werkzeug-Raum: Angebote + Bausteine (angebote.json + werkzeugkiste.json)", "status": "real-browser-tauglich", "hinweis": "andock.html/mycelknoten.html als Vorlage verlinkt (Hosting folgt)" },
+    { "name": "Marktplatz: Listings + einfache Wort-Suche (markt-listings.json)", "status": "real-browser-tauglich", "hinweis": "Listing = Such-Korpus (label/anchorId/text wie Sage). 6 Listings (4 live, 2 in Vorbereitung)" },
+    { "name": "Marktplatz: Anbieter-Listing + Download-gegen-Gebuehr", "status": "noch-nicht-gebaut", "hinweis": "Platzhalter-UI + Struktur stehen; Bezahl-Abwicklung bewusst noch NICHT gebaut" },
+    { "name": "Semantische Such-Discovery direkt im Marktplatz (Modul 22 ueber Listing-Korpus)", "status": "noch-nicht-gebaut", "hinweis": "Korpus liegt im richtigen Schema; volle semantische Suche via Such-Werkzeug erreichbar" },
     { "name": "Browser-Transport / Server-Zeh-Entscheidung", "status": "noch-nicht-gebaut", "hinweis": "offene Wand, bewusst vertagt" }
   ],
-  "real_anteil_geschaetzt": "ca. 20% (lauffaehiges, getestetes Modell + statische Seite; Werkzeugkiste verlinkt reife Sage-Module, die hier noch nicht kopiert sind)"
+  "real_anteil_geschaetzt": "ca. 35% (getestetes Modell + Toolpoint-Seite mit drei Raeumen; Such-Werkzeug + Andock-Wizard byte-kopiert und hier lauffaehig; Marktplatz-Struktur steht, Bezahl-/semantische-Discovery noch nicht gebaut)"
 }

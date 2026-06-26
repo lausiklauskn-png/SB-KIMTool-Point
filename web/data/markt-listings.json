@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "2026-06-26",
+  "hinweis": "Marktplatz-Listings. Jeder Eintrag ist zugleich ein Such-Korpus-Eintrag (Felder label/anchorId/text wie sage-suchkorpus.js). Vektoren werden bei Bedarf erst zur Laufzeit erzeugt (lazy, Modul 03). KEINE personenbezogenen Daten — nur Handle, Beschreibung, Landing-Link.",
+  "preisHinweis": "Preis-Angaben sind Platzhalter. Die Bezahl-Abwicklung ist noch nicht gebaut (Marktplatz im Aufbau).",
+  "haftung": "Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Jeder Anbieter ist selbst für seine App verantwortlich und prüft sie eigenständig. Verlinkt wird auf die Seite des Anbieters — du überzeugst dich dort selbst.",
+  "listings": [
+    {
+      "label": "Such-Werkzeug",
+      "anchorId": "such-tool/",
+      "text": "Semantische Suche, die die Bedeutung hinter den Worten versteht. Suchen, finden, Frage stellen, sprechen, KI-Brücke, nach Sinn sortieren. Läuft im Browser, server-los, offline-fähig.",
+      "einZeiler": "Suche, die nach Bedeutung findet — nicht nach Stichwörtern.",
+      "landingUrl": "such-tool/",
+      "kategorie": "Werkzeug",
+      "tags": ["Suche", "semantisch", "Sprache", "offline"],
+      "anbieter": "lausiklauskn-png",
+      "preis": "kostenlos",
+      "status": "live"
+    },
+    {
+      "label": "Mein-Rezeptbuch",
+      "anchorId": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+      "text": "Digitales Kochbuch. Rezepte verwalten, sammeln, planen, kochen, Essen, Gerichte, Zutaten, Mahlzeiten, Küche, Backen, Einkaufsliste, Wochenplan, Menüplan, übersetzen. KI-Unterstützung, offline nutzbar.",
+      "einZeiler": "Persönliches digitales Kochbuch mit KI-Unterstützung, offline nutzbar.",
+      "landingUrl": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+      "kategorie": "App",
+      "tags": ["Kochen", "Rezepte", "Essen", "Planung", "offline"],
+      "anbieter": "lausiklauskn-png",
+      "preis": "kostenlos",
+      "status": "live"
+    },
+    {
+      "label": "Mein-Mixarium",
+      "anchorId": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+      "text": "Getränke-Labor. Cocktails, Mocktails, alkoholfreie Drinks, Smoothies, Limonaden, Tees, Sirupe mischen, verwalten, planen. Trinken, Bar, Rezepte für Getränke. KI-gestützte Rezeptgenerierung, offline nutzbar.",
+      "einZeiler": "Getränke-Labor für Cocktails, Mocktails, Smoothies & mehr — offline nutzbar.",
+      "landingUrl": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+      "kategorie": "App",
+      "tags": ["Getränke", "Cocktails", "Drinks", "Rezepte", "offline"],
+      "anbieter": "lausiklauskn-png",
+      "preis": "kostenlos",
+      "status": "live"
+    },
+    {
+      "label": "BookLedgerPro",
+      "anchorId": "https://lausiklauskn-png.github.io/BookLedgerPro/",
+      "text": "Verschlüsselte Buchhaltung für Deutschland. Buchführung, Konten, Buchungssätze, Rechnungen, Belege, Umsatzsteuer, EÜR, GoBD, Kostenstellen. Offline-first, Daten verschlüsselt am Gerät, KI optional und in der EU.",
+      "einZeiler": "Verschlüsselte Offline-Buchhaltung (Deutschland), GoBD-orientiert, KI optional (EU).",
+      "landingUrl": "https://lausiklauskn-png.github.io/BookLedgerPro/",
+      "kategorie": "App",
+      "tags": ["Buchhaltung", "Finanzen", "Steuer", "verschlüsselt", "offline"],
+      "anbieter": "lausiklauskn-png",
+      "preis": "Vorschau",
+      "status": "live"
+    },
+    {
+      "label": "Mein-Tresor",
+      "anchorId": "https://lausiklauskn-png.github.io/Mein-Tresor/",
+      "text": "Verschlüsselter Tresor für Dateien und Schlüssel. Daten sicher ablegen, AES-Verschlüsselung, Passwort, Shamir-Aufteilung, Tarnfach. Offline-fähig. In Vorbereitung.",
+      "einZeiler": "Verschlüsselter Tresor mit 20 Fächern — in Vorbereitung.",
+      "landingUrl": "https://lausiklauskn-png.github.io/Mein-Tresor/",
+      "kategorie": "App",
+      "tags": ["Tresor", "Verschlüsselung", "Sicherheit", "offline"],
+      "anbieter": "lausiklauskn-png",
+      "preis": "—",
+      "status": "kommt-bald"
+    },
+    {
+      "label": "Jasons-Tresor",
+      "anchorId": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
+      "text": "Bibliothek und Tresor für JSON-Dateien und Schlüssel. Sicher ablegen, ordnen, suchen, exportieren, AES-Verschlüsselung mit Passwort. Offline-fähig. In Vorbereitung.",
+      "einZeiler": "Sichere Bibliothek und Tresor für JSON-Dateien — in Vorbereitung.",
+      "landingUrl": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
+      "kategorie": "App",
+      "tags": ["Tresor", "Bibliothek", "Verschlüsselung", "offline"],
+      "anbieter": "lausiklauskn-png",
+      "preis": "—",
+      "status": "kommt-bald"
+    }
+  ]
+}
