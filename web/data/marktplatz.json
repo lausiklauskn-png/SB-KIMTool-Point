@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-19",
-  "hinweis": "Schicht 3 — PWA-Marktplatz. Saat = echte Live-Endknoten aus dem Sage-Protokoll (verifiziert). „→ andocken\" öffnet die echte Live-Seite des Knotens in einem neuen Tab. Heute bezeugt: erster vollständiger semantischer Match SB·KIMTool·Point ⟷ Sage (0.848508 ≥ 0.80, beidseitig signatur-verifiziert). NEU 2026-06-19: sechster Peer BookLedgerPro reziprok verifiziert (verified-spore). NEU 2026-06-21: erstes eigenständiges Werkzeug am Markt — das semantische Such-Werkzeug (Modul 22, von Sage übernommen) zum Öffnen/Herunterladen; siehe Werkzeuge unten.",
+  "lastUpdated": "2026-06-27",
+  "hinweis": "Schicht 3 — PWA-Marktplatz. Saat = echte Live-Endknoten aus dem Sage-Protokoll (verifiziert). „→ andocken\" öffnet die echte Live-Seite des Knotens in einem neuen Tab. Heute bezeugt: erster vollständiger semantischer Match SB·KIMTool·Point ⟷ Sage (0.848508 ≥ 0.80, beidseitig signatur-verifiziert). NEU 2026-06-19: sechster Peer BookLedgerPro reziprok verifiziert (verified-spore). NEU 2026-06-21: erstes eigenständiges Werkzeug am Markt — das semantische Such-Werkzeug (Modul 22, von Sage übernommen) zum Öffnen/Herunterladen; siehe Werkzeuge unten. NEU 2026-06-27: Knoten Family Projekt (family-projekt.de) reziprok verifiziert — verified-match 0.831105.",
   "eintraege": [
     {
       "name": "Rezeptbuch",
@@ -61,6 +61,16 @@
       "status": "verified-spore",
       "echt": true,
       "matchHinweis": "Sechster Peer (von Sage vermittelt, 2026-06-19). Identitaet reziprok + offline geprueft -> verified-SPORE (9/9, id=SHA256(pubkey), Ed25519, Manipulation faellt durch). KEIN Match-Score: domainVector ist _demo, Domaenen-Match offen bis echtes Embedding. Verschluesselungs-/Tresor-Achse als Hypothese mitbeobachtet."
+    },
+    {
+      "name": "Family Projekt",
+      "nodeId": "HLXUEJFWHGt6…",
+      "kannDas": "Freies, neutrales Mycel-Zuhause: brauchbare Werkzeuge und Apps an einem Ort, eigene Apps mit eigenen Seiten + ein Marktplatz, semantische Suche nach Bedeutung, mehrsprachig, datenschutzfreundlich, offline-faehig.",
+      "andockLink": "https://family-projekt.de/",
+      "status": "verified-match-2026-06-27",
+      "echt": true,
+      "matchScore": 0.831105,
+      "matchHinweis": "Knoten Family Projekt — verified-MATCH 0.8311 (echter domainVector, 384-dim, L2=1, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet HLXUEJFW…; beidseitig nachgerechnet (Family Projekt meldet denselben 0.8311). Selbst-Pruefung: Ed25519-Signatur VALID, id=base64url(SHA256(pubkey)). Werkzeug-/App-/Marktplatz-Achse — passt zu diesem Werkzeug-Hub."
     }
   ],
   "werkzeuge_hinweis": "Eigenstaendige Werkzeuge am Markt (kein Knoten, sondern ein Tool zum Mitnehmen). Von Sage-Protokol uebernommen, hier 1:1 gespiegelt.",
