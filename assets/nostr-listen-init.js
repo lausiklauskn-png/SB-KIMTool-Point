@@ -32,6 +32,16 @@
           return A.listenNostr()
             .then(function () {
               console.info("[SBKIMTool] Auto-Lauschen aktiv (Empfangsmodus mit Antwortrecht).");
+              // Sichtbar machen: kanonisches Event (Modul 17) + verkehr-Lampe
+              // ruhig grün (= am Relais verbunden, lauscht). Beides fail-soft.
+              try { window.dispatchEvent(new CustomEvent("sbkim:nostr-listening", { detail: { active: true } })); } catch (e) {}
+              try {
+                var lt = document.getElementById("lamp-traffic");
+                if (lt) {
+                  lt.classList.add("on");
+                  lt.title = "verkehr — grün: am Relais verbunden, lauscht (Empfangsmodus, antwortet nur). Pulst bei echtem Verkehr.";
+                }
+              } catch (e) {}
             })
             .catch(function (e) { console.warn("[SBKIMTool] Auto-Lauschen übersprungen:", e); });
         }
