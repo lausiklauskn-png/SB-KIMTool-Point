@@ -178,6 +178,40 @@ Ebene.
   Discovery, Listings) → Klaus ändert sie selbst, ohne Code. Später ein
   **verstecktes Admin-Panel** (mit dem Bezahl-/Einreich-Dienst).
 
+## 6b. Family Projekt ist SELBST ein Mycel-Knoten (Klaus 2026-06-27, wichtig)
+
+Die Seite soll von Anfang an **ans Mycel angebunden** sein — sie ist ein
+eigener SBKIM-Knoten, nicht nur eine Schauseite.
+
+- **Eigene Identität:** eigene Ed25519-**Spore**; **andockt** an Sage-Protokol +
+  SB-KIMTool-Point (+ weitere Knoten). Module **1:1 aus Sage kopieren**
+  (kopieren, nicht klonen).
+- **Im Kopf (oben) schon eingebaut:**
+  - **Modul 17 Floating-Widget** — Vier-Slot-Live-Status **LEBT / VERKEHR /
+    FREMD / SIEGEL**.
+  - **Modul 16 Siegel** — Siegel-Badge sichtbar (Vertrauens-Signal, Bronze→Gold
+    bei echtem Handshake).
+  - **Modul 15 Membran** — Lampen + **Fremdzugriff-Erkennung** (FREMD).
+  - **Reihenfolge-Lehre (Sage CLAUDE.md Modul 17):** `SbkimWidget.init()` MUSS
+    **vor** `SbkimMembrane.init()` / `SbkimSiegel.init()` laufen.
+- **Nur diese Status-/Schutz-Module** + die für Identität/Handshake nötigen
+  Basis-Module (01/02/03/04/05/09). **Nicht jedes fertige Tool** einbauen
+  (Klaus: „brauchen wir nicht").
+- **Briefkasten (mailbox) — Sonderregel:**
+  - **Öffentlich VERSTECKT.** Der Briefkasten darf auf der **öffentlichen** Seite
+    **nicht** sichtbar/lesbar sein (Klaus will nicht, dass Fremde ihn lesen).
+  - **Entwicklungsphase (vor Internet-Freigabe): sichtbar FÜR KLAUS** — als
+    Test-Kanal, um die **Verbindung zu prüfen** (Handshake/Sync mit Sage,
+    SB-KIMTool-Point, weiteren Knoten). Das ist heute der Weg, die Andock-
+    Verbindung real zu testen (solange der Auto-Handshake übers Relay noch
+    „in Vorbereitung" ist).
+  - **Umsetzung:** über einen **Dev-Schalter** (z. B. `localStorage fp_dev=1`
+    oder `?dev` in der URL) — Briefkasten-Knopf nur sichtbar, wenn Dev-Modus an.
+    **Vor dem öffentlichen Launch ausschalten** (Default aus). Im Brief/PULS
+    festhalten, damit es vor Launch nicht vergessen wird.
+- **Ton:** Lampen/Siegel/Widget sind kleine Kopf-Statuselemente (wie in
+  Mein-Rezeptbuch/Mein-Mixarium) — kein Analogie-Text, passt zur sachlichen Seite.
+
 ## 7. Mockups (in diesem Ordner, abgenommen)
 
 - `mockup-startseite-v3.html` — **Startseite, von Klaus „ganz okay"**. Enthält
@@ -191,8 +225,14 @@ Ebene.
 
 1. **Repo-Grundgerüst** + `vendor/three.module.min.js` (+ggf. GSAP) aus Sage
    kopieren; gemeinsame `assets/style.css` + `assets/app.js` aus Mockup v3.
+   **Mycel-Module 1:1 aus Sage kopieren** (15 Membran, 16 Siegel, 17 Floating-
+   Widget + Basis 01/02/03/04/05/09) → eigene Spore erzeugen + Andock vorbereiten
+   (§6b).
 2. **Startseite** mit **echtem three.js-Mycel-Hintergrund** (themed, Scroll-Zoom)
-   → Klaus' Browser-Sichttest (Termux/lokal).
+   + **Kopf-Status: Floating-Widget (LEBT/VERKEHR/FREMD/SIEGEL) + Siegel-Badge +
+   Lampen** (§6b; `SbkimWidget.init()` vor 15/16). **Briefkasten nur im Dev-Modus.**
+   → Klaus' Browser-Sichttest (Termux/lokal) inkl. **Verbindungs-Test** (Handshake
+   mit Sage / SB-KIMTool-Point über den Dev-Briefkasten).
 3. **Werkzeug-Seiten** (eine Landingpage je eigenem Werkzeug) auf Vorlage.
 4. **Netzwerk-Raum** (Versprechen + Andock-Werkzeug + Profi-Link; Auto-Handshake
    „in Vorbereitung").
@@ -232,6 +272,10 @@ Ebene.
 5. `Sage-Protokol/docs/components/_toolpoint_marktplatz.md` (Listing-Datenvertrag).
 6. `Sage-Protokol/src/modules/19_andock_wizard.js`, `22_such_widget.md`,
    `_standalone_such_tool.md`.
+7. Für die Knoten-Anbindung (§6b): `Sage-Protokol/src/modules/15_membran.js`,
+   `16_siegel.js`, `17_floating_widget.js` + deren Karten in `docs/components/`
+   (Reihenfolge 17 vor 15/16); `docs/INTERFACES.md` §11.6 (Briefkasten/Netz-Sync)
+   und `SB-KIMTool-Point` (gelebtes Briefkasten-/Siegel-/Lampen-Muster im Kopf).
 
 **Abschluss-Befehl der Folge-Sitzung:** PULS/Brief fortschreiben, neuen Brief
 für die nächste Sitzung anlegen — die Kette reißt nie ab.
