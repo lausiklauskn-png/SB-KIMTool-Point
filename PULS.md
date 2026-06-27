@@ -1,6 +1,24 @@
 # PULS — Übergabeprotokoll
 
-Stand: 2026-06-22 · Branch `claude/such-tool-pwa-standalone-sbgf2h`
+Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
+
+## Nachtrag 2026-06-27 — Stufe 2: Auto-Lauschen am Nostr-Relais
+
+`main` in den Session-Branch gemerget (Branch hing 117 Commits hinter `main`). Dann
+Stufe-2-Auto-Lauschen integriert (Rollout aus `family-project/docs/SESSION_BRIEF_LAUSCHEN_ROLLOUT.md`):
+
+- Byte-identisch aus Sage `src/modules/` kopiert (kopieren, nicht klonen):
+  `05_anastomose.js` (Superset der bisherigen Version, ergänzt `listenNostr`/Nostr-Transport)
+  → `web/tools/sbkim-anastomose.js`; `05b_nostr_relay.js` → `web/tools/sbkim-nostr-relay.js`;
+  `noble-secp256k1.js` → `web/tools/noble-secp256k1.js`.
+- `werkzeuge.html` lädt 05b als `<script type="module">` (self-mountet `window.SbkimNostrRelay`,
+  importiert noble relativ aus derselben Mappe) + neues `assets/nostr-listen-init.js`, das nach
+  `SbkimAnastomose.init()` **fail-soft + nicht-blockierend** `listenNostr()` aufruft.
+- Relais `wss://relay.family-projekt.de` (in 05b eingebacken). **Empfangsmodus mit Antwortrecht:**
+  nur antworten, nie initiieren (kein Crawler). Schutz-Module 10/11/12/15 = Wächter (später).
+- **Verifikation:** `npm test` **148/148 grün** (Anastomose-Oberfläche `init/handshake/receiveHandshake/listSiblings` intakt, kein Import-Bruch). `node --check` der Init-Datei OK.
+- §11.6: `sbkim/SIGNAL.json` `seq` 25→26 + history-Eintrag + Postfach-Notiz (`AUSTAUSCH.md`).
+- **Offen:** Browser-Sichttest (Hard-Reload Strg+Shift+R) wartet auf Klaus — Live-Echo am Relais.
 
 ## Nachtrag 2026-06-22 — Such-Werkzeug als eigenständige, installierbare PWA
 
