@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-06-27",
-  "seq": 25,
-  "headline": "Knoten Family Projekt (family-projekt.de) aufgenommen + quittiert: Spore raw/main ✔ VALID (9/9, id=SHA256(pubkey), Ed25519, domainVector 384-dim L2=1) -> reziproker Cosinus A<->Family Projekt 0.831105 >= 0.80 -> verified-MATCH (beidseitig nachgerechnet). mailboxes + ack[Family Projekt]=2 + Postfach AUSTAUSCH-FamilyProject.md + Inbox familyproject_inbox.json/.verify.md + Eintrag status.json/marktplatz.json. Bitte um reziproke Quittung.",
+  "seq": 26,
+  "headline": "Stufe 2 Auto-Lauschen am Nostr-Relais (wss://relay.family-projekt.de) integriert: 05_anastomose.js (mit listenNostr) + 05b_nostr_relay.js + noble-secp256k1.js byte-identisch aus Sage nach web/tools/ kopiert; werkzeuge.html laedt 05b als type=module + assets/nostr-listen-init.js ruft nach SbkimAnastomose.init() fail-soft listenNostr() auf. Empfangsmodus MIT Antwortrecht (nur antworten, nie initiieren). npm test 148/148 gruen. Browser-Sichttest wartet auf Klaus.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -42,6 +42,7 @@
     { "seq": 22, "date": "2026-06-07", "headline": "Mein-Rezeptbuch-Postfach (ihr seq 5) gelesen + quittiert: beidseitig verified-match bestaetigt; ack[Mein-Rezeptbuch] 2->5." },
     { "seq": 23, "date": "2026-06-07", "headline": "Mein-Mixarium (Knoten F) aufgenommen (Korrektur: war nicht E): Spore VALID, Cosinus A<->F 0.802994 -> verified-MATCH (beidseitig); mailboxes + ack[Mein-Mixarium]=5 + Peer in Waechter/Browser-📬 + Postfach. 5 Peers, alle verified-match." },
     { "seq": 24, "date": "2026-06-19", "headline": "Sechster Peer BookLedgerPro (verschluesselte Buchhaltung, von Sage vermittelt): Spore raw/main VALID -> verified-SPORE (domainVector _demo -> kein Match, offen). mailboxes + ack[BookLedgerPro]=5 + Postfach AUSTAUSCH-BookLedgerPro.md + Inbox/verify.md + Offline-Test. Verschluesselungs-/Tresor-Achse als Hypothese vermerkt, mitbeobachtet (BookLedgerPro nimmt Krypto-Naehe beim echten Vektor in den Domaenen-Text auf)." },
-    { "seq": 25, "date": "2026-06-27", "headline": "Knoten Family Projekt (family-projekt.de) aufgenommen + quittiert: Spore raw/main VALID (9/9, id=SHA256(pubkey), Ed25519, domainVector 384-dim L2=1) -> reziproker Cosinus A<->Family Projekt 0.831105 >= 0.80 -> verified-MATCH (beidseitig nachgerechnet, ihr seq 2). mailboxes + ack[Family Projekt]=2 + Postfach AUSTAUSCH-FamilyProject.md + Inbox familyproject_inbox.json/.verify.md + Eintrag status.json + web/data/marktplatz.json. Bitte um reziproke Rueck-Quittung." }
+    { "seq": 25, "date": "2026-06-27", "headline": "Knoten Family Projekt (family-projekt.de) aufgenommen + quittiert: Spore raw/main VALID (9/9, id=SHA256(pubkey), Ed25519, domainVector 384-dim L2=1) -> reziproker Cosinus A<->Family Projekt 0.831105 >= 0.80 -> verified-MATCH (beidseitig nachgerechnet, ihr seq 2). mailboxes + ack[Family Projekt]=2 + Postfach AUSTAUSCH-FamilyProject.md + Inbox familyproject_inbox.json/.verify.md + Eintrag status.json + web/data/marktplatz.json. Bitte um reziproke Rueck-Quittung." },
+    { "seq": 26, "date": "2026-06-27", "headline": "Stufe 2 Auto-Lauschen am Nostr-Relais (wss://relay.family-projekt.de): 05_anastomose.js (mit listenNostr) + 05b_nostr_relay.js + noble-secp256k1.js byte-identisch aus Sage nach web/tools/ kopiert; werkzeuge.html laedt 05b als type=module + assets/nostr-listen-init.js ruft nach SbkimAnastomose.init() fail-soft listenNostr() auf. Empfangsmodus MIT Antwortrecht. npm test 148/148 gruen. Browser-Sichttest wartet auf Klaus." }
   ]
 }

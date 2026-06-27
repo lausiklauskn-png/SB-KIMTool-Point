@@ -165,6 +165,9 @@
   <script src="web/tools/sbkim-embedding.js"></script>
   <script src="web/tools/sbkim-spore.js"></script>
   <script src="web/tools/sbkim-anastomose.js"></script>
+  <!-- Modul 05b Nostr-Relais-Client (Stufe 2): self-mountet window.SbkimNostrRelay,
+       importiert noble-secp256k1 relativ aus derselben Mappe. type=module Pflicht. -->
+  <script type="module" src="web/tools/sbkim-nostr-relay.js"></script>
   <script src="web/tools/sbkim-heterokaryose.js"></script>
   <!-- Modul 22 Such-Werkzeug: nach 03 Embedding + 04 Match laden, dann init. -->
   <script src="web/tools/sbkim-such-widget.js"></script>
@@ -174,5 +177,8 @@
   <script src="assets/sbkim-siegel.js"></script>
   <script src="assets/netz-briefkasten.js"></script>
   <script src="assets/such-widget-init.js"></script>
+  <!-- Auto-Lauschen am Nostr-Relais (Stufe 2): nach Anastomose.init() fail-soft
+       listenNostr(). Empfangsmodus mit Antwortrecht — nur antworten, nie initiieren. -->
+  <script src="assets/nostr-listen-init.js"></script>
 </body>
 </html>

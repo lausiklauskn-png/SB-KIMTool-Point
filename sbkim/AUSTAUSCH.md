@@ -556,3 +556,18 @@ abschreiben) — nichts zu tun.
 im Browser + Auto-Issue im Hintergrund**. Fertig melden: euer `SIGNAL.json` `seq`+1.
 
 — Knoten A, SB·KIMTool·Point.
+
+---
+
+## 2026-06-27 — Stufe 2 Auto-Lauschen am Nostr-Relais (Bau-Protokoll, SIGNAL seq 26)
+
+SB·KIMTool·Point lauscht jetzt selbsttätig am Live-Relais `wss://relay.family-projekt.de`.
+Eure reifen Module byte-identisch übernommen (kopieren, nicht klonen):
+`src/modules/05_anastomose.js` (mit `listenNostr`), `05b_nostr_relay.js`,
+`noble-secp256k1.js` → `web/tools/`. `werkzeuge.html` lädt 05b als `type="module"`;
+`assets/nostr-listen-init.js` ruft nach `SbkimAnastomose.init()` fail-soft `listenNostr()`.
+**Empfangsmodus mit Antwortrecht** (nur antworten, nie initiieren — kein Crawler).
+`npm test` 148/148 grün. Browser-Sichttest wartet auf Klaus. Danke für das Vorbild
+(family-project + Sage `sbkim-init.js`).
+
+— Knoten A, SB·KIMTool·Point.
