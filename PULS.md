@@ -2,6 +2,30 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-06-29 — Werkzeugkiste-Katalog auf den neuen Sage-Stand gezogen (20/21/23 + Pinnwand)
+
+Branch `claude/pinnwand-verwandt-ki-iyzpi7` (zuerst frisch auf `origin/main` gesetzt —
+Achtsamkeits-Regel; lokaler Branch war 122 Commits hinter `main`). Reiner Katalog-/Doku-Nachzug
+auf Klaus' Zuruf, damit der Tool-Point den aktuellen Sage-Stand spiegelt:
+
+- **`werkzeugkiste.json` module[]** um drei Einträge erweitert: **20 Schluessel-Safe** +
+  **21 Spracheingabe** (beide reif als Code-Stub in Sage, hier noch **nicht kopiert** →
+  `point_status: noch-nicht-kopiert`, kein `datei`) und **23 Rendezvous** (Datei
+  `web/tools/sbkim-rendezvous.js` liegt bereits → `1:1 aus Sage kopiert`, in `TOOL_FILES`
+  ergänzt; in Sage LIVE cross-app bewiesen Sage↔Mixarium 2026-06-28). Pflichtfelder
+  (Was/Nutzen/Verwendung/Einbau/Aktiviert-durch) je Eintrag vollständig.
+- **`werkzeugkiste.json` komplett_werkzeuge[]** um die **Pinnwand** (Frage-Antwort-Brett)
+  erweitert — **link-first** auf die Live-Sage-Seite (mehrteilige PWA → bewusst **nicht**
+  lokal gespiegelt, Drift-Vermeidung). Trägt die ehrliche Lesart: gratis Cosinus = **Rangfolge**,
+  KI-Richter (opt-in/BYOK) = Urteil. In Klaus' Browser bestätigt (2026-06-29).
+- **`assets/app.js`:** Komplett-Werkzeug-Render toleriert jetzt fehlendes `datei`
+  (link-first → nur „↗ Live öffnen (Sage)" statt Spiegel-/Download-Knöpfe). `TOOL_FILES["23"]`.
+- **`test/komplett-werkzeuge.test.js`** nachgezogen (drei statt zwei; Pinnwand link-first-Vertrag:
+  Pflichtfelder + Live-Link, **kein** `datei`/`sha256`).
+- **`status.json`** + **`werkzeugkiste.json`** `lastUpdated` → 2026-06-29; Katalog-Komponente
+  ehrlich vermerkt.
+- **Verifikation:** `npm test` **96/96** grün. **Browser-Lauf der Werkzeuge-Seite wartet auf Klaus.**
+
 ## Nachtrag 2026-06-28 — Modul 23 Rendezvous + öffentlicher „🌐 Mit dem Netz verbinden"-Knopf
 
 Branch `claude/module-23-rendezvous-rollout-zqaa8u` (zuerst frisch auf `origin/main`
