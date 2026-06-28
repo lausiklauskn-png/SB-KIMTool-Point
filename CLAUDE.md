@@ -80,9 +80,14 @@ aber besonders wichtig, wenn Arbeit über **mehrere noch nicht gemergte PRs** ge
 sonst baust du auf einem alten Stand und „es ändert sich nichts". Im Zweifel kurz prüfen, dann
 bauen. Selbstständiges Merken/Bauen/Mergen ist erlaubt — **achtsam** auf die Basis.
 
-**Merge entscheidet Klaus.** Ich bereite vor (Draft-PR, Test-Plan) und merge nur auf
-ausdrückliche Ansage. Niemals auf einen anderen als den vorgegebenen Branch pushen
-ohne ausdrückliche Erlaubnis.
+**Selbst-Merge-Freibrief (Klaus 2026-06-28, netzweit für ALLE Repos — Mixarium und andere
+eingeschlossen).** Die Sitzung merget ihre **eigenen** PRs **selbstständig** in `main`, sobald
+sie getestet (`npm test`/Headless grün; bei reinen Doku-/byte-Kopie-Änderungen Drift-Guard grün),
+abgegrenzt und nicht architektonisch zweifelhaft sind — **ohne auf „X mergen" zu warten**
+(Draft-PR → ready → squash-merge). **NICHT** automatisch mergen bei echtem Zweifel
+(Richtungsentscheid, schwer umkehrbar, mehrere gleich gute Wege) ODER wenn Klaus ausdrücklich
+vorher draufschauen will. Klaus' Browser-Sichttest bleibt davon unberührt (headless ersetzt ihn
+nicht). Niemals auf einen anderen als den vorgegebenen Branch pushen ohne ausdrückliche Erlaubnis.
 
 ## Test & Ehrlichkeit über den Zustand
 
@@ -160,7 +165,8 @@ freigegebenen Umfang** — dann **ohne Rückfrage umsetzen**. Ein Freibrief gilt
 benannte Aufgabe/Sitzung**, ist **nicht** auf spätere übertragbar und **läuft mit deren
 Abschluss aus**; eine neue Sitzung braucht eine **neue ausdrückliche Freigabe**. Ohne Freibrief
 gilt die normale Plan-vor-Code-Pflicht. Die Leitplanken (Ehrlichkeit, `npm test`, Kein-PII,
-Offline, „Merge entscheidet Klaus") bleiben **immer** unberührt.
+Offline, Plan-vor-Code, Brief-Kette) bleiben **immer** unberührt. Der Merge-Schritt selbst
+läuft seit 2026-06-28 unter dem netzweiten Selbst-Merge-Freibrief (siehe § Branch & PR-Workflow).
 
 ### Dokumentationspflicht **am** Abschluss — Befehl: nächsten Brief schreiben
 
