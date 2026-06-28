@@ -171,6 +171,11 @@
   <script src="web/tools/sbkim-heterokaryose.js"></script>
   <!-- Modul 22 Such-Werkzeug: nach 03 Embedding + 04 Match laden, dann init. -->
   <script src="web/tools/sbkim-such-widget.js"></script>
+  <!-- Modul 23 Rendezvous (gemeinsamer Raum) + öffentlicher 🌐-Knopf. Byte-1:1
+       aus Sage src/modules/23_rendezvous(.ui).js. Nutzt den vorhandenen Stack
+       (Anastomose/Relais/Spore/Embedding) — kein Doppel-Laden. -->
+  <script src="web/tools/sbkim-rendezvous.js"></script>
+  <script src="web/tools/sbkim-rendezvous-ui.js"></script>
   <script src="assets/werkstatt.js"></script>
   <script src="assets/app.js"></script>
   <script src="assets/fx.js"></script>
@@ -180,5 +185,7 @@
   <!-- Auto-Lauschen am Nostr-Relais (Stufe 2): nach Anastomose.init() fail-soft
        listenNostr(). Empfangsmodus mit Antwortrecht — nur antworten, nie initiieren. -->
   <script src="assets/nostr-listen-init.js"></script>
+  <!-- Rendezvous-Knopf „🌐 Mit dem Netz verbinden" mounten (Modul 23 UI). -->
+  <script src="assets/rendezvous-init.js"></script>
 </body>
 </html>
