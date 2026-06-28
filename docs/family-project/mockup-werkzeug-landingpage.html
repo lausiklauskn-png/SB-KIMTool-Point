@@ -1,0 +1,252 @@
+<!doctype html>
+<!--
+  Family Project — BEISPIEL-Landingpage (Vorlage zur Beurteilung).
+  Eine einzelne Werkzeug-/Verkaufsseite, wie sie pro Werkzeug aussehen könnte.
+  Self-contained (eine Datei), keine externen Abhängigkeiten. Sachlicher Ton,
+  keine Analogien. Bild-Flächen sind ehrlich als Platzhalter markiert.
+-->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Such-Werkzeug — Family Project</title>
+  <meta name="description" content="Such-Werkzeug: findet nach Bedeutung statt nach Stichwörtern. Läuft im Browser, ohne Server, ohne Konto." />
+  <style>
+    :root{
+      --bg:#0e1116; --bg2:#141922; --card:#1a212c; --line:#2a3340;
+      --text:#e7ecf2; --muted:#94a2b2; --accent:#5ad1c2; --accent2:#7c9cff;
+      --gold:#e6b450; --ok:#46d27f;
+      --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+      --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6}
+    a{color:var(--accent);text-decoration:none}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+    /* Kopfleiste */
+    header{position:sticky;top:0;z-index:20;background:rgba(14,17,22,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .bar{display:flex;align-items:center;gap:16px;height:58px}
+    .brand{font-weight:800;letter-spacing:.02em;color:var(--text);font-size:1.05rem;display:flex;align-items:center;gap:9px}
+    .brand .mark{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-block}
+    .brand b{color:var(--accent)}
+    nav.top{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+    nav.top a{color:var(--muted);font-size:.9rem;padding:7px 12px;border-radius:8px}
+    nav.top a:hover{color:var(--text);background:var(--bg2)}
+    .back{color:var(--muted);font-size:.85rem}
+
+    /* Held */
+    .hero{padding:64px 0 40px;background:
+      radial-gradient(900px 420px at 80% -10%,rgba(124,156,255,.16),transparent 60%),
+      radial-gradient(700px 360px at 0% 120%,rgba(90,209,194,.12),transparent 60%)}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:5px 12px;margin-bottom:18px}
+    .hero h1{font-size:clamp(2rem,5.5vw,3.2rem);line-height:1.1;margin:0 0 14px;max-width:16ch}
+    .hero h1 .hl{color:var(--accent)}
+    .hero p.lead{font-size:1.12rem;color:var(--muted);max-width:60ch;margin:0 0 26px}
+    .cta{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;border-radius:10px;padding:12px 20px;font-size:.98rem;cursor:pointer;border:1px solid transparent}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08121a}
+    .btn.primary:hover{filter:brightness(1.06)}
+    .btn.ghost{background:transparent;border-color:var(--line);color:var(--text)}
+    .btn.ghost:hover{border-color:var(--accent)}
+    .microcopy{margin-top:14px;font-size:.85rem;color:var(--muted)}
+
+    /* Vorschau / Screenshot-Platzhalter */
+    .shot{margin:34px 0 0;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--bg2),var(--bg));overflow:hidden}
+    .shot-top{display:flex;gap:7px;padding:12px 14px;border-bottom:1px solid var(--line)}
+    .shot-top i{width:11px;height:11px;border-radius:50%;background:var(--line);display:inline-block}
+    .shot-body{aspect-ratio:16/8;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted);background:
+      repeating-linear-gradient(45deg,rgba(255,255,255,.012) 0 12px,transparent 12px 24px)}
+    .shot-body .ph{font-family:var(--mono);font-size:.82rem;border:1px dashed var(--line);border-radius:8px;padding:8px 14px}
+    .shot-body .bubble{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 30px rgba(90,209,194,.25)}
+    /* Screenshot-Galerie (mehrere Bilder, ＋ / ×) */
+    .thumbs{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .thumb,.addthumb{position:relative;width:88px;height:56px;border-radius:9px;border:1px solid var(--line);background:linear-gradient(180deg,var(--bg2),var(--card));color:var(--muted);font-family:var(--mono);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .thumb.active{border-color:var(--accent);color:var(--text);box-shadow:0 0 0 1px var(--accent) inset}
+    .thumb .x{position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:var(--card);border:1px solid var(--line);font-size:.72rem;display:flex;align-items:center;justify-content:center}
+    .thumb .x:hover{color:#ff8585;border-color:#ff8585}
+    .addthumb{border-style:dashed;font-size:1.25rem;color:var(--accent)}
+    .addthumb:hover{border-color:var(--accent)}
+    .galnote{color:var(--muted);font-size:.82rem;margin:12px 0 0}
+
+    section{padding:48px 0}
+    h2{font-size:1.6rem;margin:0 0 8px}
+    .sub{color:var(--muted);margin:0 0 26px;max-width:62ch}
+
+    /* Vorteile */
+    .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+    .f{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+    .f .ico{font-size:1.5rem;margin-bottom:8px}
+    .f h3{margin:0 0 6px;font-size:1.06rem}
+    .f p{margin:0;color:var(--muted);font-size:.93rem}
+
+    /* Preis / Unterstützen */
+    .price{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .price .big{font-size:1.9rem;font-weight:800}
+    .price .big small{font-size:.95rem;font-weight:500;color:var(--muted)}
+    .price .note{color:var(--muted);font-size:.9rem;max-width:42ch}
+    .btn.gold{background:linear-gradient(135deg,var(--gold),#caa33f);color:#1a1405}
+
+    /* Vertrauen */
+    .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .t{display:flex;gap:11px;align-items:flex-start;font-size:.92rem;color:var(--muted)}
+    .t .d{color:var(--ok);font-size:1.1rem;flex-shrink:0}
+    .t b{color:var(--text)}
+
+    footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:.85rem}
+    footer .frow{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+    footer a{color:var(--muted)}
+    footer a:hover{color:var(--accent)}
+    .badge-soon{font-family:var(--mono);font-size:.7rem;color:var(--gold);border:1px solid var(--gold);border-radius:5px;padding:1px 7px;margin-left:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <span class="brand"><span class="mark"></span>Family<b>Project</b></span>
+      <nav class="top">
+        <a href="#">Start</a>
+        <a href="#">Werkzeuge</a>
+        <a href="#">Marktplatz</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <a class="back" href="#">← zurück zu Family Project</a>
+        <div style="height:14px"></div>
+        <span class="eyebrow">● Werkzeug · läuft im Browser</span>
+        <h1>Such-Werkzeug — findet nach <span class="hl">Bedeutung</span>, nicht nach Stichwörtern.</h1>
+        <p class="lead">
+          Beschreib in eigenen Worten, was du suchst. Das Such-Werkzeug versteht
+          die Absicht dahinter und ordnet die Treffer nach Sinn — komplett im
+          Browser, ohne Server, ohne Konto.
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#">▶ Jetzt öffnen</a>
+          <a class="btn ghost" href="#">⤓ Installieren</a>
+        </div>
+        <div class="microcopy">Kostenlos · keine Anmeldung · funktioniert offline nach dem ersten Öffnen.</div>
+
+        <div class="gallery">
+          <div class="shot">
+            <div class="shot-top"><i></i><i></i><i></i></div>
+            <div class="shot-body">
+              <div class="bubble">🖼️</div>
+              <div class="ph" id="mainlabel">Screenshot 1 — [ vom Anbieter eingefügt ]</div>
+            </div>
+          </div>
+          <div class="thumbs" id="thumbs">
+            <button class="thumb active" data-n="1">1<span class="x" title="entfernen">×</span></button>
+            <button class="thumb" data-n="2">2<span class="x" title="entfernen">×</span></button>
+            <button class="thumb" data-n="3">3<span class="x" title="entfernen">×</span></button>
+            <button class="thumb" data-n="4">4<span class="x" title="entfernen">×</span></button>
+            <button class="addthumb" id="addthumb" title="Screenshot hinzufügen">＋</button>
+          </div>
+          <p class="galnote">
+            Mehrere Screenshots möglich — der Anbieter fügt eigene hinzu (＋) oder
+            entfernt sie (×). Die Bilder liegen <strong>auf der Seite des Anbieters</strong>,
+            nicht auf diesem Server.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>Was es kann</h2>
+        <p class="sub">Vier Dinge, die es nützlich machen — jedes einzeln nutzbar.</p>
+        <div class="feat">
+          <div class="f"><div class="ico">🔍</div><h3>Versteht die Bedeutung</h3><p>Treffer werden nach Bedeutungs-Nähe geordnet, nicht nach zufälligen Stichwörtern. Gratis, ohne Schlüssel.</p></div>
+          <div class="f"><div class="ico">🎤</div><h3>Sprechen statt tippen</h3><p>Frag per Sprache — Deutsch, Englisch, Russisch. Direkt im Browser oder über einen EU-Dienst mit eigenem Schlüssel.</p></div>
+          <div class="f"><div class="ico">🤖</div><h3>KI-Brücke (optional)</h3><p>Frage an ChatGPT, Claude, Gemini oder Perplexity weitergeben, Antwort einfügen, nach Bedeutung sortieren lassen.</p></div>
+          <div class="f"><div class="ico">🔐</div><h3>Dein Schlüssel bleibt bei dir</h3><p>Optionale Schlüssel liegen verschlüsselt nur auf deinem Gerät — nie auf einem fremden Server.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+      <div class="wrap">
+        <h2>Was es kostet</h2>
+        <p class="sub">Das Such-Werkzeug ist kostenlos. Wenn es dir hilft, kannst du die Weiterentwicklung freiwillig unterstützen.</p>
+        <div class="price">
+          <div>
+            <div class="big">0 € <small>· kostenlos nutzen</small></div>
+            <div class="note">Öffnen, nutzen, installieren — ohne Konto, ohne Tracker.</div>
+          </div>
+          <div style="text-align:right">
+            <a class="btn gold" href="#">♡ Spenden <span class="badge-soon">bald</span></a>
+            <div class="note" style="margin-top:8px">Freiwillige Unterstützung (PayPal) — kommt später.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>Worauf du dich verlassen kannst</h2>
+        <p class="sub">Ehrlich und nachprüfbar — kein „vertrau mir".</p>
+        <div class="trust">
+          <div class="t"><span class="d">✓</span><div><b>Deine Daten bleiben in deinem Gerät.</b> Es gibt keinen eigenen Server und kein Nutzerkonto.</div></div>
+          <div class="t"><span class="d">✓</span><div><b>Keine Tracker.</b> Keine Analyse-Software, keine versteckten Verbindungen.</div></div>
+          <div class="t"><span class="d">✓</span><div><b>Außenverbindungen nur auf deine Aktion.</b> Jede ist benannt und sichtbar.</div></div>
+          <div class="t"><span class="d">✓</span><div><b>Offline nutzbar.</b> Nach dem ersten Öffnen läuft es ohne Internet.</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="mark"></span>Family<b>Project</b></span>
+      <a href="#">← zurück zur Startseite</a>
+      <a href="#">Werkzeuge</a>
+      <a href="#">Marktplatz</a>
+      <a href="#" style="margin-left:auto">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Project · Beispiel-Vorlage zur Ansicht.</div>
+  </footer>
+
+  <script>
+    // Demo-Galerie: Auswahl, Entfernen (×), Hinzufügen (＋). Nur Vorschau —
+    // echte Bilder kämen als Link auf die Anbieter-Seite (img src=...).
+    (function () {
+      var thumbs = document.getElementById("thumbs");
+      var addBtn = document.getElementById("addthumb");
+      var label = document.getElementById("mainlabel");
+      var counter = 4;
+      function select(btn) {
+        thumbs.querySelectorAll(".thumb").forEach(function (t) { t.classList.remove("active"); });
+        btn.classList.add("active");
+        label.textContent = "Screenshot " + btn.dataset.n + " — [ vom Anbieter eingefügt ]";
+      }
+      thumbs.addEventListener("click", function (e) {
+        var x = e.target.closest(".x");
+        var thumb = e.target.closest(".thumb");
+        if (x && thumb) {
+          e.stopPropagation();
+          var wasActive = thumb.classList.contains("active");
+          thumb.remove();
+          var first = thumbs.querySelector(".thumb");
+          if (wasActive && first) select(first);
+          else if (!first) label.textContent = "Noch keine Screenshots — mit ＋ hinzufügen";
+          return;
+        }
+        if (thumb) select(thumb);
+      });
+      addBtn.addEventListener("click", function () {
+        counter += 1;
+        var b = document.createElement("button");
+        b.className = "thumb";
+        b.dataset.n = counter;
+        b.innerHTML = counter + '<span class="x" title="entfernen">×</span>';
+        thumbs.insertBefore(b, addBtn);
+        select(b);
+      });
+    })();
+  </script>
+</body>
+</html>
