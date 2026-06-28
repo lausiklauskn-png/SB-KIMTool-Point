@@ -14,10 +14,24 @@ const box = JSON.parse(readFileSync(join(ROOT, "werkzeugkiste.json"), "utf8"));
 
 const MANDATORY = ["was", "nutzen", "verwendung", "einbau", "aktiviert_durch"];
 
-test("catalog: komplett_werkzeuge lists exactly the two Sage tools", () => {
+test("catalog: komplett_werkzeuge lists the Sage tools (two lokal gespiegelt + Pinnwand link-first)", () => {
   assert.ok(Array.isArray(box.komplett_werkzeuge), "komplett_werkzeuge is an array");
   const ids = box.komplett_werkzeuge.map((t) => t.id).sort();
-  assert.deepEqual(ids, ["andock", "mycelknoten"]);
+  assert.deepEqual(ids, ["andock", "mycelknoten", "pinnwand"]);
+});
+
+// Pinnwand is a MULTI-file PWA — bewusst NICHT lokal gespiegelt (Drift-Vermeidung),
+// sondern link-first auf die Live-Quelle. Hier andere Pflichten als bei den
+// Ein-Datei-Spiegeln: Pflichtfelder + Live-Link + Herkunft, aber KEIN datei/sha256.
+test('tool "pinnwand": link-first (Live-Quelle), catalog complete, no local mirror', () => {
+  const t = box.komplett_werkzeuge.find((x) => x.id === "pinnwand");
+  assert.ok(t, "entry exists");
+  for (const f of MANDATORY) {
+    assert.ok(t[f] && t[f].length > 0, `field ${f} present`);
+  }
+  assert.match(t.quelle, /Sage-Protokol/, "live Sage source link recorded");
+  assert.ok(t.herkunft, "origin recorded");
+  assert.ok(!t.datei, "no local mirror file (link-first, Drift-Vermeidung)");
 });
 
 for (const id of ["andock", "mycelknoten"]) {

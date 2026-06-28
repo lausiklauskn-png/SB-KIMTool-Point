@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-20",
+  "lastUpdated": "2026-06-29",
   "hinweis": "Quelle der Werkzeugkiste-Kacheln. sage_status = Reife im Sage-Protokol (verifiziert aus Sage/status.json, 2026-05-29). point_status = Stand hier im Tool-Point. 'vorgebaut-schlummert' heisst: bereits gebaut, springt bei Bedarf an (z.B. Angriff) — NICHT leer. Optionales Feld 'datei' = echte, offline einbaubare Datei in diesem Repo (Seite bietet sie zum Kopieren/Laden an).",
   "stufen": {
     "basic": "Pflicht — bringt den Point/SBKIM ueberhaupt zum Laufen.",
@@ -215,6 +215,37 @@
       "verwendung": "Skripte 03+04+22 nach den Abhaengigkeiten laden (KEIN Auto-Init), dann SbkimSearchWidget.init({...}) rufen — das Widget self-mountet die Blase unten rechts.",
       "einbau": "Drei Skript-Tags (sbkim-embedding.js, sbkim-match.js, sbkim-such-widget.js) + ein init()-Aufruf; optional 21 Spracheingabe.",
       "aktiviert_durch": "Nutzer oeffnet die Such-Blase (semantische Suche on demand)."
+    },
+    {
+      "id": "20", "name": "Schluessel-Safe", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "point_hinweis": "Reif als Code-Stub in Sage (src/modules/20_schluessel_safe.js, Headless-Smoke 19/19 gruen), hier noch NICHT kopiert. Lokal verschluesselter Safe fuer die SBKIM-Identitaet (nodeId + privater Schluessel + Spore): PBKDF2-SHA256 >=600k + AES-GCM-256, Shamir-Recovery 2-von-3 ueber das Passwort. Oeffnet auf Abruf (nicht beim Seitenstart). Browser-Sichttest in Sage ausstehend.",
+      "was": "Lokal verschluesselter Safe fuer die eigene SBKIM-Identitaet (Schluessel + Spore), mit Passwort + Shamir-2-von-3-Wiederherstellung.",
+      "nutzen": "Die Identitaet ueberlebt geloeschte Browserdaten — der private Schluessel liegt verschluesselt, nicht im Klartext, und ist 2-von-3 wiederherstellbar.",
+      "verwendung": "Auf Abruf oeffnen (Einstellungen/Tool), Passwort setzen, drei Anteile sichern; spaeter mit Passwort ODER 2 Anteilen entsperren.",
+      "einbau": "Modul laden (KEIN Auto-Init); Krypto-Kern aus Modul 02 (exportBackup/importBackup) wiederverwendet; Store sbkim_safe ueber Modul 01.",
+      "aktiviert_durch": "Nutzer oeffnet den Safe (SbkimSafe.open())."
+    },
+    {
+      "id": "21", "name": "Spracheingabe", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "point_hinweis": "Reif als Code-Stub in Sage (src/modules/21_spracheingabe.js, Headless-Smoke 45/45 gruen), hier noch NICHT kopiert. Input-agnostische Sprach-Eingabe-Schicht: Dual-Engine Browser Web-Speech + EU Cloud Speech-to-Text (BYOK), mehrsprachig DE/EN/RU, konsequent fail-soft (kein Mic/Key/Netz -> Textfeld bleibt). EU-Politik per Knoten (bindend/frei). Browser-Sichttest (Live-Mic) in Sage ausstehend.",
+      "was": "Sprach-zu-Text-Schicht fuer beliebige Eingabefelder: Browser-Spracherkennung oder EU-Cloud (BYOK), mehrsprachig (DE/EN/RU).",
+      "nutzen": "Eine Frage/Suche einsprechen statt tippen — fail-soft, das Textfeld bleibt immer nutzbar.",
+      "verwendung": "Modul laden, an ein Eingabefeld haengen; Engine waehlen (Browser gratis oder EU-Cloud mit eigenem Schluessel).",
+      "einbau": "Ein Skript-Tag + Bindung ans Suchfeld; optionaler EU-Schluessel; passt mit dem Such-Werkzeug (22) zusammen.",
+      "aktiviert_durch": "Nutzer tippt aufs Mikrofon-Symbol."
+    },
+    {
+      "id": "23", "name": "Rendezvous (gemeinsamer Raum)", "stufe": "pro",
+      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "point_hinweis": "Echte Sage-Datei web/tools/sbkim-rendezvous.js (1:1 aus Sage-Protokol/src/modules/23_rendezvous.js). Loest die Adress-Wand (committete nodeId != lebende nodeId): lebende Knoten treffen sich im geteilten Nostr-Tag sbkim-rdv, heften auf Nutzer-Aktion ihre lebende Visitenkarte ans Brett, ein Suchender liest die Karten und handshaket die LEBENDE ID. DOM-frei + fail-soft, nutzt nur die oeffentlichen Flaechen von 05/05b/02. In Sage LIVE cross-app bewiesen (Sage <-> Mein-Mixarium beidseitig 'ANDOCK ETABLIERT', 2026-06-28). Hier auf werkzeuge.html via assets/rendezvous-init.js gemountet; Browser-Sichttest am Point ungeprueft.",
+      "datei": "web/tools/sbkim-rendezvous.js",
+      "was": "Gemeinsamer Raum, in dem lebende Knoten ihre echte Visitenkarte (Spore) ans Brett heften und einander finden — server-los ueber ein Nostr-Relais.",
+      "nutzen": "Loest die Adress-Wand: man handshaket die LEBENDE Identitaet eines Knotens, nicht eine veraltete committete — Andocken zwischen wirklich laufenden Apps.",
+      "verwendung": "Auf Nutzer-Aktion anmelden ('Mit dem Netz verbinden') + Raum lesen ('Wer ist im Raum?'); kein Dauer-Piepser (Empfangsmodus).",
+      "einbau": "Modul + UI nach dem Stack (05/05b/02) laden; pro App kopieren (lebende Identitaet ist pro Origin getrennt).",
+      "aktiviert_durch": "Nutzer verbindet sich mit dem Raum / sucht Anwesende."
     }
   ],
   "komplett_werkzeuge_hinweis": "Komplett-Werkzeuge sind vollstaendige Ein-Datei-PWAs (kein Build, keine Abhaengigkeiten), gepflegt von Sage-Protokol (Spec-Hub). Hier 1:1 lokal gespiegelt (Offline-Default, web/tools/) PLUS Live-Link zur Sage-Quelle. byte-kompatibel mit Sage; nicht veraendert; gegenpruefbar ueber sha256. Quelle/Stand: Sage docs/observatorium/tools (PR #318), geholt 2026-06-20.",
@@ -244,6 +275,17 @@
       "verwendung": "Datei oeffnen; das schwebende Panel unten rechts zeigt den Live-Zustand (vier Lampen); ueber die echten Module andocken.",
       "einbau": "Eine einzelne HTML-Datei 1:1 ins eigene Repo kopieren; offline lauffaehig, keine Dependencies (Modelle/CDN nur im Embedding-Schritt).",
       "aktiviert_durch": "Oeffnen der Datei (Live-Lampen springen an); FREMD-Lampe bei Angriff (Membran 15)."
+    },
+    {
+      "id": "pinnwand", "name": "Pinnwand (Frage-Antwort-Brett)", "kategorie": "komplett-werkzeug",
+      "quelle": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
+      "herkunft": "Sage-Protokol (Spec-Hub)",
+      "point_status": "real-browser-tauglich · extern · live bei Sage gepflegt · hier (noch) nicht lokal gespiegelt (mehrteilige PWA, Drift-Vermeidung)",
+      "was": "Vollstaendige PWA: ein oeffentliches Frage-Antwort-Brett ueber ein geborgtes Nostr-Relais. Antworten lassen sich nach BEDEUTUNG sortieren (zentriertes Embedding, Modul 03) — gratis als ehrliche RANGFOLGE, kein Verwandt-Urteil. Optionaler KI-Richter (opt-in/BYOK: Claude/Gemini/OpenRouter oder gratis WebLLM im Browser) versteht Absicht/Verneinung ('alkoholfrei = KEIN Alkohol').",
+      "nutzen": "Zeigt server-los Frage->Antwort + die ehrliche Zwei-Stufen-Lesart: gratis Cosinus = Rangfolge, KI-Richter = Urteil. Live in Klaus' Browser bestaetigt (2026-06-29).",
+      "verwendung": "Live-Seite oeffnen, Frage aufs Brett legen, optional 'nach Bedeutung sortieren', optional KI-Richter zuschalten (eigener Schluessel oder gratis Browser-KI).",
+      "einbau": "Vollstaendige PWA von Sage; als Vorlage/Studie fuer eigene Q&A-Bretter. Mehrteilig (index.html + modules/) — bewusst nicht lokal gespiegelt, um Drift zu vermeiden; die Live-Quelle gilt.",
+      "aktiviert_durch": "Nutzer oeffnet das Brett / sortiert nach Bedeutung / schaltet den KI-Richter zu."
     }
   ]
 }

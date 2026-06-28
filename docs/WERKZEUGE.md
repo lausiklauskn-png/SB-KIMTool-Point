@@ -58,6 +58,24 @@ verändert (per `sha256` gegenprüfbar). Geholt 2026-06-20 aus Sage `docs/observ
 - **Aktiviert durch:** Öffnen der Datei (Live-Lampen springen an); FREMD-Lampe bei Angriff (15).
 - **Herkunft/Pflege:** `web/tools/KOMPLETT-WERKZEUGE.herkunft.md` (Sage-README, mitgespiegelt).
 
+#### Pinnwand (Frage-Antwort-Brett)  ✅ (browser-tauglich · extern · **link-first**, nicht lokal gespiegelt)
+- Live-Quelle: <https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/> — **mehrteilige PWA**
+  (`index.html` + `modules/`), daher **bewusst nicht lokal gespiegelt** (Drift-Vermeidung); die
+  Live-Quelle gilt.
+- **Was:** Öffentliches Frage-Antwort-Brett über ein geborgtes **Nostr-Relais**. Antworten lassen
+  sich nach **Bedeutung** sortieren (zentriertes Embedding, Modul 03) — gratis als ehrliche
+  **Rangfolge**, kein Verwandt-Urteil. Optionaler **KI-Richter** (opt-in/BYOK: Claude/Gemini/
+  OpenRouter **oder gratis WebLLM im Browser**) versteht Absicht/Verneinung („alkoholfrei = KEIN
+  Alkohol").
+- **Nutzen:** Zeigt server-los Frage→Antwort **und** die ehrliche Zwei-Stufen-Lesart:
+  gratis Cosinus = **Rangfolge**, KI-Richter = **Urteil**.
+- **Verwendung:** Live-Seite öffnen → Frage aufs Brett → optional „nach Bedeutung sortieren" →
+  optional KI-Richter zuschalten (eigener Schlüssel oder gratis Browser-KI).
+- **Einbau:** Vollständige PWA von Sage; als Vorlage/Studie für eigene Q&A-Bretter.
+- **Aktiviert durch:** Nutzer öffnet das Brett / sortiert / schaltet den KI-Richter zu.
+- **Ehrlich:** In **Klaus' Browser bestätigt (2026-06-29)** — gratis Cosinus stellt „echte
+  Alkoholcocktails" sichtbar über harmlose Treffer (Beweis: Rangfolge, kein Absichts-Urteil).
+
 ---
 
 ## BASIC — Pflicht
@@ -222,6 +240,36 @@ verändert (per `sha256` gegenprüfbar). Geholt 2026-06-20 aus Sage `docs/observ
   Hälfte (verstehen + sortieren) bewiesen. Die volle **bidirektionale Cross-Knoten-Suche
   server-los** ist noch NICHT end-to-end gezeigt (siehe `docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md`).
   Sichtbares Panel im Browser: **wartet auf Klaus' Browser-Lauf**.
+
+### 23 · Rendezvous (gemeinsamer Raum)  ○ · 1:1 aus Sage · `web/tools/sbkim-rendezvous.js`
+- **Was:** Gemeinsamer Raum, in dem **lebende** Knoten ihre echte Visitenkarte (Spore) ans
+  Brett heften und einander finden — server-los über ein **Nostr-Relais** (Tag `sbkim-rdv`).
+- **Nutzen:** Löst die **Adress-Wand** (committete ≠ lebende `nodeId`): man handshaket die
+  **lebende** Identität eines wirklich laufenden Knotens.
+- **Verwendung:** Auf Nutzer-Aktion „🌐 Mit dem Netz verbinden" (anmelden) + „👥 Wer ist im
+  Raum?" (lesen). Kein Dauer-Piepser (Empfangsmodus).
+- **Einbau:** Modul + UI nach dem Stack (05/05b/02) laden; **pro App** kopieren (lebende
+  Identität ist pro Origin getrennt). Auf `werkzeuge.html` via `assets/rendezvous-init.js`.
+- **Aktiviert durch:** Nutzer verbindet sich mit dem Raum / sucht Anwesende.
+- **Ehrlich:** In **Sage LIVE cross-app bewiesen** (Sage ↔ Mein-Mixarium beidseitig „ANDOCK
+  ETABLIERT", 2026-06-28). Browser-Sichttest am Point: **wartet auf Klaus**.
+
+### 20 · Schlüssel-Safe  ○ · reif in Sage · hier **noch nicht kopiert**
+- **Was:** Lokal verschlüsselter Safe für die eigene SBKIM-Identität (Schlüssel + Spore),
+  Passwort + **Shamir-2-von-3**-Wiederherstellung (PBKDF2-SHA256 ≥600k + AES-GCM-256).
+- **Nutzen:** Die Identität überlebt gelöschte Browserdaten; der private Schlüssel liegt nie
+  im Klartext und ist 2-von-3 wiederherstellbar.
+- **Verwendung:** Auf Abruf öffnen, Passwort setzen, drei Anteile sichern; später mit Passwort
+  ODER 2 Anteilen entsperren. **Aktiviert durch:** `SbkimSafe.open()`.
+- **Ehrlich:** Reif als Code-Stub in Sage (Headless-Smoke 19/19), **hier noch nicht kopiert**.
+
+### 21 · Spracheingabe  ○ · reif in Sage · hier **noch nicht kopiert**
+- **Was:** Sprach-zu-Text-Schicht für beliebige Eingabefelder — Browser-Spracherkennung oder
+  EU-Cloud (BYOK), mehrsprachig DE/EN/RU, konsequent fail-soft.
+- **Nutzen:** Eine Frage/Suche **einsprechen** statt tippen; das Textfeld bleibt immer nutzbar.
+- **Verwendung:** Ans Eingabefeld hängen, Engine wählen (Browser gratis oder EU mit Schlüssel);
+  passt mit dem Such-Werkzeug (22) zusammen. **Aktiviert durch:** Tipp aufs Mikrofon-Symbol.
+- **Ehrlich:** Reif als Code-Stub in Sage (Headless-Smoke 45/45), **hier noch nicht kopiert**.
 
 ---
 

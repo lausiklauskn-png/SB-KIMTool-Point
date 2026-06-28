@@ -51,6 +51,7 @@ const TOOL_FILES = {
   "17": "web/tools/sbkim-floating-widget.js",
   "18": "web/tools/sbkim-tool-pwa.js",
   "22": "web/tools/sbkim-such-widget.js",
+  "23": "web/tools/sbkim-rendezvous.js",
 };
 
 async function renderWerkzeuge() {
@@ -196,12 +197,17 @@ async function renderKomplettWerkzeuge() {
           <dt>Aktiviert durch</dt><dd>${t.aktiviert_durch}</dd>
         </dl>
       </details>
+      ${t.datei ? `
       <div class="actions">
         <a class="get" href="${t.datei}" target="_blank" rel="noopener">▶ Öffnen</a>
         <a class="get download" href="${t.datei}" download>⬇ Herunterladen</a>
         <a class="get download" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live-Quelle (Sage)</a>
         <p class="getnote">Lokal gespiegelt (<code>${t.datei}</code>) · byte-kompatibel · sha256 ${t.sha256}</p>
-      </div>`;
+      </div>` : `
+      <div class="actions">
+        <a class="get" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live öffnen (Sage)</a>
+        <p class="getnote">${t.point_status || "Live bei Sage gepflegt · hier (noch) nicht lokal gespiegelt"}</p>
+      </div>`}`;
     grid.appendChild(el);
   }
 }
