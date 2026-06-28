@@ -70,6 +70,16 @@ Vor dem nächsten Bau-Schritt / Brief:
 4. Immer gegen das **aktuelle `main`** arbeiten, nicht gegen Branch-Erwartungen.
 5. Setzt ein Schritt ungemergte PRs voraus, diese **explizit benennen** oder zuerst mergen lassen.
 
+**⚠️ Achtsamkeit: vor dem Bauen die Basis prüfen (wenn sinnvoll, Klaus 2026-06-28).**
+Bevor du baust, vergewissere dich — wo es sinnvoll ist —, dass der Arbeits-Branch auf dem
+**neuesten Stand** aufsetzt und nicht auf einem **veralteten Branch**: `git fetch origin main`,
+dann sicherstellen, dass der Branch den aktuellen `main` (bzw. die richtige Basis) enthält
+(z. B. `git reset --hard origin/main`, solange keine eigenen unveröffentlichten Commits
+verloren gehen — vorher mit `git log origin/main..HEAD` prüfen). Das ist **nicht immer Pflicht**,
+aber besonders wichtig, wenn Arbeit über **mehrere noch nicht gemergte PRs** gestapelt wird —
+sonst baust du auf einem alten Stand und „es ändert sich nichts". Im Zweifel kurz prüfen, dann
+bauen. Selbstständiges Merken/Bauen/Mergen ist erlaubt — **achtsam** auf die Basis.
+
 **Merge entscheidet Klaus.** Ich bereite vor (Draft-PR, Test-Plan) und merge nur auf
 ausdrückliche Ansage. Niemals auf einen anderen als den vorgegebenen Branch pushen
 ohne ausdrückliche Erlaubnis.

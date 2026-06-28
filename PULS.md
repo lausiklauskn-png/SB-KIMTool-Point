@@ -2,6 +2,30 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-06-28 — Modul 23 Rendezvous + öffentlicher „🌐 Mit dem Netz verbinden"-Knopf
+
+Branch `claude/module-23-rendezvous-rollout-zqaa8u` (zuerst frisch auf `origin/main`
+gesetzt — Achtsamkeits-Regel, siehe CLAUDE.md). Rollout des **gemeinsamen Raums**
+(Modul 23, aus Sage) auf den vorhandenen Stack:
+
+- `web/tools/sbkim-rendezvous.js` + `sbkim-rendezvous-ui.js` — **byte-1:1** aus
+  `Sage-Protokol/src/modules/23_rendezvous(.ui).js` (kopieren, nicht klonen).
+- `werkzeuge.html` lädt beide nach dem Stack + `assets/rendezvous-init.js` mountet
+  den öffentlichen Knopf (`SbkimRendezvousUI.init`, nodeName „SB-KIMTool-Point",
+  `createIdentity` über das vorhandene `SbkimEmbedding`+`SbkimSpore` mit der
+  committeten Domänen-Beschreibung → Match-Wert zu den Nachbarn ≥ 0.80 bleibt).
+- **Kein Doppel-Laden:** der Stack (Anastomose/Relais/Spore/Embedding) ist auf
+  `werkzeuge.html` bereits da; nur Modul 23 + UI + Init kamen dazu. Kern unangetastet.
+- Löst die **Adress-Wand** (committete ≠ lebende nodeId) per Raum `sbkim-rdv`.
+- **Verifikation:** Headless-Chromium 9/9 (Knopf mountet, Panel toggelt,
+  `_meta.nodeName` „SB-KIMTool-Point", Stack vorhanden), `npm test` **148/148** grün.
+- **CLAUDE.md:** Achtsamkeits-Regel „vor dem Bauen die Basis prüfen (wenn sinnvoll)"
+  im PR-Workflow verankert (Klaus 2026-06-28).
+- §11.6: `sbkim/SIGNAL.json` seq 27.
+
+**Offen:** Browser-Live-Test durch Klaus (z. B. SB-KIMTool-Point ↔ Sage/family/
+Mixarium → „ETABLIERT"; nach Pull Hard-Reload nicht nötig — kein Service-Worker).
+
 ## Nachtrag 2026-06-27 — Stufe 2: Auto-Lauschen am Nostr-Relais
 
 `main` in den Session-Branch gemerget (Branch hing 117 Commits hinter `main`). Dann
