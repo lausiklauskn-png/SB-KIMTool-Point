@@ -2,6 +2,43 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-08 — Identitäts-Hygiene: eigener dbSuffix `toolpoint` (Schritt 1)
+
+Branch `claude/sbkim-identity-hygiene-6pqf1h` (zuerst frisch auf `origin/main` gesetzt —
+der lokale Branch war der alte Gründungs-Stand, 124 Commits hinter `main`, seine Commits
+alle bereits in `main`; darum `git checkout -B … origin/main`). Netzweite SBKIM-Identitäts-
+Hygiene, Teil 1 (Skill `saubere-netz-anmeldung`, Modus A / eigene Schublade):
+
+**Befund (der Browser als schwarzes Loch):** alle Endknoten liegen unter EINER Origin
+`lausiklauskn-png.github.io`; IndexedDB hängt an der Origin, nicht am Pfad. SB-KIMTool-Point
+initialisierte den SBKIM-Storage **nicht** mit eigenem `dbSuffix` → Identität landete in der
+geteilten Default-DB `sbkim`, mehrere Apps zeigten dieselbe nodeId auf der Mycel-Karte.
+Drei Kollisions-Flächen auf dieser Origin gefunden + geheilt (alle → `sbkim_toolpoint`):
+
+- **`werkzeuge.html`** (der 🌐-„Mit dem Netz verbinden"-Knopf = die eigentliche Mycel-Karten-
+  Anmeldung): lud den vollen Stack, rief aber **nie** `SbkimStorage.init({dbSuffix})`. Neu:
+  `assets/sbkim-storage-init.js` (Modus A, idempotent, fail-soft) direkt NACH
+  `sbkim-storage.js` und VOR Spore/Anastomose/Rendezvous/nostr-listen geladen → läuft als
+  ERSTER `init()` synchron beim Parsen und sperrt die Schublade `sbkim_toolpoint`.
+- **`web/tools/mycelknoten.html`** Z. 10121: Fremd-Suffix `"blp"` (BookLedgerPro-Copy-Paste)
+  → `"toolpoint"`. Storage-init ist bereits erstes Glied der `initChain`.
+- **`jasons-bibliothek/index.html`**: `getOrCreateIdentity()`-Knöpfe ohne vorherigen
+  Storage-init → jetzt `init({dbSuffix:"toolpoint"})` im Wiring, vor jedem Knopf-Auslöser.
+- **`werkzeugkiste.json`**: Drift-Guard-`sha256` von `mycelknoten.html` nachgezogen.
+
+**Verifikation:** `npm test` **96/96** node-Tests + **148/148** Smoke-Proben grün;
+`node --check assets/sbkim-storage-init.js` ok. **Browser-Sichttest der Mycel-Karte
+(eigene nodeId, keine Kollision) wartet auf Klaus' Browser-Lauf.**
+
+**Mirror-Hinweis (an Klaus/Sage):** `mycelknoten.html` ist ein Sage-Spiegel; die lokale
+`blp→toolpoint`-Heilung weicht bewusst vom Upstream ab. Damit ein Re-Mirror `blp` nicht
+zurückholt, sollte Sages Quelle (`docs/observatorium/tools/mycelknoten.html`) den festen
+`blp`-Suffix ebenfalls ablegen (generisch/Platzhalter oder App-eigen). Notiert für Folge.
+
+**Offen (Schritt 2, eigene Bau-Sitzung):** Modul 23 um die Hygiene-Schritte erweitern
+(Modus A automatisch + Modus B Reinigen-Knopf), als kopierbares Modul + Demo-Repo.
+Plan-vor-Code — wartet auf Klaus' Freigabe (Demo-Repo-Name offen).
+
 ## Nachtrag 2026-06-29 — Werkzeugkiste-Katalog auf den neuen Sage-Stand gezogen (20/21/23 + Pinnwand)
 
 Branch `claude/pinnwand-verwandt-ki-iyzpi7` (zuerst frisch auf `origin/main` gesetzt —

@@ -268,7 +268,7 @@
       "datei": "web/tools/mycelknoten.html",
       "quelle": "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/docs/observatorium/tools/mycelknoten.html",
       "herkunft": "Sage-Protokol (Spec-Hub)",
-      "sha256": "297b76388604782099ecf2b5127ce3542085266962169d87b4b1958e8ad7a4d5",
+      "sha256": "bedb99f7a0462dcbe8c564c01d5ec87f6970f62c2a44b2fd89eb23c7951c427b",
       "point_status": "real-browser-tauglich · extern · von Sage gepflegt · lokal gespiegelt 2026-06-20",
       "was": "Vollstaendige Ein-Datei-PWA. Buendelt die echten, unveraenderten Sage-Module 01/02/03/04/05/07/15/16/17 in einer Datei, inkl. Live-Lampen-Widget (LEBT / VERKEHR / FREMD / SIEGEL).",
       "nutzen": "Referenz-Knoten zum Anschauen und Andocken — zeigt die echten Module live in Aktion (Identitaet, Match, Membran-Schutz, Siegel).",

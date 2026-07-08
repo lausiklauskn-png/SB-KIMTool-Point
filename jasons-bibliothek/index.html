@@ -2883,6 +2883,13 @@
   }
 
   // ---- Wiring ----
+  // Identitäts-Hygiene: SBKIM-Identität in die EIGENE Schublade dieser Origin
+  // (sbkim_toolpoint) legen, bevor ein Knopf getOrCreateIdentity auslöst —
+  // sonst landet sie in der geteilten Default-DB "sbkim" (Kollision auf
+  // lausiklauskn-png.github.io). Fail-soft; idempotent (erster init sperrt).
+  if (window.SbkimStorage && typeof window.SbkimStorage.init === "function") {
+    try { window.SbkimStorage.init({ dbSuffix: "toolpoint" }); } catch (e) {}
+  }
   $("btn-add").addEventListener("click", function () { $("file-add").click(); });
   $("file-add").addEventListener("change", function (ev) {
     var f = ev.target.files && ev.target.files[0];
