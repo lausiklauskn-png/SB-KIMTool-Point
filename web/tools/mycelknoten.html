@@ -10118,7 +10118,7 @@ echte Module von Sage-Protokol, unverändert gebündelt.</small></p>
   async function initChain(){
     async function step(name, fn){ try { await fn(); } catch(e){ log("init " + name + ": " + (e&&e.message||e)); } }
     var storageOk = true;
-    try { await window.SbkimStorage.init({ dbSuffix: "blp" }); }
+    try { await window.SbkimStorage.init({ dbSuffix: "toolpoint" }); }
     catch(e){ storageOk = false; log("init Storage: " + (e&&e.message||e)); }
     if (!storageOk){ log("Storage fehlgeschlagen — Abbruch der Kette."); return; }
     await step("Spore",      function(){ return window.SbkimSpore.init(); });
