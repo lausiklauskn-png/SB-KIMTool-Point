@@ -14,11 +14,19 @@
  * generateOwnSpore, mit der committeten Domänen-Beschreibung, damit der
  * Match-Wert zu den anderen Knoten (≥ 0.80) erhalten bleibt.
  *
+ * IDENTITÄTS-HYGIENE (Schritt 2, 2026-07-08): dieselbe Schublade wie
+ * assets/sbkim-storage-init.js (`sbkim_toolpoint`). Beim Mounten läuft
+ * Modus A (SbkimRendezvous.ensureIdentity) — sanft, automatisch, idempotent,
+ * NICHT zerstörend, KEINE Netz-Aktion: stellt die eigene Schublade + eine
+ * stabile Identität sicher. Der Modus-B-Knopf (Aufräumen) sitzt im Panel.
+ *
  * VERFASSUNGSTREU: nutzer-ausgelöst, init mountet nur den Knopf (kein Auto-
  * Connect, kein Dauer-Piepser). Fail-soft. Muster: assets/nostr-listen-init.js.
  */
 (function () {
   "use strict";
+
+  var DB_SUFFIX = "toolpoint";  // == assets/sbkim-storage-init.js
 
   var CFG = {
     nodeName: "SB-KIMTool-Point",
@@ -51,13 +59,32 @@
   }
 
   function mount() {
+    // Modul 23 mit eigener Schublade + app-eigenem Identitäts-Erzeuger
+    // konfigurieren, dann Modus A (sanft, lokal, idempotent) fahren.
+    if (window.SbkimRendezvous && typeof window.SbkimRendezvous.init === "function") {
+      try {
+        window.SbkimRendezvous.init({
+          nodeName: CFG.nodeName,
+          dbSuffix: DB_SUFFIX,
+          createIdentity: createIdentity,
+          ensureIdentity: true,   // Modus A: eigene Schublade + Identität sicherstellen
+        });
+      } catch (e) {
+        console.warn("[SBKIMTool] Rendezvous-Modul-Init (Modus A) übersprungen:", e);
+      }
+    }
     if (!window.SbkimRendezvousUI) {
       console.warn("[SBKIMTool] SbkimRendezvousUI nicht geladen — web/tools/sbkim-rendezvous-ui.js fehlt?");
       return;
     }
     try {
-      window.SbkimRendezvousUI.init({ nodeName: CFG.nodeName, corner: "bl", createIdentity: createIdentity });
-      console.info("[SBKIMTool] Rendezvous-UI gemountet (öffentlicher 🌐-Knopf).");
+      window.SbkimRendezvousUI.init({
+        nodeName: CFG.nodeName,
+        dbSuffix: DB_SUFFIX,
+        corner: "bl",
+        createIdentity: createIdentity,
+      });
+      console.info("[SBKIMTool] Rendezvous-UI gemountet (öffentlicher 🌐-Knopf, Modus A aktiv).");
     } catch (e) {
       console.warn("[SBKIMTool] Rendezvous-UI übersprungen:", e);
     }

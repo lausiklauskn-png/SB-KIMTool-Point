@@ -2,6 +2,41 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-08 — Identitäts-Hygiene Schritt 2: Modul 23 „Mit dem Netz verbinden“ + Modus A/B
+
+Branch `claude/identity-hygiene-module-23-5lh0tm` (frisch auf `origin/main` gesetzt — der lokale
+Branch war alter Gründungs-Stand, 0 Commits ahead). Erweiterung von Modul 23 (Rendezvous) um die
+zwei Hygiene-Modi aus dem Skill `saubere-netz-anmeldung` — Kern-Module 01/02/05/05b/23 nur über
+öffentliche Flächen, TABU (0.80-Riegel / DB_VERSION / PROTOCOL_VERSION) unberührt.
+
+**Getan (`web/tools/sbkim-rendezvous.js` + `-ui.js` + `assets/rendezvous-init.js`):**
+- **Modus A — `ensureIdentity(opts?)`** (sanft, automatisch, idempotent, NICHT zerstörend, KEINE
+  Netz-Aktion): eigene Schublade `sbkim_<suffix>` sicherstellen (`SbkimStorage.init`, idempotent) →
+  Identität sicherstellen (`getOrCreateIdentity`, nur wenn keine da). Läuft bei `init({ensureIdentity:true})`.
+- **Modus B — `repairAndReconnect(opts?)`** (zerstörend, NUR hinter Nutzer-Knopf): `cleanupSharedOrigin()`
+  reinigt **nur die eigene Origin** — löscht den geteilten Alt-Topf `sbkim` (NIE `sbkim_toolpoint`),
+  meldet alle Service-Worker ab, leert alle Caches → eigene Schublade sicherstellen → (opt.
+  `newIdentity:true` entfernt die aktive Identität) → `connectAndAnnounce` (Identität+Spore+Anmelden)
+  → `reloadHint` „hart neu laden“. Fail-soft in jedem Teilschritt.
+- **UI:** neuer dezenter Knopf „🧹 Aufräumen & neu anmelden“ im Rendezvous-Panel (ruft Modus B, zeigt
+  Reinigungs-Bilanz + Reload-Hinweis). `-ui.js` reicht jetzt `dbSuffix`+`createIdentity` an das Modul durch.
+- **`assets/rendezvous-init.js`:** fährt beim Mounten Modus A (`ensureIdentity`, Schublade `toolpoint`)
+  und konfiguriert Modul+UI mit `dbSuffix`/`createIdentity`. Verfassungstreu: kein Auto-Connect.
+
+**Verifiziert (headless):** `node --test` **103/103** (neu `test/rendezvous_hygiene.test.js` 7/7:
+Modus-A-Idempotenz, fail-soft ohne Spore, `init({ensureIdentity})`, cleanup löscht nur `sbkim`,
+Modus-B-Anmelden+Reload-Hinweis, `newIdentity`), Standalone-Smoke **148/148**. Alle drei geänderten
+JS-Dateien `node --check` grün.
+
+**Offen / nächste Schritte:**
+- **Demo-/Vorlage-Repo `lausiklauskn-png/netz-anmeldung`** (neues, öffentliches Repo wie `such-tool/`)
+  — bewusst NICHT eigenmächtig angelegt (neues öffentliches Repo = schwer umkehrbar, außerhalb des
+  Session-Scopes). Wartet auf Klaus' Ja (Chat-Frage gestellt). Byte-Kopie der Modul-Dateien + eigener
+  Drift-Guard folgt dann.
+- **Netzweiter Rollout** derselben Modus-A/B-Erweiterung in die übrigen PWAs (Mixarium/Rezeptbuch/BLP/
+  family-project) — je eigener PR pro Repo.
+- **Browser-Sichttest** (Modus-B-Knopf real, echtes IndexedDB/SW-Löschen) **wartet auf Klaus' Browser-Lauf**.
+
 ## Nachtrag 2026-07-08 — Identitäts-Hygiene: eigener dbSuffix `toolpoint` (Schritt 1)
 
 Branch `claude/sbkim-identity-hygiene-6pqf1h` (zuerst frisch auf `origin/main` gesetzt —

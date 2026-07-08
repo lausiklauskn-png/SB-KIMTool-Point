@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
-  "lastBuild": "2026-06-28",
-  "seq": 27,
-  "headline": "Modul 23 RENDEZVOUS + oeffentlicher Knopf 'Mit dem Netz verbinden' ausgerollt. web/tools/sbkim-rendezvous.js + sbkim-rendezvous-ui.js byte-1:1 aus Sage src/modules/23_rendezvous(.ui).js; werkzeuge.html laedt beide + assets/rendezvous-init.js mountet SbkimRendezvousUI (nodeName SB-KIMTool-Point, createIdentity ueber vorhandenes SbkimEmbedding+SbkimSpore mit committeter Domaenen-Beschreibung). Nutzt den vorhandenen Stack (Anastomose/Relais/Spore) - kein Doppel-Laden, Kern unangetastet. Loest die Adress-Wand (committete != lebende nodeId) per gemeinsamem Raum sbkim-rdv. Headless-Chromium 9/9, npm test 148/148. Verfassungstreu (nutzer-ausgeloest). Achtsamkeits-Regel 'vor dem Bauen Basis pruefen' in CLAUDE.md verankert (Klaus). Browser-Sichttest (Live-Cross-App) wartet auf Klaus.",
+  "lastBuild": "2026-07-08",
+  "seq": 28,
+  "headline": "Identitaets-Hygiene Schritt 2: Modul 23 (Rendezvous) um Modus A/B erweitert (Skill saubere-netz-anmeldung). Modus A ensureIdentity() - sanft/automatisch/idempotent/nicht-zerstoerend: eigene Schublade sbkim_toolpoint + Identitaet sicherstellen, keine Netz-Aktion. Modus B repairAndReconnect() - nutzer-ausgeloester Knopf, zerstoerend: cleanupSharedOrigin() loescht NUR den geteilten Alt-Topf sbkim (NIE sbkim_toolpoint) + meldet Service-Worker ab + leert Caches, dann frische Identitaet+Spore+Anmelden+Reload-Hinweis. UI-Knopf 'Aufraeumen & neu anmelden' im Rendezvous-Panel; assets/rendezvous-init.js faehrt Modus A beim Mount. Kern-Module + TABU (0.80-Riegel/DB_VERSION/PROTOCOL_VERSION) unberuehrt, fail-soft. node --test 103/103 (neu rendezvous_hygiene.test.js 7/7), Smoke 148/148. Kim-Bell wird das kopierbare Netz-Anmeldung-Tool (Klaus 2026-07-08). Browser-Sichttest wartet auf Klaus.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
