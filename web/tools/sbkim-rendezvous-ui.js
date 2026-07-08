@@ -9,6 +9,9 @@
  *   🌐 Mit dem Netz verbinden   → SbkimRendezvous.connectAndAnnounce({createIdentity})
  *   👥 Wer ist im Raum?         → SbkimRendezvous.discover() → Karten + 🤝 Andocken
  *   📌 Nur neu anmelden         → SbkimRendezvous.announce()
+ *   🧹 Aufräumen & neu anmelden → SbkimRendezvous.repairAndReconnect() (Modus B,
+ *                                 zerstörend: reinigt NUR die eigene Origin, dann
+ *                                 frische Identität + Spore + Anmelden + Reload-Hinweis)
  *
  * Dieses UI-Modul wird — wie Modul 23 selbst — **byte-1:1 in jede PWA kopiert**.
  * Die App parametrisiert nur:
@@ -39,7 +42,7 @@
 
   var VERSION = "0.1";
 
-  var cfg = { nodeName: "SBKIM-Knoten", createIdentity: null, corner: "bl", accent: null };
+  var cfg = { nodeName: "SBKIM-Knoten", createIdentity: null, dbSuffix: null, corner: "bl", accent: null };
   var mounted = false;
   var btnEl = null, panelEl = null, outEl = null, cardsEl = null;
 
@@ -112,6 +115,16 @@
     row.appendChild(connectBtn); row.appendChild(discoverBtn); row.appendChild(announceBtn);
     panelEl.appendChild(row);
 
+    // Modus B — Reparatur/Aufräumen (zerstörend, bewusst separat + dezent).
+    var repairRow = el("div", "margin-top:8px");
+    var repairBtn = el("button", "padding:6px 11px;border-radius:8px;border:1px dashed var(--line,#5a4a3a);" +
+      "background:transparent;color:#e6b980;cursor:pointer;font:inherit;font-size:.76rem",
+      "🧹 Aufräumen & neu anmelden"); repairBtn.type = "button";
+    repairBtn.title = "Löscht den geteilten Alt-Speicher dieser Adresse (nicht deine eigene Schublade), " +
+      "meldet Service-Worker ab, erzeugt eine frische Identität und meldet dich neu an. Danach hart neu laden.";
+    repairRow.appendChild(repairBtn);
+    panelEl.appendChild(repairRow);
+
     cardsEl = el("div", "margin-top:10px");
     cardsEl.id = "sbkim-rdv-cards";
     panelEl.appendChild(cardsEl);
@@ -132,6 +145,7 @@
     connectBtn.addEventListener("click", function () { onConnect(); });
     discoverBtn.addEventListener("click", function () { onDiscover(); });
     announceBtn.addEventListener("click", function () { onAnnounce(); });
+    repairBtn.addEventListener("click", function () { onRepair(); });
 
     mounted = true;
   }
@@ -139,7 +153,7 @@
   function ensureRdv() {
     var r = rdv();
     if (!r) { setOut("Modul 23 (SbkimRendezvous) nicht geladen."); return null; }
-    try { r.configure({ nodeName: cfg.nodeName }); } catch (_e) {}
+    configModule();
     return r;
   }
 
@@ -168,6 +182,32 @@
       if (res.ok) appendOut("✓ Du bist im Raum (nodeId " + res.nodeId + "). Lass den Tab offen.");
       else appendOut("✗ " + (res.reason || "Anmelden fehlgeschlagen."));
     }).catch(function (e) { appendOut("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+  }
+
+  function onRepair() {
+    var r = ensureRdv();
+    if (!r) return;
+    if (typeof r.repairAndReconnect !== "function") {
+      setOut("Aufräumen ist in dieser Version noch nicht verfügbar (Modul 23 zu alt).");
+      return;
+    }
+    setOut("🧹 Räume den geteilten Alt-Speicher dieser Adresse auf …\n");
+    r.repairAndReconnect().then(function (res) {
+      var c = res && res.cleaned;
+      if (c) {
+        appendOut("• Alt-Topf „sbkim“ gelöscht: " + (c.dbDeleted ? "ja" : "nein") + "\n");
+        appendOut("• Service-Worker abgemeldet: " + (c.swUnregistered || 0) + "\n");
+        appendOut("• Caches geleert: " + (c.cachesDeleted || 0) + "\n");
+      }
+      if (res && res.ok) {
+        if (res.created) appendOut("✓ Frische Identität: " + res.nodeId + "\n");
+        else appendOut("Identität (eigene Schublade): " + res.nodeId + "\n");
+        appendOut("✓ Neu im Raum angemeldet.\n");
+      } else {
+        appendOut("✗ " + ((res && res.reason) || "Neu-Anmelden fehlgeschlagen.") + "\n");
+      }
+      if (res && res.reloadHint) appendOut("\nℹ️ " + res.reloadHint);
+    }).catch(function (e) { appendOut("✗ Aufräumen fehlgeschlagen: " + (e && e.message ? e.message : e)); });
   }
 
   function onDiscover() {
@@ -241,14 +281,23 @@
     if (!opts || typeof opts !== "object") return;
     if (typeof opts.nodeName === "string" && opts.nodeName.length > 0) cfg.nodeName = opts.nodeName;
     if (typeof opts.createIdentity === "function") cfg.createIdentity = opts.createIdentity;
+    if (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) cfg.dbSuffix = opts.dbSuffix;
     if (typeof opts.corner === "string") cfg.corner = opts.corner;
     if (typeof opts.accent === "string") cfg.accent = opts.accent;
   }
 
+  function configModule() {
+    var r = rdv();
+    if (!r) return;
+    var o = { nodeName: cfg.nodeName };
+    if (cfg.dbSuffix) o.dbSuffix = cfg.dbSuffix;
+    if (typeof cfg.createIdentity === "function") o.createIdentity = cfg.createIdentity;
+    try { r.configure(o); } catch (_e) {}
+  }
+
   function init(opts) {
     applyOpts(opts);
-    var r = rdv();
-    if (r) { try { r.configure({ nodeName: cfg.nodeName }); } catch (_e) {} }
+    configModule();
     var d = doc();
     if (!d) return Promise.resolve();
     if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", mount);
