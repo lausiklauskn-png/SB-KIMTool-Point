@@ -41,11 +41,54 @@
     if (!window.SbkimEmbedding || !window.SbkimSpore) {
       return Promise.reject(new Error("Module 02/03 (Spore/Embedding) nicht geladen."));
     }
+    // Sichtbarer Fortschritt DIREKT im Panel (Tablet hat keine Konsole) +
+    // Phasen-Logs für Eruda. Die einmalige Identitäts-Erzeugung lädt ein
+    // ~30-MB-Sprach-Modell — das dauert am Tablet, sieht sonst aus wie „hängt".
+    function step(msg) {
+      console.info("[SBKIMTool] " + msg);
+      try {
+        var out = document.getElementById("sbkim-rdv-out");
+        if (out) out.textContent += "\n  … " + msg;
+      } catch (_e) {}
+    }
+    step("Sprach-Modell wird geladen (einmalig, ~30 MB — kann am Tablet 1–2 Minuten dauern)…");
+    // PFLICHT (Skill „saubere-netz-anmeldung"): beim ~30-MB-Modell-Laden IMMER
+    // eine Prozent-Anzeige — sonst denkt man, es hängt, und schließt zu, bevor es
+    // fertig ist. Live-Balken aus dem sbkim:embedding-progress-Event, EINE Zeile.
+    function ensureProgressEl() {
+      var out = document.getElementById("sbkim-rdv-out");
+      if (!out || !out.parentNode) return null;
+      var el = document.getElementById("tp-model-progress");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "tp-model-progress";
+        el.style.cssText = "margin:6px 0 0;font:.74rem/1.4 var(--mono,monospace);color:#6ee7d3;white-space:pre-wrap";
+        out.parentNode.insertBefore(el, out.nextSibling);
+      }
+      return el;
+    }
+    var onProg = function (ev) {
+      var d = ev && ev.detail; if (!d) return;
+      var el = ensureProgressEl(); if (!el) return;
+      if (typeof d.progress === "number" && isFinite(d.progress)) {
+        var pct = Math.max(0, Math.min(100, Math.round(d.progress)));
+        var filled = Math.round(pct / 5);
+        var bar = "█".repeat(filled) + "░".repeat(20 - filled);
+        var file = d.file ? String(d.file).split("/").pop() : "Modell";
+        el.textContent = "Modell laedt  " + bar + "  " + pct + " %   (" + file + ", ~30 MB einmalig)";
+      } else if (d.status === "done" || d.status === "ready") {
+        el.textContent = "Modell geladen ✓";
+      }
+    };
+    function stopProg() { try { window.removeEventListener("sbkim:embedding-progress", onProg); } catch (_e) {} }
+    try { window.addEventListener("sbkim:embedding-progress", onProg); } catch (_e) {}
     return window.SbkimEmbedding.init()
       .then(function () {
+        step("Modell geladen, berechne Bedeutungs-Vektor…");
         return window.SbkimEmbedding.embedPassage(CFG.domainDescription + ". " + CFG.domainKeywords.join(", "));
       })
       .then(function (vec) {
+        step("erzeuge deine Identität + Visitenkarte (Spore)…");
         return window.SbkimSpore.generateOwnSpore({
           domain: CFG.domain,
           endpoint: CFG.endpoint,
@@ -55,6 +98,16 @@
           domainKeywords: CFG.domainKeywords,
           domainVector: Array.from(vec),
         });
+      })
+      .then(function (spore) {
+        stopProg();
+        step("Identität fertig — melde dich jetzt im Raum an…");
+        return spore;
+      })
+      .catch(function (e) {
+        stopProg();
+        step("✗ Identitäts-Erzeugung fehlgeschlagen: " + (e && e.message ? e.message : e));
+        throw e;
       });
   }
 
