@@ -153,5 +153,21 @@
   <script src="assets/fx.js"></script>
   <script src="assets/sbkim-siegel.js"></script>
   <script src="assets/netz-briefkasten.js"></script>
+
+  <!-- SBKIM-Rendezvous auch auf der START-Seite (Klaus 2026-07-10: „🌐 Mit dem
+       Netz verbinden" war nur auf werkzeuge.html, auf der Startseite nicht
+       findbar). Gleicher Stack + Reihenfolge wie werkzeuge.html. Der ~30-MB-
+       Modell-Download passiert erst beim Klick (createIdentity), nicht beim
+       Laden — Startseite bleibt leicht. -->
+  <script src="web/tools/sbkim-storage.js"></script>
+  <script src="assets/sbkim-storage-init.js"></script>
+  <script src="web/tools/sbkim-match.js"></script>
+  <script src="web/tools/sbkim-embedding.js"></script>
+  <script src="web/tools/sbkim-spore.js"></script>
+  <script src="web/tools/sbkim-anastomose.js"></script>
+  <script type="module" src="web/tools/sbkim-nostr-relay.js"></script>
+  <script src="web/tools/sbkim-rendezvous.js"></script>
+  <script src="web/tools/sbkim-rendezvous-ui.js"></script>
+  <script src="assets/rendezvous-init.js"></script>
 </body>
 </html>
