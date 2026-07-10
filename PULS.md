@@ -2,6 +2,26 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-10 — Identitäts-Hygiene Schritt 3: Modell-Ladebalken (Skill-Pflicht) nachgezogen
+
+Branch `claude/saubere-anmeldung-toolpoint` (frisch von `origin/main`). SB-KIMTool-Point ist der
+**Referenz-Knoten** der netzweiten „saubere-netz-anmeldung"-Vereinheitlichung (Klaus 2026-07-10:
+„Toolpoint zuerst durchziehen, dann alle gleich"). Prüfung ergab: Toolpoint war bereits sauber —
+eigene Schublade `sbkim_toolpoint`, `dbSuffix` in `SbkimRendezvous.init` **und** `RendezvousUI.init`,
+Modus A (`ensureIdentity:true`), Modus B (🧹 Aufräumen), Spore aus **eigener** Domänen-Beschreibung.
+**Einzige Lücke:** der laut Skill **PFLICHT**-Modell-Ladebalken fehlte im `createIdentity`.
+
+**Getan (`assets/rendezvous-init.js`):** `createIdentity` zeigt jetzt beim ~30-MB-Modell-Laden einen
+Live-Prozent-Balken (`sbkim:embedding-progress` → EINE Zeile) + Phasen-Schritte direkt im Panel
+(`sbkim-rdv-out`), Listener sauber ab-/angemeldet, fail-soft. Muster 1:1 aus der Skill-Referenz
+`Kim-Bell/assets/rendezvous-init.js`. `npm test` **148/148 grün**; `node --check` grün. Kern-Module
+unberührt, kein PII, TABU (0.80/DB_VERSION/PROTOCOL_VERSION) unangetastet.
+
+**Für Klaus (Browser):** einmal `🧹 Aufräumen & neu anmelden` drücken (löscht die alte, falsche
+Identität aus dem geteilten Topf, erzeugt frische korrekte in `sbkim_toolpoint`), dann hart neu laden.
+**Nächste Knoten (alle gleich machen):** Mixarium, Rezeptbuch, Tresore, BLP, Kim-* auf denselben
+Stand ziehen (Ladebalken + `dbSuffix` ins Rendezvous + Modus B, wo es fehlt).
+
 ## Nachtrag 2026-07-08 — Identitäts-Hygiene Schritt 2: Modul 23 „Mit dem Netz verbinden“ + Modus A/B
 
 Branch `claude/identity-hygiene-module-23-5lh0tm` (frisch auf `origin/main` gesetzt — der lokale
