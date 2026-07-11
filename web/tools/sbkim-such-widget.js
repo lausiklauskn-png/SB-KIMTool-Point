@@ -8,7 +8,9 @@
  * Module — baut keine eigene Such-Logik:
  *
  *   1. SPRACHE   — Modul 21 SbkimSpeech (Sprach-Knopf → Text ins Feld).
- *   2. VORFILTER — Modul 04 queryLocal + Modul 03 Embedding (lokal, server-los).
+ *   2. VORFILTER — Modul 04 queryLocalMulti (Hybrid BM25+Vektor · A1 Bau 04.F,
+ *                  Query-Expansion/Multi-Query · A4 Bau 04.H) + Modul 03
+ *                  Embedding (lokal, server-los). Additiv, fail-soft.
  *   3. RICHTER   — Modul 04 hybridMatch (opt-in, BYOK).
  *   4. FAIL-SOFT — kein Schlüssel/Richter → Vorfilter gilt. Nie Eintritts-Barriere.
  *
@@ -57,6 +59,10 @@
   var LS_KEY_POSITION = "sbkim_search_widget_position";
   var LS_KEY_STATE = "sbkim_search_widget_state"; // "collapsed" | "expanded"
   var LS_KEY_ENGINE = "sbkim_search_widget_engine"; // gewählte Web-Suchmaschine
+  var LS_KEY_SIZE = "sbkim_search_widget_size"; // {w,h} ziehbare Panel-Größe
+  var LS_KEY_MERK = "sbkim_search_widget_merkliste"; // Merkliste (Text+Link, gruppiert)
+  var LS_KEY_LAST = "sbkim_search_widget_lastsearch"; // letzte Suche (Frage+Treffer), Reload-Schutz
+  var LS_KEY_VIEW = "sbkim_search_widget_view"; // Anzeige-Sicht {mode,relatedOnly,kiRelated} (verbunden/verwandt)
 
   // Frei wählbare Web-Suchmaschinen für den Internet-Neuer-Tab-Weg (Klaus
   // 2026-06-21: DuckDuckGo ODER eine andere). Query wird angehängt (URL-encoded).
@@ -74,6 +80,13 @@
   var SEARXNG_PUBLIC_DEFAULT = "https://searx.be";
 
   var DRAG_THRESHOLD_PX = 5;
+  // Ziehbare Panel-Größe (Klaus' Befund 2026-06-22: unteres Lesefeld zu eng).
+  // panelWidth = Gesamt-Panel-Breite, resultsHeight = Höhe des Treffer-Lesefelds.
+  // Ein Resize-Griff unten rechts zieht beide; Größe persistiert in localStorage.
+  var MIN_PANEL_WIDTH = 240;
+  var MAX_PANEL_WIDTH = 760;
+  var MIN_RESULTS_HEIGHT = 120;
+  var RESIZE_MAX_VH = 0.72;   // Lesefeld-Höhe max. Anteil der Viewport-Höhe
   var DEFAULT_CORNER = "bottom-right";
   var DEFAULT_OFFSET = { x: 16, y: 16 };
   // Andock-Punkt für das X: oben rechts „in der Navleiste" (Klaus 2026-06-21).
@@ -102,14 +115,25 @@
   var resultsEl = null;
   var hintEl = null;
   var voiceBtnEl = null;
+  var ocrBtnEl = null;         // 📷 Foto/Handschrift → Suchtext (Modul 24)
+  var ocrKey = "";             // EU-OCR-Schlüssel, RAM-only (nur diese Sitzung)
   var searchBtnEl = null;
   var euChipEl = null;
   var areaRowEl = null;        // Bereichs-Checkboxen (App/Knoten/Internet)
+  var viewRowEl = null;            // Anzeige-Sicht-Zeile: verbunden ↔ verwandt + nur-verwandte
+  var viewModeCheckboxEl = null;   // „🧬 verwandt (genau)" — schaltet die Sicht
+  var viewRelatedOnlyCheckboxEl = null; // „nur verwandte" — blendet Fremde aus
+  var viewKiCheckboxEl = null;     // „· KI" — verwandt-Maß vom KI-Richter (opt-in)
   var richterToggleEl = null;  // KI-Richter an/aus
+  var richterRowEl = null;            // Zeile: Richter-Anbieter + Schlüssel + Modell
+  var richterProviderSelectEl = null; // KI-Richter-Anbieter-Auswahl (Sortierung)
+  var richterKeyEl = null;            // API-Schlüssel-Feld (RAM-only, nicht persistiert)
+  var richterModelEl = null;          // optionales Modell-Feld (leer = Standard/auto)
   var searxngFieldEl = null;   // SearXNG-URL-Feld (für Web-Treffer im Widget)
   var engineSelectEl = null;   // Web-Suchmaschine-Auswahl (Neuer-Tab-Weg)
   var aiSelectEl = null;       // KI-Anbieter-Auswahl (KI-Such-Brücke Stufe A)
   var aiContextEl = null;      // „Schärfen"-Feld (optionaler Kontext vor dem Prompt)
+  var aiContextRowEl = null;   // Zeile um das Schärfen-Feld (+ 🎤 Sprach-Knopf)
   var aiPromptBtnEl = null;    // „Prompt → KI"-Knopf (kopiert + öffnet Anbieter)
   var aiPasteEl = null;        // Einfüge-Feld für die KI-Antwort (JSON)
   var aiSortBtnEl = null;      // „Antwort sortieren"-Knopf
@@ -118,6 +142,17 @@
   var internetCheckboxEl = null; // Referenz auf die Internet-Bereichs-Checkbox
   var vaultSectionEl = null;   // Tresor-Bedien-Sektion (🔐)
   var vaultSectionOpen = false;// Tresor-Sektion ein-/ausgeklappt
+  var fullscreenBtnEl = null;  // ⛶ Vollbild-Umschalter
+  var fullscreenFlag = false;  // Vollbild-Modus (NICHT persistiert — Pille bleibt Standard)
+  var merkBtnEl = null;        // 📌 Merkliste-Knopf
+  var merkOverlayEl = null;    // Merkliste-Overlay (gruppiert nach Suchfrage)
+  var detailOverlayEl = null;  // Tool-eigene Detail-Karte (Overlay über einem Treffer)
+  var merkOverlayOpen = false;
+  var detailOverlayOpen = false;
+  var detailItem = null;       // aktuell in der Detail-Karte gezeigter Treffer
+  var reloadBtnEl = null;      // 🔄 App-aktualisieren-Knopf (Hard-Reload, opt-in)
+  var optShowReload = false;   // nur wenn init({reloadButton:true}) — z.B. such-tool/
+  var reloadInFlight = false;
 
   // Position + Sichtbarkeit (localStorage-persistiert).
   var currentCorner = DEFAULT_CORNER;
@@ -135,15 +170,66 @@
   var optEuPolicy = EU_POLICY_DEFAULT;
   var optApiKey = null;
   var optProvider = DEFAULT_PROVIDER;
+  var optRichterModel = "";    // optionales KI-Richter-Modell (leer = Standard/auto)
   var optEuOnly = false;       // nur bei euPolicy:"frei" relevant
   var optQueryLabel = null;
   var optK = DEFAULT_K;
+
+  // ---- A4 (Bau 04.H) Query-Expansion / Multi-Query — kleine, app-eigene
+  //      Synonym-Karte. Schema { term(lowercase): [alt, ...] } für Modul 04
+  //      expandQuerySimple (ein Token → eine Alternative). Bidirektional
+  //      eingetragen, damit beide Frage-Richtungen denselben Treffer finden
+  //      (Frage „torte" findet Doku „kuchen" UND umgekehrt). Rein additiv:
+  //      ohne Treffer in der Karte bleibt es bei [query] (kein Regress).
+  //      Eine App darf ihre eigene Karte via init({synonyms}) setzen — sie
+  //      kennt ihre Domäne besser als diese generische Grundausstattung.
+  var DEFAULT_SYNONYMS = {
+    // Getränke / Rezept-Domäne (Endknoten Mixarium / Rezeptbuch)
+    "torte": ["kuchen"], "kuchen": ["torte"],
+    "cocktail": ["drink"], "drink": ["cocktail", "getränk"], "getränk": ["drink", "getraenk"],
+    "limo": ["limonade"], "limonade": ["limo"],
+    "smoothie": ["shake"], "shake": ["smoothie"],
+    "alkoholfrei": ["mocktail"], "mocktail": ["alkoholfrei"],
+    "plätzchen": ["keks"], "keks": ["plätzchen", "plaetzchen"],
+    // Allgemeine Umschreibungen (netzweit nützlich, harmlos)
+    "kfz": ["auto"], "auto": ["kfz", "wagen"], "wagen": ["auto"],
+    "notebook": ["laptop"], "laptop": ["notebook"],
+    "handy": ["smartphone"], "smartphone": ["handy"],
+    "arznei": ["medikament"], "medikament": ["arznei", "arzneimittel"],
+    "foto": ["bild"], "bild": ["foto"],
+  };
+  // Aktive Synonym-Karte (via init({synonyms}) überschreibbar) + A4-Schalter.
+  var optSynonyms = DEFAULT_SYNONYMS;
+  var optQueryExpand = true;   // A4 an (Default); init({queryExpand:false}) schaltet ab
   // Treffer-Anzeige (Klaus 2026-06-21): viel sammeln + ranken, 10 zeigen, der
   // Rest hinter einem ▾-Pfeil, je Klick 10 mehr.
   var RESULT_PAGE_SIZE = 10;
   var MAX_RANK = 100;          // so viele Kandidaten werden semantisch gerankt
   var resultsVisibleCount = RESULT_PAGE_SIZE;
   var lastRenderRes = null;    // letztes Ergebnis, fürs Nachladen ohne neue Suche
+
+  // ---- Anzeige-Sicht: „verbunden" (grob) ↔ „verwandt" (genau) ----
+  // (Brief „Wählen"-UI, 2026-06-28). REINE ANZEIGE-SCHICHT — gatet NICHTS. Der
+  // Andock-Handshake (Modul 05, PROVIDER_MIN_MATCH 0.80) bleibt unberührt. Der
+  // Umschalter sortiert/filtert NUR die schon gefundene Trefferliste:
+  //   "verbunden" (Default) — alle Treffer in ihrer rohen Cosinus-Reihenfolge
+  //                           (PROVIDER_MIN_MATCH-Boden), das gewohnte Verhalten.
+  //   "verwandt"            — nach dem ZENTRIERTEN Cosinus (Modul 04 relatedness())
+  //                           absteigend; echte Themen-Verwandte oben, fremde
+  //                           Domänen unten (mit „nur verwandte" ganz ausgeblendet).
+  var viewMode = "verbunden";       // "verbunden" | "verwandt"
+  var viewRelatedOnly = false;      // im "verwandt"-Modus: fremde (nicht isRelated) ausblenden
+  // „· KI" (Kalibrier-Abschluss 2026-06-28): das „verwandt"-Maß wahlweise vom
+  // KI-Richter (Modul 04 hybridMatch) liefern lassen statt vom zentrierten Cosinus.
+  // OPT-IN, BYOK, fail-soft: ohne Schlüssel / ohne Urteil → gratis Cosinus-Rangfolge.
+  // REINE ANZEIGE — gatet nichts (Andock-Riegel 0.80 unberührt). Der bestehende
+  // „KI-Richter"-Schalter (ganze Liste re-ranken) bleibt davon unberührt daneben.
+  var viewKiRelated = false;        // „· KI": verwandt-Ranking per KI-Richter (opt-in)
+  // Letztes KI-Verwandtschafts-Urteil, an die Suchfrage gebunden (RAM-only, kein PII,
+  // nicht persistiert). { query, byKey:{ "anchorId|label": {score,passt,begruendung} },
+  // available, running }. Wird bei jeder neuen Suche zurückgesetzt.
+  var kiRelatedState = { query: null, byKey: {}, available: false, running: false };
+  var lastQueryVec = null;          // Query-Embedding der letzten Suche (RAM-only, für relatedness)
   var optAllowDrag = true;
   var optRememberHidden = true;
   var optZIndex = DEFAULT_Z_INDEX;
@@ -190,10 +276,22 @@
   var nodeCorpusPreparer = null;
   var nodeCorpusReady = false;
   var nodeCorpusPrepPromise = null;
+  // Live-Cross-Knoten-Frage (Bau Query-über-Relais 2026-06-28): optional via
+  // options.queryNode injizierte Funktion (nodeId, text) -> Array<{label,score,
+  // anchorId}>. Auf der Sage-Seite verdrahtet mit SbkimAnastomose.queryNostr
+  // (Modul 05 + Relais). Im Standalone-Such-Tool ohne Modul 05 = null → der
+  // Knoten-Bereich bleibt rein lokal (fail-soft, kein Bruch).
+  var queryNodeFn = null;
+  var LIVE_NODE_MAX = 2;          // top-N Nachbarn pro Suche live fragen (Deckel)
   var SEARXNG_MAX_RESULTS = 50;   // wie viele Roh-Treffer wir holen + sortieren
 
   // Drag + Mount.
   var dragState = null;
+  // Resize (ziehbare Panel-Größe). panelWidth/resultsHeight === null → CSS-Default.
+  var resizeHandleEl = null;
+  var resizeState = null;
+  var panelWidth = null;      // px, null = CSS-Default min(320px, 88vw)
+  var resultsHeight = null;   // px, null = CSS-Default max-height 40vh
   var mountObserver = null;
   var mountObserverTimeoutId = null;
 
@@ -331,6 +429,47 @@
     else                                { widgetRoot.style.bottom = oy + "px"; widgetRoot.style.right = ox + "px"; }
   }
 
+  // ---- Ziehbare Panel-Größe (localStorage-persistiert) ----
+
+  function clampPanelWidth(w) {
+    var vw = global.innerWidth || 1024;
+    var max = Math.min(MAX_PANEL_WIDTH, vw - 16);
+    if (max < MIN_PANEL_WIDTH) max = MIN_PANEL_WIDTH;
+    if (w < MIN_PANEL_WIDTH) w = MIN_PANEL_WIDTH;
+    if (w > max) w = max;
+    return Math.round(w);
+  }
+
+  function clampResultsHeight(h) {
+    var vh = global.innerHeight || 768;
+    var max = Math.max(MIN_RESULTS_HEIGHT, Math.round(vh * RESIZE_MAX_VH));
+    if (h < MIN_RESULTS_HEIGHT) h = MIN_RESULTS_HEIGHT;
+    if (h > max) h = max;
+    return Math.round(h);
+  }
+
+  function loadSizeFromLs() {
+    var raw = lsGet(LS_KEY_SIZE);
+    if (!raw) return;
+    try {
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return;
+      if (typeof parsed.w === "number" && isFinite(parsed.w)) panelWidth = clampPanelWidth(parsed.w);
+      if (typeof parsed.h === "number" && isFinite(parsed.h)) resultsHeight = clampResultsHeight(parsed.h);
+    } catch (_e) { /* fail-soft — CSS-Default bleibt */ }
+  }
+
+  function persistSize() {
+    if (panelWidth === null && resultsHeight === null) { lsRemove(LS_KEY_SIZE); return; }
+    try { lsSet(LS_KEY_SIZE, JSON.stringify({ w: panelWidth, h: resultsHeight })); }
+    catch (_e) { /* fail-soft */ }
+  }
+
+  function applySizeToPanel() {
+    if (panelEl && panelWidth !== null) panelEl.style.width = panelWidth + "px";
+    if (resultsEl && resultsHeight !== null) resultsEl.style.maxHeight = resultsHeight + "px";
+  }
+
   // Beim Wechsel klein↔groß den Mittelpunkt halten und in den sichtbaren Bereich
   // klemmen — sonst schnappt die Blase beim Minimieren in die Ecke / aus dem Bild
   // (Klaus' Befund 2026-06-21: Such-Tool rutschte beim Minimieren nach rechts raus).
@@ -353,6 +492,52 @@
     currentFreeY = y;
     currentCorner = null;
     applyPositionToRoot();
+  }
+
+  // Splitscreen-Fix (Klaus' Befund 2026-06-22): im geteilten Bildschirm rutscht
+  // die Pille aus dem Sichtfeld. Bei jeder Viewport-Änderung (resize /
+  // orientationchange) die GEZOGENE (freie) Position ins sichtbare Feld
+  // zurück-klemmen. Ecken-verankerte Widgets bleiben durch CSS am Rand und
+  // brauchen keine Korrektur. Mindestens VIEWPORT_VISIBLE_MARGIN px bleiben am
+  // Rand sichtbar (mirror der Drag-Clamp-Reserve von 24 px).
+  var VIEWPORT_VISIBLE_MARGIN = 24;
+  var viewportListenerAttached = false;
+
+  function clampPositionIntoView() {
+    if (!widgetRoot) return;
+    if (currentFreeX === null || currentFreeY === null) return; // nur freie Position
+    var vw = global.innerWidth || 1024;
+    var vh = global.innerHeight || 768;
+    var rect = widgetRoot.getBoundingClientRect();
+    var w = rect.width || 44;
+    var x = currentFreeX;
+    var y = currentFreeY;
+    var minX = -w + VIEWPORT_VISIBLE_MARGIN;
+    var maxX = vw - VIEWPORT_VISIBLE_MARGIN;
+    var minY = 0;
+    var maxY = vh - VIEWPORT_VISIBLE_MARGIN;
+    if (x > maxX) x = maxX;
+    if (x < minX) x = minX;
+    if (y > maxY) y = maxY;
+    if (y < minY) y = minY;
+    if (x !== currentFreeX || y !== currentFreeY) {
+      currentFreeX = x;
+      currentFreeY = y;
+      applyPositionToRoot();
+      persistPosition();
+    }
+  }
+
+  function onViewportChange() { clampPositionIntoView(); }
+
+  function attachViewportListener() {
+    if (viewportListenerAttached) return;
+    if (!global || typeof global.addEventListener !== "function") return;
+    try {
+      global.addEventListener("resize", onViewportChange);
+      global.addEventListener("orientationchange", onViewportChange);
+      viewportListenerAttached = true;
+    } catch (_e) { /* fail-soft — ohne Listener bleibt nur die statische Position */ }
   }
 
   // ---- CSS-Injektion ----
@@ -395,6 +580,7 @@
       "#" + WIDGET_ID + " .sbkim-sw-bubble:hover { background: rgba(24, 24, 58, 0.94); }",
       // Interaktions-Zustand: Panel (expanded). Leicht transparent.
       "#" + WIDGET_ID + " .sbkim-sw-panel {",
+      "  position: relative;",
       "  width: min(320px, 88vw);",
       "  background: rgba(16, 16, 42, 0.92);",
       "  border: 1px solid rgba(255, 255, 255, 0.18);",
@@ -407,6 +593,50 @@
       // Zustand-Umschaltung via data-state.
       "#" + WIDGET_ID + "[data-state=\"collapsed\"] .sbkim-sw-panel { display: none; }",
       "#" + WIDGET_ID + "[data-state=\"expanded\"] .sbkim-sw-bubble { display: none; }",
+      // Vollbild-Modus (⛶, Klaus 2026-06-22): zweite Anzeige derselben Treffer —
+      // das Panel füllt den ganzen Viewport (kein Kern-Umbau, gleicher Inhalt).
+      // !important schlägt die Inline-Position/-Größe (left/top/width).
+      "#" + WIDGET_ID + ".sbkim-sw-fullscreen {",
+      "  left: 0 !important;",
+      "  top: 0 !important;",
+      "  right: 0 !important;",
+      "  bottom: 0 !important;",
+      "  width: 100% !important;",
+      "  height: 100% !important;",
+      "  z-index: 9996;",
+      "}",
+      "#" + WIDGET_ID + ".sbkim-sw-fullscreen .sbkim-sw-bubble { display: none; }",
+      "#" + WIDGET_ID + ".sbkim-sw-fullscreen .sbkim-sw-panel {",
+      "  display: block;",
+      "  width: 100% !important;",
+      "  height: 100%;",
+      "  max-width: none;",
+      "  border-radius: 0;",
+      "  box-sizing: border-box;",
+      "  display: flex;",
+      "  flex-direction: column;",
+      "  overflow: auto;",
+      "}",
+      "#" + WIDGET_ID + ".sbkim-sw-fullscreen .sbkim-sw-results {",
+      "  max-height: none !important;",
+      "  flex: 1 1 auto;",
+      "}",
+      "#" + WIDGET_ID + ".sbkim-sw-fullscreen .sbkim-sw-resize { display: none; }",
+      // Resize-Griff unten rechts (ziehbar — Breite + Lesefeld-Höhe).
+      "#" + WIDGET_ID + " .sbkim-sw-resize {",
+      "  position: absolute;",
+      "  right: 2px;",
+      "  bottom: 2px;",
+      "  width: 18px;",
+      "  height: 18px;",
+      "  cursor: nwse-resize;",
+      "  touch-action: none;",
+      "  opacity: 0.55;",
+      "  background: linear-gradient(135deg, transparent 0 44%, rgba(245,245,255,0.5) 44% 52%, transparent 52% 66%, rgba(245,245,255,0.5) 66% 74%, transparent 74%);",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-resize:hover { opacity: 1; }",
+      "#" + WIDGET_ID + ".sbkim-sw-resizing { user-select: none; -webkit-user-select: none; }",
+      "#" + WIDGET_ID + ".sbkim-sw-resizing .sbkim-sw-panel { box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5); }",
       // Kopfzeile: Drag-Griff + Knöpfe.
       "#" + WIDGET_ID + " .sbkim-sw-head {",
       "  display: flex;",
@@ -440,13 +670,14 @@
       "}",
       "#" + WIDGET_ID + " .sbkim-sw-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.16); }",
       // Bereichs-Auswahl + Optionen-Zeile (Checkbox-Pillen).
-      "#" + WIDGET_ID + " .sbkim-sw-areas, #" + WIDGET_ID + " .sbkim-sw-optrow {",
+      "#" + WIDGET_ID + " .sbkim-sw-areas, #" + WIDGET_ID + " .sbkim-sw-optrow, #" + WIDGET_ID + " .sbkim-sw-viewrow {",
       "  display: flex;",
       "  align-items: center;",
       "  gap: 0.35rem;",
       "  flex-wrap: wrap;",
       "  margin-top: 0.4rem;",
       "}",
+      "#" + WIDGET_ID + " .sbkim-sw-viewrow .sbkim-sw-check.on { border-color: rgba(196, 181, 253, 0.6); color: rgba(196, 181, 253, 0.95); }",
       "#" + WIDGET_ID + " .sbkim-sw-check {",
       "  display: inline-flex;",
       "  align-items: center;",
@@ -471,6 +702,26 @@
       "  padding: 0.3rem 0.45rem;",
       "  outline: none;",
       "}",
+      "#" + WIDGET_ID + " .sbkim-sw-richterrow {",
+      "  display: flex;",
+      "  gap: 0.3rem;",
+      "  margin-top: 0.4rem;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-richterprov, #" + WIDGET_ID + " .sbkim-sw-richterkey, #" + WIDGET_ID + " .sbkim-sw-richtermodel {",
+      "  box-sizing: border-box;",
+      "  min-width: 0;",
+      "  background: rgba(0, 0, 0, 0.24);",
+      "  border: 1px solid rgba(167, 139, 250, 0.35);",
+      "  border-radius: 8px;",
+      "  color: #F5F5FF;",
+      "  font-size: 0.72rem;",
+      "  padding: 0.3rem 0.45rem;",
+      "  outline: none;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-richterprov { flex: 0 0 auto; }",
+      "#" + WIDGET_ID + " .sbkim-sw-richterkey { flex: 1 1 auto; }",
+      "#" + WIDGET_ID + " .sbkim-sw-richtermodel { flex: 1 1 auto; }",
+      "#" + WIDGET_ID + " .sbkim-sw-richterprov option { color: #1A1A1A; }",
       "#" + WIDGET_ID + " .sbkim-sw-engine {",
       "  width: 100%;",
       "  box-sizing: border-box;",
@@ -653,6 +904,14 @@
       "  font-family: 'Geist Mono', ui-monospace, monospace;",
       "  font-size: 0.68rem;",
       "}",
+      "#" + WIDGET_ID + " .sbkim-sw-result .sbkim-sw-relscore {",
+      "  color: rgba(245, 245, 255, 0.45);",
+      "  font-family: 'Geist Mono', ui-monospace, monospace;",
+      "  font-size: 0.68rem;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-result .sbkim-sw-relscore.is-related {",
+      "  color: rgba(196, 181, 253, 0.95);",
+      "}",
       "#" + WIDGET_ID + " .sbkim-sw-result .sbkim-sw-reason {",
       "  color: rgba(245, 245, 255, 0.6);",
       "  font-size: 0.7rem;",
@@ -677,6 +936,29 @@
       "  cursor: pointer;",
       "}",
       "#" + WIDGET_ID + " .sbkim-sw-more:hover { background: rgba(255, 255, 255, 0.12); }",
+      // KI-Zusammenfassung („warum diese Reihenfolge") oben über den Treffern.
+      "#" + WIDGET_ID + " .sbkim-sw-summary {",
+      "  margin-bottom: 0.5rem;",
+      "  padding: 0.45rem 0.55rem;",
+      "  background: rgba(167, 139, 250, 0.12);",
+      "  border: 1px solid rgba(167, 139, 250, 0.4);",
+      "  border-left: 3px solid rgba(167, 139, 250, 0.85);",
+      "  border-radius: 8px;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-summary-head { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-summary-head span { flex: 1; font-size: 0.64rem; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(237, 233, 254, 0.85); }",
+      "#" + WIDGET_ID + " .sbkim-sw-saybtn {",
+      "  flex-shrink: 0;",
+      "  background: rgba(167, 139, 250, 0.22);",
+      "  border: 1px solid rgba(167, 139, 250, 0.45);",
+      "  border-radius: 999px;",
+      "  color: #EDE9FE;",
+      "  font-size: 0.66rem;",
+      "  padding: 0.12rem 0.5rem;",
+      "  cursor: pointer;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-saybtn:hover { background: rgba(167, 139, 250, 0.32); }",
+      "#" + WIDGET_ID + " .sbkim-sw-summary-text { font-size: 0.78rem; line-height: 1.4; color: rgba(245, 245, 255, 0.9); }",
       "#" + WIDGET_ID + " .sbkim-sw-copyall {",
       "  width: 100%;",
       "  box-sizing: border-box;",
@@ -737,6 +1019,46 @@
       "  padding: 0.35rem 0.45rem;",
       "  resize: vertical;",
       "}",
+      // Schärfen-Zeile: Feld + 🎤 nebeneinander.
+      "#" + WIDGET_ID + " .sbkim-sw-ctxrow { margin-top: 0.35rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-ctxrow .sbkim-sw-aicontext { flex: 1; min-width: 0; width: auto; margin-top: 0; }",
+      // Merken-Haken pro Treffer (kleiner als die Bereichs-Pillen).
+      "#" + WIDGET_ID + " .sbkim-sw-resultline { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merkbox { border: none; padding: 0 0.1rem 0 0; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merkbox span { font-size: 0.7rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-result-title { cursor: pointer; }",
+      "#" + WIDGET_ID + " .sbkim-sw-result-title:hover { text-decoration: underline; }",
+      // 📌-Kopf-Knopf hebt sich ab, wenn etwas gemerkt ist.
+      "#" + WIDGET_ID + " .sbkim-sw-merkbtn.sbkim-sw-has-merk { background: rgba(244, 180, 53, 0.28); border-color: rgba(244, 180, 53, 0.6); opacity: 1; }",
+      // Overlays (Detail-Karte + Merkliste) — über dem Panel, in Tool-Farben.
+      "#" + WIDGET_ID + " .sbkim-sw-overlay {",
+      "  position: absolute;",
+      "  inset: 0;",
+      "  z-index: 6;",
+      "  display: flex;",
+      "  flex-direction: column;",
+      "  gap: 0.45rem;",
+      "  padding: 0.6rem 0.65rem 0.7rem;",
+      "  background: rgba(12, 12, 30, 0.97);",
+      "  backdrop-filter: blur(8px);",
+      "  -webkit-backdrop-filter: blur(8px);",
+      "  border-radius: 14px;",
+      "  overflow: auto;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-overlay-head { display: flex; align-items: center; gap: 0.45rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-overlay-title { flex: 1; font-size: 0.8rem; letter-spacing: 0.03em; color: #F5F5FF; }",
+      "#" + WIDGET_ID + " .sbkim-sw-back { width: 24px; height: 24px; font-size: 0.95rem; opacity: 0.9; }",
+      "#" + WIDGET_ID + " .sbkim-sw-detail-titel { font-size: 0.86rem; color: #F5F5FF; }",
+      "#" + WIDGET_ID + " .sbkim-sw-detail-desc { font-size: 0.76rem; line-height: 1.35; color: rgba(245, 245, 255, 0.82); }",
+      "#" + WIDGET_ID + " .sbkim-sw-detail-url { font-size: 0.68rem; color: #8EE7FF; word-break: break-all; }",
+      "#" + WIDGET_ID + " .sbkim-sw-detail-open { background: rgba(110, 231, 211, 0.16); border-color: rgba(110, 231, 211, 0.42); color: #CFFcF4; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-empty { font-size: 0.74rem; color: rgba(245, 245, 255, 0.65); line-height: 1.35; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-group { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 0.4rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-group-title { font-size: 0.78rem; font-weight: 600; color: #F4B435; margin-bottom: 0.3rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.35rem 0.5rem; margin-bottom: 0.3rem; font-size: 0.8rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-actions { display: flex; gap: 0.35rem; margin-top: 0.25rem; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-actions .sbkim-sw-more { width: auto; margin-top: 0; flex: 1; }",
+      "#" + WIDGET_ID + " .sbkim-sw-merk-remove { background: rgba(255, 120, 120, 0.12); border-color: rgba(255, 120, 120, 0.35); color: rgba(255, 200, 200, 0.9); }",
     ].join("\n");
   }
 
@@ -789,12 +1111,26 @@
     return wrap;
   }
 
+  // „nur verwandte" ist nur im verwandt-Modus sinnvoll → sonst ausblenden. Hält
+  // die Checkbox-Häkchen mit dem State synchron (z.B. nach setViewMode/Restore).
+  function updateViewRowState() {
+    if (viewModeCheckboxEl && viewModeCheckboxEl._input) viewModeCheckboxEl._input.checked = (viewMode === "verwandt");
+    if (viewRelatedOnlyCheckboxEl) {
+      if (viewRelatedOnlyCheckboxEl._input) viewRelatedOnlyCheckboxEl._input.checked = !!viewRelatedOnly;
+      viewRelatedOnlyCheckboxEl.style.display = (viewMode === "verwandt") ? "" : "none";
+    }
+    if (viewKiCheckboxEl) {
+      if (viewKiCheckboxEl._input) viewKiCheckboxEl._input.checked = !!viewKiRelated;
+      viewKiCheckboxEl.style.display = (viewMode === "verwandt") ? "" : "none";
+    }
+  }
+
   function updateSearxngFieldVisibility() {
     var show = areas.internet.enabled ? "block" : "none";
     if (searxngFieldEl) searxngFieldEl.style.display = show;
     if (engineSelectEl) engineSelectEl.style.display = show;
     if (aiSelectEl) aiSelectEl.style.display = show;
-    if (aiContextEl) aiContextEl.style.display = show;
+    if (aiContextRowEl) aiContextRowEl.style.display = show ? "flex" : "none";
     if (aiPromptBtnEl) aiPromptBtnEl.style.display = show;
     if (aiAutoBtnEl) aiAutoBtnEl.style.display = show;
     if (aiPasteEl) aiPasteEl.style.display = show;
@@ -833,6 +1169,21 @@
     title.className = "sbkim-sw-title";
     title.textContent = "SBKIM-Suche";
     head.appendChild(title);
+    if (optShowReload) {
+      reloadBtnEl = makeBtn(doc, "sbkim-sw-btn sbkim-sw-reloadbtn", "🔄", "App aktualisieren — Cache leeren und neu laden (holt die neueste Version)");
+      reloadBtnEl.addEventListener("click", function (ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        hardReload();
+      });
+      head.appendChild(reloadBtnEl);
+    }
+    merkBtnEl = makeBtn(doc, "sbkim-sw-btn sbkim-sw-merkbtn", "📌", "Merkliste — Gemerktes, gruppiert nach Suchfrage");
+    merkBtnEl.addEventListener("click", function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      if (merkOverlayOpen) closeOverlays();
+      else openMerkliste();
+    });
+    head.appendChild(merkBtnEl);
     var vaultBtn = makeBtn(doc, "sbkim-sw-btn sbkim-sw-vaultbtn", "🔐", "Schlüssel-Tresor (KI-Schlüssel sicher speichern)");
     vaultBtn.addEventListener("click", function (ev) {
       if (ev && ev.stopPropagation) ev.stopPropagation();
@@ -840,6 +1191,12 @@
       renderVaultSection();
     });
     head.appendChild(vaultBtn);
+    fullscreenBtnEl = makeBtn(doc, "sbkim-sw-btn sbkim-sw-fs", "⛶", "Vollbild — Suchraum groß (verkleinern: nochmal tippen)");
+    fullscreenBtnEl.addEventListener("click", function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      toggleFullscreen();
+    });
+    head.appendChild(fullscreenBtnEl);
     var minBtn = makeBtn(doc, "sbkim-sw-btn sbkim-sw-min", "–", "Minimieren — zurück zur Such-Blase");
     minBtn.addEventListener("click", function (ev) {
       if (ev && ev.stopPropagation) ev.stopPropagation();
@@ -864,7 +1221,7 @@
     inputEl.setAttribute("aria-label", "Such-Eingabe");
     // UX-Erhalt: Wert lebt zusätzlich in queryValue; Feld wird nie neu gebaut.
     inputEl.value = queryValue;
-    inputEl.addEventListener("input", function () { queryValue = inputEl.value; });
+    inputEl.addEventListener("input", function () { queryValue = inputEl.value; persistQuery(); });
     inputEl.addEventListener("keydown", function (ev) {
       if (ev && ev.key === "Enter") { ev.preventDefault(); runAndRender(); }
     });
@@ -876,6 +1233,14 @@
       onVoiceClick();
     });
     inrow.appendChild(voiceBtnEl);
+
+    // 📷 OCR-Knopf (Strang B2): Foto/Handschrift → Suchtext via Modul 24.
+    ocrBtnEl = makeBtn(doc, "sbkim-sw-iconbtn sbkim-sw-ocr", "📷", "Foto/Handschrift → Suchtext (Mistral OCR, EU)");
+    ocrBtnEl.addEventListener("click", function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      onOcrClick();
+    });
+    inrow.appendChild(ocrBtnEl);
 
     searchBtnEl = makeBtn(doc, "sbkim-sw-iconbtn sbkim-sw-search", "🔍", "Suchen");
     searchBtnEl.addEventListener("click", function (ev) {
@@ -902,6 +1267,50 @@
     }
     panelEl.appendChild(areaRowEl);
 
+    // Anzeige-Sicht-Zeile (Brief „Wählen"-UI): „verbunden" (grob, alle erreichbaren)
+    // ↔ „verwandt" (genau, nach zentriertem Cosinus sortiert). REINE ANZEIGE — der
+    // Andock-Handshake (0.80) bleibt unberührt.
+    viewRowEl = doc.createElement("div");
+    viewRowEl.className = "sbkim-sw-viewrow";
+    viewModeCheckboxEl = makeCheckbox(doc, "sbkim-sw-view-verwandt", "🧬 verwandt (genau)",
+      viewMode === "verwandt", function (checked) {
+        viewMode = checked ? "verwandt" : "verbunden";
+        persistViewPref();
+        updateViewRowState();
+        if (lastRenderRes) renderResults(lastRenderRes);
+      });
+    viewModeCheckboxEl.setAttribute("title",
+      "Aus: verbunden (grob) — alle erreichbaren Treffer. An: verwandt (genau) — eine Rangfolge nach Themen-Bezug (gratis zentrierter Cosinus). Mit „· KI“ urteilt der KI-Richter über die Bedeutung.");
+    viewRowEl.appendChild(viewModeCheckboxEl);
+
+    viewRelatedOnlyCheckboxEl = makeCheckbox(doc, "sbkim-sw-view-onlyrelated", "nur verwandte",
+      viewRelatedOnly, function (checked) {
+        viewRelatedOnly = checked;
+        persistViewPref();
+        if (lastRenderRes) renderResults(lastRenderRes);
+      });
+    viewRelatedOnlyCheckboxEl.setAttribute("title",
+      "Nur im verwandt-Modus: blendet fremde Domänen (nicht wirklich verwandt) ganz aus.");
+
+    // „· KI" — verwandt-Maß vom KI-Richter beurteilen lassen (opt-in, BYOK).
+    // Nutzt das vorhandene Richter-Anbieter-Dropdown + Schlüsselfeld (unten).
+    // Ohne Schlüssel → fail-soft auf den gratis Cosinus. REINE ANZEIGE.
+    viewKiCheckboxEl = makeCheckbox(doc, "sbkim-sw-view-ki", "· KI",
+      viewKiRelated, function (checked) {
+        viewKiRelated = checked;
+        persistViewPref();
+        if (checked && !optApiKey) {
+          setHint("„· KI“ braucht einen Schlüssel — Tresor (🔐) entsperren oder unten eintragen. Bis dahin: gratis Cosinus.");
+        }
+        if (lastRenderRes) renderResults(lastRenderRes);
+      });
+    viewKiCheckboxEl.setAttribute("title",
+      "Nur im verwandt-Modus: das echte Verwandtschafts-Maß vom KI-Richter (über die Bedeutung) beurteilen lassen. Braucht einen Schlüssel; ohne Schlüssel bleibt der gratis zentrierte Cosinus.");
+    viewRowEl.appendChild(viewRelatedOnlyCheckboxEl);
+    viewRowEl.appendChild(viewKiCheckboxEl);
+    panelEl.appendChild(viewRowEl);
+    updateViewRowState();
+
     // Optionen-Zeile: KI-Richter-Schalter + EU-Politik-Chip.
     var optRow = doc.createElement("div");
     optRow.className = "sbkim-sw-optrow";
@@ -919,6 +1328,44 @@
     });
     optRow.appendChild(euChipEl);
     panelEl.appendChild(optRow);
+
+    // KI-Richter-Anbieter (gratis: Gemini/OpenRouter) + Schlüssel + optionales
+    // Modell. Greift, wenn KI-Richter an ist. Schlüssel bleibt NUR im Speicher
+    // (nicht persistiert) — wie die Pinnwand (BYOK, kein Key im Code/Storage).
+    richterRowEl = doc.createElement("div");
+    richterRowEl.className = "sbkim-sw-richterrow";
+
+    richterProviderSelectEl = doc.createElement("select");
+    richterProviderSelectEl.className = "sbkim-sw-richterprov";
+    richterProviderSelectEl.setAttribute("aria-label", "KI-Richter-Anbieter (Antwort-Sortierung)");
+    rebuildRichterProviderOptions();
+    richterProviderSelectEl.addEventListener("change", function () {
+      optProvider = richterProviderSelectEl.value;
+      updateRichterModelPlaceholder();
+    });
+    richterProviderSelectEl.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    richterRowEl.appendChild(richterProviderSelectEl);
+
+    richterKeyEl = doc.createElement("input");
+    richterKeyEl.type = "password";
+    richterKeyEl.className = "sbkim-sw-richterkey";
+    richterKeyEl.setAttribute("placeholder", "API-Schlüssel (bleibt nur auf diesem Gerät)");
+    richterKeyEl.setAttribute("aria-label", "API-Schlüssel für den KI-Richter");
+    richterKeyEl.setAttribute("autocomplete", "off");
+    richterKeyEl.addEventListener("input", function () { optApiKey = richterKeyEl.value.trim() || null; });
+    richterKeyEl.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    richterRowEl.appendChild(richterKeyEl);
+
+    richterModelEl = doc.createElement("input");
+    richterModelEl.type = "text";
+    richterModelEl.className = "sbkim-sw-richtermodel";
+    richterModelEl.setAttribute("aria-label", "KI-Richter-Modell (optional)");
+    richterModelEl.addEventListener("input", function () { optRichterModel = richterModelEl.value.trim(); });
+    richterModelEl.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    richterRowEl.appendChild(richterModelEl);
+    updateRichterModelPlaceholder();
+
+    panelEl.appendChild(richterRowEl);
 
     // SearXNG-URL-Feld (nur sichtbar, wenn Internet-Bereich aktiv). Leer →
     // Internet = neuer Tab; gesetzt → semantischer Web-Re-Ranker.
@@ -960,16 +1407,27 @@
     panelEl.appendChild(aiSelectEl);
 
     // Schärfen-Feld: aktiv zum Präzisieren auffordern (Klaus 2026-06-21 —
-    // wenige Worte tragen die Absicht oft nicht; vgl. NoBite-Befund).
+    // wenige Worte tragen die Absicht oft nicht; vgl. NoBite-Befund). Mit eigenem
+    // 🎤 Sprach-Knopf (Klaus 2026-06-23): das Schärfen lässt sich auch einsprechen.
+    var ctxRow = doc.createElement("div");
+    ctxRow.className = "sbkim-sw-inrow sbkim-sw-ctxrow";
     aiContextEl = doc.createElement("input");
     aiContextEl.type = "text";
     aiContextEl.className = "sbkim-sw-aicontext";
     aiContextEl.setAttribute("placeholder", "Schärfen (optional): Zweck? · Region/Land? · Art/Form? · Marke/Budget?");
     aiContextEl.setAttribute("aria-label", "Suche schärfen — optionaler Kontext");
     aiContextEl.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
-    panelEl.appendChild(aiContextEl);
+    ctxRow.appendChild(aiContextEl);
+    var ctxVoiceBtn = makeBtn(doc, "sbkim-sw-iconbtn sbkim-sw-ctxvoice", "🎤", "Schärfen einsprechen (Spracheingabe)");
+    ctxVoiceBtn.addEventListener("click", function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      onVoiceClick(aiContextEl);
+    });
+    ctxRow.appendChild(ctxVoiceBtn);
+    aiContextRowEl = ctxRow;
+    panelEl.appendChild(ctxRow);
 
-    aiPromptBtnEl = makeBtn(doc, "sbkim-sw-aibtn", "🤖 Prompt → KI", "Prompt bauen, kopieren und KI öffnen");
+    aiPromptBtnEl = makeBtn(doc, "sbkim-sw-aibtn", "🤖 Prompt → KI (öffnen + kopieren)", "Prompt bauen, kopieren und die KI öffnen (eigene App läuft parallel)");
     aiPromptBtnEl.addEventListener("click", function (ev) {
       if (ev && ev.preventDefault) ev.preventDefault();
       handleAiPromptClick();
@@ -1025,11 +1483,38 @@
     resultsEl.className = "sbkim-sw-results";
     panelEl.appendChild(resultsEl);
 
+    // Resize-Griff unten rechts — Panel ziehbar (Breite + Lesefeld-Höhe). Nur
+    // wenn Drag erlaubt ist (gepinnte Widgets bleiben unverändert in Größe/Ort).
+    if (optAllowDrag) {
+      resizeHandleEl = doc.createElement("div");
+      resizeHandleEl.className = "sbkim-sw-resize";
+      resizeHandleEl.setAttribute("aria-label", "Größe ziehen — Breite und Lesefeld-Höhe");
+      resizeHandleEl.setAttribute("title", "Ziehen, um das Such-Panel breiter/höher zu machen");
+      attachResizeHandlers(resizeHandleEl);
+      panelEl.appendChild(resizeHandleEl);
+    }
+
+    // Overlays (Detail-Karte + Merkliste) — absolut über dem Panel, anfangs zu.
+    detailOverlayEl = doc.createElement("div");
+    detailOverlayEl.className = "sbkim-sw-overlay sbkim-sw-detail";
+    detailOverlayEl.style.display = "none";
+    detailOverlayEl.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    panelEl.appendChild(detailOverlayEl);
+
+    merkOverlayEl = doc.createElement("div");
+    merkOverlayEl.className = "sbkim-sw-overlay sbkim-sw-merk";
+    merkOverlayEl.style.display = "none";
+    merkOverlayEl.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    panelEl.appendChild(merkOverlayEl);
+
     root.appendChild(panelEl);
 
     if (optAllowDrag) attachDragHandlers(root);
     updateEuChip();
     updateSearxngFieldVisibility();
+    applySizeToPanel();
+    updateMerkBtn();
+    renderOverlays();
     return root;
   }
 
@@ -1053,6 +1538,15 @@
     var base = inputEl ? inputEl.value : queryValue;
     queryValue = (base ? base + " " : "") + text;
     if (inputEl) inputEl.value = queryValue;
+    persistQuery();
+  }
+
+  // Erkannten Text an ein beliebiges Feld anhängen (Such-Feld ODER Schärfen-Feld).
+  function appendToField(el, text) {
+    if (!text) return;
+    if (el === inputEl || !el) { appendToInput(text); return; }
+    var base = el.value || "";
+    el.value = (base ? base + " " : "") + text;
   }
 
   // ---- EU-Politik ----
@@ -1060,7 +1554,8 @@
   function setEuPolicy(p) {
     optEuPolicy = normalizeEuPolicy(p);
     updateEuChip();
-    rebuildAiProviderOptions(); // EU-bindend → nur EU-KI-Anbieter (DSGVO)
+    rebuildAiProviderOptions();        // EU-bindend → nur EU-KI-Anbieter (DSGVO)
+    rebuildRichterProviderOptions();   // dasselbe für den KI-Richter (Sortierung)
   }
 
   // bindend → euOnly:true erzwungen; frei → optEuOnly (Default false, EU wählbar).
@@ -1068,9 +1563,52 @@
     return optEuPolicy === "bindend" ? true : !!optEuOnly;
   }
 
+  // ---- KI-Richter-Anbieter (Sortierung) ----
+  // Spiegelt Modul 04 HYBRID_PROVIDERS (Auswahl). EU-Politik "bindend" → nur
+  // EU-Anbieter (DSGVO). Gemini/OpenRouter sind die gratis-tauglichen.
+  var RICHTER_PROVIDERS = [
+    { id: "gemini",     label: "Richter: Gemini (gratis)",     eu: false },
+    { id: "openrouter", label: "Richter: OpenRouter (gratis)", eu: false },
+    { id: "claude",     label: "Richter: Claude",              eu: false },
+    { id: "mistral",    label: "Richter: Mistral (EU)",        eu: true },
+  ];
+  function richterProvidersForPolicy() {
+    if (optEuPolicy === "bindend") {
+      return RICHTER_PROVIDERS.filter(function (p) { return p.eu; });
+    }
+    return RICHTER_PROVIDERS.slice();
+  }
+  function richterModelDefaultFor(id) {
+    if (id === "gemini") return "automatisch";
+    if (id === "openrouter") return "meta-llama/llama-3.3-70b-instruct:free";
+    if (id === "claude") return "claude-haiku-4-5";
+    if (id === "mistral") return "mistral-small-latest";
+    return "Standard";
+  }
+  function updateRichterModelPlaceholder() {
+    if (!richterModelEl) return;
+    richterModelEl.setAttribute("placeholder", "Modell (optional) · Standard: " + richterModelDefaultFor(optProvider));
+  }
+  function rebuildRichterProviderOptions() {
+    if (!richterProviderSelectEl) return;
+    var d = global.document;
+    var list = richterProvidersForPolicy();
+    var keep = optProvider, stillThere = false, i;
+    while (richterProviderSelectEl.children.length) richterProviderSelectEl.removeChild(richterProviderSelectEl.children[0]);
+    for (i = 0; i < list.length; i++) {
+      var o = d.createElement("option");
+      o.value = list[i].id; o.textContent = list[i].label;
+      if (list[i].id === keep) { o.selected = true; stillThere = true; }
+      richterProviderSelectEl.appendChild(o);
+    }
+    if (!stillThere && list.length) { optProvider = list[0].id; richterProviderSelectEl.children[0].selected = true; }
+    updateRichterModelPlaceholder();
+  }
+
   // ---- Spracheingabe (Modul 21) ----
 
-  function onVoiceClick() {
+  function onVoiceClick(targetEl) {
+    var target = targetEl || inputEl;
     var speech = global.SbkimSpeech;
     if (!speech || typeof speech.pickEngine !== "function") {
       setHint("Modul 21 (Spracheingabe) nicht geladen — bitte tippen.");
@@ -1086,7 +1624,7 @@
       try {
         activeRecognizer = speech.makeBrowserRecognizer({
           lang: lang,
-          onResult: function (t) { appendToInput(t); setHint("Erkannt: " + t); },
+          onResult: function (t) { appendToField(target, t); setHint("Erkannt: " + t); },
           onError: function (h) { setHint(h); },
           onEnd: function () { activeRecognizer = null; },
         });
@@ -1101,11 +1639,68 @@
     setHint("Sprach-Engine '" + engine + "' braucht einen EU-Schlüssel — bitte tippen.");
   }
 
+  // 📷 OCR-Eingabe (Strang B2): Foto/Handschrift → Suchtext via Modul 24.
+  // Öffnet einen Datei-Wähler, lässt das Bild per Mistral OCR (EU, BYOK) erkennen
+  // und hängt den Text ans Feld. EU-Politik des Widgets gilt. Fail-soft.
+  function onOcrClick(targetEl) {
+    var target = targetEl || inputEl;
+    var ocr = global.SbkimOcr;
+    if (!ocr || typeof ocr.recognize !== "function") {
+      setHint("Modul 24 (OCR) nicht geladen — bitte tippen.");
+      return;
+    }
+    var doc = global.document;
+    if (!doc || typeof global.FileReader !== "function") {
+      setHint("OCR braucht einen Browser — bitte tippen.");
+      return;
+    }
+    var inp = doc.createElement("input");
+    inp.type = "file";
+    inp.accept = "image/*,application/pdf";
+    inp.setAttribute("capture", "environment");
+    inp.style.display = "none";
+    inp.addEventListener("change", function () {
+      var file = inp.files && inp.files[0];
+      if (inp.parentNode) inp.parentNode.removeChild(inp);
+      if (!file) return;
+      if (!ocrKey) {
+        var k = (typeof global.prompt === "function")
+          ? global.prompt("OCR-Schlüssel (EU/Mistral, nur diese Sitzung — wird nicht gespeichert):") : null;
+        if (!k) return;
+        ocrKey = String(k).trim();
+      }
+      setHint("📷 Texterkennung läuft …");
+      var reader = new global.FileReader();
+      reader.onload = function (ev) {
+        ocr.recognize(String(ev.target.result),
+          { provider: "mistral", apiKey: ocrKey, mimeType: file.type, euPolicy: optEuPolicy })
+          .then(function (r) {
+            if (r && r.available) {
+              appendToField(target, r.text || "");
+              var ver = r.model ? (" · Mistral OCR " + r.model) : "";
+              setHint((r.text ? ("Erkannt (" + r.text.length + " Zeichen)") : "Kein Text erkannt") + ver);
+            } else {
+              var reason = (r && r.reason) || "Texterkennung nicht möglich.";
+              if (/Schlüssel/.test(reason)) ocrKey = "";
+              setHint("⚠️ " + reason);
+            }
+          })
+          .catch(function (e) {
+            setHint("⚠️ " + (ocr.ocrErrorHint ? ocr.ocrErrorHint(e) : "Texterkennung nicht möglich — bitte tippen."));
+          });
+      };
+      reader.onerror = function () { setHint("Bild konnte nicht gelesen werden."); };
+      reader.readAsDataURL(file);
+    });
+    (doc.body || doc.documentElement).appendChild(inp);
+    inp.click();
+  }
+
   // ---- Komponierte Suche (Vorfilter → Richter → Fail-soft) ----
   // Spiegelung des Helfers sbkimHybridSearch aus HYBRID-MATCH-EINBAU.md.
 
-  function search(text) {
-    return runMultiSearch(text);
+  function search(text, onLive) {
+    return runMultiSearch(text, onLive);
   }
 
   // Lazy-Korpus-Vorbereitung: führt corpusPreparer EINMAL aus (Embedding etc.),
@@ -1247,11 +1842,14 @@
       "",
       "WICHTIG für die Ausgabe:",
       "- Lege die Antwort in EINEN Code-Block (```), damit ich sie mit einem Klick kopieren kann.",
-      "- Im Code-Block NUR gültiges JSON, sonst nichts.",
-      "- Erfinde KEINE URLs, nur echte Treffer. Keine Dubletten.",
-      "- Format pro Eintrag:",
-      '  {"titel": "...", "url": "https://...", "quelle": "domain.de", "text": "ein bis zwei Sätze"}',
-      "- So viele echte Einträge wie möglich (Ziel bis 100).",
+      "- Im Code-Block NUR gültiges JSON, sonst nichts. EIN JSON-Objekt:",
+      '  {"zusammenfassung": "...", "treffer": [ {"titel":"...","url":"https://...","quelle":"domain.de","text":"ein bis zwei Sätze"} ]}',
+      "- zusammenfassung: 2–4 kurze Sätze IN DER SPRACHE MEINER FRAGE, die ERKLÄREN,",
+      "  WARUM diese Reihenfolge/Auswahl sinnvoll ist (kurze inhaltliche Begründung — z.B. warum",
+      "  bestimmte Quellen zuerst kommen, worauf zu achten ist), damit ich die Seiten NICHT alle",
+      "  öffnen muss. Nüchtern, keine Werbung.",
+      "- treffer: nach Bedeutungsnähe geordnet; erfinde KEINE URLs, nur echte Treffer, keine Dubletten.",
+      "- So viele echte Treffer wie möglich (Ziel bis 100).",
     ]).join("\n");
   }
 
@@ -1266,18 +1864,30 @@
   }
 
   // Eingefügte KI-Antwort → saubere Eintrags-Liste. Verträgt Code-Fences
-  // (```json … ```), Text drumherum und gesäuberte URLs. [] wenn kein Array.
+  // (```json … ```), Text drumherum und gesäuberte URLs. Akzeptiert ein blankes
+  // Array ODER ein Objekt {zusammenfassung, treffer:[…]}. [] wenn nichts brauchbar.
   function parseAiAnswer(text) {
     if (typeof text !== "string" || !text.trim()) return [];
     var raw = text.trim();
     var fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
     if (fence) raw = fence[1].trim();
-    var start = raw.indexOf("[");
-    var end = raw.lastIndexOf("]");
-    if (start < 0 || end <= start) return [];
-    var arr;
-    try { arr = JSON.parse(raw.slice(start, end + 1)); }
-    catch (e) { return []; }
+    var arr = null;
+    // Form 1: Objekt mit treffer-Array (neues Format mit Zusammenfassung).
+    try {
+      var os = raw.indexOf("{"), oe = raw.lastIndexOf("}");
+      if (os >= 0 && oe > os) {
+        var obj = JSON.parse(raw.slice(os, oe + 1));
+        if (obj && Array.isArray(obj.treffer)) arr = obj.treffer;
+      }
+    } catch (_e) { /* nb — Fallback unten */ }
+    // Form 2: blankes Array (altes Format).
+    if (!arr) {
+      var start = raw.indexOf("[");
+      var end = raw.lastIndexOf("]");
+      if (start < 0 || end <= start) return [];
+      try { arr = JSON.parse(raw.slice(start, end + 1)); }
+      catch (e) { return []; }
+    }
     if (!Array.isArray(arr)) return [];
     var out = [];
     for (var i = 0; i < arr.length; i++) {
@@ -1290,6 +1900,24 @@
       out.push({ titel: titel || url, url: url, quelle: quelle, text: txt });
     }
     return out;
+  }
+
+  // Kurze KI-Zusammenfassung („warum diese Reihenfolge") aus der Antwort ziehen.
+  // "" wenn keine vorhanden (altes Array-Format / Mensch hat nur Treffer geliefert).
+  function extractAiSummary(text) {
+    if (typeof text !== "string" || !text.trim()) return "";
+    var raw = text.trim();
+    var fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fence) raw = fence[1].trim();
+    try {
+      var os = raw.indexOf("{"), oe = raw.lastIndexOf("}");
+      if (os >= 0 && oe > os) {
+        var obj = JSON.parse(raw.slice(os, oe + 1));
+        if (obj && typeof obj.zusammenfassung === "string") return obj.zusammenfassung.trim();
+        if (obj && typeof obj.summary === "string") return obj.summary.trim();
+      }
+    } catch (_e) { /* fail-soft */ }
+    return "";
   }
 
   function hasPastedAi() { return !!(pastedAiText && parseAiAnswer(pastedAiText).length); }
@@ -1331,17 +1959,24 @@
     var context = aiContextEl ? aiContextEl.value : "";
     var prompt = buildAiPrompt(query, context);
     var prov = aiProviderById(optAiProvider);
+    // Kopieren UND öffnen (Klaus 2026-06-22, Befund App-Link): Anbieter wie
+    // ChatGPT/Claude/Gemini haben oft eine EIGENE App — Android öffnet die URL dann
+    // als parallele App in eigenem Task; die PWA läuft ungestört weiter (kein
+    // Reload, Inhalt bleibt). Ist KEINE App installiert, öffnet die URL in Chrome
+    // (gleiche Engine wie die PWA → mögliche Kollision) — darum bleibt der Prompt
+    // zusätzlich in der Zwischenablage als verlässlicher Weg, und persistQuery +
+    // Reload-Schutz sichern den Inhalt. Nur die reine Web-Suche (ohne eigene App)
+    // ist konsequent copy-only.
     copyToClipboard(prompt).then(function (ok) {
       setHint(ok
-        ? "Prompt kopiert → bei " + prov.label + " einfügen, Antwort hierher zurück."
-        : "Prompt im Feld unten — manuell kopieren, bei " + prov.label + " einfügen.");
-      if (!ok && aiPasteEl) { /* Sichtbar machen, falls Clipboard verboten ist. */ }
+        ? "Prompt kopiert + " + prov.label + " wird geöffnet (eigene App läuft parallel) — Antwort hierher zurück einfügen."
+        : prov.label + " wird geöffnet — Prompt im Feld unten markieren/kopieren, falls nötig.");
     });
     try {
       if (typeof global.open === "function") {
         global.open(prov.openUrl + encodeURIComponent(prompt), "_blank", "noopener");
       }
-    } catch (_e) { /* nb — Clipboard reicht als verlässlicher Weg */ }
+    } catch (_e) { /* nb — Clipboard bleibt der verlässliche Weg */ }
   }
 
   // „Antwort sortieren": eingefügte KI-Antwort übernehmen und Suche auslösen.
@@ -1841,23 +2476,104 @@
 
   // Stufe 2 (Sortiermaschine): Modul 04 queryLocal-Cosinus über EINEN Korpus,
   // Treffer mit Quelle (source) + Bedeutungs-Text + URL angereichert.
+  // Eine echte, extern öffenbare Adresse (http/https) — KEIN interner Seiten-Anker
+  // wie "modul-06". Knoten-/Internet-Treffer tragen ihre App-URL im anchorId.
+  function isExternalUrl(s) {
+    return typeof s === "string" && /^https?:\/\//i.test(s);
+  }
+
+  // Query einmal einbetten (Modul 03), damit der „verwandt"-Modus relatedness()
+  // gegen die Treffer-Inhalts-Vektoren rechnen kann. Fail-soft: ohne Modul 03 /
+  // bei Fehler → null (dann degradiert die Sicht sauber auf „verbunden").
+  function computeQueryVec(query) {
+    var embedding = global.SbkimEmbedding;
+    if (!embedding || typeof embedding.embedQuery !== "function") return Promise.resolve(null);
+    return Promise.resolve()
+      .then(function () { return embedding.embedQuery(query); })
+      .then(function (vec) {
+        return (vec && vec.length) ? vec : null;
+      })
+      .catch(function (err) { warn("Query-Embedding für 'verwandt'-Sicht fehlgeschlagen — Sicht bleibt 'verbunden'.", err); return null; });
+  }
+
+  // A4 (Bau 04.H): Frage-Varianten über die app-eigene Synonym-Karte bilden.
+  // Fail-soft: A4 aus, kein expandQuerySimple oder Wurf → nur [query] (byte-
+  // gleich zum Einzel-Fall, kein Regress).
+  function expandVariants(match, query) {
+    if (!optQueryExpand || typeof match.expandQuerySimple !== "function") return [query];
+    try {
+      var vs = match.expandQuerySimple(query, { synonyms: optSynonyms });
+      return (Array.isArray(vs) && vs.length) ? vs : [query];
+    } catch (e) { warn("Query-Expansion fehlgeschlagen — Einzel-Frage.", e); return [query]; }
+  }
+
+  // Rang-Liste (queryLocal / queryLocalMulti) → angereicherte Treffer mit
+  // Quelle, Bedeutungs-Text, Öffnen-Link, nodeId, passageVec (aus dem Korpus
+  // rekonstruiert — queryLocalMulti gibt nur label/score/anchorId zurück).
+  function enrichRanked(res, corpus, source) {
+    res = res || [];
+    var byKey = {};
+    for (var i = 0; i < corpus.length; i++) { var c = corpus[i]; byKey[c.anchorId || c.label] = c; }
+    return res.map(function (r) {
+      var src = byKey[r.anchorId || r.label] || {};
+      return {
+        label: r.label, score: r.score, anchorId: r.anchorId, source: source,
+        text: src.text || r.label, snippet: src.snippet || null,
+        // Öffnen-Link: explizite url ODER ein anchorId, das eine echte externe
+        // Adresse ist (Knoten-Treffer → App-URL im anchorId). So zeigen Zeilen-
+        // Link, Detail-Karte „↗ Seite öffnen", Merkliste + Text-Export den Link.
+        url: src.url || (isExternalUrl(r.anchorId) ? r.anchorId : null),
+        nodeId: src.nodeId || null,   // für den Live-Cross-Knoten-Pfad (Knoten-Bereich)
+        // Inhalts-Vektor durchreichen — der „verwandt"-Modus braucht ihn für
+        // relatedness(queryVec, passageVec). RAM-only, wird NICHT persistiert.
+        passageVec: src.passageVec || null,
+      };
+    });
+  }
+
   function queryCorpus(query, corpus, source) {
     var match = global.SbkimMatch;
     if (!match || typeof match.queryLocal !== "function") return Promise.resolve([]);
     if (!Array.isArray(corpus) || corpus.length === 0) return Promise.resolve([]);
     var k = Math.min(corpus.length, MAX_RANK); // viel ranken, UI paginiert
-    return Promise.resolve(match.queryLocal(query, k, { corpus: corpus })).then(function (res) {
-      res = res || [];
-      var byKey = {};
-      for (var i = 0; i < corpus.length; i++) { var c = corpus[i]; byKey[c.anchorId || c.label] = c; }
-      return res.map(function (r) {
-        var src = byKey[r.anchorId || r.label] || {};
-        return {
-          label: r.label, score: r.score, anchorId: r.anchorId, source: source,
-          text: src.text || r.label, snippet: src.snippet || null, url: src.url || null,
-        };
+
+    // A1 (Bau 04.F): Vorfilter auf Hybrid BM25+Vektor heben — cross-phrased
+    //   Wort-Treffer, die der reine Cosinus-Boden (PROVIDER_MIN_MATCH 0.80)
+    //   ausschließt, werden über den lexikalischen Pfad AUFGENOMMEN. Fail-soft:
+    //   ohne `text`-Feld fällt BM25 in Modul 04 auf `label` zurück.
+    // A4 (Bau 04.H): mit mehreren Frage-Varianten suchen und via RRF verschmelzen
+    //   (queryLocalMulti). Rein additiv — senkt keine Schwelle, gatet nichts;
+    //   der Andock-Riegel (Modul 05) bleibt unberührt.
+    // A4 (Bau 04.I): Ausschluss-/Negations-Filter. „alkoholfrei" / „ohne
+    //   Erdbeeren" (Allergie) sind Constraints, keine Ähnlichkeit — der
+    //   Cosinus filtert sie nicht. EINMAL aus der Original-Frage geparst
+    //   (konsistent über alle Multi-Query-Varianten) und als fertige Menge
+    //   durchgereicht. Ohne Verneinung passiert nichts (byte-gleiches Ranking).
+    var hybridOpts = { corpus: corpus, hybrid: true };
+    var exclusions = (typeof match.parseExclusions === "function")
+      ? match.parseExclusions(query) : null;
+    if (exclusions && (exclusions.alcoholFree ||
+        (exclusions.terms && exclusions.terms.length))) {
+      hybridOpts.exclude = exclusions;
+    }
+    var ranked;
+    if (typeof match.queryLocalMulti === "function") {
+      ranked = Promise.resolve(match.queryLocalMulti(expandVariants(match, query), k, hybridOpts));
+    } else {
+      ranked = Promise.resolve(match.queryLocal(query, k, hybridOpts));
+    }
+    return ranked
+      .then(function (res) { return enrichRanked(res, corpus, source); })
+      .catch(function (err) {
+        // Fail-soft: A1/A4-Pfad-Fehler → zurück auf den einfachen Cosinus-Pfad
+        // (Bau 04.C), damit die Suche nie an der Verbesserung scheitert.
+        warn("Hybrid/Multi-Query fehlgeschlagen — Fallback auf einfachen Vorfilter.", err);
+        var fbOpts = { corpus: corpus };
+        if (hybridOpts.exclude) fbOpts.exclude = hybridOpts.exclude;
+        return Promise.resolve(match.queryLocal(query, k, fbOpts))
+          .then(function (res) { return enrichRanked(res, corpus, source); })
+          .catch(function (err2) { warn("Vorfilter-Fallback fehlgeschlagen.", err2); return []; });
       });
-    });
   }
 
   // Stufe 1 (Eingang) für den Internet-Bereich: SearXNG-Roh-Treffer holen.
@@ -1897,13 +2613,60 @@
     });
   }
 
-  function areaCandidates(area, query) {
+  function areaCandidates(area, query, onLive) {
     if (area === "app") {
       return ensureCorpusPrepared().then(function () { return queryCorpus(query, localCorpus, "app"); })
         .catch(function (err) { warn("App-Bereich-Suche fehlgeschlagen.", err); return []; });
     }
     if (area === "knoten") {
-      return ensureNodeCorpusPrepared().then(function () { return queryCorpus(query, nodeCorpus, "knoten"); })
+      return ensureNodeCorpusPrepared()
+        .then(function () { return queryCorpus(query, nodeCorpus, "knoten"); })
+        .then(function (localHits) {
+          if (!Array.isArray(localHits)) localHits = [];
+          // Live-Pfad (Bau Query-über-Relais) — NICHT-BLOCKIEREND (Pflege 2026-06-28):
+          // den top-rangierten Nachbarn MIT nodeId LIVE übers Brett fragen. Die
+          // lokalen Treffer (WELCHER Knoten passt) gehen SOFORT zurück; die Live-
+          // Antwort (WAS der Knoten gerade dazu hat) wird — auch Minuten später bei
+          // schwachem Netz / kaltem Embedding-Modell — über onLive in die Liste
+          // NACHGEREICHT, statt die ganze Suche zu blockieren. Fail-soft: ohne
+          // queryNode (Standalone) oder ohne onLive (programmatisch ohne Sink) bleibt
+          // es beim lokalen Treffer; ohne/zu späte Antwort bleibt die Liste, wie sie ist.
+          if (typeof queryNodeFn === "function" && typeof onLive === "function") {
+            var targets = [], seen = {};
+            for (var i = 0; i < localHits.length && targets.length < LIVE_NODE_MAX; i++) {
+              var h = localHits[i];
+              if (h && h.nodeId && !seen[h.nodeId]) { seen[h.nodeId] = 1; targets.push(h); }
+            }
+            if (targets.length) {
+              var liveTasks = targets.map(function (t) {
+                return Promise.resolve(queryNodeFn(t.nodeId, query))
+                  .then(function (rows) {
+                    if (!Array.isArray(rows)) return [];
+                    return rows.map(function (r) {
+                      var aId = (r && r.anchorId) ? r.anchorId : (t.anchorId || null);
+                      return {
+                        label: (r && r.label) ? r.label : "",
+                        score: (r && typeof r.score === "number") ? r.score : 0,
+                        anchorId: aId,
+                        url: isExternalUrl(aId) ? aId : null,   // „↗ Seite öffnen" auch für Live-Treffer
+                        source: "knoten", text: (r && r.label) ? r.label : "",
+                        live: true, viaNode: t.label,
+                      };
+                    }).filter(function (x) { return x.label; });
+                  })
+                  .catch(function (err) { warn("Live-Frage an Knoten " + t.label + " fehlgeschlagen.", err); return []; });
+              });
+              // Fire-and-forget: sobald die (evtl. späten) Live-Antworten da sind,
+              // über onLive nachreichen — der Aufrufer mischt sie in die Anzeige.
+              Promise.all(liveTasks).then(function (lists) {
+                var liveRows = [];
+                for (var j = 0; j < lists.length; j++) liveRows = liveRows.concat(lists[j]);
+                if (liveRows.length) { try { onLive(liveRows); } catch (e) {} }
+              });
+            }
+          }
+          return localHits;
+        })
         .catch(function (err) { warn("Knoten-Bereich-Suche fehlgeschlagen.", err); return []; });
     }
     return Promise.resolve([]);
@@ -1916,9 +2679,10 @@
     var forJudge = candidates.map(function (c) {
       return { label: c.label, text: c.text || c.label, cosine: c.score, anchorId: c.anchorId };
     });
+    var judgeOpts = { apiKey: optApiKey, provider: optProvider, euOnly: euOnlyForPolicy() };
+    if (optRichterModel) judgeOpts.model = optRichterModel;  // leer = Standard/auto (z.B. Gemini)
     return Promise.resolve(match.hybridMatch(
-        { text: query, label: optQueryLabel || null }, forJudge,
-        { apiKey: optApiKey, provider: optProvider, euOnly: euOnlyForPolicy() }))
+        { text: query, label: optQueryLabel || null }, forJudge, judgeOpts))
       .then(function (judgment) {
         if (!judgment || !judgment.available) {
           return { mode: "semantisch", treffer: candidates, reason: judgment && judgment.reason };
@@ -1929,7 +2693,7 @@
           .map(function (v) {
             var c = byKey[v.anchorId || v.label] || {};
             return { label: v.label, score: v.score, anchorId: v.anchorId, source: c.source,
-                     text: c.text, url: c.url, begruendung: v.begruendung };
+                     text: c.text, url: c.url, begruendung: v.begruendung, passageVec: c.passageVec || null };
           })
           .sort(function (a, b) { return (b.score || 0) - (a.score || 0); });
         return { mode: "richter", treffer: treffer, attestation: judgment.attestation };
@@ -1939,10 +2703,78 @@
       });
   }
 
+  function kiRelKey(t) { return (t.anchorId || "") + "|" + (t.label || ""); }
+
+  // „· KI"-Verwandtschaft: dieselbe hybridMatch-Brücke wie der Richter, aber das
+  // Urteil wird NICHT auf passt gefiltert — wir wollen ALLE Verdikte (Score +
+  // passt-Flag), um die ANZEIGE nach dem KI-Bedeutungs-Maß zu sortieren. Liefert
+  // eine byKey-Karte, fail-soft (available:false bei Fehler / ohne Schlüssel).
+  function kiRelatedness(query, treffer) {
+    var match = global.SbkimMatch;
+    if (!match || typeof match.hybridMatch !== "function") {
+      return Promise.resolve({ available: false, byKey: {}, reason: "Modul 04 hybridMatch fehlt." });
+    }
+    var forJudge = treffer.map(function (c) {
+      return { label: c.label, text: c.text || c.label, cosine: c.score, anchorId: c.anchorId };
+    });
+    var judgeOpts = { apiKey: optApiKey, provider: optProvider, euOnly: euOnlyForPolicy() };
+    if (optRichterModel) judgeOpts.model = optRichterModel;
+    return Promise.resolve(match.hybridMatch(
+        { text: query, label: optQueryLabel || null }, forJudge, judgeOpts))
+      .then(function (j) {
+        if (!j || !j.available) return { available: false, byKey: {}, reason: j && j.reason };
+        var byKey = {};
+        (j.verdicts || []).forEach(function (v) {
+          byKey[(v.anchorId || "") + "|" + (v.label || "")] =
+            { score: v.score, passt: v.passt, begruendung: v.begruendung };
+        });
+        return { available: true, byKey: byKey, attestation: j.attestation };
+      })
+      .catch(function (err) {
+        return { available: false, byKey: {}, reason: (err && err.message) || String(err) };
+      });
+  }
+
+  // Stößt das KI-Verwandtschafts-Urteil an, wenn (und nur wenn) „verwandt" + „· KI"
+  // + Schlüssel da sind und für die aktuelle Frage noch kein Urteil vorliegt. Zeigt
+  // währenddessen weiter den gratis Cosinus (fail-soft); nach dem Urteil ein
+  // Re-Render. Cache-Guard (query + available) verhindert eine Schleife/Doppelruf.
+  function ensureKiRelated(res) {
+    if (viewMode !== "verwandt" || !viewKiRelated || !optApiKey) return;
+    var match = global.SbkimMatch;
+    if (!match || typeof match.hybridMatch !== "function") return;
+    var q = (queryValue || "").trim();
+    if (!q) return;
+    var treffer = (res && res.treffer) || [];
+    if (!treffer.length) return;
+    if (kiRelatedState.running) return;
+    if (kiRelatedState.query === q && kiRelatedState.available) return;
+    kiRelatedState.running = true;
+    setHint("KI-Richter beurteilt die Verwandtschaft … (kann etwas dauern)");
+    kiRelatedness(q, treffer).then(function (out) {
+      kiRelatedState = { query: q, byKey: out.byKey || {}, available: !!out.available, running: false };
+      if ((queryValue || "").trim() !== q) return;   // veraltet (neue Suche) → nicht zeichnen
+      setHint(out.available
+        ? "KI-Richter hat nach Verwandtschaft sortiert."
+        : "KI-Richter nicht verfügbar — gratis Cosinus-Rangfolge." + (out.reason ? " (" + out.reason + ")" : ""));
+      if (lastRenderRes) renderResults(lastRenderRes);
+    }).catch(function (err) {
+      kiRelatedState = { query: q, byKey: {}, available: false, running: false };
+      warn("KI-Verwandtschaft fehlgeschlagen — gratis Cosinus.", err);
+    });
+  }
+
+  // Greift das KI-Urteil gerade für die ANZEIGE (verwandt + KI + Schlüssel + Urteil
+  // zur aktuellen Frage vorhanden)? Genutzt von displayTreffer + buildResultsText.
+  function kiRelatedActive() {
+    return viewMode === "verwandt" && viewKiRelated && !!optApiKey &&
+      kiRelatedState.available && kiRelatedState.query === (queryValue || "").trim();
+  }
+
   // Mehrfach-Suche: gewählte Bereiche → je Cosinus-Kandidaten → zusammenführen →
   // optional KI-Richter → gerankte Treffer mit Quellen-Badge. Internet ohne
   // SearXNG-URL → Neuer-Tab-Karte (webLink) statt Inline-Treffer.
-  function runMultiSearch(text) {
+  function runMultiSearch(text, onLive) {
     if (typeof text !== "string" || text.trim().length === 0) {
       lastSearchMode = "leer";
       return Promise.resolve({ mode: "leer", treffer: [], webLink: null });
@@ -1973,7 +2805,7 @@
 
     var tasks = [];
     if (areas.app.enabled) tasks.push(areaCandidates("app", query));
-    if (areas.knoten.enabled) tasks.push(areaCandidates("knoten", query));
+    if (areas.knoten.enabled) tasks.push(areaCandidates("knoten", query, onLive));
 
     // Internet-Bereich separat (kann Kandidaten ODER einen webLink liefern).
     var internetP = Promise.resolve({ candidates: [], webLink: null });
@@ -2005,9 +2837,14 @@
       }
     }
 
-    return Promise.all([Promise.all(tasks), internetP]).then(function (both) {
+    // Query-Vektor parallel einbetten (für den „verwandt"-Modus). Blockiert die
+    // Suche nicht zusätzlich — läuft neben den Bereichs-Tasks.
+    var qvecP = computeQueryVec(query);
+
+    return Promise.all([Promise.all(tasks), internetP, qvecP]).then(function (both) {
       var lists = both[0];
       var internet = both[1];
+      lastQueryVec = both[2] || null;
       var all = [];
       lists.forEach(function (l) { if (Array.isArray(l)) all = all.concat(l); });
       if (Array.isArray(internet.candidates)) all = all.concat(internet.candidates);
@@ -2042,10 +2879,34 @@
     var text = inputEl ? inputEl.value : queryValue;
     queryValue = text;
     setHint("Suche läuft …");
+    kiRelatedState = { query: null, byKey: {}, available: false, running: false }; // neue Frage → KI-Urteil neu holen
     searchCount++;
+    var myToken = searchCount;                // gegen veraltete Live-Antworten
     resultsVisibleCount = RESULT_PAGE_SIZE; // neue Suche → wieder die ersten 10
     expand(); // Ergebnis ist da bzw. kommt — Widget wächst.
-    return runMultiSearch(text).then(function (res) {
+    var baseRes = null;
+    // Live-Antwort vom Knoten kommt evtl. erst Minuten später (schwaches Netz,
+    // kaltes Embedding-Modell). Wir reichen sie dann in die schon gezeigte Liste
+    // nach (einsortiert nach Score), statt die Suche so lange zu blockieren.
+    function onLiveKnoten(liveRows) {
+      if (myToken !== searchCount || !baseRes) return;   // neue Suche gestartet → verwerfen
+      if (!Array.isArray(liveRows) || !liveRows.length) return;
+      var merged = (baseRes.treffer || []).slice();
+      var keyset = {};
+      merged.forEach(function (t) { keyset[(t.anchorId || "") + "|" + t.label] = 1; });
+      liveRows.forEach(function (r) {
+        var k = (r.anchorId || "") + "|" + r.label;
+        if (!keyset[k]) { keyset[k] = 1; merged.push(r); }
+      });
+      merged.sort(function (a, b) { return (b.score || 0) - (a.score || 0); });
+      if (merged.length > MAX_RANK) merged = merged.slice(0, MAX_RANK);
+      baseRes = { mode: baseRes.mode, treffer: merged, webLink: baseRes.webLink,
+                  reason: baseRes.reason, attestation: baseRes.attestation };
+      renderResults(baseRes);
+      setHint("Live-Antwort vom Knoten ergänzt.");
+    }
+    return runMultiSearch(text, onLiveKnoten).then(function (res) {
+      baseRes = res;
       renderResults(res);
       return res;
     }).catch(function (err) {
@@ -2067,6 +2928,54 @@
     } catch (e) { warn("Konnte Link nicht öffnen: " + url, e); }
   }
 
+  // Sprache der Zusammenfassung grob erkennen (DE/EN/RU — wie Modul 21 SPEECH_LANGS),
+  // damit die Vorlese-Stimme die RICHTIGE Sprache/Stimme nimmt (Klaus 2026-06-23).
+  // Leichte Heuristik, server-los: Kyrillisch → ru; deutsche Sonderzeichen/Stoppwörter
+  // → de; englische Stoppwörter → en; sonst Default de.
+  function detectLangCode(text) {
+    var t = String(text || "");
+    if (/[Ѐ-ӿ]/.test(t)) return "ru-RU";
+    var lower = " " + t.toLowerCase().replace(/[^\p{L}\s]/gu, " ") + " ";
+    if (/[äöüß]/.test(lower)) return "de-DE";
+    var de = (lower.match(/ (der|die|das|und|nicht|weil|eine|einen|für|ist|ich|mit|auch|wird|werden|zum|zur|sind|wurde|warum|reihenfolge|gewählt) /g) || []).length;
+    var en = (lower.match(/ (the|and|because|why|this|with|are|was|were|of|to|is|for|that|chosen|order|first|should) /g) || []).length;
+    if (en > de) return "en-US";
+    return "de-DE";
+  }
+
+  function pickVoiceFor(lang) {
+    try {
+      var synth = global.speechSynthesis;
+      if (!synth || typeof synth.getVoices !== "function") return null;
+      var voices = synth.getVoices() || [];
+      var two = lang.slice(0, 2).toLowerCase();
+      // Exakte Sprach-Region zuerst, sonst gleiche Sprache.
+      for (var i = 0; i < voices.length; i++) { if ((voices[i].lang || "").toLowerCase().replace("_", "-") === lang.toLowerCase()) return voices[i]; }
+      for (var j = 0; j < voices.length; j++) { if ((voices[j].lang || "").toLowerCase().indexOf(two) === 0) return voices[j]; }
+    } catch (_e) { /* nb */ }
+    return null;
+  }
+
+  // Text vorlesen (Browser-Sprachausgabe, server-los, gratis), in der erkannten
+  // Sprache. Toggle: läuft schon etwas → stoppen. Fail-soft ohne speechSynthesis.
+  function readAloud(text) {
+    try {
+      var synth = global.speechSynthesis;
+      if (!synth || typeof global.SpeechSynthesisUtterance !== "function") {
+        setHint("Vorlesen wird vom Browser nicht unterstützt.");
+        return;
+      }
+      if (synth.speaking) { synth.cancel(); return; }
+      if (!text) return;
+      var lang = detectLangCode(text);
+      var u = new global.SpeechSynthesisUtterance(String(text));
+      u.lang = lang;
+      var v = pickVoiceFor(lang);
+      if (v) u.voice = v;
+      synth.speak(u);
+    } catch (e) { warn("Vorlesen fehlgeschlagen.", e); }
+  }
+
   function makeBadge(doc, srcKey) {
     var badge = doc.createElement("span");
     badge.className = "sbkim-sw-badge " + srcKey;
@@ -2076,14 +2985,19 @@
 
   // Alle gerankten Treffer als nüchterner Text-Block (zum Kopieren/Schicken).
   function buildResultsText(res) {
-    var t = (res && res.treffer) || [];
+    var t = displayTreffer(res);
     var q = (queryValue || "").trim();
+    var sortNote = (viewMode === "verwandt")
+      ? (kiRelatedActive() ? "sortiert nach Verwandtschaft (KI-Richter)" : "sortiert nach Verwandtschaft (Rangfolge)")
+      : "sortiert nach Bedeutung";
     var head = "SBKIM-Suche" + (q ? " — \"" + q + "\"" : "") +
-      "  (" + t.length + " Treffer, sortiert nach Bedeutung)";
+      "  (" + t.length + " Treffer, " + sortNote + ")";
     var lines = [head, ""];
     for (var i = 0; i < t.length; i++) {
       var r = t[i];
-      var pct = (typeof r.score === "number") ? (Math.round(r.score * 100) + "%  ") : "";
+      var relPct = (viewMode === "verwandt" && typeof r.relatedness === "number")
+        ? ("~" + Math.round(r.relatedness * 100) + "%  ") : "";
+      var pct = relPct + ((typeof r.score === "number") ? (Math.round(r.score * 100) + "%  ") : "");
       var src = r.source ? "[" + (SOURCE_LABELS[r.source] || r.source) + "] " : "";
       lines.push((i + 1) + ". " + src + pct + (r.label || ""));
       if (r.url) lines.push("    " + r.url);
@@ -2095,13 +3009,96 @@
     return lines.join("\n").replace(/\n+$/, "\n");
   }
 
+  function shallowCopyTreffer(t) {
+    var copy = {};
+    for (var key in t) { if (Object.prototype.hasOwnProperty.call(t, key)) copy[key] = t[key]; }
+    return copy;
+  }
+
+  // REINE Funktion (keine Seiteneffekte, headless testbar): wendet die Anzeige-Sicht
+  // auf eine Trefferliste an.
+  //   mode "verbunden" → Liste unverändert (gewohnte rohe Cosinus-Reihenfolge).
+  //   mode "verwandt"  → je Treffer relatedness(queryVec, t.passageVec) (Modul 04,
+  //                      zentrierter Cosinus) anhängen, absteigend sortieren;
+  //                      opts.relatedOnly blendet nicht-isRelated-Treffer aus.
+  // Fail-soft: ohne Modul 04 / ohne queryVec → Liste unverändert (degradiert auf
+  // "verbunden"). Treffer ohne passageVec (z.B. wiederhergestellte Suche, Live-
+  // Knoten-Antwort ohne Vektor) bekommen relatedness=null und wandern nach unten
+  // (bzw. werden bei relatedOnly ausgeblendet). relatedness() wirft bei falscher
+  // Eingabe InvalidVectorError → pro Treffer abgefangen, kein Bruch der ganzen Liste.
+  function rankView(treffer, queryVec, opts) {
+    opts = opts || {};
+    var mode = opts.mode || "verbunden";
+    var relatedOnly = !!opts.relatedOnly;
+    var kiByKey = opts.kiByKey || null;
+    var list = Array.isArray(treffer) ? treffer.slice() : [];
+    if (mode !== "verwandt") return list;
+    var match = global.SbkimMatch;
+    // „· KI": liegt ein KI-Richter-Urteil vor (byKey), danach ranken — das echte
+    // Bedeutungs-Maß (Score 0..1, passt-Flag) statt des zentrierten Cosinus.
+    // Fail-soft: ohne Urteil fällt es unten auf den Cosinus-Pfad zurück.
+    if (kiByKey) {
+      var ek = list.map(function (t) {
+        var v = kiByKey[(t.anchorId || "") + "|" + (t.label || "")];
+        var copy = shallowCopyTreffer(t);
+        var s = (v && typeof v.score === "number" && isFinite(v.score)) ? v.score : null;
+        copy.relatedness = s;
+        copy.isRelated = !!(v && v.passt);
+        copy.kiJudged = true;
+        if (v && v.begruendung && !copy.begruendung) copy.begruendung = v.begruendung;
+        return copy;
+      });
+      ek.sort(function (a, b) {
+        var ra = (a.relatedness === null) ? -Infinity : a.relatedness;
+        var rb = (b.relatedness === null) ? -Infinity : b.relatedness;
+        if (rb !== ra) return rb - ra;
+        return (b.score || 0) - (a.score || 0);
+      });
+      if (relatedOnly) ek = ek.filter(function (t) { return t.isRelated; });
+      return ek;
+    }
+    if (!match || typeof match.relatedness !== "function" || !queryVec) return list;
+    var enriched = list.map(function (t) {
+      var rel = null;
+      if (t && t.passageVec) {
+        try { rel = match.relatedness(queryVec, t.passageVec); }
+        catch (_e) { rel = null; } // InvalidVectorError o.ä. → fail-soft, Treffer bleibt
+      }
+      var copy = shallowCopyTreffer(t);
+      copy.relatedness = (typeof rel === "number" && isFinite(rel)) ? rel : null;
+      copy.isRelated = copy.relatedness !== null &&
+        (typeof match.isRelated === "function" ? match.isRelated(copy.relatedness) : copy.relatedness >= 0.30);
+      return copy;
+    });
+    enriched.sort(function (a, b) {
+      var ra = (a.relatedness === null) ? -Infinity : a.relatedness;
+      var rb = (b.relatedness === null) ? -Infinity : b.relatedness;
+      if (rb !== ra) return rb - ra;
+      return (b.score || 0) - (a.score || 0);
+    });
+    if (relatedOnly) enriched = enriched.filter(function (t) { return t.isRelated; });
+    return enriched;
+  }
+
+  // Die für die ANZEIGE aufbereitete Trefferliste (Sicht angewandt). Genutzt von
+  // renderResults UND buildResultsText, damit Anzeige und „Block kopieren" gleich
+  // sortiert sind.
+  function displayTreffer(res) {
+    var kiByKey = kiRelatedActive() ? kiRelatedState.byKey : null;
+    return rankView((res && res.treffer) || [], lastQueryVec,
+      { mode: viewMode, relatedOnly: viewRelatedOnly, kiByKey: kiByKey });
+  }
+
   function renderResults(res) {
     if (!resultsEl) return;
     var doc = global.document;
     // Treffer-Liste neu zeichnen (createElement, kein innerHTML) — berührt das
     // Textfeld NICHT (UX-Erhalt).
     while (resultsEl.firstChild) resultsEl.removeChild(resultsEl.firstChild);
-    var treffer = res.treffer || [];
+    // Anzeige-Sicht anwenden (verbunden = unverändert, verwandt = nach relatedness
+    // umsortiert / optional gefiltert). Rein für die Darstellung — res.treffer (roh)
+    // bleibt unangetastet, ebenso die Persistenz.
+    var treffer = displayTreffer(res);
     var modeHint = {
       "modul-04-fehlt": "Modul 04 (Match) nicht geladen.",
       "fehler": "Suche fehlgeschlagen" + (res.reason ? " (" + res.reason + ")" : "") + ".",
@@ -2112,7 +3109,46 @@
       "richter": "KI-Richter-Urteil." + (res.reason ? " (Hinweis: " + res.reason + ")" : ""),
     };
     setHint(modeHint[res.mode] || "");
+
+    // Kurze KI-Zusammenfassung („warum diese Reihenfolge") ganz oben — aus der
+    // eingefügten/geholten KI-Antwort, sonst aus der wiederhergestellten Suche.
+    var summary = "";
+    if (hasPastedAi()) summary = extractAiSummary(pastedAiText);
+    if (!summary && res && typeof res.summary === "string") summary = res.summary;
+    res.summary = summary; // für Persistenz/Restore
     lastRenderRes = res;
+    // „· KI": Urteil bei Bedarf anstoßen (nur verwandt + KI + Schlüssel). Zeigt bis
+    // dahin den gratis Cosinus; bei Eintreffen folgt ein Re-Render. Fail-soft.
+    ensureKiRelated(res);
+    if (summary) {
+      var sumEl = doc.createElement("div");
+      sumEl.className = "sbkim-sw-summary";
+      var sumHead = doc.createElement("div");
+      sumHead.className = "sbkim-sw-summary-head";
+      var sumLabel = doc.createElement("span");
+      sumLabel.textContent = "Kurz erklärt — warum diese Reihenfolge";
+      sumHead.appendChild(sumLabel);
+      var sayBtn = doc.createElement("button");
+      sayBtn.type = "button";
+      sayBtn.className = "sbkim-sw-saybtn";
+      sayBtn.textContent = "🔊 Vorlesen";
+      sayBtn.setAttribute("title", "Zusammenfassung vorlesen (nochmal tippen stoppt)");
+      sayBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+      (function (txt) {
+        sayBtn.addEventListener("click", function (ev) {
+          if (ev && ev.preventDefault) ev.preventDefault();
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          readAloud(txt);
+        });
+      })(summary);
+      sumHead.appendChild(sayBtn);
+      sumEl.appendChild(sumHead);
+      var sumText = doc.createElement("div");
+      sumText.className = "sbkim-sw-summary-text";
+      sumText.textContent = summary;
+      sumEl.appendChild(sumText);
+      resultsEl.appendChild(sumEl);
+    }
 
     // 🖨 Block kopieren: ALLE gerankten Treffer als Text in die Zwischenablage,
     // damit Klaus den ganzen Block auf einen Klick rüberschicken kann.
@@ -2133,26 +3169,36 @@
 
     // Nur die ersten resultsVisibleCount zeigen, Rest hinter dem ▾-Pfeil
     // (Klaus 2026-06-21: 10 zeigen, je Klick 10 mehr).
+    var gkey = currentGroupKey();
     var shown = Math.min(treffer.length, resultsVisibleCount);
     for (var i = 0; i < shown; i++) {
       var t = treffer[i];
       var el = doc.createElement("div");
       el.className = "sbkim-sw-result";
+      // Tippen auf die Treffer-Zeile (außer Haken/Titel) → Tool-eigene Detail-Karte.
+      var detailItemForRow = merkItemOf(t);
+      attachDetailHandler(el, detailItemForRow);
       var line = doc.createElement("div");
+      line.className = "sbkim-sw-resultline";
+      // Merken-Haken pro Treffer (Klaus 2026-06-22). Gemerktes → localStorage,
+      // gruppiert unter der Suchfrage; funktioniert für alle Treffer-Arten.
+      line.appendChild(makeMerkCheckbox(doc, t, gkey));
       line.appendChild(makeBadge(doc, t.source || "app"));
 
       var titleEl;
       if (t.url) {
         titleEl = doc.createElement("a");
         titleEl.className = "sbkim-sw-result-link";
-        titleEl.href = t.url;
+        titleEl.href = t.url; // rechte Maustaste → „in neuem Tab öffnen" bleibt
         titleEl.target = "_blank";
         titleEl.rel = "noopener noreferrer";
         titleEl.textContent = t.label;
-        attachOpenHandler(titleEl, t.url);
+        attachDetailHandler(titleEl, detailItemForRow); // Linksklick → Detail-Karte
       } else {
         titleEl = doc.createElement("span");
+        titleEl.className = "sbkim-sw-result-title";
         titleEl.textContent = t.label;
+        attachDetailHandler(titleEl, detailItemForRow);
       }
       line.appendChild(titleEl);
 
@@ -2163,6 +3209,19 @@
         // Cosinus → Prozent Bedeutungs-Übereinstimmung (anschaulich für Klaus).
         scoreEl.textContent = Math.round(t.score * 100) + " %";
         line.appendChild(scoreEl);
+      }
+      // Im "verwandt"-Modus zusätzlich den zentrierten Verwandtschafts-Wert zeigen
+      // (🧬 = echter Themen-Bezug, getrennt vom rohen Andock-Cosinus).
+      if (viewMode === "verwandt" && typeof t.relatedness === "number") {
+        line.appendChild(doc.createTextNode(" "));
+        var relEl = doc.createElement("span");
+        relEl.className = "sbkim-sw-relscore" + (t.isRelated ? " is-related" : "");
+        var kiJudged = t.kiJudged === true;
+        relEl.setAttribute("title", kiJudged
+          ? "Verwandtschaft — vom KI-Richter über die Bedeutung beurteilt, gatet nichts"
+          : "Verwandtschaft (zentrierter Cosinus) — Rangfolge nach Themen-Bezug, gatet nichts");
+        relEl.textContent = "🧬 " + Math.round(t.relatedness * 100) + " %" + (kiJudged ? " · KI" : "");
+        line.appendChild(relEl);
       }
       el.appendChild(line);
       // Inhalt (KI-Snippet) zeigen, damit man SIEHT, worum es geht.
@@ -2198,21 +3257,64 @@
       resultsEl.appendChild(moreBtn);
     }
 
-    // Web-Karte (Internet ohne SearXNG-URL / Fallback) ans ENDE.
+    // Web-Karte (Internet ohne SearXNG-URL / Fallback) ans ENDE. KOPIEREN statt
+    // öffnen (Klaus 2026-06-22): ein Direkt-Link würde die PWA in den Hintergrund
+    // schieben und der Inhalt ginge verloren. Der Knopf kopiert die Frage; der
+    // Nutzer öffnet die Suchmaschine selbst (Splitscreen) und fügt sie ein.
     if (res.webLink && res.webLink.url) {
       var linkEl = doc.createElement("div");
       linkEl.className = "sbkim-sw-result";
-      linkEl.appendChild(makeBadge(doc, "internet"));
-      var a = doc.createElement("a");
-      a.className = "sbkim-sw-result-link";
-      a.href = res.webLink.url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = "↗ Im Netz suchen: " + (res.webLink.query || "");
-      attachOpenHandler(a, res.webLink.url);
-      linkEl.appendChild(a);
+      var wline = doc.createElement("div");
+      wline.className = "sbkim-sw-resultline";
+      wline.appendChild(makeBadge(doc, "internet"));
+      var wq = doc.createElement("span");
+      wq.className = "sbkim-sw-result-title";
+      wq.textContent = res.webLink.query || "";
+      wline.appendChild(wq);
+      linkEl.appendChild(wline);
+      // Zwei Wege zur Wahl (Klaus 2026-06-22): kopieren (App bleibt offen) ODER
+      // direkt im Browser öffnen (kann die App neu laden — Frage/Treffer sind
+      // aber gesichert). So entscheidet der Nutzer selbst.
+      var webActions = doc.createElement("div");
+      webActions.className = "sbkim-sw-merk-actions";
+      var webCopyBtn = doc.createElement("button");
+      webCopyBtn.type = "button";
+      webCopyBtn.className = "sbkim-sw-more sbkim-sw-webcopy";
+      webCopyBtn.textContent = "📋 Frage kopieren";
+      webCopyBtn.setAttribute("title", "Frage kopieren; Suchmaschine selbst öffnen (Splitscreen) und einfügen — App bleibt offen");
+      webCopyBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+      (function (q) {
+        webCopyBtn.addEventListener("click", function (ev) {
+          if (ev && ev.preventDefault) ev.preventDefault();
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          copyToClipboard(q).then(function (ok) {
+            setHint(ok
+              ? "Frage kopiert — Suchmaschine selbst öffnen (Splitscreen) und einfügen. Die App bleibt offen."
+              : "Konnte nicht kopieren — Frage oben markieren und kopieren.");
+          });
+        });
+      })(res.webLink.query || "");
+      webActions.appendChild(webCopyBtn);
+      var webOpenBtn = doc.createElement("button");
+      webOpenBtn.type = "button";
+      webOpenBtn.className = "sbkim-sw-more sbkim-sw-webopen";
+      webOpenBtn.textContent = "↗ Im Browser öffnen";
+      webOpenBtn.setAttribute("title", "Suchmaschine direkt öffnen — kann die App neu laden, Frage/Treffer sind aber gesichert");
+      webOpenBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+      (function (url) {
+        webOpenBtn.addEventListener("click", function (ev) {
+          if (ev && ev.preventDefault) ev.preventDefault();
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          openUrl(url);
+        });
+      })(res.webLink.url);
+      webActions.appendChild(webOpenBtn);
+      linkEl.appendChild(webActions);
       resultsEl.appendChild(linkEl);
     }
+
+    // Letzte Suche lokal merken (Reload-Schutz) — überlebt einen PWA-Neustart.
+    persistLastSearch(res);
   }
 
   // Klick/Tap auf einen Link: Drag verhindern + explizit öffnen (Touch-fest).
@@ -2225,6 +3327,439 @@
       if (ev && ev.stopPropagation) ev.stopPropagation();
       openUrl(url);
     });
+  }
+
+  // Klick/Tap auf einen Treffer → Tool-eigene Detail-Karte (Klaus 2026-06-22).
+  function attachDetailHandler(el, item) {
+    el.addEventListener("pointerdown", function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+    });
+    el.addEventListener("click", function (ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      openDetail(item);
+    });
+  }
+
+  // ===================================================================
+  // Merken-Liste (Klaus 2026-06-22) — pro Treffer ein Haken; das Gemerkte landet
+  // in localStorage, GRUPPIERT unter der Suchfrage als Überschrift. Nur Text +
+  // Link (+ Quelle/Datum für Anzeige) — keine Vektoren, keine PII, kein Protokoll.
+  // Funktioniert für alle Treffer-Arten (App/Knoten/Netz) mit Badge je Art.
+  // ===================================================================
+
+  // Heading-Schlüssel = die Suchfrage (nicht der Seitenname). Aktuell laufende
+  // Frage; leere Frage → Sammel-Gruppe.
+  function currentGroupKey() {
+    var q = (queryValue || "").trim();
+    return q || "(ohne Frage)";
+  }
+
+  // Treffer → schlankes Merk-/Detail-Objekt (nur Text + Link + Anzeige-Felder).
+  function merkItemOf(t) {
+    return {
+      titel: t.label || t.titel || t.url || "",
+      url: t.url || null,
+      text: t.snippet || t.text || null,
+      source: t.source || "app",
+      score: typeof t.score === "number" ? t.score : null,
+      begruendung: t.begruendung || null,
+    };
+  }
+
+  function merkKeyOf(item) {
+    return String((item && (item.url || item.titel || item.label)) || "");
+  }
+
+  function loadMerkliste() {
+    var raw = lsGet(LS_KEY_MERK);
+    if (!raw) return {};
+    try {
+      var o = JSON.parse(raw);
+      return (o && typeof o === "object" && !Array.isArray(o)) ? o : {};
+    } catch (_e) { return {}; }
+  }
+
+  function saveMerkliste(obj) {
+    try { lsSet(LS_KEY_MERK, JSON.stringify(obj || {})); } catch (_e) { /* fail-soft */ }
+  }
+
+  function merkCount() {
+    var m = loadMerkliste(), n = 0;
+    for (var q in m) { if (Array.isArray(m[q])) n += m[q].length; }
+    return n;
+  }
+
+  function isMerkt(groupKey, item) {
+    var arr = loadMerkliste()[groupKey];
+    if (!Array.isArray(arr)) return false;
+    var key = merkKeyOf(item);
+    for (var i = 0; i < arr.length; i++) { if (merkKeyOf(arr[i]) === key) return true; }
+    return false;
+  }
+
+  function addMerk(groupKey, item) {
+    var m = loadMerkliste();
+    if (!Array.isArray(m[groupKey])) m[groupKey] = [];
+    var key = merkKeyOf(item);
+    for (var i = 0; i < m[groupKey].length; i++) { if (merkKeyOf(m[groupKey][i]) === key) return; }
+    m[groupKey].push({
+      titel: String(item.titel || item.label || item.url || "").slice(0, 300),
+      url: item.url ? String(item.url) : null,
+      text: item.text ? String(item.text).slice(0, 600) : null,
+      source: item.source || "app",
+      addedAt: Date.now(),
+    });
+    saveMerkliste(m);
+    updateMerkBtn();
+  }
+
+  function removeMerk(groupKey, key) {
+    var m = loadMerkliste();
+    if (!Array.isArray(m[groupKey])) return;
+    m[groupKey] = m[groupKey].filter(function (it) { return merkKeyOf(it) !== key; });
+    if (m[groupKey].length === 0) delete m[groupKey];
+    saveMerkliste(m);
+    updateMerkBtn();
+  }
+
+  function toggleMerk(groupKey, item) {
+    if (isMerkt(groupKey, item)) removeMerk(groupKey, merkKeyOf(item));
+    else addMerk(groupKey, item);
+  }
+
+  function clearMerkliste() {
+    lsRemove(LS_KEY_MERK);
+    updateMerkBtn();
+    if (merkOverlayOpen) renderMerkOverlay();
+  }
+
+  function getMerkliste() {
+    try { return JSON.parse(JSON.stringify(loadMerkliste())); } catch (_e) { return {}; }
+  }
+
+  // Kleiner Haken pro Treffer-Zeile (📌). Klick togglet Merken; stopPropagation,
+  // damit weder der Drag noch die Detail-Karte mit anspringt.
+  function makeMerkCheckbox(doc, t, groupKey) {
+    var item = merkItemOf(t);
+    var wrap = doc.createElement("label");
+    wrap.className = "sbkim-sw-check sbkim-sw-merkbox";
+    wrap.setAttribute("title", "Merken — in die Merkliste legen");
+    var input = doc.createElement("input");
+    input.type = "checkbox";
+    input.checked = isMerkt(groupKey, item);
+    input.addEventListener("change", function () { toggleMerk(groupKey, item); });
+    wrap.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    wrap.addEventListener("click", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    var pin = doc.createElement("span");
+    pin.textContent = "📌";
+    wrap.appendChild(input);
+    wrap.appendChild(pin);
+    wrap._input = input;
+    return wrap;
+  }
+
+  function updateMerkBtn() {
+    if (!merkBtnEl) return;
+    var n = merkCount();
+    merkBtnEl.textContent = "📌";
+    merkBtnEl.setAttribute("aria-label", "Merkliste" + (n ? " (" + n + " gemerkt)" : " (leer)"));
+    merkBtnEl.setAttribute("title", "Merkliste — Gemerktes, gruppiert nach Suchfrage" + (n ? " (" + n + ")" : ""));
+    if (merkBtnEl.classList) {
+      if (n) merkBtnEl.classList.add("sbkim-sw-has-merk");
+      else merkBtnEl.classList.remove("sbkim-sw-has-merk");
+    }
+  }
+
+  // ---- Overlays (Detail-Karte + Merkliste) ----
+
+  function renderOverlays() {
+    if (detailOverlayEl) detailOverlayEl.style.display = detailOverlayOpen ? "flex" : "none";
+    if (merkOverlayEl) merkOverlayEl.style.display = merkOverlayOpen ? "flex" : "none";
+  }
+
+  function hideOverlays() {
+    detailOverlayOpen = false;
+    merkOverlayOpen = false;
+    renderOverlays();
+  }
+
+  // „Zurück": Overlay schließen; Treffer neu zeichnen, damit die Haken den evtl.
+  // im Overlay geänderten Merk-Zustand spiegeln.
+  function closeOverlays() {
+    hideOverlays();
+    if (lastRenderRes) renderResults(lastRenderRes);
+  }
+
+  function openDetail(item) {
+    if (!item) return;
+    detailItem = item;
+    detailOverlayOpen = true;
+    merkOverlayOpen = false;
+    if (!expandedFlag) expand();
+    renderDetailOverlay();
+    renderOverlays();
+  }
+
+  function openMerkliste() {
+    merkOverlayOpen = true;
+    detailOverlayOpen = false;
+    if (!expandedFlag) expand();
+    renderMerkOverlay();
+    renderOverlays();
+  }
+
+  function makeOverlayHead(doc, titleText) {
+    var head = doc.createElement("div");
+    head.className = "sbkim-sw-overlay-head";
+    var backBtn = makeBtn(doc, "sbkim-sw-btn sbkim-sw-back", "‹", "Zurück");
+    backBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    backBtn.addEventListener("click", function (ev) {
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      closeOverlays();
+    });
+    head.appendChild(backBtn);
+    var title = doc.createElement("span");
+    title.className = "sbkim-sw-overlay-title";
+    title.textContent = titleText;
+    head.appendChild(title);
+    return head;
+  }
+
+  // Tool-eigene Detail-Karte (in den Tool-Farben) für EINEN Treffer.
+  function renderDetailOverlay() {
+    if (!detailOverlayEl) return;
+    var doc = global.document;
+    while (detailOverlayEl.firstChild) detailOverlayEl.removeChild(detailOverlayEl.firstChild);
+    detailOverlayEl.appendChild(makeOverlayHead(doc, "Treffer"));
+    var item = detailItem || {};
+    var gkey = currentGroupKey();
+
+    var badgeLine = doc.createElement("div");
+    badgeLine.appendChild(makeBadge(doc, item.source || "app"));
+    var titleEl = doc.createElement("span");
+    titleEl.className = "sbkim-sw-detail-titel";
+    titleEl.textContent = item.titel || "(ohne Titel)";
+    badgeLine.appendChild(titleEl);
+    detailOverlayEl.appendChild(badgeLine);
+
+    if (item.text) {
+      var desc = doc.createElement("div");
+      desc.className = "sbkim-sw-detail-desc";
+      desc.textContent = item.text;
+      detailOverlayEl.appendChild(desc);
+    }
+    if (item.url) {
+      var urlEl = doc.createElement("div");
+      urlEl.className = "sbkim-sw-detail-url";
+      urlEl.textContent = item.url;
+      detailOverlayEl.appendChild(urlEl);
+    }
+
+    // [📌 Merken] / [📌 Gemerkt ✓] — Merken aus dem Overlay; gilt sofort.
+    var merkBtn = makeBtn(doc, "sbkim-sw-aibtn sbkim-sw-detail-merk", "", "Merken");
+    function refreshMerkBtnLabel() {
+      var on = isMerkt(gkey, item);
+      merkBtn.textContent = on ? "📌 Gemerkt ✓ (entfernen)" : "📌 Merken";
+    }
+    refreshMerkBtnLabel();
+    merkBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    merkBtn.addEventListener("click", function (ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      toggleMerk(gkey, item);
+      refreshMerkBtnLabel();
+    });
+    detailOverlayEl.appendChild(merkBtn);
+
+    // [↗ Seite öffnen] — echte Seite im neuen Tab (nur wenn es eine URL gibt).
+    if (item.url) {
+      var openBtn = makeBtn(doc, "sbkim-sw-aibtn sbkim-sw-detail-open", "↗ Seite öffnen", "Echte Seite im neuen Tab öffnen");
+      openBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+      openBtn.addEventListener("click", function (ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        openUrl(item.url);
+      });
+      detailOverlayEl.appendChild(openBtn);
+    }
+  }
+
+  // Merkliste-Overlay: gemerkte Treffer, gruppiert unter der Suchfrage.
+  function renderMerkOverlay() {
+    if (!merkOverlayEl) return;
+    var doc = global.document;
+    while (merkOverlayEl.firstChild) merkOverlayEl.removeChild(merkOverlayEl.firstChild);
+    merkOverlayEl.appendChild(makeOverlayHead(doc, "Merkliste"));
+
+    var m = loadMerkliste();
+    var groups = Object.keys(m);
+    if (groups.length === 0) {
+      var empty = doc.createElement("div");
+      empty.className = "sbkim-sw-merk-empty";
+      empty.textContent = "Noch nichts gemerkt — Treffer ankreuzen (📌) oder in der Detail-Karte per 📌 Merken.";
+      merkOverlayEl.appendChild(empty);
+      return;
+    }
+
+    var clearBtn = makeBtn(doc, "sbkim-sw-aibtn sbkim-sw-merk-clear", "Alles entfernen", "Ganze Merkliste leeren");
+    clearBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    clearBtn.addEventListener("click", function (ev) {
+      if (ev && ev.preventDefault) ev.preventDefault();
+      clearMerkliste();
+    });
+    merkOverlayEl.appendChild(clearBtn);
+
+    groups.forEach(function (groupKey) {
+      var items = m[groupKey];
+      if (!Array.isArray(items) || items.length === 0) return;
+      var groupEl = doc.createElement("div");
+      groupEl.className = "sbkim-sw-merk-group";
+      var gt = doc.createElement("div");
+      gt.className = "sbkim-sw-merk-group-title";
+      gt.textContent = groupKey; // die Suchfrage als Überschrift
+      groupEl.appendChild(gt);
+
+      items.forEach(function (it) {
+        var row = doc.createElement("div");
+        row.className = "sbkim-sw-merk-item";
+        var l = doc.createElement("div");
+        l.className = "sbkim-sw-resultline";
+        l.appendChild(makeBadge(doc, it.source || "app"));
+        var titleEl;
+        if (it.url) {
+          titleEl = doc.createElement("a");
+          titleEl.className = "sbkim-sw-result-link";
+          titleEl.href = it.url;
+          titleEl.target = "_blank";
+          titleEl.rel = "noopener noreferrer";
+          titleEl.textContent = it.titel || it.url;
+          attachOpenHandler(titleEl, it.url);
+        } else {
+          titleEl = doc.createElement("span");
+          titleEl.className = "sbkim-sw-result-title";
+          titleEl.textContent = it.titel || "(ohne Titel)";
+        }
+        l.appendChild(titleEl);
+        row.appendChild(l);
+        if (it.text) {
+          var sn = doc.createElement("div");
+          sn.className = "sbkim-sw-snippet";
+          sn.textContent = it.text;
+          row.appendChild(sn);
+        }
+        var actions = doc.createElement("div");
+        actions.className = "sbkim-sw-merk-actions";
+        if (it.url) {
+          var openA = makeBtn(doc, "sbkim-sw-more sbkim-sw-merk-open", "↗ öffnen", "Seite im neuen Tab öffnen");
+          openA.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+          (function (url) {
+            openA.addEventListener("click", function (ev) {
+              if (ev && ev.preventDefault) ev.preventDefault();
+              if (ev && ev.stopPropagation) ev.stopPropagation();
+              openUrl(url);
+            });
+          })(it.url);
+          actions.appendChild(openA);
+        }
+        var rm = makeBtn(doc, "sbkim-sw-more sbkim-sw-merk-remove", "✕ entfernen", "Aus der Merkliste entfernen");
+        rm.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+        (function (gk, key) {
+          rm.addEventListener("click", function (ev) {
+            if (ev && ev.preventDefault) ev.preventDefault();
+            if (ev && ev.stopPropagation) ev.stopPropagation();
+            removeMerk(gk, key);  // Haken weg → Eintrag weg
+            renderMerkOverlay();
+          });
+        })(groupKey, merkKeyOf(it));
+        actions.appendChild(rm);
+        row.appendChild(actions);
+        groupEl.appendChild(row);
+      });
+      merkOverlayEl.appendChild(groupEl);
+    });
+  }
+
+  // ===================================================================
+  // Letzte Suche merken (Reload-Schutz, Klaus 2026-06-22). Beim Öffnen eines
+  // Web-Treffers im Splitscreen wirft Android die PWA gern aus dem Speicher →
+  // Neustart, Trefferliste (RAM) weg. Darum die letzte Suche (Frage + Treffer,
+  // nur Text+Link, keine Vektoren/PII) in localStorage spiegeln und beim Mount
+  // wiederherstellen — so bleibt der Vergleichs-Ablauf erhalten.
+  // ===================================================================
+
+  function persistLastSearch(res) {
+    try {
+      if (!res) return;
+      var treffer = (res.treffer || []).slice(0, 50).map(function (t) {
+        return {
+          label: t.label, score: typeof t.score === "number" ? t.score : null,
+          source: t.source || "app", url: t.url || null, snippet: t.snippet || null,
+          begruendung: t.begruendung || null, anchorId: t.anchorId || null, text: t.text || null,
+        };
+      });
+      var hasWeb = !!(res.webLink && res.webLink.url);
+      if (!treffer.length && !hasWeb) { lsRemove(LS_KEY_LAST); return; }
+      lsSet(LS_KEY_LAST, JSON.stringify({
+        query: queryValue || "", mode: res.mode || "semantisch",
+        treffer: treffer, webLink: res.webLink || null,
+        summary: (typeof res.summary === "string" ? res.summary : ""),
+      }));
+    } catch (_e) { /* fail-soft (Quota/Inkognito) */ }
+  }
+
+  // Beim Mount aufrufen (NACH localStorage-Prefs): setzt queryValue + lastRenderRes
+  // aus der gespeicherten Suche, damit das Panel die Treffer wieder zeigen kann.
+  function restoreLastSearch() {
+    var raw = lsGet(LS_KEY_LAST);
+    if (!raw) return;
+    try {
+      var p = JSON.parse(raw);
+      if (!p || typeof p !== "object") return;
+      if (typeof p.query === "string") queryValue = p.query;
+      if (Array.isArray(p.treffer)) {
+        lastRenderRes = { mode: p.mode || "semantisch", treffer: p.treffer,
+                          webLink: p.webLink || null,
+                          summary: (typeof p.summary === "string" ? p.summary : ""),
+                          restored: true };
+      }
+    } catch (_e) { /* fail-soft */ }
+  }
+
+  // Anzeige-Sicht (verbunden/verwandt + nur-verwandte) persistieren/wiederherstellen.
+  // User-Wahl ist heilig und übersteht Re-Init; Default bleibt "verbunden" (grob),
+  // damit nichts an der gewohnten Sicht überrascht.
+  function persistViewPref() {
+    try { lsSet(LS_KEY_VIEW, JSON.stringify({ mode: viewMode, relatedOnly: viewRelatedOnly, kiRelated: viewKiRelated })); }
+    catch (_e) { /* fail-soft (Quota/Inkognito) */ }
+  }
+  function restoreViewPref() {
+    var raw = lsGet(LS_KEY_VIEW);
+    if (!raw) return;
+    try {
+      var p = JSON.parse(raw);
+      if (p && typeof p === "object") {
+        if (p.mode === "verbunden" || p.mode === "verwandt") viewMode = p.mode;
+        if (typeof p.relatedOnly === "boolean") viewRelatedOnly = p.relatedOnly;
+        if (typeof p.kiRelated === "boolean") viewKiRelated = p.kiRelated;
+      }
+    } catch (_e) { /* fail-soft */ }
+  }
+
+  // Nur die eingetippte Frage sofort sichern (Klaus 2026-06-22): auch OHNE
+  // gerenderte Trefferliste (z.B. wenn man nur den KI-Prompt kopiert) soll die
+  // Frage einen App-Neustart überleben. Mergt in den lastsearch-Eintrag, ohne
+  // vorhandene Treffer zu verlieren.
+  function persistQuery() {
+    try {
+      var raw = lsGet(LS_KEY_LAST);
+      var p = {};
+      if (raw) { try { p = JSON.parse(raw) || {}; } catch (_e) { p = {}; } }
+      p.query = queryValue || "";
+      var hasTreffer = Array.isArray(p.treffer) && p.treffer.length;
+      var hasWeb = p.webLink && p.webLink.url;
+      if (!p.query && !hasTreffer && !hasWeb) { lsRemove(LS_KEY_LAST); return; }
+      lsSet(LS_KEY_LAST, JSON.stringify(p));
+    } catch (_e) { /* fail-soft */ }
   }
 
   // ---- Korpus ----
@@ -2268,7 +3803,11 @@
           el.classList.contains("sbkim-sw-euchip") ||
           el.classList.contains("sbkim-sw-result") ||
           el.classList.contains("sbkim-sw-result-link") ||
+          el.classList.contains("sbkim-sw-result-title") ||
           el.classList.contains("sbkim-sw-check") ||
+          el.classList.contains("sbkim-sw-merkbox") ||
+          el.classList.contains("sbkim-sw-overlay") ||
+          el.classList.contains("sbkim-sw-resize") ||
           el.classList.contains("sbkim-sw-searxng"))) return true;
       el = el.parentNode;
       depth++;
@@ -2355,6 +3894,83 @@
     setTimeout(function () { if (dragState === consumed) dragState = null; }, 0);
   }
 
+  // ---- Resize (ziehbare Panel-Größe, Griff unten rechts) ----
+
+  function attachResizeHandlers(handle) {
+    handle.addEventListener("pointerdown", onResizeDown);
+  }
+
+  function onResizeDown(ev) {
+    // Resize ist KEIN Verschieben: Propagation stoppen, damit der Move-Drag
+    // (root pointerdown) nicht zugleich anspringt.
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    if (ev && ev.preventDefault) ev.preventDefault();
+    if (!optAllowDrag || !panelEl || !widgetRoot) return;
+    // Auf freie Position umstellen, damit die obere-linke Ecke verankert bleibt
+    // und der untere-rechte Griff natürlich nach unten-rechts wächst (sonst
+    // wüchse ein ecken-verankertes Panel in die „falsche" Richtung).
+    var rootRect = widgetRoot.getBoundingClientRect();
+    currentFreeX = rootRect.left;
+    currentFreeY = rootRect.top;
+    currentCorner = null;
+    applyPositionToRoot();
+    var panelRect = panelEl.getBoundingClientRect();
+    var startResH = resultsHeight !== null
+      ? resultsHeight
+      : (resultsEl ? resultsEl.getBoundingClientRect().height : MIN_RESULTS_HEIGHT);
+    resizeState = {
+      pointerId: ev ? ev.pointerId : undefined,
+      startX: ev ? ev.clientX : 0,
+      startY: ev ? ev.clientY : 0,
+      startW: panelWidth !== null ? panelWidth : panelRect.width,
+      startResH: startResH,
+    };
+    try {
+      if (ev && resizeHandleEl && typeof resizeHandleEl.setPointerCapture === "function") {
+        resizeHandleEl.setPointerCapture(ev.pointerId);
+      }
+    } catch (_e) { /* fail-soft */ }
+    if (resizeHandleEl) {
+      resizeHandleEl.addEventListener("pointermove", onResizeMove);
+      resizeHandleEl.addEventListener("pointerup", onResizeUp);
+      resizeHandleEl.addEventListener("pointercancel", onResizeUp);
+    }
+    try { widgetRoot.classList.add("sbkim-sw-resizing"); } catch (_e) { /* nb */ }
+  }
+
+  function onResizeMove(ev) {
+    if (!resizeState) return;
+    try {
+      var dx = ev.clientX - resizeState.startX;
+      var dy = ev.clientY - resizeState.startY;
+      panelWidth = clampPanelWidth(resizeState.startW + dx);
+      resultsHeight = clampResultsHeight(resizeState.startResH + dy);
+      applySizeToPanel();
+    } catch (err) {
+      warn("Resize-Pointer-Fehler — Resize abgebrochen.", err);
+      onResizeUp(ev);
+    }
+  }
+
+  function onResizeUp(_ev) {
+    if (!resizeState) return;
+    try {
+      if (resizeHandleEl && typeof resizeHandleEl.releasePointerCapture === "function" &&
+          resizeState.pointerId !== undefined) {
+        resizeHandleEl.releasePointerCapture(resizeState.pointerId);
+      }
+    } catch (_e) { /* nb */ }
+    if (resizeHandleEl) {
+      resizeHandleEl.removeEventListener("pointermove", onResizeMove);
+      resizeHandleEl.removeEventListener("pointerup", onResizeUp);
+      resizeHandleEl.removeEventListener("pointercancel", onResizeUp);
+    }
+    if (widgetRoot) { try { widgetRoot.classList.remove("sbkim-sw-resizing"); } catch (_e) { /* nb */ } }
+    persistSize();
+    persistPosition(); // freie Position wurde beim Resize-Start gesetzt
+    resizeState = null;
+  }
+
   // ---- Mount (mit MutationObserver-Fallback, Pattern aus Modul 17) ----
 
   function mountWidget() {
@@ -2371,6 +3987,13 @@
     applyPositionToRoot();
     applyVisibility();
     applyState();
+    applySizeToPanel();
+    attachViewportListener();
+    // Heilung: eine auf großem Schirm gezogene Position kann auf kleinem Schirm
+    // (oder im Splitscreen) schon beim Mount aus dem Bild liegen.
+    clampPositionIntoView();
+    // Letzte Suche wiederherstellen (Reload-Schutz): Treffer wieder anzeigen.
+    if (lastRenderRes && resultsEl) renderResults(lastRenderRes);
   }
 
   function setupMountObserver(doc) {
@@ -2426,6 +4049,42 @@
     }
   }
 
+  // App aktualisieren (Hard-Reload, Klaus 2026-06-22): leert Cache Storage + meldet
+  // den Service-Worker ab, dann neu laden — so holt die installierte PWA die
+  // neueste Version, ohne dass der Nutzer im Browser-Menü „Cache leeren" sucht.
+  // Opt-in (optShowReload), weil es Host-Caches betrifft; in such-tool/ aktiv.
+  function hardReload() {
+    if (reloadInFlight) return;
+    reloadInFlight = true;
+    setHint("App wird aktualisiert — Cache leeren und neu laden …");
+    var reloaded = false;
+    var doReload = function () {
+      if (reloaded) return;
+      reloaded = true;
+      try { if (global.location && typeof global.location.reload === "function") global.location.reload(); }
+      catch (_e) { reloadInFlight = false; }
+    };
+    var tasks = [];
+    try {
+      if (global.caches && typeof global.caches.keys === "function") {
+        tasks.push(Promise.resolve(global.caches.keys())
+          .then(function (keys) { return Promise.all((keys || []).map(function (k) { return global.caches.delete(k); })); })
+          .catch(function () {}));
+      }
+    } catch (_e) { /* nb */ }
+    try {
+      var sw = global.navigator && global.navigator.serviceWorker;
+      if (sw && typeof sw.getRegistrations === "function") {
+        tasks.push(Promise.resolve(sw.getRegistrations())
+          .then(function (regs) { return Promise.all((regs || []).map(function (r) { return r.unregister ? r.unregister() : null; })); })
+          .catch(function () {}));
+      }
+    } catch (_e) { /* nb */ }
+    Promise.all(tasks).then(doReload, doReload);
+    // Sicherheits-Timeout, falls eine Promise hängt — trotzdem neu laden.
+    try { if (global.setTimeout) global.setTimeout(doReload, 1500); } catch (_e) { /* nb */ }
+  }
+
   // ---- Öffentliche Sync-Methoden ----
 
   function show() {
@@ -2467,6 +4126,8 @@
 
   function collapse() {
     if (!ready) { warn("collapse() vor init() — no-op."); return; }
+    hideOverlays();                        // Minimieren schließt offene Overlays
+    if (fullscreenFlag) exitFullscreen();  // Minimieren beendet auch Vollbild
     var before = widgetRoot ? widgetRoot.getBoundingClientRect() : null;
     expandedFlag = false;
     persistState();
@@ -2474,6 +4135,48 @@
     keepCenterAcrossResize(before);
     persistPosition();
   }
+
+  // ---- Vollbild-Modus (⛶, Klaus 2026-06-22) ----
+  // Zweite Anzeige DERSELBEN Treffer (kein Kern-Umbau): das vorhandene Panel
+  // füllt den ganzen Viewport. Bewusst NICHT persistiert — die Pille bleibt der
+  // Standard-Start, Vollbild ist immer eine bewusste Nutzer-Aktion.
+
+  function applyFullscreen() {
+    if (!widgetRoot) return;
+    if (fullscreenFlag) widgetRoot.classList.add("sbkim-sw-fullscreen");
+    else widgetRoot.classList.remove("sbkim-sw-fullscreen");
+    updateFullscreenBtn();
+  }
+
+  function updateFullscreenBtn() {
+    if (!fullscreenBtnEl) return;
+    fullscreenBtnEl.textContent = fullscreenFlag ? "🗗" : "⛶";
+    fullscreenBtnEl.setAttribute("aria-label",
+      fullscreenFlag ? "Vollbild verlassen — zurück zum Panel" : "Vollbild — Suchraum groß");
+  }
+
+  function enterFullscreen() {
+    if (!ready) { warn("enterFullscreen() vor init() — no-op."); return; }
+    fullscreenFlag = true;
+    expandedFlag = true;   // Vollbild zeigt immer das Panel
+    persistState();
+    applyState();
+    applyFullscreen();
+  }
+
+  function exitFullscreen() {
+    if (!ready) { warn("exitFullscreen() vor init() — no-op."); return; }
+    fullscreenFlag = false;
+    applyFullscreen();
+    // Inline-Position/-Größe wieder herstellen (Klasse mit !important ist weg).
+    applyPositionToRoot();
+    applySizeToPanel();
+    clampPositionIntoView();
+  }
+
+  function toggleFullscreen() { if (fullscreenFlag) exitFullscreen(); else enterFullscreen(); }
+
+  function isFullscreen() { return !!fullscreenFlag; }
 
   // Such-Inhalt leeren (Frage, eingefügte KI-Antwort, Schärfen-Kontext, Treffer).
   // Der Tresor bleibt unberührt — das ist Identität, kein „Inhalt".
@@ -2485,6 +4188,7 @@
     if (aiPasteEl) aiPasteEl.value = "";
     resultsVisibleCount = RESULT_PAGE_SIZE;
     lastRenderRes = null;
+    lsRemove(LS_KEY_LAST);   // frischer Start: gespeicherte Suche auch löschen
     if (resultsEl) { while (resultsEl.firstChild) resultsEl.removeChild(resultsEl.firstChild); }
     setHint("");
   }
@@ -2495,6 +4199,8 @@
   // BEHÄLT ihn (Klaus 2026-06-21).
   function dockToTop() {
     if (!ready) { warn("dockToTop() vor init() — no-op."); return; }
+    if (fullscreenFlag) { fullscreenFlag = false; applyFullscreen(); }
+    hideOverlays();
     expandedFlag = false;
     visibleFlag = true;
     currentCorner = NAV_DOCK_CORNER;
@@ -2520,6 +4226,27 @@
     return buildPositionSnapshot();
   }
 
+  // Aktuelle ziehbare Größe (defensive Kopie). null = CSS-Default.
+  function getSize() {
+    return { panelWidth: panelWidth, resultsHeight: resultsHeight };
+  }
+
+  // Programmatische Größe (Tests / Reset / manual_check-Knopf). null setzt aufs
+  // CSS-Default zurück; Zahlen werden auf die Min-/Maxmaße geklemmt.
+  function setSize(opts) {
+    opts = opts || {};
+    if (opts.panelWidth === null) panelWidth = null;
+    else if (typeof opts.panelWidth === "number" && isFinite(opts.panelWidth)) panelWidth = clampPanelWidth(opts.panelWidth);
+    if (opts.resultsHeight === null) resultsHeight = null;
+    else if (typeof opts.resultsHeight === "number" && isFinite(opts.resultsHeight)) resultsHeight = clampResultsHeight(opts.resultsHeight);
+    if (panelEl) {
+      if (panelWidth === null) panelEl.style.width = "";
+      if (resultsHeight === null && resultsEl) resultsEl.style.maxHeight = "";
+    }
+    applySizeToPanel();
+    persistSize();
+  }
+
   // ---- Init ----
 
   function init(options) {
@@ -2536,9 +4263,17 @@
     if (options.euOnly !== undefined) optEuOnly = !!options.euOnly;
     if (typeof options.queryLabel === "string") optQueryLabel = options.queryLabel;
     if (typeof options.k === "number" && isFinite(options.k) && options.k >= 1) optK = Math.floor(options.k);
+    // A4: app-eigene Synonym-Karte ersetzt die generische Grundausstattung
+    // (eine App kennt ihre Domäne besser). {} = A4 praktisch aus (nur [query]).
+    if (options.synonyms && typeof options.synonyms === "object") optSynonyms = options.synonyms;
+    if (options.queryExpand !== undefined) optQueryExpand = !!options.queryExpand;
     if (options.allowDrag !== undefined) optAllowDrag = !!options.allowDrag;
     if (options.rememberHidden !== undefined) optRememberHidden = !!options.rememberHidden;
+    if (options.reloadButton !== undefined) optShowReload = !!options.reloadButton;
     if (typeof options.zIndex === "number" && isFinite(options.zIndex)) optZIndex = options.zIndex;
+    // Optionale Start-Größe (localStorage = User-Wahl überschreibt sie unten).
+    if (typeof options.panelWidth === "number" && isFinite(options.panelWidth)) panelWidth = clampPanelWidth(options.panelWidth);
+    if (typeof options.resultsHeight === "number" && isFinite(options.resultsHeight)) resultsHeight = clampResultsHeight(options.resultsHeight);
 
     if (options.corpus !== undefined) setCorpus(options.corpus);
     if (typeof options.prepareCorpus === "function") corpusPreparer = options.prepareCorpus;
@@ -2546,6 +4281,8 @@
     // Mehrfach-Suche: Knoten-Korpus + SearXNG + Bereiche + Richter-Default.
     if (Array.isArray(options.nodeCorpus)) { nodeCorpus = options.nodeCorpus.slice(); nodeCorpusReady = true; }
     if (typeof options.prepareNodeCorpus === "function") nodeCorpusPreparer = options.prepareNodeCorpus;
+    // Live-Cross-Knoten-Frage (Bau Query-über-Relais): (nodeId, text) -> Promise<Array<{label,score,anchorId}>>.
+    if (typeof options.queryNode === "function") queryNodeFn = options.queryNode;
     if (typeof options.searxngUrl === "string") searxngUrl = options.searxngUrl.trim();
     if (typeof options.webSearchEngine === "string") {
       for (var wi = 0; wi < WEB_ENGINES.length; wi++) {
@@ -2558,6 +4295,10 @@
       }
     }
     if (options.richter !== undefined) richterOn = !!options.richter;
+    // Anzeige-Sicht-Default (localStorage = User-Wahl überschreibt sie unten).
+    if (options.viewMode === "verbunden" || options.viewMode === "verwandt") viewMode = options.viewMode;
+    if (options.relatedOnly !== undefined) viewRelatedOnly = !!options.relatedOnly;
+    if (options.kiRelated !== undefined) viewKiRelated = !!options.kiRelated;
     if (options.areas && typeof options.areas === "object") {
       ["app", "knoten", "internet"].forEach(function (id) {
         if (typeof options.areas[id] === "boolean") areas[id].enabled = options.areas[id];
@@ -2581,6 +4322,7 @@
     loadStateFromLs();
     loadPositionFromLs();
     loadEngineFromLs();   // persistierte Suchmaschinen-Wahl (User-Wahl heilig)
+    loadSizeFromLs();     // persistierte Panel-Größe (User-Wahl heilig)
     if (options.startExpanded === true) expandedFlag = true;
 
     if (ready) {
@@ -2589,11 +4331,14 @@
       applyPositionToRoot();
       applyVisibility();
       applyState();
+      applySizeToPanel();
       updateEuChip();
       return Promise.resolve();
     }
 
     ready = true;
+    restoreViewPref();     // Anzeige-Sicht (verbunden/verwandt) aus localStorage — vor dem Mount
+    restoreLastSearch();   // letzte Suche aus localStorage (vor dem Mount), Reload-Schutz
     mountWidget();
     return Promise.resolve();
   }
@@ -2609,11 +4354,50 @@
     collapse: collapse,
     dockToTop: dockToTop,
     isExpanded: isExpanded,
+    enterFullscreen: enterFullscreen,
+    exitFullscreen: exitFullscreen,
+    toggleFullscreen: toggleFullscreen,
+    isFullscreen: isFullscreen,
+    openMerkliste: openMerkliste,
+    closeOverlays: closeOverlays,
+    getMerkliste: getMerkliste,
+    clearMerkliste: clearMerkliste,
+    reload: hardReload,
     getPosition: getPosition,
+    getSize: getSize,
+    setSize: setSize,
     setCorpus: setCorpus,
     search: search,
+    // Anzeige-Sicht „verbunden" (grob) ↔ „verwandt" (genau). Reine Anzeige.
+    setViewMode: function (mode) {
+      if (mode !== "verbunden" && mode !== "verwandt") return viewMode;
+      viewMode = mode;
+      persistViewPref();
+      updateViewRowState();
+      if (lastRenderRes) renderResults(lastRenderRes);
+      return viewMode;
+    },
+    getViewMode: function () { return viewMode; },
+    setRelatedOnly: function (on) {
+      viewRelatedOnly = !!on;
+      persistViewPref();
+      updateViewRowState();
+      if (lastRenderRes) renderResults(lastRenderRes);
+      return viewRelatedOnly;
+    },
+    // „· KI": verwandt-Maß vom KI-Richter (opt-in, BYOK). Reine Anzeige.
+    setKiRelated: function (on) {
+      viewKiRelated = !!on;
+      persistViewPref();
+      updateViewRowState();
+      if (lastRenderRes) renderResults(lastRenderRes);
+      return viewKiRelated;
+    },
+    getKiRelated: function () { return viewKiRelated; },
+    rankView: rankView,   // reine Funktion (treffer, queryVec, {mode,relatedOnly,kiByKey}) — headless testbar
     buildPrompt: buildAiPrompt,
     parseAiAnswer: parseAiAnswer,
+    parseAiSummary: extractAiSummary,
     setAiAnswer: function (text) { pastedAiText = (typeof text === "string" ? text : ""); return hasPastedAi(); },
     resultsAsText: function () { return buildResultsText(lastRenderRes); },
     autoSearch: autoSearch,                 // B2-Probe: automatischer KI-Aufruf (Claude)
@@ -2632,8 +4416,19 @@
       get corpusSize() { return Array.isArray(localCorpus) ? localCorpus.length : 0; },
       get corpusReady() { return corpusReady; },
       get nodeCorpusSize() { return Array.isArray(nodeCorpus) ? nodeCorpus.length : 0; },
+      get liveNodeQuery() { return typeof queryNodeFn === "function"; },
       get areas() { return { app: areas.app.enabled, knoten: areas.knoten.enabled, internet: areas.internet.enabled }; },
       get richterOn() { return richterOn; },
+      // A1/A4-Verdrahtung (reine Diagnose): Vorfilter läuft hybrid, Multi-Query
+      // an/aus + Größe der aktiven Synonym-Karte.
+      get hybridPrefilter() { return true; },
+      get queryExpand() { return optQueryExpand; },
+      get synonymCount() { return optSynonyms ? Object.keys(optSynonyms).length : 0; },
+      get viewMode() { return viewMode; },
+      get relatedOnly() { return viewRelatedOnly; },
+      get kiRelated() { return viewKiRelated; },
+      get kiRelatedActive() { return kiRelatedActive(); },
+      get hasQueryVec() { return !!lastQueryVec; },
       get hasSearxng() { return !!searxngUrl; },
       get webEngine() { return optWebEngine; },
       get aiProvider() { return optAiProvider; },
@@ -2643,6 +4438,12 @@
       get vaultUnlocked() { return vaultUnlocked; },
       get visible() { return isVisible(); },
       get expanded() { return !!expandedFlag; },
+      get fullscreen() { return !!fullscreenFlag; },
+      get merkCount() { return merkCount(); },
+      get merkOverlayOpen() { return !!merkOverlayOpen; },
+      get detailOverlayOpen() { return !!detailOverlayOpen; },
+      get panelWidth() { return panelWidth; },
+      get resultsHeight() { return resultsHeight; },
       get widgetMounted() { return !!(widgetRoot && widgetRoot.parentNode); },
       get lastSearchMode() { return lastSearchMode; },
       get searchCount() { return searchCount; },

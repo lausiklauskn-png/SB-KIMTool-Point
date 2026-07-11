@@ -48,7 +48,15 @@
  *   { badgeSelector?: string,     // Default '.lamps' (Container, Option β)
  *     visible?: "visible"|"hidden", // Default "visible"
  *     mountModal?: boolean,        // Default true
- *     repoUrl?: string | null }    // Default null → Auto-Erkennung
+ *     repoUrl?: string | null,     // Default null → Auto-Erkennung
+ *     ribbonText?: string,         // Band-Text im Wappen unten (SELF-INSCRIBING).
+ *                                  // Ohne Wert bleibt das Band OFFEN (leer) +
+ *                                  // ein console.info-Vermerk; kein Auto-Label.
+ *                                  // Host graviert seinen Namen via ribbonText.
+ *     andockTool?: boolean }       // Default false. true → optionaler
+ *                                  // „Fremden Knoten andocken"-Knopf im Modal,
+ *                                  // öffnet Modul-18-Wizard (KI-unabhängiger
+ *                                  // Handshake). „🔑"-Pfad bleibt unberührt.
  *
  * Self-check: emits a console.info line on script load (synchronous,
  * before any call). Siehe INTERFACES.md §1 Modul 16 und
@@ -99,7 +107,7 @@
       aspect:      "Floating-Widget mit Vier-Slot-Live-Status",
       description: "Live-Status-Dashboard (LEBT/VERKEHR/FREMD/SIEGEL) als Endknoten-Standard; macht den SBKIM-Lauf sichtbar ohne Navleisten-Mount-Pflicht. Render-Schicht ohne Protokoll-Eingriff.",
     },
-    // Aspekt 4 — Mycel-Verbindung etabliert (Karte 16 § Sub (e),
+    // Aspekt 4 — Mycel-Aktivität (Karte 16 § Sub (e),
     // Spec-Erweiterung 2026-05-26). Dynamisch sichtbar:
     // _meta.mycelConnected === false → Modal rendert „pending"-Marker
     // statt Datum; _meta.mycelConnected === true → Modal rendert Datum.
@@ -108,26 +116,38 @@
     {
       since:       "2026-05-26",
       module:      "16",
-      aspect:      "Mycel-Verbindung etabliert (erster Handshake)",
-      description: "Diese App hat in der aktuellen Session mindestens einen erfolgreichen Cross-Knoten-Handshake durchgeführt. SIEGEL-Stufe Gold.",
+      aspect:      "Mycel-Aktivität (erster Hyphen-Verkehr)",
+      description: "Diese Zelle hatte in dieser Sitzung mindestens einen Hyphen-Verkehr (erfolgreicher Cross-Knoten-Handshake) — Leben im Mycel. SIEGEL-Stufe Gold.",
     },
     {
       since:       "2026-06-07",
       module:      "16",
       aspect:      "Semantische Selbst-Beschreibung im Siegel",
-      description: "Der Knoten beschreibt seine Domäne in eigenen Worten direkt im Siegel; daraus wird der domainVector neu berechnet und die Spore frisch signiert (Modul 02/03). Reiner Render-/Bedien-Pfad, kein Protokoll-Eingriff.",
+      description: "Direkt im Siegel lässt sich die App in eigenen Worten (oder per eingefügter README) beschreiben; der Text wird per Modul 03 (e5-small, 384-dim, L2-normalisiert) zum Domain-Vektor und mit dem vorhandenen Schlüssel neu in die Spore signiert — gleiche nodeId, treffenderer verified-match. Ein einziger, sauberer Identitäts-/Andock-Pfad ohne Modul-18-Verweis.",
+    },
+    {
+      since:       "2026-06-20",
+      module:      "20",
+      aspect:      "Schlüssel-Tresor (Identitäts-Sicherung)",
+      description: "Die SBKIM-Identität (nodeId + privater Knotenschlüssel + Spore) wird lokal verschlüsselt gesichert (Modul-02-Krypto-Kern: PBKDF2-SHA256 ≥600k + AES-GCM-256), mit Shamir-Recovery 2 von 3 über das Passwort — gegen Identitäts-Verlust/-Wandern. Nur Identität/Schlüssel, kein PII, nie übers Netz.",
+    },
+    {
+      since:       "2026-07-01",
+      module:      "15",
+      aspect:      "KI-Richter im Cross-Knoten-Antwort-Pfad (opt-in)",
+      description: "Der op:\"query\"-Empfänger (Membran Sub b) kann eingehende Fremd-Anfragen optional durch den KI-Richter (Modul 04 queryLocalJudged, BYOK) nach Bedeutung beurteilen und sortieren, statt nur nach rohem Cosinus. Default AUS (roher Vorfilter), Schlüssel RAM-only/nie im Code, fail-soft; der 0.80-Andock-Riegel bleibt unberührt.",
     },
   ];
 
   // ---- Aspekt-4-Anker (Karte 16 § Sub (e) dynamische Render-Variante) ----
   //
-  // Eindeutige Identifikation des „Mycel-Verbindung etablierten"-Aspekts
+  // Eindeutige Identifikation des „Mycel-Aktivitäts"-Aspekts
   // in der ZERTIFIKAT_ASPEKTE-Liste; das Modal rendert ihn in Bronze mit
   // „pending"-Marker statt Datum.
 
   var ASPEKT_4_SINCE = "2026-05-26";
   var ASPEKT_4_MODULE = "16";
-  var ASPEKT_4_TITLE_PREFIX = "Mycel-Verbindung etabliert";
+  var ASPEKT_4_TITLE_PREFIX = "Mycel-Aktivität";
 
   function isAspect4(a) {
     return a && a.since === ASPEKT_4_SINCE && a.module === ASPEKT_4_MODULE &&
@@ -143,13 +163,25 @@
   var FIRST_BOOT_ANIMATION_MS = 600;
   var MOUNT_OBSERVER_TIMEOUT_MS = 10000;
 
+  // Band-Text im Wappen (unteres Ribbon, SELF-INSCRIBING). DEFAULT_RIBBON_TEXT
+  // ist der im inlined WAPPEN_SVG eingebackene Wert ("SAGE OBSERVATORIUM") —
+  // er dient als (a) Sages explizite Marke und (b) No-Replace-Sentinel
+  // (byte-identisch). Der Laufzeit-Default OHNE init({ribbonText}) ist NICHT
+  // dieser Wert, sondern ein OFFENES (leeres) Band (Klaus-Entscheidung
+  // 2026-06-20): kein geratenes Auto-Label, der Host graviert seinen Namen
+  // bewusst ein. Befund-Anlass 2026-06-19: Rezeptbuch/Mixarium trugen statisch
+  // "MEIN-TRESOR", weil die SVG-Datei kopiert + nie angepasst wurde.
+  var DEFAULT_RIBBON_TEXT = "SAGE OBSERVATORIUM";
+  // Eindeutiger Anker im WAPPEN_SVG (genau ein Vorkommen, im Ribbon-textPath).
+  var RIBBON_MARKER = ">" + DEFAULT_RIBBON_TEXT + "</textPath>";
+
   // Sub (e) Bronze/Gold-Stufung (Spec-Erweiterung 2026-05-26).
   var STUFE_BRONZE = "bronze";
   var STUFE_GOLD = "gold";
   var STUFENWECHSEL_ANIMATION_MS = 600;
   var HANDSHAKE_EVENT = "sbkim:handshake";
-  var ARIA_LABEL_BRONZE = "SBKIM-Siegel · Mycel suchend";
-  var ARIA_LABEL_GOLD = "SBKIM-Siegel · Mycel verbunden";
+  var ARIA_LABEL_BRONZE = "SBKIM-Siegel · im Mycel, ruhend";
+  var ARIA_LABEL_GOLD = "SBKIM-Siegel · im Mycel, aktiv";
 
   // ---- Wappen-SVG (Akkretions-Disk-Korona + Auszeichnungs-Siegel) ----
   //
@@ -162,7 +194,7 @@
   // skaliert das SVG via viewBox-Attribute auf die CSS-Box (`width:40px;
   // height:40px`). aria-hidden auf dem SVG — das `title`/`aria-label`
   // am Badge-Span trägt das a11y-Label.
-  var WAPPEN_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">\n  <defs>\n    <linearGradient id="goldRingGrad" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFF6C8"/>\n      <stop offset="15%"  stop-color="#FFE066"/>\n      <stop offset="40%"  stop-color="#F4C430"/>\n      <stop offset="70%"  stop-color="#A67C00"/>\n      <stop offset="100%" stop-color="#5B3D00"/>\n    </linearGradient>\n    <linearGradient id="goldText" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFF1A8"/>\n      <stop offset="35%"  stop-color="#FFD700"/>\n      <stop offset="55%"  stop-color="#E5B312"/>\n      <stop offset="85%"  stop-color="#8B6914"/>\n      <stop offset="100%" stop-color="#5B3D00"/>\n    </linearGradient>\n    <linearGradient id="goldRibbonGrad" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFE873"/>\n      <stop offset="50%"  stop-color="#D4A017"/>\n      <stop offset="100%" stop-color="#7A5800"/>\n    </linearGradient>\n    <linearGradient id="goldShieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFE066"/>\n      <stop offset="100%" stop-color="#A67C00"/>\n    </linearGradient>\n    <radialGradient id="navyDeep" cx="50%" cy="40%" r="70%">\n      <stop offset="0%"   stop-color="#1A2C5C"/>\n      <stop offset="60%"  stop-color="#0E1A40"/>\n      <stop offset="100%" stop-color="#050A1F"/>\n    </radialGradient>\n    <radialGradient id="gemGrad" cx="35%" cy="30%" r="70%">\n      <stop offset="0%"   stop-color="#9BC4FF"/>\n      <stop offset="35%"  stop-color="#3A6FE8"/>\n      <stop offset="100%" stop-color="#0B1F70"/>\n    </radialGradient>\n    <radialGradient id="treeGlow" cx="50%" cy="50%" r="50%">\n      <stop offset="0%"   stop-color="#FFF1A8" stop-opacity="1"/>\n      <stop offset="60%"  stop-color="#F4C430" stop-opacity="0.5"/>\n      <stop offset="100%" stop-color="#F4C430" stop-opacity="0"/>\n    </radialGradient>\n    <filter id="darkDropShadow" x="-30%" y="-30%" width="160%" height="160%">\n      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/>\n      <feOffset dx="3" dy="5" result="shadow"/>\n      <feComponentTransfer><feFuncA type="linear" slope="1.0"/></feComponentTransfer>\n      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>\n    </filter>\n    <filter id="embossShadow" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>\n      <feOffset dx="0" dy="3" result="off"/>\n      <feComponentTransfer><feFuncA type="linear" slope="0.65"/></feComponentTransfer>\n      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>\n    </filter>\n    <filter id="strongShadow" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>\n      <feOffset dx="0" dy="5" result="off"/>\n      <feComponentTransfer><feFuncA type="linear" slope="0.8"/></feComponentTransfer>\n      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>\n    </filter>\n    <!-- Korona-Blur (Akkretions-Disk-Stil aus Sage-Page .bh-disk).\n         stdDeviation=22 entspricht in etwa dem \\`filter: blur(10px)\\` der\n         CSS-Variante bei 280-px-Skalierung; im 1024-Viewbox stärker\n         dosiert, damit die zwölf farbigen Arc-Segmente zu einem\n         weichen Conic-Gradient verschmelzen. -->\n    <filter id="bhCorona" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceGraphic" stdDeviation="22"/>\n    </filter>\n    <filter id="bhCoronaInner" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceGraphic" stdDeviation="14"/>\n    </filter>\n    <path id="topArc" d="M 141.1 412.6 A 384 384 0 0 1 882.9 412.6" fill="none"/>\n  </defs>\n\n  <rect width="1024" height="1024" fill="#050505"/>\n\n  <!-- Akkretions-Disk-Korona (Vorbild: .bh-disk auf Sage-Page).\n       Conic-Gradient orange → gold → magenta → blau → türkis → orange\n       als zwölf Arc-Segmente (je 30°) um den Siegel-Außenrand\n       (Radius 475, knapp außerhalb des Gold-Rings r=444), mit\n       feGaussianBlur stdDeviation=22 → smoothe Conic-Anmutung.\n       Innerer Ring (Radius 460, schmaler Stroke, weniger Blur)\n       entspricht .bh-disk-2 — dezente zweite Schicht. -->\n  <g filter="url(#bhCorona)" opacity="0.78">\n    <path d="M 512 37 A 475 475 0 0 1 749.5 100.6"        fill="none" stroke="#ff7a00" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 749.5 100.6 A 475 475 0 0 1 923.4 274.5"   fill="none" stroke="#ffaf36" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 923.4 274.5 A 475 475 0 0 1 987 512"       fill="none" stroke="#f7c569" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 987 512 A 475 475 0 0 1 923.4 749.5"       fill="none" stroke="#dd8598" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 923.4 749.5 A 475 475 0 0 1 749.5 923.4"   fill="none" stroke="#bf50c1" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 749.5 923.4 A 475 475 0 0 1 512 987"       fill="none" stroke="#8754c8" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 512 987 A 475 475 0 0 1 274.5 923.4"       fill="none" stroke="#4f57ce" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 274.5 923.4 A 475 475 0 0 1 100.6 749.5"   fill="none" stroke="#2a80c2" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 100.6 749.5 A 475 475 0 0 1 37 512"        fill="none" stroke="#0cb4af" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 37 512 A 475 475 0 0 1 100.6 274.5"        fill="none" stroke="#2abc8b" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 100.6 274.5 A 475 475 0 0 1 274.5 100.6"   fill="none" stroke="#71a65d" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 274.5 100.6 A 475 475 0 0 1 512 37"        fill="none" stroke="#b8902e" stroke-width="60" stroke-linecap="butt"/>\n  </g>\n  <g filter="url(#bhCoronaInner)" opacity="0.55">\n    <path d="M 512 52 A 460 460 0 0 1 742 113"            fill="none" stroke="#ff7a00" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 742 113 A 460 460 0 0 1 911 282"           fill="none" stroke="#ffaf36" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 911 282 A 460 460 0 0 1 972 512"           fill="none" stroke="#f7c569" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 972 512 A 460 460 0 0 1 911 742"           fill="none" stroke="#dd8598" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 911 742 A 460 460 0 0 1 742 911"           fill="none" stroke="#bf50c1" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 742 911 A 460 460 0 0 1 512 972"           fill="none" stroke="#8754c8" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 512 972 A 460 460 0 0 1 282 911"           fill="none" stroke="#4f57ce" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 282 911 A 460 460 0 0 1 113 742"           fill="none" stroke="#2a80c2" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 113 742 A 460 460 0 0 1 52 512"            fill="none" stroke="#0cb4af" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 52 512 A 460 460 0 0 1 113 282"            fill="none" stroke="#2abc8b" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 113 282 A 460 460 0 0 1 282 113"           fill="none" stroke="#71a65d" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 282 113 A 460 460 0 0 1 512 52"            fill="none" stroke="#b8902e" stroke-width="32" stroke-linecap="butt"/>\n  </g>\n\n  <!-- Drop shadow under seal -->\n  <circle cx="512" cy="520" r="444" fill="#000" opacity="0.5"/>\n\n  <!-- Gold ring + navy interior -->\n  <circle cx="512" cy="512" r="444" fill="url(#goldRingGrad)"/>\n  <circle cx="512" cy="512" r="368" fill="url(#navyDeep)"/>\n  <circle cx="512" cy="512" r="372" fill="none" stroke="url(#goldRingGrad)" stroke-width="4"/>\n  <circle cx="512" cy="512" r="367" fill="none" stroke="#3D2914" stroke-width="1" opacity="0.5"/>\n  <circle cx="512" cy="512" r="441" fill="none" stroke="#3D2914" stroke-width="1" opacity="0.4"/>\n  <circle cx="512" cy="512" r="445" fill="none" stroke="#FFE066" stroke-width="1" opacity="0.5"/>\n\n  <!-- Engraved dots on inner border -->\n  <g fill="#3A2A0A" opacity="0.55">\n    <circle cx="512.0" cy="120.0" r="1.5"/><circle cx="539.3" cy="121.0" r="1.5"/><circle cx="566.6" cy="123.8" r="1.5"/><circle cx="593.5" cy="128.6" r="1.5"/><circle cx="620.0" cy="135.2" r="1.5"/><circle cx="646.1" cy="143.6" r="1.5"/><circle cx="671.4" cy="153.9" r="1.5"/><circle cx="696.0" cy="165.9" r="1.5"/><circle cx="719.7" cy="179.6" r="1.5"/><circle cx="742.4" cy="194.9" r="1.5"/><circle cx="764.0" cy="211.7" r="1.5"/><circle cx="784.3" cy="230.0" r="1.5"/><circle cx="803.3" cy="249.7" r="1.5"/><circle cx="820.9" cy="270.7" r="1.5"/><circle cx="837.0" cy="292.8" r="1.5"/><circle cx="851.5" cy="316.0" r="1.5"/><circle cx="864.3" cy="340.2" r="1.5"/><circle cx="875.5" cy="365.2" r="1.5"/><circle cx="884.8" cy="390.9" r="1.5"/><circle cx="892.4" cy="417.2" r="1.5"/><circle cx="898.0" cy="443.9" r="1.5"/><circle cx="901.9" cy="471.0" r="1.5"/><circle cx="903.8" cy="498.3" r="1.5"/><circle cx="903.8" cy="525.7" r="1.5"/><circle cx="901.9" cy="553.0" r="1.5"/><circle cx="898.0" cy="580.1" r="1.5"/><circle cx="892.4" cy="606.8" r="1.5"/><circle cx="884.8" cy="633.1" r="1.5"/><circle cx="875.5" cy="658.8" r="1.5"/><circle cx="864.3" cy="683.8" r="1.5"/><circle cx="851.5" cy="708.0" r="1.5"/><circle cx="837.0" cy="731.2" r="1.5"/><circle cx="820.9" cy="753.3" r="1.5"/><circle cx="803.3" cy="774.3" r="1.5"/><circle cx="784.3" cy="794.0" r="1.5"/><circle cx="764.0" cy="812.3" r="1.5"/><circle cx="742.4" cy="829.1" r="1.5"/><circle cx="719.7" cy="844.4" r="1.5"/><circle cx="696.0" cy="858.1" r="1.5"/><circle cx="671.4" cy="870.1" r="1.5"/><circle cx="646.1" cy="880.4" r="1.5"/><circle cx="620.0" cy="888.8" r="1.5"/><circle cx="593.5" cy="895.4" r="1.5"/><circle cx="566.6" cy="900.2" r="1.5"/><circle cx="539.3" cy="903.0" r="1.5"/><circle cx="512.0" cy="904.0" r="1.5"/><circle cx="484.7" cy="903.0" r="1.5"/><circle cx="457.4" cy="900.2" r="1.5"/><circle cx="430.5" cy="895.4" r="1.5"/><circle cx="404.0" cy="888.8" r="1.5"/><circle cx="377.9" cy="880.4" r="1.5"/><circle cx="352.6" cy="870.1" r="1.5"/><circle cx="328.0" cy="858.1" r="1.5"/><circle cx="304.3" cy="844.4" r="1.5"/><circle cx="281.6" cy="829.1" r="1.5"/><circle cx="260.0" cy="812.3" r="1.5"/><circle cx="239.7" cy="794.0" r="1.5"/><circle cx="220.7" cy="774.3" r="1.5"/><circle cx="203.1" cy="753.3" r="1.5"/><circle cx="187.0" cy="731.2" r="1.5"/><circle cx="172.5" cy="708.0" r="1.5"/><circle cx="159.7" cy="683.8" r="1.5"/><circle cx="148.5" cy="658.8" r="1.5"/><circle cx="139.2" cy="633.1" r="1.5"/><circle cx="131.6" cy="606.8" r="1.5"/><circle cx="126.0" cy="580.1" r="1.5"/><circle cx="122.1" cy="553.0" r="1.5"/><circle cx="120.2" cy="525.7" r="1.5"/><circle cx="120.2" cy="498.3" r="1.5"/><circle cx="122.1" cy="471.0" r="1.5"/><circle cx="126.0" cy="443.9" r="1.5"/><circle cx="131.6" cy="417.2" r="1.5"/><circle cx="139.2" cy="390.9" r="1.5"/><circle cx="148.5" cy="365.2" r="1.5"/><circle cx="159.7" cy="340.2" r="1.5"/><circle cx="172.5" cy="316.0" r="1.5"/><circle cx="187.0" cy="292.8" r="1.5"/><circle cx="203.1" cy="270.7" r="1.5"/><circle cx="220.7" cy="249.7" r="1.5"/><circle cx="239.7" cy="230.0" r="1.5"/><circle cx="260.0" cy="211.7" r="1.5"/><circle cx="281.6" cy="194.9" r="1.5"/><circle cx="304.3" cy="179.6" r="1.5"/><circle cx="328.0" cy="165.9" r="1.5"/><circle cx="352.6" cy="153.9" r="1.5"/><circle cx="377.9" cy="143.6" r="1.5"/><circle cx="404.0" cy="135.2" r="1.5"/><circle cx="430.5" cy="128.6" r="1.5"/><circle cx="457.4" cy="123.8" r="1.5"/><circle cx="484.7" cy="121.0" r="1.5"/>\n  </g>\n\n  <!-- OFFIZIELLE BESTÄTIGUNG -->\n  <text font-family="Georgia, \'Times New Roman\', serif" font-size="62" font-weight="bold" fill="url(#goldText)" letter-spacing="1" filter="url(#darkDropShadow)">\n    <textPath href="#topArc" startOffset="50%" text-anchor="middle">OFFIZIELLE BESTÄTIGUNG</textPath>\n  </text>\n\n  <!-- SBKIM -->\n  <g filter="url(#strongShadow)">\n    <text x="512" y="500" font-family="Georgia, \'Times New Roman\', serif" font-size="190" font-weight="bold" fill="url(#goldText)" text-anchor="middle" stroke="#3D2914" stroke-width="2.5" letter-spacing="2">SBKIM</text>\n  </g>\n\n  <!-- SIEGEL -->\n  <g filter="url(#embossShadow)">\n    <text x="512" y="620" font-family="Georgia, \'Times New Roman\', serif" font-size="110" font-weight="bold" fill="url(#goldText)" text-anchor="middle" stroke="#3D2914" stroke-width="2" letter-spacing="6">SIEGEL</text>\n  </g>\n\n  <!-- Left medallion (Schild) -->\n  <g>\n    <circle cx="188" cy="555" r="84" fill="#3D2914" opacity="0.85"/>\n    <circle cx="188" cy="555" r="80" fill="url(#goldRingGrad)"/>\n    <circle cx="188" cy="555" r="70" fill="url(#navyDeep)"/>\n    <circle cx="188" cy="555" r="70" fill="none" stroke="#D4A017" stroke-width="1.5" opacity="0.7"/>\n    <g transform="translate(188 555)">\n      <path d="M -34 -36 L 34 -36 C 34 0, 22 30, 0 44 C -22 30, -34 0, -34 -36 Z" fill="url(#goldShieldGrad)" stroke="#3D2914" stroke-width="2"/>\n      <path d="M -16 0 L -4 14 L 20 -12" fill="none" stroke="#6B4A00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>\n    </g>\n    <circle cx="188" cy="643" r="11" fill="#3D2914"/>\n    <circle cx="188" cy="643" r="9" fill="url(#gemGrad)"/>\n    <ellipse cx="185.3" cy="639.4" rx="3.15" ry="1.98" fill="#B8DCFF" opacity="0.85"/>\n    <circle cx="184.4" cy="638.5" r="1.17" fill="#FFFFFF" opacity="0.9"/>\n  </g>\n\n  <!-- Right medallion (Mycel) -->\n  <g>\n    <circle cx="836" cy="555" r="84" fill="#3D2914" opacity="0.85"/>\n    <circle cx="836" cy="555" r="80" fill="url(#goldRingGrad)"/>\n    <circle cx="836" cy="555" r="70" fill="url(#navyDeep)"/>\n    <circle cx="836" cy="555" r="70" fill="none" stroke="#D4A017" stroke-width="1.5" opacity="0.7"/>\n    <g transform="translate(836 555)">\n      <circle cx="0" cy="-10" r="14" fill="url(#treeGlow)"/>\n      <line x1="0" y1="40" x2="0" y2="-10" stroke="#F4C430" stroke-width="4" stroke-linecap="round"/>\n      <line x1="0" y1="-10" x2="-37.6" y2="-23.7" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="-37.6" y1="-23.7" x2="-55.5" y2="-22.1" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-55.5" cy="-22.1" r="2.2" fill="#FFE873"/>\n      <line x1="-37.6" y1="-23.7" x2="-50.3" y2="-36.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-50.3" cy="-36.4" r="2.2" fill="#FFE873"/>\n      <circle cx="-37.6" cy="-23.7" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="-28.3" y2="-38.3" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="-28.3" y1="-38.3" x2="-45.2" y2="-44.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-45.2" cy="-44.4" r="2.2" fill="#FFE873"/>\n      <line x1="-28.3" y1="-38.3" x2="-34.4" y2="-55.2" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-34.4" cy="-55.2" r="2.2" fill="#FFE873"/>\n      <circle cx="-28.3" cy="-38.3" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="-13.7" y2="-47.6" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="-13.7" y1="-47.6" x2="-26.4" y2="-60.3" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-26.4" cy="-60.3" r="2.2" fill="#FFE873"/>\n      <line x1="-13.7" y1="-47.6" x2="-12.1" y2="-65.5" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-12.1" cy="-65.5" r="2.2" fill="#FFE873"/>\n      <circle cx="-13.7" cy="-47.6" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="13.7" y2="-47.6" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="13.7" y1="-47.6" x2="12.1" y2="-65.5" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="12.1" cy="-65.5" r="2.2" fill="#FFE873"/>\n      <line x1="13.7" y1="-47.6" x2="26.4" y2="-60.3" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="26.4" cy="-60.3" r="2.2" fill="#FFE873"/>\n      <circle cx="13.7" cy="-47.6" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="28.3" y2="-38.3" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="28.3" y1="-38.3" x2="34.4" y2="-55.2" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="34.4" cy="-55.2" r="2.2" fill="#FFE873"/>\n      <line x1="28.3" y1="-38.3" x2="45.2" y2="-44.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="45.2" cy="-44.4" r="2.2" fill="#FFE873"/>\n      <circle cx="28.3" cy="-38.3" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="37.6" y2="-23.7" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="37.6" y1="-23.7" x2="50.3" y2="-36.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="50.3" cy="-36.4" r="2.2" fill="#FFE873"/>\n      <line x1="37.6" y1="-23.7" x2="55.5" y2="-22.1" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="55.5" cy="-22.1" r="2.2" fill="#FFE873"/>\n      <circle cx="37.6" cy="-23.7" r="2.5" fill="#FFE873"/>\n    </g>\n    <circle cx="836" cy="643" r="11" fill="#3D2914"/>\n    <circle cx="836" cy="643" r="9" fill="url(#gemGrad)"/>\n    <ellipse cx="833.3" cy="639.4" rx="3.15" ry="1.98" fill="#B8DCFF" opacity="0.85"/>\n    <circle cx="832.4" cy="638.5" r="1.17" fill="#FFFFFF" opacity="0.9"/>\n  </g>\n\n  <!-- Infinity medallion -->\n  <g>\n    <circle cx="512" cy="750" r="84" fill="#3D2914" opacity="0.85"/>\n    <circle cx="512" cy="750" r="80" fill="url(#goldRingGrad)"/>\n    <circle cx="512" cy="750" r="70" fill="url(#navyDeep)"/>\n    <circle cx="512" cy="750" r="70" fill="none" stroke="#D4A017" stroke-width="1.5" opacity="0.7"/>\n    <path d="M 470.2 750 C 470.2 727.2, 500.6 727.2, 512 750 C 523.4 772.8, 553.8 772.8, 553.8 750 C 553.8 727.2, 523.4 727.2, 512 750 C 500.6 772.8, 470.2 772.8, 470.2 750 Z" fill="none" stroke="url(#goldRingGrad)" stroke-width="10" stroke-linejoin="round"/>\n    <g fill="#FFE873">\n      <circle cx="460" cy="710" r="2.5"/>\n      <circle cx="564" cy="710" r="2.5"/>\n      <circle cx="452" cy="786" r="2"/>\n      <circle cx="572" cy="786" r="2"/>\n    </g>\n  </g>\n\n  <!-- Bottom ribbon SELF-INSCRIBING -->\n  <g>\n    <path d="M 28 880 L 200 850 L 200 925 L 28 945 Z" fill="url(#goldRibbonGrad)" stroke="#3D2914" stroke-width="2"/>\n    <path d="M 28 880 L 70 905 L 28 945 Z" fill="#7A5800"/>\n    <path d="M 996 880 L 824 850 L 824 925 L 996 945 Z" fill="url(#goldRibbonGrad)" stroke="#3D2914" stroke-width="2"/>\n    <path d="M 996 880 L 954 905 L 996 945 Z" fill="#7A5800"/>\n    <path d="M 180 850 Q 512 935, 844 850 L 844 940 Q 512 1018, 180 940 Z" fill="url(#goldRibbonGrad)" stroke="#3D2914" stroke-width="2.5"/>\n    <path d="M 200 870 Q 512 950, 824 870" fill="none" stroke="#FFE873" stroke-width="1.2" opacity="0.55"/>\n    <path d="M 200 920 Q 512 995, 824 920" fill="none" stroke="#3D2914" stroke-width="1" opacity="0.5"/>\n    <path id="ribbonText" d="M 222 902 Q 512 980, 802 902" fill="none"/>\n    <text font-family="Georgia, \'Times New Roman\', serif" font-size="48" font-weight="bold" fill="#3D2914" letter-spacing="3">\n      <textPath href="#ribbonText" startOffset="50%" text-anchor="middle">SELF-INSCRIBING</textPath>\n    </text>\n  </g>\n</svg>\n';
+  var WAPPEN_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">\n  <defs>\n    <linearGradient id="goldRingGrad" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFF6C8"/>\n      <stop offset="15%"  stop-color="#FFE066"/>\n      <stop offset="40%"  stop-color="#F4C430"/>\n      <stop offset="70%"  stop-color="#A67C00"/>\n      <stop offset="100%" stop-color="#5B3D00"/>\n    </linearGradient>\n    <linearGradient id="goldText" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFF1A8"/>\n      <stop offset="35%"  stop-color="#FFD700"/>\n      <stop offset="55%"  stop-color="#E5B312"/>\n      <stop offset="85%"  stop-color="#8B6914"/>\n      <stop offset="100%" stop-color="#5B3D00"/>\n    </linearGradient>\n    <linearGradient id="goldRibbonGrad" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFE873"/>\n      <stop offset="50%"  stop-color="#D4A017"/>\n      <stop offset="100%" stop-color="#7A5800"/>\n    </linearGradient>\n    <linearGradient id="goldShieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">\n      <stop offset="0%"   stop-color="#FFE066"/>\n      <stop offset="100%" stop-color="#A67C00"/>\n    </linearGradient>\n    <radialGradient id="navyDeep" cx="50%" cy="40%" r="70%">\n      <stop offset="0%"   stop-color="#1A2C5C"/>\n      <stop offset="60%"  stop-color="#0E1A40"/>\n      <stop offset="100%" stop-color="#050A1F"/>\n    </radialGradient>\n    <radialGradient id="gemGrad" cx="35%" cy="30%" r="70%">\n      <stop offset="0%"   stop-color="#9BC4FF"/>\n      <stop offset="35%"  stop-color="#3A6FE8"/>\n      <stop offset="100%" stop-color="#0B1F70"/>\n    </radialGradient>\n    <radialGradient id="treeGlow" cx="50%" cy="50%" r="50%">\n      <stop offset="0%"   stop-color="#FFF1A8" stop-opacity="1"/>\n      <stop offset="60%"  stop-color="#F4C430" stop-opacity="0.5"/>\n      <stop offset="100%" stop-color="#F4C430" stop-opacity="0"/>\n    </radialGradient>\n    <filter id="darkDropShadow" x="-30%" y="-30%" width="160%" height="160%">\n      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/>\n      <feOffset dx="3" dy="5" result="shadow"/>\n      <feComponentTransfer><feFuncA type="linear" slope="1.0"/></feComponentTransfer>\n      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>\n    </filter>\n    <filter id="embossShadow" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>\n      <feOffset dx="0" dy="3" result="off"/>\n      <feComponentTransfer><feFuncA type="linear" slope="0.65"/></feComponentTransfer>\n      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>\n    </filter>\n    <filter id="strongShadow" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>\n      <feOffset dx="0" dy="5" result="off"/>\n      <feComponentTransfer><feFuncA type="linear" slope="0.8"/></feComponentTransfer>\n      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>\n    </filter>\n    <!-- Korona-Blur (Akkretions-Disk-Stil aus Sage-Page .bh-disk).\n         stdDeviation=22 entspricht in etwa dem \\`filter: blur(10px)\\` der\n         CSS-Variante bei 280-px-Skalierung; im 1024-Viewbox stärker\n         dosiert, damit die zwölf farbigen Arc-Segmente zu einem\n         weichen Conic-Gradient verschmelzen. -->\n    <filter id="bhCorona" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceGraphic" stdDeviation="22"/>\n    </filter>\n    <filter id="bhCoronaInner" x="-20%" y="-20%" width="140%" height="140%">\n      <feGaussianBlur in="SourceGraphic" stdDeviation="14"/>\n    </filter>\n    <path id="topArc" d="M 141.1 412.6 A 384 384 0 0 1 882.9 412.6" fill="none"/>\n  </defs>\n\n  <rect width="1024" height="1024" fill="#050505"/>\n\n  <!-- Akkretions-Disk-Korona (Vorbild: .bh-disk auf Sage-Page).\n       Conic-Gradient orange → gold → magenta → blau → türkis → orange\n       als zwölf Arc-Segmente (je 30°) um den Siegel-Außenrand\n       (Radius 475, knapp außerhalb des Gold-Rings r=444), mit\n       feGaussianBlur stdDeviation=22 → smoothe Conic-Anmutung.\n       Innerer Ring (Radius 460, schmaler Stroke, weniger Blur)\n       entspricht .bh-disk-2 — dezente zweite Schicht. -->\n  <g filter="url(#bhCorona)" opacity="0.78">\n    <path d="M 512 37 A 475 475 0 0 1 749.5 100.6"        fill="none" stroke="#ff7a00" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 749.5 100.6 A 475 475 0 0 1 923.4 274.5"   fill="none" stroke="#ffaf36" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 923.4 274.5 A 475 475 0 0 1 987 512"       fill="none" stroke="#f7c569" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 987 512 A 475 475 0 0 1 923.4 749.5"       fill="none" stroke="#dd8598" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 923.4 749.5 A 475 475 0 0 1 749.5 923.4"   fill="none" stroke="#bf50c1" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 749.5 923.4 A 475 475 0 0 1 512 987"       fill="none" stroke="#8754c8" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 512 987 A 475 475 0 0 1 274.5 923.4"       fill="none" stroke="#4f57ce" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 274.5 923.4 A 475 475 0 0 1 100.6 749.5"   fill="none" stroke="#2a80c2" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 100.6 749.5 A 475 475 0 0 1 37 512"        fill="none" stroke="#0cb4af" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 37 512 A 475 475 0 0 1 100.6 274.5"        fill="none" stroke="#2abc8b" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 100.6 274.5 A 475 475 0 0 1 274.5 100.6"   fill="none" stroke="#71a65d" stroke-width="60" stroke-linecap="butt"/>\n    <path d="M 274.5 100.6 A 475 475 0 0 1 512 37"        fill="none" stroke="#b8902e" stroke-width="60" stroke-linecap="butt"/>\n  </g>\n  <g filter="url(#bhCoronaInner)" opacity="0.55">\n    <path d="M 512 52 A 460 460 0 0 1 742 113"            fill="none" stroke="#ff7a00" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 742 113 A 460 460 0 0 1 911 282"           fill="none" stroke="#ffaf36" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 911 282 A 460 460 0 0 1 972 512"           fill="none" stroke="#f7c569" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 972 512 A 460 460 0 0 1 911 742"           fill="none" stroke="#dd8598" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 911 742 A 460 460 0 0 1 742 911"           fill="none" stroke="#bf50c1" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 742 911 A 460 460 0 0 1 512 972"           fill="none" stroke="#8754c8" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 512 972 A 460 460 0 0 1 282 911"           fill="none" stroke="#4f57ce" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 282 911 A 460 460 0 0 1 113 742"           fill="none" stroke="#2a80c2" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 113 742 A 460 460 0 0 1 52 512"            fill="none" stroke="#0cb4af" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 52 512 A 460 460 0 0 1 113 282"            fill="none" stroke="#2abc8b" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 113 282 A 460 460 0 0 1 282 113"           fill="none" stroke="#71a65d" stroke-width="32" stroke-linecap="butt"/>\n    <path d="M 282 113 A 460 460 0 0 1 512 52"            fill="none" stroke="#b8902e" stroke-width="32" stroke-linecap="butt"/>\n  </g>\n\n  <!-- Drop shadow under seal -->\n  <circle cx="512" cy="520" r="444" fill="#000" opacity="0.5"/>\n\n  <!-- Gold ring + navy interior -->\n  <circle cx="512" cy="512" r="444" fill="url(#goldRingGrad)"/>\n  <circle cx="512" cy="512" r="368" fill="url(#navyDeep)"/>\n  <circle cx="512" cy="512" r="372" fill="none" stroke="url(#goldRingGrad)" stroke-width="4"/>\n  <circle cx="512" cy="512" r="367" fill="none" stroke="#3D2914" stroke-width="1" opacity="0.5"/>\n  <circle cx="512" cy="512" r="441" fill="none" stroke="#3D2914" stroke-width="1" opacity="0.4"/>\n  <circle cx="512" cy="512" r="445" fill="none" stroke="#FFE066" stroke-width="1" opacity="0.5"/>\n\n  <!-- Engraved dots on inner border -->\n  <g fill="#3A2A0A" opacity="0.55">\n    <circle cx="512.0" cy="120.0" r="1.5"/><circle cx="539.3" cy="121.0" r="1.5"/><circle cx="566.6" cy="123.8" r="1.5"/><circle cx="593.5" cy="128.6" r="1.5"/><circle cx="620.0" cy="135.2" r="1.5"/><circle cx="646.1" cy="143.6" r="1.5"/><circle cx="671.4" cy="153.9" r="1.5"/><circle cx="696.0" cy="165.9" r="1.5"/><circle cx="719.7" cy="179.6" r="1.5"/><circle cx="742.4" cy="194.9" r="1.5"/><circle cx="764.0" cy="211.7" r="1.5"/><circle cx="784.3" cy="230.0" r="1.5"/><circle cx="803.3" cy="249.7" r="1.5"/><circle cx="820.9" cy="270.7" r="1.5"/><circle cx="837.0" cy="292.8" r="1.5"/><circle cx="851.5" cy="316.0" r="1.5"/><circle cx="864.3" cy="340.2" r="1.5"/><circle cx="875.5" cy="365.2" r="1.5"/><circle cx="884.8" cy="390.9" r="1.5"/><circle cx="892.4" cy="417.2" r="1.5"/><circle cx="898.0" cy="443.9" r="1.5"/><circle cx="901.9" cy="471.0" r="1.5"/><circle cx="903.8" cy="498.3" r="1.5"/><circle cx="903.8" cy="525.7" r="1.5"/><circle cx="901.9" cy="553.0" r="1.5"/><circle cx="898.0" cy="580.1" r="1.5"/><circle cx="892.4" cy="606.8" r="1.5"/><circle cx="884.8" cy="633.1" r="1.5"/><circle cx="875.5" cy="658.8" r="1.5"/><circle cx="864.3" cy="683.8" r="1.5"/><circle cx="851.5" cy="708.0" r="1.5"/><circle cx="837.0" cy="731.2" r="1.5"/><circle cx="820.9" cy="753.3" r="1.5"/><circle cx="803.3" cy="774.3" r="1.5"/><circle cx="784.3" cy="794.0" r="1.5"/><circle cx="764.0" cy="812.3" r="1.5"/><circle cx="742.4" cy="829.1" r="1.5"/><circle cx="719.7" cy="844.4" r="1.5"/><circle cx="696.0" cy="858.1" r="1.5"/><circle cx="671.4" cy="870.1" r="1.5"/><circle cx="646.1" cy="880.4" r="1.5"/><circle cx="620.0" cy="888.8" r="1.5"/><circle cx="593.5" cy="895.4" r="1.5"/><circle cx="566.6" cy="900.2" r="1.5"/><circle cx="539.3" cy="903.0" r="1.5"/><circle cx="512.0" cy="904.0" r="1.5"/><circle cx="484.7" cy="903.0" r="1.5"/><circle cx="457.4" cy="900.2" r="1.5"/><circle cx="430.5" cy="895.4" r="1.5"/><circle cx="404.0" cy="888.8" r="1.5"/><circle cx="377.9" cy="880.4" r="1.5"/><circle cx="352.6" cy="870.1" r="1.5"/><circle cx="328.0" cy="858.1" r="1.5"/><circle cx="304.3" cy="844.4" r="1.5"/><circle cx="281.6" cy="829.1" r="1.5"/><circle cx="260.0" cy="812.3" r="1.5"/><circle cx="239.7" cy="794.0" r="1.5"/><circle cx="220.7" cy="774.3" r="1.5"/><circle cx="203.1" cy="753.3" r="1.5"/><circle cx="187.0" cy="731.2" r="1.5"/><circle cx="172.5" cy="708.0" r="1.5"/><circle cx="159.7" cy="683.8" r="1.5"/><circle cx="148.5" cy="658.8" r="1.5"/><circle cx="139.2" cy="633.1" r="1.5"/><circle cx="131.6" cy="606.8" r="1.5"/><circle cx="126.0" cy="580.1" r="1.5"/><circle cx="122.1" cy="553.0" r="1.5"/><circle cx="120.2" cy="525.7" r="1.5"/><circle cx="120.2" cy="498.3" r="1.5"/><circle cx="122.1" cy="471.0" r="1.5"/><circle cx="126.0" cy="443.9" r="1.5"/><circle cx="131.6" cy="417.2" r="1.5"/><circle cx="139.2" cy="390.9" r="1.5"/><circle cx="148.5" cy="365.2" r="1.5"/><circle cx="159.7" cy="340.2" r="1.5"/><circle cx="172.5" cy="316.0" r="1.5"/><circle cx="187.0" cy="292.8" r="1.5"/><circle cx="203.1" cy="270.7" r="1.5"/><circle cx="220.7" cy="249.7" r="1.5"/><circle cx="239.7" cy="230.0" r="1.5"/><circle cx="260.0" cy="211.7" r="1.5"/><circle cx="281.6" cy="194.9" r="1.5"/><circle cx="304.3" cy="179.6" r="1.5"/><circle cx="328.0" cy="165.9" r="1.5"/><circle cx="352.6" cy="153.9" r="1.5"/><circle cx="377.9" cy="143.6" r="1.5"/><circle cx="404.0" cy="135.2" r="1.5"/><circle cx="430.5" cy="128.6" r="1.5"/><circle cx="457.4" cy="123.8" r="1.5"/><circle cx="484.7" cy="121.0" r="1.5"/>\n  </g>\n\n  <!-- OFFIZIELLE BESTÄTIGUNG -->\n  <text font-family="Georgia, \'Times New Roman\', serif" font-size="62" font-weight="bold" fill="url(#goldText)" letter-spacing="1" filter="url(#darkDropShadow)">\n    <textPath href="#topArc" startOffset="50%" text-anchor="middle">OFFIZIELLE BESTÄTIGUNG</textPath>\n  </text>\n\n  <!-- SBKIM -->\n  <g filter="url(#strongShadow)">\n    <text x="512" y="500" font-family="Georgia, \'Times New Roman\', serif" font-size="190" font-weight="bold" fill="url(#goldText)" text-anchor="middle" stroke="#3D2914" stroke-width="2.5" letter-spacing="2">SBKIM</text>\n  </g>\n\n  <!-- SIEGEL -->\n  <g filter="url(#embossShadow)">\n    <text x="512" y="620" font-family="Georgia, \'Times New Roman\', serif" font-size="110" font-weight="bold" fill="url(#goldText)" text-anchor="middle" stroke="#3D2914" stroke-width="2" letter-spacing="6">SIEGEL</text>\n  </g>\n\n  <!-- Left medallion (Schild) -->\n  <g>\n    <circle cx="188" cy="555" r="84" fill="#3D2914" opacity="0.85"/>\n    <circle cx="188" cy="555" r="80" fill="url(#goldRingGrad)"/>\n    <circle cx="188" cy="555" r="70" fill="url(#navyDeep)"/>\n    <circle cx="188" cy="555" r="70" fill="none" stroke="#D4A017" stroke-width="1.5" opacity="0.7"/>\n    <g transform="translate(188 555)">\n      <path d="M -34 -36 L 34 -36 C 34 0, 22 30, 0 44 C -22 30, -34 0, -34 -36 Z" fill="url(#goldShieldGrad)" stroke="#3D2914" stroke-width="2"/>\n      <path d="M -16 0 L -4 14 L 20 -12" fill="none" stroke="#6B4A00" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>\n    </g>\n    <circle cx="188" cy="643" r="11" fill="#3D2914"/>\n    <circle cx="188" cy="643" r="9" fill="url(#gemGrad)"/>\n    <ellipse cx="185.3" cy="639.4" rx="3.15" ry="1.98" fill="#B8DCFF" opacity="0.85"/>\n    <circle cx="184.4" cy="638.5" r="1.17" fill="#FFFFFF" opacity="0.9"/>\n  </g>\n\n  <!-- Right medallion (Mycel) -->\n  <g>\n    <circle cx="836" cy="555" r="84" fill="#3D2914" opacity="0.85"/>\n    <circle cx="836" cy="555" r="80" fill="url(#goldRingGrad)"/>\n    <circle cx="836" cy="555" r="70" fill="url(#navyDeep)"/>\n    <circle cx="836" cy="555" r="70" fill="none" stroke="#D4A017" stroke-width="1.5" opacity="0.7"/>\n    <g transform="translate(836 555)">\n      <circle cx="0" cy="-10" r="14" fill="url(#treeGlow)"/>\n      <line x1="0" y1="40" x2="0" y2="-10" stroke="#F4C430" stroke-width="4" stroke-linecap="round"/>\n      <line x1="0" y1="-10" x2="-37.6" y2="-23.7" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="-37.6" y1="-23.7" x2="-55.5" y2="-22.1" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-55.5" cy="-22.1" r="2.2" fill="#FFE873"/>\n      <line x1="-37.6" y1="-23.7" x2="-50.3" y2="-36.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-50.3" cy="-36.4" r="2.2" fill="#FFE873"/>\n      <circle cx="-37.6" cy="-23.7" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="-28.3" y2="-38.3" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="-28.3" y1="-38.3" x2="-45.2" y2="-44.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-45.2" cy="-44.4" r="2.2" fill="#FFE873"/>\n      <line x1="-28.3" y1="-38.3" x2="-34.4" y2="-55.2" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-34.4" cy="-55.2" r="2.2" fill="#FFE873"/>\n      <circle cx="-28.3" cy="-38.3" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="-13.7" y2="-47.6" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="-13.7" y1="-47.6" x2="-26.4" y2="-60.3" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-26.4" cy="-60.3" r="2.2" fill="#FFE873"/>\n      <line x1="-13.7" y1="-47.6" x2="-12.1" y2="-65.5" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="-12.1" cy="-65.5" r="2.2" fill="#FFE873"/>\n      <circle cx="-13.7" cy="-47.6" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="13.7" y2="-47.6" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="13.7" y1="-47.6" x2="12.1" y2="-65.5" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="12.1" cy="-65.5" r="2.2" fill="#FFE873"/>\n      <line x1="13.7" y1="-47.6" x2="26.4" y2="-60.3" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="26.4" cy="-60.3" r="2.2" fill="#FFE873"/>\n      <circle cx="13.7" cy="-47.6" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="28.3" y2="-38.3" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="28.3" y1="-38.3" x2="34.4" y2="-55.2" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="34.4" cy="-55.2" r="2.2" fill="#FFE873"/>\n      <line x1="28.3" y1="-38.3" x2="45.2" y2="-44.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="45.2" cy="-44.4" r="2.2" fill="#FFE873"/>\n      <circle cx="28.3" cy="-38.3" r="2.5" fill="#FFE873"/>\n      <line x1="0" y1="-10" x2="37.6" y2="-23.7" stroke="#F4C430" stroke-width="2.5" stroke-linecap="round"/>\n      <line x1="37.6" y1="-23.7" x2="50.3" y2="-36.4" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="50.3" cy="-36.4" r="2.2" fill="#FFE873"/>\n      <line x1="37.6" y1="-23.7" x2="55.5" y2="-22.1" stroke="#F4C430" stroke-width="1.6" stroke-linecap="round"/>\n      <circle cx="55.5" cy="-22.1" r="2.2" fill="#FFE873"/>\n      <circle cx="37.6" cy="-23.7" r="2.5" fill="#FFE873"/>\n    </g>\n    <circle cx="836" cy="643" r="11" fill="#3D2914"/>\n    <circle cx="836" cy="643" r="9" fill="url(#gemGrad)"/>\n    <ellipse cx="833.3" cy="639.4" rx="3.15" ry="1.98" fill="#B8DCFF" opacity="0.85"/>\n    <circle cx="832.4" cy="638.5" r="1.17" fill="#FFFFFF" opacity="0.9"/>\n  </g>\n\n  <!-- Infinity medallion -->\n  <g>\n    <circle cx="512" cy="750" r="84" fill="#3D2914" opacity="0.85"/>\n    <circle cx="512" cy="750" r="80" fill="url(#goldRingGrad)"/>\n    <circle cx="512" cy="750" r="70" fill="url(#navyDeep)"/>\n    <circle cx="512" cy="750" r="70" fill="none" stroke="#D4A017" stroke-width="1.5" opacity="0.7"/>\n    <path d="M 470.2 750 C 470.2 727.2, 500.6 727.2, 512 750 C 523.4 772.8, 553.8 772.8, 553.8 750 C 553.8 727.2, 523.4 727.2, 512 750 C 500.6 772.8, 470.2 772.8, 470.2 750 Z" fill="none" stroke="url(#goldRingGrad)" stroke-width="10" stroke-linejoin="round"/>\n    <g fill="#FFE873">\n      <circle cx="460" cy="710" r="2.5"/>\n      <circle cx="564" cy="710" r="2.5"/>\n      <circle cx="452" cy="786" r="2"/>\n      <circle cx="572" cy="786" r="2"/>\n    </g>\n  </g>\n\n  <!-- Bottom ribbon SELF-INSCRIBING -->\n  <g>\n    <path d="M 28 880 L 200 850 L 200 925 L 28 945 Z" fill="url(#goldRibbonGrad)" stroke="#3D2914" stroke-width="2"/>\n    <path d="M 28 880 L 70 905 L 28 945 Z" fill="#7A5800"/>\n    <path d="M 996 880 L 824 850 L 824 925 L 996 945 Z" fill="url(#goldRibbonGrad)" stroke="#3D2914" stroke-width="2"/>\n    <path d="M 996 880 L 954 905 L 996 945 Z" fill="#7A5800"/>\n    <path d="M 180 850 Q 512 935, 844 850 L 844 940 Q 512 1018, 180 940 Z" fill="url(#goldRibbonGrad)" stroke="#3D2914" stroke-width="2.5"/>\n    <path d="M 200 870 Q 512 950, 824 870" fill="none" stroke="#FFE873" stroke-width="1.2" opacity="0.55"/>\n    <path d="M 200 920 Q 512 995, 824 920" fill="none" stroke="#3D2914" stroke-width="1" opacity="0.5"/>\n    <path id="ribbonText" d="M 222 902 Q 512 980, 802 902" fill="none"/>\n    <text font-family="Georgia, \'Times New Roman\', serif" font-size="38" font-weight="bold" fill="#3D2914" letter-spacing="1">\n      <textPath href="#ribbonText" startOffset="50%" text-anchor="middle">SAGE OBSERVATORIUM</textPath>\n    </text>\n  </g>\n</svg>\n';
 
   // ---- Modul-Zustand (Closure) ----
 
@@ -171,6 +203,19 @@
   var visibleMode = "visible";
   var mountModalFlag = true;
   var repoUrlOverride = null;
+  var ribbonText = DEFAULT_RIBBON_TEXT;
+  // true sobald init({ribbonText}) einen expliziten Wert gesetzt hat.
+  // Ohne expliziten Wert wird der Band-Text aus dem Repo-/Pages-Namen
+  // automatisch abgeleitet (deriveRibbonFromRepo), damit jeder Endknoten
+  // ohne Config seinen EIGENEN Namen trägt und nie ein mitkopiertes
+  // Fremd-Label zeigt (Mein-Rezeptbuch-Bitte 2026-06-20).
+  var ribbonTextExplicit = false;
+  // Optionaler Andock-Knopf im Modal (opt-in, Default aus). Wenn true,
+  // hängt mountSiegelModal() einen „Fremden Knoten andocken"-Knopf ins
+  // Modal, der den KI-unabhängigen Modul-18-Wizard (SbkimToolPwa.
+  // openAndockTab) öffnet. Der bestehende „🔑"-Identitäts-Pfad bleibt
+  // unberührt (Klaus 2026-06-19: Andocken als ZUSÄTZLICHE Option).
+  var andockToolEnabled = false;
 
   var moduleStatuses = null;        // Array<{id, name, globalName, surfaceFn, lazy, status}>
   var certifiedFlag = false;
@@ -450,6 +495,38 @@
     }
   }
 
+  // XML-Text-Escaping für den Band-Text (defensiv — Forker-Eingabe).
+  function escapeXmlText(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  // Effektiver Band-Text. Bewusst KEINE Auto-Ableitung aus dem Repo-Namen
+  // (Klaus-Entscheidung 2026-06-20): das untere Ribbon ist das SELF-
+  // INSCRIBING-Element des Siegels — ein geratener Repo-Slug wirkt auf einer
+  // Auszeichnung schnell falsch. Ohne expliziten `ribbonText` bleibt das Band
+  // OFFEN (leer); ein Vermerk (console.info einmalig + Doku) bittet den Host,
+  // seinen Namen via init({ribbonText}) einzugravieren. Der explizite Wert
+  // übersteuert; ein mitkopiertes Fremd-Label entsteht so nie.
+  function effectiveRibbonText() {
+    return ribbonTextExplicit ? ribbonText : "";
+  }
+
+  // Liefert den WAPPEN_SVG mit dem effektiven Band-Text. Entspricht der
+  // effektive Text der inlined Konstante (Sage: "SAGE OBSERVATORIUM"),
+  // bleibt das SVG byte-identisch; sonst wird der Ribbon-Text ersetzt
+  // (leerer Wert → offenes Band).
+  function renderWappenSvg() {
+    var eff = effectiveRibbonText();
+    if (eff === DEFAULT_RIBBON_TEXT) return WAPPEN_SVG;
+    return WAPPEN_SVG.replace(
+      RIBBON_MARKER,
+      ">" + escapeXmlText(eff) + "</textPath>",
+    );
+  }
+
   function buildBadgeElement() {
     var doc = global.document;
     var span = doc.createElement("span");
@@ -466,7 +543,8 @@
     // die 40-px-Badge-Box; bei 40 px sind Text-Bänder mikro-klein, das
     // Medaillon ist als visueller Anker erkennbar. aria-hidden auf dem
     // SVG — `title`/`aria-label` am Span trägt das a11y-Label.
-    span.innerHTML = WAPPEN_SVG;
+    // renderWappenSvg() setzt den konfigurierten Band-Text (init ribbonText).
+    span.innerHTML = renderWappenSvg();
     return span;
   }
 
@@ -603,6 +681,109 @@
 
   // ---- Modal-Mount (Karte 16 § Sub (c)) ----
 
+  // ---- Optionaler Andock-Knopf (opt-in, Modul 18 wiederverwendet) ----
+  //
+  // KI-unabhängiger Handshake: öffnet den Modul-18-Wizard
+  // (SbkimToolPwa.openAndockTab: Repo-URL → Spore holen → verifyForeignSpore
+  // → Match → Handshake via Modul 05). Reiner Browser-Pfad (WebCrypto+fetch),
+  // keine Claude-Sitzung nötig. Fail-soft: fehlt Modul 18, zeigt der Knopf
+  // einen Hinweis statt zu werfen. Der „🔑"-Identitäts-Pfad bleibt unberührt.
+
+  function showAndockHint(text) {
+    if (!modalRoot) return;
+    var hint = modalRoot.querySelector("[data-siegel-andock-tool-hint]");
+    if (!hint) return;
+    hint.style.display = "block";
+    hint.textContent = text;
+  }
+
+  function onAndockClick() {
+    var tp = global.SbkimToolPwa;
+    if (!tp || typeof tp.openAndockTab !== "function") {
+      showAndockHint(
+        "Andock-Werkzeug (Modul 18 SbkimToolPwa) ist nicht geladen — " +
+        "bitte src/modules/18_tool_pwa.js einbinden und SbkimToolPwa.init({…}) aufrufen.",
+      );
+      warn("Andock-Knopf geklickt, aber Modul 18 (SbkimToolPwa) ist nicht geladen.");
+      return;
+    }
+    var hint = modalRoot ? modalRoot.querySelector("[data-siegel-andock-tool-hint]") : null;
+    if (hint) { hint.style.display = "none"; hint.textContent = ""; }
+    try {
+      var p = tp.openAndockTab();
+      // Siegel-Modal schließen, damit der Modul-18-Wizard sichtbar ist:
+      // der Wizard hat einen niedrigeren z-index (10000) als das Siegel-
+      // Modal (99998) und läge sonst dahinter (Befund Klaus 2026-06-20:
+      // „Knopf da, Klick öffnet nichts" — Wizard war verdeckt).
+      closeModal();
+      if (p && typeof p.catch === "function") {
+        p.catch(function (err) {
+          warn("Andock-Wizard-Start fehlgeschlagen.", err);
+        });
+      }
+    } catch (err) {
+      warn("Andock-Werkzeug-Start fehlgeschlagen.", err);
+      showAndockHint("Andock-Werkzeug nicht bereit: " + (err && err.message ? err.message : String(err)));
+    }
+  }
+
+  function buildAndockBlock(doc) {
+    var block = doc.createElement("div");
+    block.setAttribute("data-siegel-andock-tool", "");
+    block.style.cssText = [
+      "margin:0 0 1.2rem",
+      "padding:0.85rem 0.9rem",
+      "background:rgba(201,169,97,0.08)",
+      "border:1px solid var(--siegel-line, rgba(201,169,97,0.45))",
+      "border-radius:8px",
+    ].join(";");
+
+    var lead = doc.createElement("p");
+    lead.style.cssText = [
+      "margin:0 0 0.6rem",
+      "font-family:'Geist', system-ui, sans-serif",
+      "font-size:0.86rem",
+      "line-height:1.5",
+      "color:rgba(245,245,255,0.86)",
+    ].join(";");
+    lead.textContent =
+      "Fremden Knoten verbinden — ohne KI, direkt im Browser: Repo-/App-URL " +
+      "eingeben → Spore prüfen → Match → Handshake.";
+
+    var btn = doc.createElement("button");
+    btn.type = "button";
+    btn.setAttribute("data-siegel-andock-tool-btn", "");
+    btn.textContent = "🔌 Fremden Knoten andocken →";
+    btn.style.cssText = [
+      "display:inline-block",
+      "background:var(--siegel-gold, #C9A961)",
+      "color:#1A1306",
+      "border:none",
+      "border-radius:8px",
+      "padding:0.5rem 0.9rem",
+      "font-family:'Geist', system-ui, sans-serif",
+      "font-size:0.9rem",
+      "font-weight:600",
+      "cursor:pointer",
+    ].join(";");
+
+    var hint = doc.createElement("p");
+    hint.setAttribute("data-siegel-andock-tool-hint", "");
+    hint.style.cssText = [
+      "display:none",
+      "margin:0.55rem 0 0",
+      "font-size:0.8rem",
+      "line-height:1.45",
+      "color:rgba(245,245,255,0.6)",
+    ].join(";");
+
+    block.appendChild(lead);
+    block.appendChild(btn);
+    block.appendChild(hint);
+    btn.addEventListener("click", onAndockClick);
+    return block;
+  }
+
   function mountSiegelModal() {
     if (modalMounted) return;
     if (!mountModalFlag) return;
@@ -687,9 +868,9 @@
 
     // Sub (e) Bronze-Hinweis-Block (Karte 16 § Sub (e) Klick-Verhalten in
     // Bronze). Sichtbar nur wenn _meta.mycelConnected === false. Reiner
-    // Hinweis-Text — kein [Andocken]-Knopf mehr (Modul-18-Pfad entfernt
-    // 2026-06-07): das echte Andocken läuft über den 🔑-Knopf, den der
-    // Glue (assets/sbkim-siegel.js) oben ins Panel hängt.
+    // Hinweis-Text; der Andock-/Identitäts-Pfad ist der „🔑 …"-Knopf, den
+    // der Host (Sage-Page / Endknoten) oben ins Modal einhängt (Pflege
+    // 2026-06-07: kein Modul-18-Verweis mehr, ein Pfad statt mehrerer).
     var bronzeHinweisBlock = doc.createElement("div");
     bronzeHinweisBlock.setAttribute("data-siegel-bronze-hinweis", "");
     bronzeHinweisBlock.style.cssText = [
@@ -760,6 +941,11 @@
     panel.appendChild(header);
     panel.appendChild(bronzeHinweisBlock);     // Sub (e) — sichtbar nur in Bronze
     panel.appendChild(dateLine);
+    // Optionaler Andock-Knopf (opt-in via init({andockTool:true})). Nur
+    // dann im DOM — Default-Render trägt KEIN [data-siegel-andock-tool].
+    if (andockToolEnabled) {
+      panel.appendChild(buildAndockBlock(doc));
+    }
     panel.appendChild(modulesHeader);
     panel.appendChild(modulesList);
     panel.appendChild(aspectsHeader);
@@ -798,8 +984,7 @@
 
   // Sub (e) Bronze-Hinweis-Block-Render (Karte 16 § Sub (e) Klick-
   // Verhalten in Bronze). Wird aus renderModalContents() bei jedem
-  // Modal-Render aufgerufen. Reiner Hinweis-Text (Modul-18-Pfad
-  // entfernt 2026-06-07) — verweist auf den 🔑-Knopf des Glue.
+  // Modal-Render aufgerufen.
   function renderBronzeHinweisBlock(modalRoot) {
     var block = modalRoot.querySelector("[data-siegel-bronze-hinweis]");
     if (!block) return;
@@ -817,13 +1002,14 @@
     var p = doc.createElement("p");
     p.style.cssText = "margin:0;";
     var strong = doc.createElement("strong");
-    strong.textContent = "Mycel suchend";
+    strong.textContent = "Im Mycel · ruhend";
     strong.style.cssText = "color:var(--siegel-bronze, #8C6E2F);font-weight:600;";
     p.appendChild(strong);
     p.appendChild(doc.createTextNode(
-      " — diese App ist SBKIM-fähig, aber in dieser Session noch nicht mit einem " +
-      "Geschwister-Knoten verbunden. Eine eigene Identität & Spore erzeugst oder " +
-      "pflegst du oben über den 🔑-Knopf.",
+      " — diese Zelle trägt das SBKIM-Siegel und ist damit Teil des Mycels, so klein sie auch ist. " +
+      "In dieser Sitzung gab es noch keinen Hyphen-Verkehr (Handshake). Über den Knopf " +
+      "„🔑 Eigene Identität & Spore erzeugen / verwalten →“ oben knüpfst du aktiv einen Faden " +
+      "zu einem Geschwister-Knoten.",
     ));
     block.appendChild(p);
   }
@@ -1023,6 +1209,23 @@
     } else if (opts.repoUrl === null) {
       repoUrlOverride = null;
     }
+    // Band-Text im Wappen (Forker gravieren ihren Knoten-Namen ein). Fail-
+    // soft: leerer/Nicht-String-Wert lässt das Band OFFEN (kein Auto-Label).
+    if (typeof opts.ribbonText === "string" && opts.ribbonText.trim().length > 0) {
+      ribbonText = opts.ribbonText.trim();
+      ribbonTextExplicit = true;
+    } else if (typeof console !== "undefined" && console.info) {
+      // Vermerk (einmalig, init ist idempotent): Band bleibt bewusst offen.
+      console.info(
+        "[SbkimSiegel] Band offen gelassen — init({ ribbonText: \"DEIN-KNOTEN\" }) " +
+        "setzen, um den eigenen Namen ins Siegel zu gravieren (kein Auto-Label).",
+      );
+    }
+    // Optionaler Andock-Knopf (KI-unabhängiger Handshake via Modul 18).
+    // Strikt boolean true → opt-in; alles andere lässt den Default (aus).
+    if (opts.andockTool === true) {
+      andockToolEnabled = true;
+    }
 
     // Surface-Check: Snapshot zur init()-Zeit.
     moduleStatuses = buildModuleStatuses();
@@ -1179,6 +1382,8 @@
       get visibleMode()       { return visibleMode; },
       get mountModalFlag()    { return mountModalFlag; },
       get badgeSelector()     { return badgeSelector; },
+      get ribbonText()        { return effectiveRibbonText(); },
+      get andockToolEnabled() { return andockToolEnabled; },
       // Sub (e) Bronze/Gold-Stufung (Karte 16 § Sub (e)).
       get mycelConnected()    { return mycelConnected; },
       get mycelConnectedAt()  { return mycelConnectedAt; },

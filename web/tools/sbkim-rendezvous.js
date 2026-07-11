@@ -41,16 +41,24 @@
  *     falls keine da. Kein Löschen, KEIN Auto-Anmelden (Empfangsmodus).
  *   Modus B — repairAndReconnect(): zerstörend, NUR hinter Nutzer-Knopf.
  *     Reinigt NUR die eigene Origin (löscht `sbkim`, Service-Worker, Caches —
- *     eigene Schublade bleibt), dann frische Identität + Spore + Anmelden +
- *     „hart neu laden".
+ *     eigene Schublade bleibt), dann Anmelden + „hart neu laden".
+ *     Identitäts-Isolierung (2026-07-11): liegt die einzige Identität noch im
+ *     geteilten Topf `sbkim`, wird sie ERST in die eigene Schublade migriert
+ *     (Modul 01 migrateIdentityFrom), DANN der Topf gelöscht — Kollision
+ *     aufgelöst UND Identität behalten. Scheitert die Migration, bleibt der
+ *     Topf als Fallback stehen (reiner Schutz vor Identitätsverlust).
  *
  * Public surface (registered on window.SbkimRendezvous):
  *   init(opts?) -> Promise<void>
  *       opts = { nodeName, relayClient, anastomose, spore, storage, dbSuffix,
- *                createIdentity, ensureIdentity, freshSec, listenMs }
+ *                createIdentity, ensureIdentity, prepareCorpus, freshSec,
+ *                listenMs }
  *       Alle optional. relayClient/anastomose/spore/storage sonst aus den
  *       Globals. dbSuffix = eigene Schublade. createIdentity = app-eigener
  *       async-Callback. ensureIdentity:true fährt Modus A einmal (lokal).
+ *       prepareCorpus = app-eigener async-Provider → [{label,text,anchorId,
+ *       passageVec}]; enableAnswering() koppelt damit den lokalen Such-Korpus
+ *       aktiv an Modul 04 (setLocalCorpus), gegen die „Korpus-leer-Falle".
  *       init() ist idempotent + fail-soft, baut NICHTS ins Netz.
  *   configure(opts) -> void           (Teil-Update der Konfig, gleiche Felder)
  *   ensureIdentity(opts?) -> Promise<{ ok, created, nodeId?, reason? }>  (Modus A)
@@ -81,15 +89,17 @@
  *       Antwortrecht bewusst AN: lauscht auf Frage-Zettel (Tag "sbkim-qry")
  *       an die eigene lebende nodeId und antwortet mit Top-k der lokalen
  *       Bedeutungs-Suche (Modul 04 queryLocal). Default AUS, Dedupe + Rate-
- *       Limit 6/min. disableAnswering() schaltet ab.
+ *       Limit 6/min. disableAnswering() schaltet ab. Beim Einschalten wird der
+ *       lokale Korpus über cfg.prepareCorpus aktiv gekoppelt (Korpus-leer-
+ *       Falle abgesichert; fail-soft ohne Provider).
  *   askNode(cardOderNodeId, text, opts?) -> Promise<{ ok, results?, ... }>
  *       (Bau 23.B) Nutzer-ausgelöste Cross-Knoten-Frage; wartet auf den
  *       Antwort-Zettel (Default 15 s). Vertrag: INTERFACES §1 Modul 23.
  *   _meta -> { version, tag, presenceKind, sharedDbName, dbSuffix, freshSec,
  *              listenMs, nodeName, hasRelay, hasAnastomose, hasSpore, hasMatch,
  *              hasStorage, hasCreateIdentity,
- *              answering, answeredCount, queryTag, queryKind, queryResKind,
- *              queryMaxPerMin }
+ *              answering, answeredCount, hasPrepareCorpus, answerCorpusEnsured,
+ *              queryTag, queryKind, queryResKind, queryMaxPerMin }
  *
  * Self-check: emits a console.info line on script load. Siehe
  * docs/components/23_rendezvous.md + INTERFACES.md §1 Modul 23.
@@ -104,7 +114,7 @@
   var RDV_PRESENCE_KIND = "sbkim-presence";
   var RDV_FRESH_SEC_DEFAULT = 1800;     // Karten der letzten 30 min berücksichtigen
   var RDV_LISTEN_MS_DEFAULT = 4000;     // Sammelfenster beim Lesen des Raums
-  var RDV_HANDSHAKE_TIMEOUT_MS = 12000; // großzügig — Empfänger lädt evtl. Modell
+  var RDV_HANDSHAKE_TIMEOUT_MS = 300000; // 5 min (Klaus 2026-07-08; dokumentierter Wert INTERFACES §Modul 05 / PULS Modul-18-Handshake): Empfänger lädt beim ersten Andocken evtl. das ~30-MB-Modell — 12 s waren zu kurz
   var NOSTR_KIND = 1;
   // Der geteilte Alt-Topf (Default-DB des Storage-Moduls). Modus B löscht NUR
   // diese DB — NIE die eigene Schublade `sbkim_<suffix>`.
@@ -122,6 +132,7 @@
     storage: null,       // null → global.SbkimStorage (Identitäts-Hygiene)
     dbSuffix: null,      // eigene Schublade `sbkim_<dbSuffix>`
     createIdentity: null,// app-eigener async-Callback (Spore-Erzeugung)
+    prepareCorpus: null, // async → [{label,text,anchorId,passageVec}] (Korpus-Kopplung, Bau 23.B-Härtung)
     freshSec: RDV_FRESH_SEC_DEFAULT,
     listenMs: RDV_LISTEN_MS_DEFAULT,
   };
@@ -225,6 +236,43 @@
     }
   }
 
+  // ---- dbHasIdentity(dbName) — read-only IndexedDB-Probe (Identitäts-Schutz) ----
+  // Prüft OHNE Seiteneffekt, ob eine benannte SBKIM-DB bereits eine Identität
+  // trägt (nicht-leerer Store `sbkim_keys`). Rein lesend, fail-soft: ohne
+  // IndexedDB / bei jedem Fehler → false. Legt die DB NICHT dauerhaft an — muss
+  // sie zum Prüfen geöffnet werden und existierte sie vorher nicht (onupgrade-
+  // needed feuert), wird die frisch-leere Phantom-DB gleich wieder gelöscht.
+  // Nutzt NUR die Web-IndexedDB-API + die bekannten Store-Namen — Modul 01/02
+  // bleiben unangetastet.
+  function dbHasIdentity(dbName) {
+    return new Promise(function (resolve) {
+      var idb = (typeof global.indexedDB !== "undefined" && global.indexedDB) ? global.indexedDB : null;
+      if (!idb || typeof idb.open !== "function" || !dbName) return resolve(false);
+      var req, created = false;
+      try { req = idb.open(dbName); } catch (_e) { return resolve(false); }
+      req.onupgradeneeded = function () { created = true; };
+      req.onerror = function () { resolve(false); };
+      req.onblocked = function () { resolve(false); };
+      req.onsuccess = function () {
+        var db = req.result;
+        function finish(has) {
+          try { db.close(); } catch (_e) {}
+          if (created) { try { idb.deleteDatabase(dbName); } catch (_e2) {} }
+          resolve(has);
+        }
+        try {
+          if (created || !db.objectStoreNames || !db.objectStoreNames.contains("sbkim_keys")) {
+            return finish(false);
+          }
+          var tx = db.transaction("sbkim_keys", "readonly");
+          var cnt = tx.objectStore("sbkim_keys").count();
+          cnt.onsuccess = function () { finish(typeof cnt.result === "number" && cnt.result > 0); };
+          cnt.onerror = function () { finish(false); };
+        } catch (_e) { finish(false); }
+      };
+    });
+  }
+
   // ==== IDENTITÄTS-HYGIENE (Skill „saubere-netz-anmeldung") ====
 
   // ---- Modus A: ensureIdentity() — sanft, automatisch, idempotent ----
@@ -234,6 +282,22 @@
     var storage = resolveStorage();
     if (suffix && storage) {
       try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    // Identitäts-Isolierung (2026-07-11, Teil 2): liegt die einzige Identität
+    // noch im geteilten Topf `sbkim` und die eigene Schublade ist leer, holen
+    // wir sie herüber, BEVOR getOrCreateIdentity unten eine NEUE erzeugt (was
+    // die geteilte-Topf-Kollision fortschreiben würde). Modus A = sanft,
+    // additiv, nicht-zerstörend (der geteilte Topf bleibt hier stehen; erst
+    // repairAndReconnect löscht ihn). Fail-soft; ohne migrateIdentityFrom
+    // (älteres Storage-Modul) passiert nichts.
+    if (suffix && storage && typeof storage.migrateIdentityFrom === "function") {
+      try {
+        var sharedHasIdA = await dbHasIdentity(SHARED_DB_NAME);
+        var suffixHasIdA = await dbHasIdentity("sbkim_" + suffix);
+        if (sharedHasIdA && !suffixHasIdA) {
+          await storage.migrateIdentityFrom(SHARED_DB_NAME);
+        }
+      } catch (_e) { /* fail-soft: dann erzeugt getOrCreateIdentity ggf. neu */ }
     }
     var spore = resolveSpore();
     if (!spore || typeof spore.getOrCreateIdentity !== "function") {
@@ -252,9 +316,20 @@
     return { ok: true, created: !existed, nodeId: (id && id.nodeId) ? id.nodeId : undefined };
   }
 
-  // ---- cleanupSharedOrigin() — Modus-B-Reinigung (NUR eigene Origin) ----
-  async function cleanupSharedOrigin() {
-    var result = { dbDeleted: false, swUnregistered: 0, cachesDeleted: 0, notes: [] };
+  // ---- cleanupSharedOrigin(opts?) — Modus-B-Reinigung (NUR eigene Origin) ----
+  // opts.deleteSharedDb (Default true): löscht den geteilten Alt-Topf `sbkim`.
+  // Identitäts-Schutz (Weg A, 2026-07-11): repairAndReconnect() setzt das auf
+  // FALSE, wenn die einzige Identität noch im geteilten Topf steckt — dann
+  // bleibt `sbkim` STEHEN (sonst wäre die Identität weg). SW-Abmeldung +
+  // Cache-Leerung laufen IMMER (heilen den häufigsten Kollisions-Anteil).
+  async function cleanupSharedOrigin(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var deleteSharedDb = opts.deleteSharedDb !== false;
+    var result = { dbDeleted: false, dbKept: false, swUnregistered: 0, cachesDeleted: 0, notes: [] };
+    if (!deleteSharedDb) {
+      result.dbKept = true;
+      result.notes.push("Geteilte DB 'sbkim' NICHT gelöscht — sie trägt noch die einzige Identität (Schutz vor Identitätsverlust).");
+    } else {
     try {
       var idb = (typeof global.indexedDB !== "undefined" && global.indexedDB) ? global.indexedDB : null;
       if (idb && typeof idb.deleteDatabase === "function") {
@@ -269,6 +344,7 @@
         });
       } else { result.notes.push("Kein IndexedDB verfügbar."); }
     } catch (_e) { result.notes.push("DB-Löschen übersprungen (fail-soft)."); }
+    }
     try {
       var nav = global.navigator;
       if (nav && nav.serviceWorker && typeof nav.serviceWorker.getRegistrations === "function") {
@@ -290,12 +366,63 @@
     return result;
   }
 
-  // ---- Modus B: repairAndReconnect() — zerstörend, nutzer-ausgelöst ----
+  // ---- Modus B: repairAndReconnect() — nutzer-ausgelöst, identitäts-schonend ----
   async function repairAndReconnect(opts) {
     opts = (opts && typeof opts === "object") ? opts : {};
-    var cleaned = await cleanupSharedOrigin();
     var suffix = (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) ? opts.dbSuffix : cfg.dbSuffix;
     var storage = resolveStorage();
+    // Reihenfolge (Weg A, 2026-07-11): eigene Schublade ZUERST aktivieren, DANN
+    // erst reinigen — sonst könnte die spätere init den geteilten Topf gar nicht
+    // mehr von der eigenen Schublade unterscheiden.
+    if (suffix && storage) {
+      try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    // Identitäts-Schutz: den geteilten Topf `sbkim` NUR löschen, wenn die eigene
+    // Schublade `sbkim_<suffix>` die Identität schon trägt. Steckt die einzige
+    // Identität (Alt-Fall / frühe Ordering-Kollision) noch in `sbkim`, würde das
+    // Löschen sie vernichten und beim Neu-Anmelden eine NEUE erzeugen — genau das
+    // gemeldete Symptom. Im Zweifel (Probe-Fehler) NICHT löschen (fail-safe:
+    // Identität behalten geht vor geteilten Topf leeren). Bei newIdentity:true
+    // will der Nutzer ausdrücklich frisch anfangen → volle Reinigung.
+    // Identitäts-Isolierung (2026-07-11): Alt-Fall (Identität nur im geteilten
+    // Topf) wird jetzt AUFGELÖST statt nur geschützt — die Identität wird in
+    // die eigene Schublade MIGRIERT, dann der geteilte Topf gefahrlos gelöscht
+    // (Kollision weg UND Identität behalten). Nur wenn die Migration fehlschlägt
+    // oder kein Migrations-Pfad da ist (älteres Storage-Modul), bleibt der reine
+    // Schutz als Fallback (Topf stehen lassen). Bei newIdentity:true will der
+    // Nutzer ausdrücklich frisch anfangen → volle Reinigung, keine Migration.
+    var protectShared = false, identityNote = null, migrated = false;
+    if (opts.newIdentity !== true) {
+      try {
+        var sharedHasId = await dbHasIdentity(SHARED_DB_NAME);
+        var suffixHasId = suffix ? await dbHasIdentity("sbkim_" + suffix) : false;
+        if (sharedHasId && !suffixHasId) {
+          if (suffix && storage && typeof storage.migrateIdentityFrom === "function") {
+            try {
+              await storage.migrateIdentityFrom(SHARED_DB_NAME);
+              var suffixHasIdAfter = await dbHasIdentity("sbkim_" + suffix);
+              if (suffixHasIdAfter) {
+                migrated = true;
+                identityNote = "Deine Identität lag im geteilten Speicher — sie wurde in deine eigene Schublade übernommen; der geteilte Topf wird jetzt geleert (Kollision aufgelöst, Identität behalten).";
+              } else {
+                protectShared = true;
+                identityNote = "Migration unvollständig — geteilte DB vorsichtshalber NICHT gelöscht (Identität geschützt).";
+              }
+            } catch (_e2) {
+              protectShared = true;
+              identityNote = "Migration fehlgeschlagen — geteilte DB vorsichtshalber NICHT gelöscht (Identität geschützt).";
+            }
+          } else {
+            // Kein Migrations-Pfad (älteres Storage-Modul) → reiner Schutz.
+            protectShared = true;
+            identityNote = "Deine Identität lag noch im geteilten Speicher — sie wurde NICHT gelöscht (kein Identitätsverlust). Nach dem harten Neuladen läuft sie in deiner eigenen Schublade weiter.";
+          }
+        }
+      } catch (_e) { protectShared = true; identityNote = "Speicher-Probe fehlgeschlagen — geteilte DB vorsichtshalber NICHT gelöscht (Identität geschützt)."; }
+    }
+    var cleaned = await cleanupSharedOrigin({ deleteSharedDb: !protectShared });
+    // Nach der Reinigung die eigene Schublade erneut sicherstellen (der geteilte
+    // Topf kann jetzt weg sein; die eigene Schublade überlebt in jedem Fall).
     if (suffix && storage) {
       try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
     }
@@ -311,6 +438,7 @@
     var res = await connectAndAnnounce({ createIdentity: opts.createIdentity || cfg.createIdentity || undefined });
     return {
       ok: res.ok, cleaned: cleaned, created: res.created,
+      protectedIdentity: protectShared, migratedIdentity: migrated, identityNote: identityNote,
       nodeId: res.nodeId, reason: res.reason, reloadHint: RELOAD_HINT,
     };
   }
@@ -326,6 +454,10 @@
     if (opts.storage !== undefined) cfg.storage = opts.storage;
     if (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) cfg.dbSuffix = opts.dbSuffix;
     if (typeof opts.createIdentity === "function") cfg.createIdentity = opts.createIdentity;
+    if (opts.prepareCorpus !== undefined) {
+      cfg.prepareCorpus = (typeof opts.prepareCorpus === "function") ? opts.prepareCorpus : null;
+      answerCorpusEnsured = false; // neuer Provider → beim nächsten Antwort-AN neu koppeln
+    }
     if (typeof opts.freshSec === "number" && isFinite(opts.freshSec) && opts.freshSec > 0) {
       cfg.freshSec = Math.floor(opts.freshSec);
     }
@@ -480,6 +612,22 @@
             };
           })
           .sort(function (a, b) { return b.ts - a.ts; });
+        // Adress-Wand-Härtung (Klaus 2026-07-10): ein Knoten kann durch
+        // wiederholtes „Aufräumen & neu anmelden" mehrere Alt-Identitäten
+        // hinterlassen — deren Präsenz-Kärtchen leben ~30 min weiter und
+        // fluten den Raum („immer mehr Identitäten"). Pro Knoten-NAME nur die
+        // NEUESTE Karte zeigen (Liste ist bereits ts-absteigend sortiert). So
+        // trifft „❓ Fragen" immer die frischeste, lauschende ID; die toten
+        // Alt-Kärtchen verschwinden aus Raum + Karte. Opt-out: collapseByName:false.
+        if (opts.collapseByName !== false) {
+          var seenName = Object.create(null);
+          cards = cards.filter(function (c) {
+            var key = (c.nodeName || "").toLowerCase();
+            if (!key) return true;
+            if (seenName[key]) return false;
+            seenName[key] = true; return true;
+          });
+        }
         // Reine Anzeige-Anreicherung: zentrierter Verwandtschafts-Score je Karte
         // (gatet nichts; Handshake bleibt 0.80-Riegel). Fail-soft ohne Modul 04.
         resolve({ ok: true, cards: relatednessForCards(cards, own) });
@@ -533,16 +681,48 @@
   var RDV_QUERY_MAX_PER_MIN = 6;     // Antwort-Rate-Limit (Vorgriff Modul 11)
   var RDV_QUERY_TEXT_MAX = 300;      // Frage-Text hart gekappt (untrusted input)
   var RDV_QUERY_K_MAX = 5;           // maximal 5 Treffer je Antwort
-  var RDV_ASK_TIMEOUT_MS = 15000;
+  var RDV_ASK_TIMEOUT_MS = 60000; // 15 s war zu knapp: der Antworter lädt beim ersten Mal sein ~30-MB-Modell
 
   var answerUnsub = null;            // aktiver Antwort-Lauscher (null = AUS)
   var answeredCount = 0;
   var seenQids = [];                 // Dedupe-Fenster (Cap 200)
   var answerTimestamps = [];         // für das Rate-Limit (ms-Zeitstempel)
+  var answerCorpusEnsured = false;   // Korpus-Kopplung schon erzwungen? (Bau 23.B-Härtung)
 
   function resolveQueryMatch() {
     var m = cfg.match || global.SbkimMatch;
     return (m && typeof m.queryLocal === "function") ? m : null;
+  }
+
+  // ---- Korpus-Kopplung härten (Bau 23.B-Härtung, 2026-07-10) ----
+  // Die Korpus-leer-Falle: enableAnswering() ruft beim Fragen queryLocal —
+  // ECHTE Treffer gibt es aber nur, wenn Modul 04 vorher einen lokalen Korpus
+  // registriert bekam (setLocalCorpus). Bisher tat das AUSSCHLIESSLICH das
+  // Such-Widget (Modul 22) LAZY bei der ERSTEN Widget-Suche. Antwort-Pfad (23)
+  // und Korpus-Aufbau (22) waren also nicht gekoppelt → wer „Antworten" AN-
+  // schaltet, aber nie selbst suchte, antwortete mit LEERER Liste trotz
+  // vorhandener Daten (live zugeschlagen, PULS.md 2026-07-02). Beim bewussten
+  // Einschalten des Antwortrechts stellen wir den Korpus jetzt AKTIV sicher —
+  // unabhängig davon, ob je eine Widget-Suche lief.
+  //
+  // Verfassungstreu + fail-soft: rein lokal (kein Netz), nutzt NUR die
+  // öffentliche Fläche von Modul 04 (setLocalCorpus). Ohne cfg.prepareCorpus
+  // (App koppelt den Korpus anders, z.B. selbst übers Widget) ODER ohne
+  // setLocalCorpus-Fähigkeit ODER bei einem Fehler im Provider → wir tun
+  // NICHTS bzw. lassen den Korpus wie er ist; queryLocal liefert dann ehrlich
+  // leer, es bricht NICHTS. Idempotent: nur einmal je Provider.
+  async function ensureAnswerCorpus() {
+    if (answerCorpusEnsured) return;
+    if (typeof cfg.prepareCorpus !== "function") return; // App koppelt anders → nicht erzwingen
+    var m = cfg.match || global.SbkimMatch;
+    if (!m || typeof m.setLocalCorpus !== "function") return; // kein Registrier-Pfad → fail-soft
+    try {
+      var corpus = await cfg.prepareCorpus();
+      if (Array.isArray(corpus)) {
+        m.setLocalCorpus(corpus);
+        answerCorpusEnsured = true;
+      }
+    } catch (_e) { /* fail-soft: Korpus bleibt unverändert, queryLocal ggf. ehrlich leer */ }
   }
   function qidSeen(qid) { return seenQids.indexOf(qid) !== -1; }
   function rememberQid(qid) {
@@ -564,8 +744,17 @@
     var own = await getOwnLiveSpore();
     if (!own || !own.id) return { ok: false, reason: "Noch keine Identität — zuerst anmelden (announce)." };
     var ownId = own.id;
+    // Adress-Wand-Härtung (Klaus 2026-07-10): beim Einschalten des Antwortrechts
+    // eine FRISCHE Präsenz-Karte unter GENAU dieser lauschenden ID ans Brett
+    // heften. So ist die neueste Karte im Raum immer die, die auch wirklich
+    // Fragen beantwortet — der Frager (discover: newest-per-name) trifft sie.
+    try { await doAnnounce(own); } catch (_e) { /* fail-soft: Lauschen läuft trotzdem */ }
     var kCap = (typeof opts.k === "number" && isFinite(opts.k) && opts.k >= 1)
       ? Math.min(Math.floor(opts.k), RDV_QUERY_K_MAX) : RDV_QUERY_K_MAX;
+    // Korpus-leer-Falle absichern: vor dem Lauschen den lokalen Korpus aktiv
+    // sicherstellen, damit die erste eingehende Frage nicht ins Leere greift
+    // (fail-soft — ohne Provider/Registrier-Pfad passiert nichts, kein Bruch).
+    await ensureAnswerCorpus();
     try {
       answerUnsub = relay.subscribe(
         { kinds: [NOSTR_KIND], "#t": [RDV_QUERY_TAG], since: nowSec() },
@@ -589,7 +778,11 @@
             var match = resolveQueryMatch();
             if (match) {
               try {
-                var hits = await match.queryLocal(text, k, { hybrid: true });
+                // exclude:true — die Frage eines fremden Knotens kann eine
+                // Verneinung tragen („alkoholfrei", „ohne Erdbeeren"). Modul 04
+                // parst sie und filtert VOR dem Ranking (Bau 04.I). Ohne
+                // Verneinung byte-gleich; Andock-Riegel unberührt.
+                var hits = await match.queryLocal(text, k, { hybrid: true, exclude: true });
                 results = (Array.isArray(hits) ? hits : []).slice(0, k).map(function (h) {
                   var r = { label: String(h.label || ""), score: (typeof h.score === "number") ? h.score : null };
                   if (typeof h.anchorId === "string" && h.anchorId) r.anchorId = h.anchorId;
@@ -617,6 +810,18 @@
       answerUnsub = null;
       return { ok: false, reason: "Antwort-Lauscher fehlgeschlagen: " + (e && e.message ? e.message : e) };
     }
+    // Vorwärmen (Bau 23.B-Härtung II, 2026-07-10): der Antworter lädt sein
+    // ~30-MB-Modell + baut seinen Korpus SONST erst bei der ersten eingehenden
+    // Frage — das kann 30 s–2 min dauern und läuft in den Frage-Timeout. Deshalb
+    // beim Einschalten des Antwortrechts JETZT im Hintergrund eine Aufwärm-Suche
+    // absetzen: das lädt Modell + Korpus vor, sodass die erste echte Frage
+    // sofort beantwortet wird. Fire-and-forget, fail-soft (kein Netz, rein lokal).
+    (function warmUpAnswerer() {
+      var m = resolveQueryMatch();
+      if (!m) return;
+      try { Promise.resolve(m.queryLocal("aufwärmen", 1)).catch(function () {}); }
+      catch (_e) { /* fail-soft */ }
+    })();
     signalListening(true);
     return { ok: true };
   }
@@ -725,9 +930,15 @@
         hasSpore: resolveSpore() !== null,
         hasMatch: resolveMatch() !== null,
         hasStorage: resolveStorage() !== null,
+        // Identitäts-Isolierung (2026-07-11): trägt das aktive Storage-Modul
+        // den Migrations-Pfad? (älteres Bundle ohne migrateIdentityFrom → false,
+        // dann greift der reine Schutz-Fallback in repairAndReconnect).
+        hasMigrate: (function () { var s = resolveStorage(); return !!(s && typeof s.migrateIdentityFrom === "function"); })(),
         hasCreateIdentity: typeof cfg.createIdentity === "function",
         answering: answerUnsub !== null,          // Bau 23.B
         answeredCount: answeredCount,             // Bau 23.B
+        hasPrepareCorpus: typeof cfg.prepareCorpus === "function", // Bau 23.B-Härtung
+        answerCorpusEnsured: answerCorpusEnsured,  // Bau 23.B-Härtung (Korpus gekoppelt?)
         queryTag: RDV_QUERY_TAG,                  // Bau 23.B
         queryKind: RDV_QUERY_KIND,                // Bau 23.B
         queryResKind: RDV_QUERY_RES_KIND,         // Bau 23.B
