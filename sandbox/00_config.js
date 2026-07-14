@@ -6,7 +6,7 @@
 
 /** Real Sage protocol constants (source of truth: Sage-Protokol/status.json). */
 export const SAGE = Object.freeze({
-  PROTOCOL_VERSION: "0.1",
+  PROTOCOL_VERSION: "0.2",
   EMBEDDING_MODEL: "Xenova/multilingual-e5-small",
   EMBEDDING_DIM: 384,
   PROVIDER_MIN_MATCH: 0.80,

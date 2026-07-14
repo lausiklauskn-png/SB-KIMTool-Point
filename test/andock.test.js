@@ -57,7 +57,7 @@ test("Spore: Sage-Pflichtfelder + Schema vollständig", () => {
     assert.ok(sp[f] !== undefined, `Feld fehlt: ${f}`);
   }
   assert.equal(sp.nodeType, "hybrid");
-  assert.equal(sp.protocolVersion, "0.1");
+  assert.equal(sp.protocolVersion, "0.2");
   assert.ok(sp.endpoint.endsWith("/"), "endpoint braucht Schrägstrich am Ende");
   assert.equal(sp.publicKey.kty, "OKP");
   assert.equal(sp.publicKey.crv, "Ed25519");
@@ -92,4 +92,62 @@ test("Spore: Manipulation zerstört die Signatur", () => {
   rest.domain = "GEFAELSCHT";
   const bytes = Buffer.from(JSON.stringify(canon(rest)), "utf8");
   assert.equal(edVerify(null, bytes, pub, b64uToBuf(signature)), false);
+});
+
+// --- A10 „Schnipsel-Mittel" (Spore v0.2) ---
+import { writeFileSync } from "node:fs";
+
+function makeSporeWithSnippets(snips) {
+  const out = resolve(tmpdir(), `spore_snip_${process.pid}_${Date.now()}.json`);
+  const snipPath = resolve(tmpdir(), `snips_${process.pid}_${Date.now()}.json`);
+  writeFileSync(snipPath, JSON.stringify(snips));
+  const r = spawnSync(process.execPath, [resolve(ROOT, "scripts/generate_spore.mjs")], {
+    encoding: "utf8",
+    env: { ...process.env, SPORE_OUT: out, SPORE_SNIPPETS: snipPath, SBKIM_NODE_KEY: "" },
+  });
+  assert.equal(r.status, 0, `Generator-Fehler: ${r.stderr}`);
+  const spore = JSON.parse(readFileSync(out, "utf8"));
+  rmSync(out, { force: true });
+  rmSync(snipPath, { force: true });
+  return spore;
+}
+
+const fakeVec = (seed) => {
+  let s = 0; for (let i = 0; i < seed.length; i++) s = (s * 31 + seed.charCodeAt(i)) >>> 0;
+  const v = new Array(384);
+  for (let i = 0; i < 384; i++) { s = (1103515245 * s + 12345) >>> 0; v[i] = (s / 0xffffffff) * 2 - 1; }
+  const n = Math.sqrt(v.reduce((a, x) => a + x * x, 0)) || 1;
+  return v.map((x) => x / n);
+};
+
+test("Spore v0.2: ohne Schnipsel-Datei fehlt snippetVectors (fail-soft)", () => {
+  const sp = makeSpore();
+  assert.equal(sp.protocolVersion, "0.2");
+  assert.equal(sp.snippetVectors, undefined, "ohne Datei darf kein snippetVectors erscheinen");
+});
+
+test("Spore v0.2: snippetVectors werden angehängt + Signatur bleibt gültig", () => {
+  const snips = [{ vec: fakeVec("s1"), text: "Satz eins." }, { vec: fakeVec("s2"), text: "Satz zwei." }];
+  const sp = makeSporeWithSnippets(snips);
+  assert.equal(sp.protocolVersion, "0.2");
+  assert.ok(Array.isArray(sp.snippetVectors), "snippetVectors fehlt");
+  assert.equal(sp.snippetVectors.length, 2);
+  assert.equal(sp.snippetVectors[0].vec.length, 384);
+  assert.equal(sp.snippetVectors[0].text, "Satz eins.");
+  // Schnipsel wandern in die signierten Bytes -> Signatur muss weiterhin gültig sein.
+  const pub = createPublicKey({ key: { kty: "OKP", crv: "Ed25519", x: sp.publicKey.x }, format: "jwk" });
+  const { signature, ...rest } = sp;
+  assert.equal(edVerify(null, Buffer.from(JSON.stringify(canon(rest)), "utf8"), pub, b64uToBuf(signature)), true);
+});
+
+test("Spore v0.2: akzeptiert {snippetVectors:[…]}-Form (embed_helper-Ausgabe)", () => {
+  const sp = makeSporeWithSnippets({ snippetVectors: [{ vec: fakeVec("x"), text: "Nur einer." }] });
+  assert.equal(sp.snippetVectors.length, 1);
+  assert.equal(sp.snippetVectors[0].text, "Nur einer.");
+});
+
+test("Spore v0.2: harte Kürzung auf 20 Schnipsel", () => {
+  const many = Array.from({ length: 25 }, (_, i) => ({ vec: fakeVec("n" + i), text: "S" + i }));
+  const sp = makeSporeWithSnippets(many);
+  assert.equal(sp.snippetVectors.length, 20, "muss hart auf 20 gekürzt werden");
 });

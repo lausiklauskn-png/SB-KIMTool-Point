@@ -28,12 +28,18 @@ const CONFIG = {
   guestCategories: ["Werkzeug-Kopie", "Modul-Andock", "Spore-Verifikation"],
   endpoint: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",  // mit Schrägstrich!
   embeddingModel: "Xenova/multilingual-e5-small",
-  protocolVersion: "0.1",
+  protocolVersion: "0.2",                    // Spore v0.2 (A6+A10): sanfter Übergang, 0.1↔0.2 handshake-kompatibel
   // Echter 384-dim domainVector (von Sage im Browser erzeugt, Modul 03, e5 passage-Präfix).
   // Liegt versioniert daneben; fehlt er, fällt der Generator ehrlich auf den Demo-Stub zurück.
   realVectorPath: "sbkim/domainVector.real.json",
+  // A10 „Schnipsel-Mittel" (Spore v0.2): OPTIONALE satz-granulare 384-dim-Vektoren, im Browser
+  // gerechnet (Sages tools/embed_helper.html Abschnitt A10) und hier als JSON abgelegt. Fehlt die
+  // Datei, wird ehrlich OHNE snippetVectors signiert (v0.2 bleibt). Reine Anzeige/Verwandt-Messung.
+  snippetsPath: "sbkim/snippetVectors.real.json",
   outPath: "sbkim/spore.json",
 };
+const SPORE_SNIPPET_MAX = 20;               // Obergrenze snippetVectors[] (Sage Modul 02 / INTERFACES §0)
+const SPORE_SNIPPET_VEC_DIM = 384;
 /* ========================================================================= */
 
 function base64url(buf) {
@@ -81,6 +87,37 @@ async function loadDomainVector() {
   }
 }
 
+// Lädt die OPTIONALEN A10-Schnipsel-Vektoren (Spore v0.2). Rückgabe: Array
+// [{vec:number[384], text?}]. Fehlt die Datei, ehrlich [] (kein Schnipsel — v0.2 bleibt).
+// Vorhandene, aber kaputte Datei: laut scheitern (kein stilles Falschmaß). Harte Kürzung auf
+// SPORE_SNIPPET_MAX, deckungsgleich zu Sage Modul 02 (sanitizeSnippetVectors).
+async function loadSnippetVectors() {
+  const target = process.env.SPORE_SNIPPETS || CONFIG.snippetsPath;   // Test-/CLI-Übersteuerung
+  const p = isAbsolute(target) ? target : resolve(process.cwd(), target);
+  let data;
+  try {
+    data = JSON.parse(await readFile(p, "utf8"));
+  } catch (e) {
+    if (e.code === "ENOENT") return [];       // keine Schnipsel — fail-soft
+    throw e;
+  }
+  // Akzeptiert entweder ein blankes Array oder {snippetVectors:[...]} (embed_helper-Ausgabe).
+  const list = Array.isArray(data) ? data : Array.isArray(data?.snippetVectors) ? data.snippetVectors : null;
+  if (!list) throw new Error(`${target}: erwartet Array [{vec,text?}] oder {snippetVectors:[…]}`);
+  const out = [];
+  for (let i = 0; i < list.length && out.length < SPORE_SNIPPET_MAX; i++) {
+    const s = list[i];
+    if (!s || typeof s !== "object") throw new Error(`snippetVectors[${i}] ist kein Objekt`);
+    const vec = Array.isArray(s.vec) ? s.vec : Array.isArray(s.vector) ? s.vector : null;
+    if (!vec || vec.length !== SPORE_SNIPPET_VEC_DIM || !vec.every((x) => Number.isFinite(x)))
+      throw new Error(`snippetVectors[${i}].vec muss ${SPORE_SNIPPET_VEC_DIM} endliche Floats haben`);
+    const item = { vec: vec.map(Number) };
+    if (typeof s.text === "string" && s.text.trim()) item.text = s.text;
+    out.push(item);
+  }
+  return out;
+}
+
 function loadKeyPair() {  // ANDOCK §3
   const raw = process.env.SBKIM_NODE_KEY;
   if (raw && raw.trim()) {
@@ -104,6 +141,7 @@ async function main() {
   const id = base64url(createHash("sha256").update(rawPub).digest());
 
   const { vector, real } = await loadDomainVector();
+  const snippets = await loadSnippetVectors();       // A10 (Spore v0.2), optional/fail-soft
 
   const unsigned = {
     createdAt: new Date().toISOString(),          // von Sage verlangt
@@ -123,6 +161,9 @@ async function main() {
   };
   // _demo nur, wenn der Vektor wirklich Stub ist — kein vorgetäuschtes Wissen, keine Falsch-Markierung.
   if (!real) unsigned._demo = ["domainVector"];
+  // A10 (Spore v0.2): Schnipsel-Vektoren nur anhängen, wenn vorhanden (sonst ehrlich weglassen).
+  // Wandern in die signierten Bytes; Reihenfolge egal (canonicalize sortiert die Schlüssel).
+  if (snippets.length) unsigned.snippetVectors = snippets;
 
   const signature = base64url(edSign(null, canonicalBytes(unsigned), privateKey));  // ANDOCK §4
   const spore = canonicalize(unsigned);
@@ -132,8 +173,9 @@ async function main() {
   const outPath = isAbsolute(target) ? target : resolve(process.cwd(), target);
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, JSON.stringify(spore, null, 2) + "\n", "utf8");
-  console.log("spore.json geschrieben:", outPath, "\n  nodeId:", id);
+  console.log("spore.json geschrieben:", outPath, "\n  nodeId:", id, "\n  protocolVersion:", CONFIG.protocolVersion);
   console.log(real ? "  ✓ echter domainVector (Modul 03) — kein _demo." : "  ⚠ Demo-domainVector (Stub) — _demo gesetzt.");
+  console.log(snippets.length ? `  ✓ ${snippets.length} Satz-Schnipsel (snippetVectors, A10) angehängt.` : "  · keine snippetVectors (Datei fehlt) — v0.2 ohne Schnipsel.");
   if (ephemeral) console.warn("  ⚠ UNGESICHERT / NUR TEST — kein SBKIM_NODE_KEY gesetzt (nodeId wechselt pro Lauf).");
   else console.log("  ✓ bleibende Identität aus SBKIM_NODE_KEY.");
 }
