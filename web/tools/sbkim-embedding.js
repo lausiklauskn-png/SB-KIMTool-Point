@@ -398,6 +398,62 @@
     return embedBatch(texts, EMBEDDING_PASSAGE_PREFIX, "embedPassageBatch");
   }
 
+  // --- A10 „Schnipsel-Mittel" (Spore v0.2) — byte-gleiche Portierung aus Sage
+  // Modul 03. Satz-weise Passage-Vektoren für die optionalen snippetVectors der
+  // Spore. Kein Worker, reine Berechnung; deckungsgleich zu Sage. ---
+  var SPORE_SNIPPET_MAX = 20;                 // Obergrenze (INTERFACES §0 / Modul 02)
+  var SNIPPET_TEXT_MAX = 160;                 // nur die text-Anzeige wird gekürzt, nicht der Vektor
+
+  function splitIntoSentences(text) {
+    if (typeof text !== "string") return [];
+    if (text.trim().length === 0) return [];
+    var lines = text.split(/[\r\n]+/);
+    var out = [];
+    for (var li = 0; li < lines.length; li++) {
+      var line = lines[li].replace(/\s+/g, " ").trim();
+      if (line.length === 0) continue;
+      var parts = line.split(/(?<=[.!?…])\s+/);
+      for (var pi = 0; pi < parts.length; pi++) {
+        var s = parts[pi].trim();
+        if (s.length > 0) out.push(s);
+      }
+    }
+    return out;
+  }
+
+  function shortenSnippetText(s) {
+    s = String(s).trim();
+    if (s.length <= SNIPPET_TEXT_MAX) return s;
+    return s.slice(0, SNIPPET_TEXT_MAX - 1).trim() + "…";
+  }
+
+  // Reine, deterministische Satz-Vorbereitung VOR dem Embedding (headless prüfbar).
+  function prepareSnippetTexts(input, cap) {
+    cap = (typeof cap === "number" && cap > 0) ? Math.floor(cap) : SPORE_SNIPPET_MAX;
+    var sources = Array.isArray(input) ? input : [input];
+    var sentences = [];
+    for (var i = 0; i < sources.length && sentences.length < cap; i++) {
+      var parts = splitIntoSentences(sources[i]);
+      for (var j = 0; j < parts.length && sentences.length < cap; j++) {
+        sentences.push(shortenSnippetText(parts[j]));
+      }
+    }
+    return sentences;
+  }
+
+  // A10: jeder Satz ein L2-normalisierter Passage-Vektor. Fail-soft: leer → [].
+  async function embedSnippets(input, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var cap = (typeof opts.max === "number" && opts.max > 0)
+      ? Math.floor(opts.max) : SPORE_SNIPPET_MAX;
+    var texts = prepareSnippetTexts(input, cap);
+    if (texts.length === 0) return [];
+    var vecs = await embedPassageBatch(texts);
+    var out = [];
+    for (var i = 0; i < texts.length; i++) out.push({ vec: vecs[i], text: texts[i] });
+    return out;
+  }
+
   var SbkimEmbedding = {
     init: init,
     isReady: isReady,
@@ -407,6 +463,10 @@
     embedQueryBatch: embedQueryBatch,
     embedPassageBatch: embedPassageBatch,
     embedContentVector: embedContentVector,
+    embedSnippets: embedSnippets,
+    // Test-Brücken (A10): reine Satz-Zerlegung/Deckelung headless prüfbar (ohne Modell).
+    _splitIntoSentences: splitIntoSentences,
+    _prepareSnippetTexts: prepareSnippetTexts,
     // Test-Brücke: Modell-Quellen-Erkennung (Body-Probe) headless prüfbar —
     // unterscheidet echtes JSON (selbst-gehostet) von der SPA-index.html-Falle.
     _detectModelSource: detectModelSource,

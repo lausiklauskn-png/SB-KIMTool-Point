@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-07-14",
-  "seq": 29,
-  "headline": "Spore v0.2-Faehigkeit gebaut (A6+A10): scripts/generate_spore.mjs stempelt jetzt protocolVersion 0.2 und haengt OPTIONAL snippetVectors an (bis 20 satz-granulare 384-dim-Vektoren, aus sbkim/snippetVectors.real.json; fehlt die Datei -> ehrlich ohne Schnipsel). Sage-Mirror PROTOCOL_VERSION 0.1->0.2 (Sage steht seit 2026-07-14 auf 0.2). node --test 107/107 gruen (4 neue A10-Proben). Die eigentliche Neu-Signatur der Live-spore.json ist Klaus' Termux-Lauf mit dem Schluessel (open_node_key.mjs -> generate_spore.mjs), nodeId CyunQNDR... bleibt. snippetVectors = reine Anzeige, 0.80-Riegel unberuehrt, 0.1<->0.2 handshake-kompatibel.",
+  "seq": 30,
+  "headline": "Browser-✍-Signier-Knopf auf v0.2 gehoben: web/tools/sbkim-spore.js byte-1:1 auf Sages Modul 02 v0.2 aktualisiert (PROTOCOL_VERSION 0.2 + snippetVectors), sbkim-embedding.js um embedSnippets (A10, satz-weise, kein Worker) ergaenzt, assets/sbkim-siegel.js ✍-Re-Sign haengt jetzt snippetVectors an (fail-soft). jasons-bibliothek/index.html Modul-02-Embed byte-genau nachgezogen (Drift-Guard gruen). node --test 111/111. Damit re-signiert SB-KIMTool-Point per BROWSER-KLICK zu v0.2 (kein Termux). Live-Neu-Signatur = Klaus' Browser-Lauf; nodeId-Abgleich noetig (Browser-Identitaet vs. committete CyunQNDR...). snippetVectors = reine Anzeige, 0.80-Riegel unberuehrt.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -167,6 +167,11 @@
       "seq": 29,
       "date": "2026-07-14",
       "headline": "Spore v0.2-Faehigkeit (generate_spore.mjs: protocolVersion 0.2 + optionale snippetVectors) + Sage-Mirror 0.2. node --test 107/107. Live-Neu-Signatur = Klaus' Schluessel-Lauf. ack[Sage]=46 (Sages v0.2-Meldung verarbeitet)."
+    },
+    {
+      "seq": 30,
+      "date": "2026-07-14",
+      "headline": "Browser-Siegel auf Spore v0.2 (byte-Copy Modul 02 + embedSnippets + ✍ haengt Schnipsel an). node --test 111/111. Re-Sign per Browser-Klick statt Termux."
     }
   ]
 }
