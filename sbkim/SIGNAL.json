@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-07-14",
-  "seq": 33,
-  "headline": "Identitaets-Wechsler poliert nach Klaus' Sichttest: (1) Dropdown zeigt jetzt Slot · nodeId + volle aktive nodeId (Befund: aktiv war Test-Identitaet lZmu5nsP…, nicht committete CyunQNDR…). (2) Neuer Browser-Knopf 'Kanon-Schluessel importieren': node_key.enc.json im Browser entschluesseln → Modul-02-Backup (v2) → importBackup(force), gleiche nodeId CyunQNDR… → KEIN Netz-Churn (Klaus' Wahl Weg 2). Modul 02/web-tools unberuehrt (Drift-Guard). Krypto-Kette headless bewiesen (test/kanon_import.test.js), node --test 120/120. Browser-Sichttest wartet auf Klaus.",
+  "seq": 34,
+  "headline": "SB-KIMTool-Point v0.2 ABGESCHLOSSEN. Kanon-Identitaet CyunQNDR… im Browser aktiv + verbunden (Mycel-Karte bestaetigt). Spore v0.2 mit VOLLER Domaenen-Beschreibung neu signiert (nodeId unveraendert, 3 snippetVectors). Match-Werte ehrlich neu gemessen: Infrastruktur steigt (Sage 0.8618, Tresore 0.8624, family 0.8492), Inhalts-Knoten trennen sich: Rezeptbuch 0.7961 + Mixarium 0.7673 nun < 0.80 -> BEWUSST neu eingestuft auf verified-spore (Protokoll unterscheidet nach Bedeutung Werkzeug-Hub vs. Koch-/Getraenke-Knoten). marktplatz.json/status.json/Tests + domainVector.real.json nachgezogen, node --test 120/120. BITTE Rezeptbuch + Mixarium: reziprok neu einstufen (wir sind bei euch jetzt < 0.80).",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -15,6 +15,8 @@
     "Family Projekt": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/AUSTAUSCH-FamilyProject.md"
   },
   "forNodes": [
+    "Mein-Rezeptbuch",
+    "Mein-Mixarium",
     "*"
   ],
   "ack": {
@@ -187,6 +189,11 @@
       "seq": 33,
       "date": "2026-07-14",
       "headline": "Wechsler zeigt jetzt Slot · nodeId (Befund: aktiv = Test-Identitaet lZmu5nsP…, nicht committete CyunQNDR…) + Knopf 'Kanon-Schluessel importieren' (node_key.enc.json → importBackup(force), gleiche nodeId, kein Netz-Churn — Weg 2). web/tools unberuehrt. test/kanon_import.test.js, node --test 120/120. Browser-Sichttest wartet auf Klaus."
+    },
+    {
+      "seq": 34,
+      "date": "2026-07-14",
+      "headline": "v0.2 ABGESCHLOSSEN: Kanon-Identitaet CyunQNDR… aktiv + verbunden (Mycel-Karte live bestaetigt); Spore v0.2 mit voller Beschreibung neu signiert (3 snippetVectors). Match ehrlich neu: Sage 0.8618/Tresore 0.8624/family 0.8492 (hoch), Rezeptbuch 0.7961 + Mixarium 0.7673 < 0.80 -> verified-spore (Protokoll trennt Werkzeug-Hub vs. Inhalts-Knoten). marktplatz/status/Tests/domainVector.real nachgezogen, node --test 120/120. Rezeptbuch+Mixarium: bitte reziprok neu einstufen."
     }
   ]
 }

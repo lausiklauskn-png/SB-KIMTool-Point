@@ -53,7 +53,7 @@ test("jason_inbox: echter Cross-Knoten-Match A<->C >= 0.80 (verified-match)", ()
   const score = cosine(mine, inbox.domainVector);
   // Reproduzierbar 0.853740 (Stand 2026-06-06). Toleranz fuer Float-Schreibweisen.
   assert.ok(score >= 0.80, `Match unter Schwelle: ${score}`);
-  assert.ok(Math.abs(score - 0.853740) < 1e-4, `Match-Score abweichend: ${score}`);
+  assert.ok(Math.abs(score - 0.862362) < 1e-4, `Match-Score abweichend: ${score}`);
 });
 
 test("jason_inbox: Manipulation am Inhalt wird abgelehnt", () => {
