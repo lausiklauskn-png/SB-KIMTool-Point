@@ -2,6 +2,37 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 — Spore v0.2-Fähigkeit (A6+A10) + Sage-Mirror auf 0.2
+
+Branch `claude/welle-spore-v02-qsiq2a` (frisch von `origin/main`). Teil der netzweiten
+**Neu-Signier-Welle Spore v0.2** — Sage steht seit 2026-07-14 auf v0.2, SB-KIMTool-Point als
+zweiter Knoten drangenommen (Klaus' Wahl).
+
+**Getan (Code, headless bewiesen):**
+- `scripts/generate_spore.mjs`: `CONFIG.protocolVersion` **0.1 → 0.2**; neuer optionaler Lader
+  `loadSnippetVectors()` liest `sbkim/snippetVectors.real.json` (Array `[{vec,text?}]` **oder**
+  `{snippetVectors:[…]}` aus Sages `embed_helper.html` A10), sanitisiert (max **20**, vec-Länge 384,
+  `SPORE_SNIPPETS`-Env-Übersteuerung) und hängt `snippetVectors` **fail-soft** an (fehlt die Datei →
+  ehrlich ohne Schnipsel, v0.2 bleibt). Wandert in die signierten Bytes.
+- **Sage-Mirror:** `sandbox/00_config.js` `PROTOCOL_VERSION` + `status.json` `protocolVersion` **→ 0.2**,
+  `lastUpdated` 2026-07-14 (Quelle-der-Wahrheit-Regel: bei Abweichung Sage nachziehen).
+- Neue Datei `sbkim/snippetVectors.real.README.md` (wie der Vektor im Browser via A10 erzeugen +
+  Termux-Neu-Signier-Befehl).
+- Tests: `test/andock.test.js` Assertion 0.1→0.2 + **4 neue A10-Proben** (ohne Datei kein Feld;
+  mit Datei angehängt + Signatur gültig; `{snippetVectors:[…]}`-Form; harte Kürzung auf 20).
+  **`node --test` 107/107 grün** (vorher 103).
+
+**Offen / nächster Schritt:**
+- Die **eigentliche Neu-Signatur der Live-`spore.json`** ist Klaus' **Termux-Lauf** mit dem Schlüssel:
+  `SBKIM_NODE_KEY="$(SBKIM_KEY_PW='…' node scripts/open_node_key.mjs)" node scripts/generate_spore.mjs`
+  → schreibt `sbkim/spore.json` v0.2 (nodeId `CyunQNDR…` bleibt). Für Schnipsel vorher
+  `sbkim/snippetVectors.real.json` im Browser (A10) erzeugen. Danach committen.
+- **Vorbefund (NICHT von dieser Änderung):** `tests/smoke_bau22_such_widget.mjs` Probe 27 („Netz-Link
+  gerendert" / „Klick öffnet URL") ist **schon auf `main` rot** (2/148) — separater Modul-22-Befund,
+  hier bewusst nicht angefasst (Kein-Modul-Mix). `node --test` (Spore/Andock-Vertrag) ist grün.
+
+**Manual-Check:** entfällt (kein Seiten-Eingriff; reine Node-Signier-Fähigkeit). Beweis = `node --test`.
+
 ## Nachtrag 2026-07-10 — Identitäts-Hygiene Schritt 3: Modell-Ladebalken (Skill-Pflicht) nachgezogen
 
 Branch `claude/saubere-anmeldung-toolpoint` (frisch von `origin/main`). SB-KIMTool-Point ist der

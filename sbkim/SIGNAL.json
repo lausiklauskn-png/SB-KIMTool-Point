@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
-  "lastBuild": "2026-07-08",
-  "seq": 28,
-  "headline": "Identitaets-Hygiene Schritt 2: Modul 23 (Rendezvous) um Modus A/B erweitert (Skill saubere-netz-anmeldung). Modus A ensureIdentity() - sanft/automatisch/idempotent/nicht-zerstoerend: eigene Schublade sbkim_toolpoint + Identitaet sicherstellen, keine Netz-Aktion. Modus B repairAndReconnect() - nutzer-ausgeloester Knopf, zerstoerend: cleanupSharedOrigin() loescht NUR den geteilten Alt-Topf sbkim (NIE sbkim_toolpoint) + meldet Service-Worker ab + leert Caches, dann frische Identitaet+Spore+Anmelden+Reload-Hinweis. UI-Knopf 'Aufraeumen & neu anmelden' im Rendezvous-Panel; assets/rendezvous-init.js faehrt Modus A beim Mount. Kern-Module + TABU (0.80-Riegel/DB_VERSION/PROTOCOL_VERSION) unberuehrt, fail-soft. node --test 103/103 (neu rendezvous_hygiene.test.js 7/7), Smoke 148/148. Kim-Bell wird das kopierbare Netz-Anmeldung-Tool (Klaus 2026-07-08). Browser-Sichttest wartet auf Klaus.",
+  "lastBuild": "2026-07-14",
+  "seq": 29,
+  "headline": "Spore v0.2-Faehigkeit gebaut (A6+A10): scripts/generate_spore.mjs stempelt jetzt protocolVersion 0.2 und haengt OPTIONAL snippetVectors an (bis 20 satz-granulare 384-dim-Vektoren, aus sbkim/snippetVectors.real.json; fehlt die Datei -> ehrlich ohne Schnipsel). Sage-Mirror PROTOCOL_VERSION 0.1->0.2 (Sage steht seit 2026-07-14 auf 0.2). node --test 107/107 gruen (4 neue A10-Proben). Die eigentliche Neu-Signatur der Live-spore.json ist Klaus' Termux-Lauf mit dem Schluessel (open_node_key.mjs -> generate_spore.mjs), nodeId CyunQNDR... bleibt. snippetVectors = reine Anzeige, 0.80-Riegel unberuehrt, 0.1<->0.2 handshake-kompatibel.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -18,7 +18,7 @@
     "*"
   ],
   "ack": {
-    "Sage-Protokol": 16,
+    "Sage-Protokol": 46,
     "Jasons-Tresor": 8,
     "Mein-Tresor": 9,
     "Mein-Rezeptbuch": 5,
@@ -162,6 +162,11 @@
       "seq": 27,
       "date": "2026-06-28",
       "headline": "Modul 23 Rendezvous + oeffentlicher Knopf Mit dem Netz verbinden ausgerollt (web/tools/sbkim-rendezvous(.ui).js byte-1:1 aus Sage; werkzeuge.html + assets/rendezvous-init.js). Nutzt vorhandenen Stack, kein Doppel-Laden. Headless 9/9, npm 148/148. Achtsamkeits-Regel (Basis vor Bau pruefen) in CLAUDE.md. Browser-Sichttest wartet auf Klaus."
+    },
+    {
+      "seq": 29,
+      "date": "2026-07-14",
+      "headline": "Spore v0.2-Faehigkeit (generate_spore.mjs: protocolVersion 0.2 + optionale snippetVectors) + Sage-Mirror 0.2. node --test 107/107. Live-Neu-Signatur = Klaus' Schluessel-Lauf. ack[Sage]=46 (Sages v0.2-Meldung verarbeitet)."
     }
   ]
 }

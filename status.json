@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-29",
+  "lastUpdated": "2026-07-14",
   "repo": "SB-KIMTool-Point",
-  "protocolVersion": "0.1",
+  "protocolVersion": "0.2",
   "runContractVersion": "0.2",
   "prinzip": "Ehrlicher Real-Anteil (analog Sage 'X % real'). Trennt klar, was echt browser-tauglich ist, was nur Modell/Demo ist und was in Sage reif aber hier noch nicht eingebaut wurde.",
   "seiten_ehrlichkeit": "Die statische Seite ZEIGT einen aufgezeichneten Node-Lauf (web/data/run.json). Sie fuehrt das Modell NICHT live im Browser aus. Der Beweis ist der headless Smoke-Test (npm test).",
