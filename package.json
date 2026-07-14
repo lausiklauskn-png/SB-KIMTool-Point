@@ -10,5 +10,8 @@
     "build:such-pwa": "node scripts/build-such-pwa.mjs",
     "verify": "node scripts/browser-verify.mjs"
   },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5"
+  },
   "license": "UNLICENSED"
 }
