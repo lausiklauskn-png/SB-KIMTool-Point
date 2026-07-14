@@ -531,30 +531,64 @@
     dlg.addEventListener("click", function (e) { if (e.target === dlg) closeWiz(dlg); });
   }
 
+  // nodeId lesbar kürzen (Anfang genügt zum Unterscheiden, z. B. CyunQNDR…).
+  function shortNode(id) {
+    if (!id) return "";
+    return id.length > 20 ? id.slice(0, 16) + "…" : id;
+  }
+
   // Identitäts-Wechsler (Baustein 5) — Dropdown mit allen Browser-Identitäten
-  // füllen, die aktive markieren. 1:1-Logik aus Sages refreshAndockIdentities,
-  // nur die IDs an diesen Dialog angepasst. Fail-soft: fehlt Modul 02 / gibt es
-  // keine Identität, bleibt „— keine geladen —" stehen (nie Crash, nie toter Knopf).
+  // füllen, die aktive markieren. Basis-Logik aus Sages refreshAndockIdentities.
+  // ERWEITERUNG (Klaus 2026-07-14): listIdentities() liefert nur die Speicher-
+  // Slots ("main"), nicht die eigentliche Spore — darum je Slot die nodeId
+  // auflösen und anzeigen (Slot · nodeId), plus die volle aktive nodeId in #wiz-o5.
+  // So sieht Klaus, WELCHE Spore hinter jeder Identität steckt.
+  // Fail-soft: fehlt Modul 02 / gibt es keine Identität, bleibt „— keine geladen —"
+  // stehen (nie Crash, nie toter Knopf).
   function refreshWizardIdentities() {
     var sel = document.getElementById("wiz-ident-select");
     if (!sel || !window.SbkimSpore || typeof window.SbkimSpore.listIdentities !== "function") return;
+    var o5 = document.getElementById("wiz-o5");
     window.SbkimSpore.listIdentities().then(function (ids) {
       var activeP = (typeof window.SbkimSpore.getActiveIdentityKey === "function")
         ? window.SbkimSpore.getActiveIdentityKey().catch(function () { return null; })
         : Promise.resolve(null);
       return activeP.then(function (active) {
-        sel.innerHTML = "";
         if (!ids || !ids.length) {
+          sel.innerHTML = "";
           var empty = document.createElement("option");
           empty.value = ""; empty.textContent = "— keine geladen —";
           sel.appendChild(empty);
+          if (o5) { o5.style.color = "var(--accent)"; o5.textContent = ""; }
           return;
         }
-        ids.forEach(function (k) {
-          var opt = document.createElement("option");
-          opt.value = k; opt.textContent = k + (k === active ? "  (aktiv)" : "");
-          if (k === active) opt.selected = true;
-          sel.appendChild(opt);
+        // Pro Slot die nodeId auflösen. getOrCreateIdentity(slot) gibt bei einem
+        // EXISTIERENDEN Slot nur zurück (erzeugt nichts) — alle Slots hier
+        // existieren (aus listIdentities). Fail-soft je Slot: ohne nodeId nur Slot-Name.
+        var canResolve = typeof window.SbkimSpore.getOrCreateIdentity === "function";
+        return Promise.all(ids.map(function (k) {
+          if (!canResolve) return Promise.resolve({ key: k, nodeId: null });
+          return window.SbkimSpore.getOrCreateIdentity(k)
+            .then(function (id) { return { key: k, nodeId: (id && id.nodeId) || null }; })
+            .catch(function () { return { key: k, nodeId: null }; });
+        })).then(function (rows) {
+          sel.innerHTML = "";
+          var activeNode = null;
+          rows.forEach(function (row) {
+            var opt = document.createElement("option");
+            opt.value = row.key;
+            var label = row.key + (row.nodeId ? " · " + shortNode(row.nodeId) : "");
+            if (row.key === active) { label += "  (aktiv)"; opt.selected = true; activeNode = row.nodeId; }
+            opt.textContent = label;
+            if (row.nodeId) opt.title = row.nodeId; // volle nodeId bei Hover (Desktop/DeX)
+            sel.appendChild(opt);
+          });
+          if (o5) {
+            o5.style.color = "var(--accent)";
+            o5.textContent = activeNode
+              ? "Aktive Spore-nodeId: " + activeNode
+              : "Aktiver Slot: " + (active || "—") + " (noch keine Spore signiert)";
+          }
         });
       });
     }).catch(function () { /* fail-soft: Dropdown bleibt unverändert */ });

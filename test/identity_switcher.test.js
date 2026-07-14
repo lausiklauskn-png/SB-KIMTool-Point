@@ -46,13 +46,16 @@ function makeSelect() {
 function makeOption() { return { value: "", textContent: "", selected: false }; }
 
 // Spore-Mock mit echtem Multi-Identitäts-Lebenszyklus (wie Modul 02:
-// mehrere Slots, ein aktiver, wechselbar).
+// mehrere Slots, ein aktiver, wechselbar). Jeder Slot k hat eine nodeId
+// "node-<k>", aufgelöst über getOrCreateIdentity(k) — genau wie Modul 02
+// bei einem existierenden Slot nur zurückgibt (nichts erzeugt).
 function makeSporeMock(initialIds, initialActive) {
   let ids = initialIds.slice();
   let active = initialActive;
   return {
     listIdentities: async () => ids.slice(),
     getActiveIdentityKey: async () => active,
+    getOrCreateIdentity: async (k) => ({ nodeId: "node-" + (k || "main") }),
     setActiveIdentity: async (key) => {
       if (!ids.includes(key)) throw new Error("kein Slot: " + key);
       active = key;
@@ -62,35 +65,52 @@ function makeSporeMock(initialIds, initialActive) {
   };
 }
 
-// Die portierte Refresh-Logik (1:1 zu refreshWizardIdentities / Sages
-// refreshAndockIdentities), hier gegen den Shim + Mock ausgeführt.
-async function refresh(sel, spore, doc) {
+function shortNode(id) {
+  if (!id) return "";
+  return id.length > 20 ? id.slice(0, 16) + "…" : id;
+}
+
+// Die portierte Refresh-Logik (1:1 zu refreshWizardIdentities): Slots listen,
+// je Slot die nodeId auflösen, aktive markieren, aktive nodeId nach o5.
+async function refresh(sel, spore, doc, o5) {
   if (!sel || !spore || typeof spore.listIdentities !== "function") return;
   const ids = await spore.listIdentities();
   let active = null;
   if (typeof spore.getActiveIdentityKey === "function") {
     try { active = await spore.getActiveIdentityKey(); } catch (_e) { /* nb */ }
   }
-  sel.innerHTML = "";
   if (!ids || !ids.length) {
+    sel.innerHTML = "";
     const opt = doc.createElement();
     opt.value = ""; opt.textContent = "— keine geladen —";
     sel.appendChild(opt);
+    if (o5) o5.textContent = "";
     return;
   }
-  ids.forEach((k) => {
+  const canResolve = typeof spore.getOrCreateIdentity === "function";
+  const rows = await Promise.all(ids.map(async (k) => {
+    if (!canResolve) return { key: k, nodeId: null };
+    try { const id = await spore.getOrCreateIdentity(k); return { key: k, nodeId: (id && id.nodeId) || null }; }
+    catch (_e) { return { key: k, nodeId: null }; }
+  }));
+  sel.innerHTML = "";
+  let activeNode = null;
+  rows.forEach((row) => {
     const opt = doc.createElement();
-    opt.value = k; opt.textContent = k + (k === active ? "  (aktiv)" : "");
-    if (k === active) opt.selected = true;
+    opt.value = row.key;
+    let label = row.key + (row.nodeId ? " · " + shortNode(row.nodeId) : "");
+    if (row.key === active) { label += "  (aktiv)"; opt.selected = true; activeNode = row.nodeId; }
+    opt.textContent = label;
     sel.appendChild(opt);
   });
+  if (o5) o5.textContent = activeNode ? "Aktive Spore-nodeId: " + activeNode : "Aktiver Slot: " + (active || "—");
 }
 
 // Die portierte Wechsel-Logik (change-Handler).
-async function switchTo(key, spore, sel, doc) {
+async function switchTo(key, spore, sel, doc, o5) {
   if (!key || !spore || typeof spore.setActiveIdentity !== "function") return;
   await spore.setActiveIdentity(key);
-  await refresh(sel, spore, doc);
+  await refresh(sel, spore, doc, o5);
 }
 
 const DOC = { createElement: makeOption };
@@ -112,6 +132,16 @@ test("mehrere Identitäten: alle gelistet, aktive mit (aktiv) markiert", async (
   assert.match(active[0].textContent, /\(aktiv\)$/);
   // die nicht-aktiven tragen die Markierung NICHT
   assert.ok(!/\(aktiv\)/.test(sel.options.find((o) => o.value === "aaa").textContent));
+});
+
+test("Dropdown zeigt die nodeId (Spore), nicht nur den Slot-Namen", async () => {
+  const sel = makeSelect();
+  const o5 = { textContent: "" };
+  await refresh(sel, makeSporeMock(["main"], "main"), DOC, o5);
+  // Label trägt Slot + nodeId, nicht nur "main"
+  assert.match(sel.options[0].textContent, /main · node-main/);
+  // die volle aktive nodeId steht in der Ausgabezeile (#wiz-o5)
+  assert.match(o5.textContent, /Aktive Spore-nodeId: node-main/);
 });
 
 test("Auswahl wechselt die aktive Identität (nachweisbar beim erneuten Füllen)", async () => {
