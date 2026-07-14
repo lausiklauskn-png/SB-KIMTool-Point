@@ -2,6 +2,36 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 (6) — Identitäts-Wechsler zeigt nodeId + „Kanon-Schlüssel importieren"
+
+Folge aus Klaus' Browser-Sichttest (2026-07-14) des portierten Wechslers.
+
+**Befund 1 (Anzeige):** Das Dropdown zeigte nur den Speicher-Slot `main`, nicht **welche
+Spore** dahinter steckt. **Fix (`assets/sbkim-siegel.js`, PR #124):** je Slot die nodeId
+auflösen (`getOrCreateIdentity(slot)` gibt bei existierendem Slot nur zurück) → Anzeige
+„Slot · nodeId", volle aktive nodeId in `#wiz-o5`. Klaus sah danach: aktive Identität =
+**`lZmu5nsP…`** (eine **Test-Identität**), NICHT die committete **`CyunQNDR…`**.
+
+**Befund 2 (Aufräumen, Weg 2 — Klaus' Wahl „CyunQNDR behalten, kein Netz-Churn"):**
+neuer Browser-Knopf **„Kanon-Schlüssel importieren"** im Wechsler
+(`assets/sbkim-siegel.js`): wählt `node_key.enc.json` + Passwort → entschlüsselt den
+Knoten-Schlüssel **im Browser** (PBKDF2-600k + AES-GCM, Tag anhängen) → PKCS8-PEM → DER →
+Ed25519-Import → baut einen **Modul-02-Backup-Umschlag (v2)** → spielt ihn über den
+**bestehenden, geprüften `importBackup`-Pfad** ein (`{force:true}`). **Gleiche nodeId
+`CyunQNDR…` → kein Netz-Wechsel.** Modul 02 (`web/tools/`) **unangetastet** (Drift-Guard).
+nodeId wird vor dem Import gegen die committete `sbkim/spore.json` geprüft (Schutz vor
+falscher Datei); fail-soft mit klaren Meldungen; Passwort bleibt lokal, kein PII.
+
+**Getestet (headless):** `test/kanon_import.test.js` (2/2) fährt die **ganze Krypto-Kette +
+den Format-Vertrag** durch (echter `node_key`-Umschlag via `scripts/make_node_key.mjs` →
+Konvertierung → `importBackup` → `getNodeId()` == kanonische nodeId, aktiver Slot `main`;
+falsche Datei wird abgewiesen). **`node --test` 120/120 grün.** Die DOM-Verdrahtung (Datei-
+Knopf, prompt, fetch) ist headless nicht prüfbar → **wartet auf Klaus' Browser-Lauf.**
+
+**Nächster Schritt (Klaus, Browser):** Wizard → „Kanon-Schlüssel importieren" → `node_key.enc.json`
++ Passwort → aktive Identität wird `CyunQNDR…`; danach per ✍ v0.2 neu signieren → `spore.json`
+nach `sbkim/spore.json` committen. Dann sauber verbinden.
+
 ## Nachtrag 2026-07-14 (5) — Identitäts-Wechsler (Baustein 5) in den 🔑-Wizard portiert
 
 Branch `claude/identity-switcher-wizard-yryoqw` (frisch von `origin/main`; alle 3 PRs #119/#120/#121

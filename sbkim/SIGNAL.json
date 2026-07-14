@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-07-14",
-  "seq": 32,
-  "headline": "Identitaets-Wechsler (Baustein 5) aus Sage in den 🔑-Wizard (assets/sbkim-siegel.js) portiert: 5. Abschnitt mit Dropdown aller Browser-Identitaeten, aktive markiert, Auswahl setzt aktive (SbkimSpore.setActiveIdentity); Refresh nach Identitaet-erzeugen + beim Oeffnen; fail-soft. Behebt die Identitaets-Anhaeufung (Wizard jetzt vollstaendig wie Sage). Neuer Logik-Test test/identity_switcher.test.js (6/6); node --test 117/117 gruen (fake-indexeddb als devDependency deklariert — heilt vorbestehende Luecke). web/tools unberuehrt (Drift-Guard). Browser-Sichttest des Dropdowns wartet auf Klaus.",
+  "seq": 33,
+  "headline": "Identitaets-Wechsler poliert nach Klaus' Sichttest: (1) Dropdown zeigt jetzt Slot · nodeId + volle aktive nodeId (Befund: aktiv war Test-Identitaet lZmu5nsP…, nicht committete CyunQNDR…). (2) Neuer Browser-Knopf 'Kanon-Schluessel importieren': node_key.enc.json im Browser entschluesseln → Modul-02-Backup (v2) → importBackup(force), gleiche nodeId CyunQNDR… → KEIN Netz-Churn (Klaus' Wahl Weg 2). Modul 02/web-tools unberuehrt (Drift-Guard). Krypto-Kette headless bewiesen (test/kanon_import.test.js), node --test 120/120. Browser-Sichttest wartet auf Klaus.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -182,6 +182,11 @@
       "seq": 32,
       "date": "2026-07-14",
       "headline": "Identitaets-Wechsler (Baustein 5) aus Sage in den 🔑-Wizard portiert (assets/sbkim-siegel.js): Dropdown aller Browser-Identitaeten, aktive markiert, Auswahl setzt aktive; Refresh nach Erzeugen + beim Oeffnen; fail-soft. Logik-Test 6/6, node --test 117/117 (fake-indexeddb devDependency deklariert). web/tools unberuehrt. Browser-Sichttest wartet auf Klaus."
+    },
+    {
+      "seq": 33,
+      "date": "2026-07-14",
+      "headline": "Wechsler zeigt jetzt Slot · nodeId (Befund: aktiv = Test-Identitaet lZmu5nsP…, nicht committete CyunQNDR…) + Knopf 'Kanon-Schluessel importieren' (node_key.enc.json → importBackup(force), gleiche nodeId, kein Netz-Churn — Weg 2). web/tools unberuehrt. test/kanon_import.test.js, node --test 120/120. Browser-Sichttest wartet auf Klaus."
     }
   ]
 }

@@ -419,6 +419,13 @@
           '<option value="">— keine geladen —</option>' +
         '</select>' +
         '<div id="wiz-o5" style="font-family:var(--mono);font-size:.78rem;color:var(--accent);word-break:break-all;margin:.45em 0 0"></div>' +
+        '<div style="margin:.75em 0 0;border-top:1px solid rgba(201,169,97,0.2);padding-top:.6em">' +
+          '<b style="color:#F5E6B8;font-size:.85rem">Kanon-Schlüssel importieren</b>' +
+          '<p style="color:var(--muted);margin:.25em 0 .45em;font-size:.78rem">Hast du die <code>node_key.enc.json</code> (der dauerhafte Knoten-Schlüssel dieses Repos)? Wähle sie + gib ihr Passwort ein — dann liegt die <b>committete</b> Identität wieder im Browser (gleiche nodeId, <b>kein</b> Netz-Wechsel). Passwort bleibt nur im Browser.</p>' +
+          '<input type="file" id="wiz-kanon-file" accept=".json,application/json" hidden />' +
+          '<button type="button" class="andock-close" id="wiz-kanon-btn" style="margin:.2em 0">node_key.enc.json wählen + importieren</button>' +
+          '<div id="wiz-kanon-out" style="font-family:var(--mono);font-size:.78rem;color:var(--accent);word-break:break-all"></div>' +
+        '</div>' +
       '</div>' +
       '<p style="color:var(--muted);font-size:.78rem;margin:.7em 0 0">Die heruntergeladene <code>spore.json</code> nach <code>sbkim/spore.json</code> ins Repo legen. Backup-Datei + Passwort sicher aufbewahren — ohne beides keine Wiederherstellung. Mit Schritt 4 spielst du sie jederzeit (auch auf neuem Gerät) zurück.</p>' +
       '<button class="andock-close" type="button" id="wiz-close" style="margin-top:1em">Schließen</button>';
@@ -525,6 +532,47 @@
         });
       });
     }
+    // Kanon-Schlüssel-Import: node_key.enc.json wählen → im Browser entschlüsseln
+    // → über importBackup(force) einspielen → aktive Identität = committete nodeId.
+    var kanonBtn = dlg.querySelector("#wiz-kanon-btn");
+    var kanonFile = dlg.querySelector("#wiz-kanon-file");
+    if (kanonBtn && kanonFile) {
+      kanonBtn.addEventListener("click", function () { kanonFile.click(); });
+      kanonFile.addEventListener("change", function (ev) {
+        var input = ev.target;
+        var file = input.files && input.files[0];
+        if (!file) { out("#wiz-kanon-out", "Keine Datei gewählt.", true); return; }
+        if (!window.SbkimSpore || !window.SbkimSpore.importBackup) { out("#wiz-kanon-out", "Modul 02 importBackup fehlt.", true); input.value = ""; return; }
+        file.text().then(function (text) {
+          var envelope;
+          try { envelope = JSON.parse(text); }
+          catch (e) { out("#wiz-kanon-out", "Datei ist kein gültiges JSON.", true); input.value = ""; return; }
+          var pw = window.prompt("Passwort des Knoten-Schlüssels (node_key.enc.json):");
+          if (!pw) { out("#wiz-kanon-out", "Abgebrochen — kein Passwort.", true); input.value = ""; return; }
+          out("#wiz-kanon-out", "Lese committete Spore + entschlüssele Schlüssel …");
+          // Committete Spore laden (für nodeId-Abgleich + Spore-Feld des Backups).
+          fetch("sbkim/spore.json", { cache: "no-store" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; })
+            .then(function (spore) {
+              return nodeKeyToBackupBlob(envelope, pw, spore).then(function (res) {
+                out("#wiz-kanon-out", "Spiele Identität ein (nodeId=" + res.nodeId + ") …");
+                return window.SbkimSpore.importBackup(res.blob, pw, { force: true }).then(function () {
+                  return res.nodeId;
+                });
+              });
+            })
+            .then(function (nodeId) {
+              out("#wiz-kanon-out", "✓ Kanon-Identität importiert + aktiv: " + nodeId + ". Test-Identitäten kannst du jetzt oben umschalten/ignorieren.");
+              refreshWizardIdentities();
+              dlg.querySelector("#wiz-s2").disabled = false;
+              dlg.querySelector("#wiz-s3").disabled = false;
+            })
+            .catch(function (err) { out("#wiz-kanon-out", "Fehler: " + (err && err.message || err), true); })
+            .then(function () { input.value = ""; });
+        });
+      });
+    }
     // Beim Bauen einmal befüllen (falls schon eine Identität im Browser liegt).
     refreshWizardIdentities();
     dlg.querySelector("#wiz-close").addEventListener("click", function () { closeWiz(dlg); });
@@ -600,6 +648,99 @@
     refreshWizardIdentities();
   }
   function closeWiz(dlg) { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
+
+  // ---- Kanon-Schlüssel-Import (node_key.enc.json → Browser-Identität) ----
+  // Bringt die committete Identität (aus dem verschlüsselten Node-Schlüssel)
+  // in den Browser, OHNE Modul 02 anzufassen: der Node-Schlüssel wird im
+  // Browser entschlüsselt, in einen Modul-02-Backup-Umschlag (v2) gepackt und
+  // über den bestehenden, geprüften `importBackup`-Pfad eingespielt (force).
+  // Gleiche nodeId → kein Netz-Wechsel. Alles fail-soft, Passwort bleibt lokal.
+  function stdB64ToBytes(s) {
+    var bin = (window.atob || atob)(s);
+    var u = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return u;
+  }
+  function b64urlToBytes(s) {
+    var pad = s.length % 4 === 0 ? "" : "====".slice(s.length % 4);
+    return stdB64ToBytes(s.replace(/-/g, "+").replace(/_/g, "/") + pad);
+  }
+  function bytesToB64url(bytes) {
+    var u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    var bin = "";
+    for (var i = 0; i < u.length; i++) bin += String.fromCharCode(u[i]);
+    return (window.btoa || btoa)(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function pemToDer(pem) {
+    var body = pem.replace(/-----BEGIN[^-]+-----/, "").replace(/-----END[^-]+-----/, "").replace(/\s+/g, "");
+    return stdB64ToBytes(body);
+  }
+  async function deriveAesGcmKey(subtle, password, salt, iterations, usages) {
+    var base = await subtle.importKey("raw", new TextEncoder().encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+    return await subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: iterations, hash: "SHA-256" },
+      base, { name: "AES-GCM", length: 256 }, false, usages
+    );
+  }
+
+  // Node-Schlüssel-Umschlag + Passwort (+ committete Spore) → Modul-02-Backup-Blob (v2).
+  // Wirft mit klaren Meldungen bei falschem Passwort / falscher Datei / nodeId-Mismatch.
+  async function nodeKeyToBackupBlob(envelope, password, spore) {
+    var subtle = window.crypto && window.crypto.subtle;
+    if (!subtle) throw new Error("WebCrypto fehlt in diesem Browser.");
+    if (!envelope || !envelope.kdf || !envelope.cipher || typeof envelope.ciphertext !== "string") {
+      throw new Error("Das ist keine gültige node_key.enc.json (kdf/cipher/ciphertext fehlt).");
+    }
+    // 1) Node-Schlüssel entschlüsseln (AES-256-GCM, Tag getrennt → anhängen).
+    var salt = stdB64ToBytes(envelope.kdf.salt);
+    var iv = stdB64ToBytes(envelope.cipher.iv);
+    var tag = stdB64ToBytes(envelope.cipher.tag);
+    var ct = stdB64ToBytes(envelope.ciphertext);
+    var iterations = envelope.kdf.iterations || 600000;
+    var aesKey = await deriveAesGcmKey(subtle, password, salt, iterations, ["decrypt"]);
+    var combined = new Uint8Array(ct.length + tag.length);
+    combined.set(ct, 0); combined.set(tag, ct.length);
+    var plainBuf;
+    try { plainBuf = await subtle.decrypt({ name: "AES-GCM", iv: iv }, aesKey, combined); }
+    catch (e) { throw new Error("Passwort falsch oder Datei beschädigt (Entschlüsselung abgewiesen)."); }
+    // 2) Klartext = base64(PKCS8-PEM) → PEM → DER → Ed25519-Privatschlüssel.
+    var pem = (window.atob || atob)(new TextDecoder().decode(plainBuf));
+    var der = pemToDer(pem);
+    var privKey = await subtle.importKey("pkcs8", der, { name: "Ed25519" }, true, ["sign"]);
+    var privJwk = await subtle.exportKey("jwk", privKey);
+    var pubJwk = { kty: "OKP", crv: "Ed25519", x: privJwk.x, key_ops: ["verify"], ext: true };
+    // 3) nodeId ableiten + gegen die committete Spore prüfen (Schutz vor falscher Datei).
+    var rawPub = b64urlToBytes(privJwk.x);
+    var hash = await subtle.digest("SHA-256", rawPub);
+    var nodeId = bytesToB64url(new Uint8Array(hash));
+    if (spore && spore.id && spore.id !== nodeId) {
+      throw new Error("Der Schlüssel passt nicht zur committeten Spore: nodeId " + nodeId + " ≠ " + spore.id + ".");
+    }
+    // 4) Backup-Umschlag (v2) bauen — genau das Format, das importBackup liest.
+    var payload = {
+      identities: [{
+        key: "main", nodeId: nodeId,
+        keys: { privateKey: { kty: "OKP", crv: "Ed25519", x: privJwk.x, d: privJwk.d, key_ops: ["sign"], ext: true }, publicKey: pubJwk },
+        spore: spore, siblings: [],
+      }],
+      "active-identity": "main",
+    };
+    var bsalt = window.crypto.getRandomValues(new Uint8Array(16));
+    var biv = window.crypto.getRandomValues(new Uint8Array(12));
+    var bIter = 600000;
+    var bKey = await deriveAesGcmKey(subtle, password, bsalt, bIter, ["encrypt"]);
+    var pt = new TextEncoder().encode(JSON.stringify(payload));
+    var bct = await subtle.encrypt({ name: "AES-GCM", iv: biv }, bKey, pt);
+    var blob = {
+      version: 2,
+      kdf: { salt: bytesToB64url(bsalt), iterations: bIter },
+      cipher: { algorithm: "AES-GCM-256", iv: bytesToB64url(biv) },
+      ciphertext: bytesToB64url(new Uint8Array(bct)),
+      "payload-schema-version": 2,
+    };
+    return { blob: blob, nodeId: nodeId };
+  }
+
   function downloadJson(filename, obj) {
     var blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
     var url = URL.createObjectURL(blob);
