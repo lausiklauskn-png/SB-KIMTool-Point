@@ -411,6 +411,15 @@
           '<button type="button" class="andock-close" id="wiz-s4" style="margin:.4em 0">Backup-Datei wählen + wiederherstellen</button>' +
           '<div id="wiz-o4" style="font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all"></div></li>' +
       '</ol>' +
+      '<div id="wiz-ident-switch" style="margin:1em 0 0;padding:.7em .85em;border-radius:10px;border:1px solid rgba(201,169,97,0.3);background:rgba(201,169,97,0.06)">' +
+        '<b style="color:#F5E6B8">Identitäts-Wechsler</b>' +
+        '<p style="color:var(--muted);margin:.3em 0 .55em;font-size:.8rem">In der Regel gibt es nur eine Identität. Sammeln sich aus Tests mehrere an, wählst du hier die aktive — mit ihr wird signiert, gesichert und verbunden.</p>' +
+        '<label for="wiz-ident-select" style="font-size:.82rem;color:rgba(245,245,255,0.8);display:block;margin:0 0 .3em">Aktive Identität:</label>' +
+        '<select id="wiz-ident-select" style="width:100%;box-sizing:border-box;padding:.45em .5em;font:inherit;font-size:.82rem;color:#F5F5FF;background:rgba(0,0,0,0.35);border:1px solid rgba(201,169,97,0.35);border-radius:8px">' +
+          '<option value="">— keine geladen —</option>' +
+        '</select>' +
+        '<div id="wiz-o5" style="font-family:var(--mono);font-size:.78rem;color:var(--accent);word-break:break-all;margin:.45em 0 0"></div>' +
+      '</div>' +
       '<p style="color:var(--muted);font-size:.78rem;margin:.7em 0 0">Die heruntergeladene <code>spore.json</code> nach <code>sbkim/spore.json</code> ins Repo legen. Backup-Datei + Passwort sicher aufbewahren — ohne beides keine Wiederherstellung. Mit Schritt 4 spielst du sie jederzeit (auch auf neuem Gerät) zurück.</p>' +
       '<button class="andock-close" type="button" id="wiz-close" style="margin-top:1em">Schließen</button>';
     document.body.appendChild(dlg);
@@ -426,6 +435,7 @@
       window.SbkimSpore.getOrCreateIdentity().then(function (id) {
         out("#wiz-o1", "nodeId: " + id.nodeId);
         dlg.querySelector("#wiz-s2").disabled = false;
+        refreshWizardIdentities();
       }).catch(function (e) { out("#wiz-o1", "Fehler: " + (e && e.message || e), true); b.disabled = false; });
     });
     dlg.querySelector("#wiz-s2").addEventListener("click", function () {
@@ -498,13 +508,62 @@
         out("#wiz-o4", "Nichts wiederhergestellt" + (res && res.reason ? " — " + res.reason : "") + ".", true);
       }
     }
+    // Identitäts-Wechsler (Baustein 5, aus Sage portiert): Auswahl setzt die
+    // aktive Identität (Modul 02 setActiveIdentity) → danach neu befüllen +
+    // Bestätigung. Fail-soft: fehlt Modul 02, bleibt der Wechsler still leer.
+    var identSel = dlg.querySelector("#wiz-ident-select");
+    if (identSel) {
+      identSel.addEventListener("change", function (e) {
+        var key = e.target.value;
+        if (!key || !window.SbkimSpore || typeof window.SbkimSpore.setActiveIdentity !== "function") return;
+        out("#wiz-o5", "Wechsle aktive Identität …");
+        window.SbkimSpore.setActiveIdentity(key).then(function () {
+          out("#wiz-o5", "Aktive Identität: " + key);
+          refreshWizardIdentities();
+        }).catch(function (err) {
+          out("#wiz-o5", "Fehler beim Wechseln: " + (err && err.message || err), true);
+        });
+      });
+    }
+    // Beim Bauen einmal befüllen (falls schon eine Identität im Browser liegt).
+    refreshWizardIdentities();
     dlg.querySelector("#wiz-close").addEventListener("click", function () { closeWiz(dlg); });
     dlg.addEventListener("click", function (e) { if (e.target === dlg) closeWiz(dlg); });
+  }
+
+  // Identitäts-Wechsler (Baustein 5) — Dropdown mit allen Browser-Identitäten
+  // füllen, die aktive markieren. 1:1-Logik aus Sages refreshAndockIdentities,
+  // nur die IDs an diesen Dialog angepasst. Fail-soft: fehlt Modul 02 / gibt es
+  // keine Identität, bleibt „— keine geladen —" stehen (nie Crash, nie toter Knopf).
+  function refreshWizardIdentities() {
+    var sel = document.getElementById("wiz-ident-select");
+    if (!sel || !window.SbkimSpore || typeof window.SbkimSpore.listIdentities !== "function") return;
+    window.SbkimSpore.listIdentities().then(function (ids) {
+      var activeP = (typeof window.SbkimSpore.getActiveIdentityKey === "function")
+        ? window.SbkimSpore.getActiveIdentityKey().catch(function () { return null; })
+        : Promise.resolve(null);
+      return activeP.then(function (active) {
+        sel.innerHTML = "";
+        if (!ids || !ids.length) {
+          var empty = document.createElement("option");
+          empty.value = ""; empty.textContent = "— keine geladen —";
+          sel.appendChild(empty);
+          return;
+        }
+        ids.forEach(function (k) {
+          var opt = document.createElement("option");
+          opt.value = k; opt.textContent = k + (k === active ? "  (aktiv)" : "");
+          if (k === active) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+    }).catch(function () { /* fail-soft: Dropdown bleibt unverändert */ });
   }
 
   function openWizard() {
     var dlg = document.getElementById("sbkim-ident-wizard");
     if (dlg && dlg.showModal) dlg.showModal(); else if (dlg) dlg.setAttribute("open", "");
+    refreshWizardIdentities();
   }
   function closeWiz(dlg) { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
   function downloadJson(filename, obj) {

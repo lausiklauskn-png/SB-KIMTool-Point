@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-07-14",
-  "seq": 31,
-  "headline": "2. Hub aus Sage neu bespielt (Modul-Ebene): 4 abgedriftete Browser-Module byte-1:1 auf Sage-Kanon aktualisiert — Embedding 03 (inkl. Worker + embedSnippets), Match 04, Rendezvous 23, Rendezvous-UI 23ui. Jetzt ALLE 14 geteilten Module byte-1:1 mit Sage. node --test 111/111. Sage = Quelle der Wahrheit; Klone werden aus Sage bespielt. OFFEN: Identitaets-Wechsler (Baustein 5) in assets/sbkim-siegel.js portieren (Browser-UI, wartet auf Klaus Sichttest) + Identitaets-Aufraeumung.",
+  "seq": 32,
+  "headline": "Identitaets-Wechsler (Baustein 5) aus Sage in den 🔑-Wizard (assets/sbkim-siegel.js) portiert: 5. Abschnitt mit Dropdown aller Browser-Identitaeten, aktive markiert, Auswahl setzt aktive (SbkimSpore.setActiveIdentity); Refresh nach Identitaet-erzeugen + beim Oeffnen; fail-soft. Behebt die Identitaets-Anhaeufung (Wizard jetzt vollstaendig wie Sage). Neuer Logik-Test test/identity_switcher.test.js (6/6); node --test 117/117 gruen (fake-indexeddb als devDependency deklariert — heilt vorbestehende Luecke). web/tools unberuehrt (Drift-Guard). Browser-Sichttest des Dropdowns wartet auf Klaus.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -177,6 +177,11 @@
       "seq": 31,
       "date": "2026-07-14",
       "headline": "Modul-Ebene aus Sage neu bespielt: 03/04/23/23ui byte-1:1, alle 14 Module kanonisch. node --test 111/111. Identitaets-Wechsler-Port + Browser-Sichttest offen."
+    },
+    {
+      "seq": 32,
+      "date": "2026-07-14",
+      "headline": "Identitaets-Wechsler (Baustein 5) aus Sage in den 🔑-Wizard portiert (assets/sbkim-siegel.js): Dropdown aller Browser-Identitaeten, aktive markiert, Auswahl setzt aktive; Refresh nach Erzeugen + beim Oeffnen; fail-soft. Logik-Test 6/6, node --test 117/117 (fake-indexeddb devDependency deklariert). web/tools unberuehrt. Browser-Sichttest wartet auf Klaus."
     }
   ]
 }

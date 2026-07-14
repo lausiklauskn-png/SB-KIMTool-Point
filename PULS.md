@@ -2,6 +2,45 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 (5) — Identitäts-Wechsler (Baustein 5) in den 🔑-Wizard portiert
+
+Branch `claude/identity-switcher-wizard-yryoqw` (frisch von `origin/main`; alle 3 PRs #119/#120/#121
+enthalten). Der **letzte fehlende Wizard-Baustein** aus Sage nachgezogen — behebt die dokumentierte
+Ursache des Doppel-/Dreifach-Identitäts-Problems.
+
+**Getan (nur `assets/sbkim-siegel.js` — Browser-UI, kein `web/tools/`-Modul angefasst):**
+- In `buildWizardDialog()` **nach Schritt 4** (nach dem `</ol>`) ein 5. Abschnitt **„Identitäts-Wechsler"**:
+  `<select id="wiz-ident-select">` + Ausgabe `<div id="wiz-o5">`, re-geskinnt in der bestehenden
+  Wizard-Optik (kein neuer Look).
+- Modul-Funktion `refreshWizardIdentities()` (1:1-Logik aus Sages `refreshAndockIdentities`): liest
+  `SbkimSpore.listIdentities()` + `getActiveIdentityKey()`, füllt das Dropdown, markiert die aktive
+  („(aktiv)"), **fail-soft** (fehlt Modul 02 / keine Identität → still „— keine geladen —", kein Crash).
+- `change`-Handler → `SbkimSpore.setActiveIdentity(key)` → danach neu befüllen + Bestätigung in `#wiz-o5`.
+- Refresh **ausgelöst**: (a) nach erfolgreichem Schritt 1 (`getOrCreateIdentity`-`then`), (b) beim Öffnen
+  in `openWizard()`, (c) einmal beim Bauen des Dialogs.
+- **Keine neuen Datenverträge** — nur die bestehende Modul-02-Fläche (`listIdentities`/
+  `getActiveIdentityKey`/`setActiveIdentity`). Modul 02 selbst unverändert (byte-1:1 mit Sage bleibt).
+
+**Getestet (headless):**
+- Neuer Logik-Test `test/identity_switcher.test.js` (6/6): Modul-02-Fläche vorhanden (Contract) +
+  Refresh/Wechsel-Wiring-Logik gegen einen Spore-Mock (leer → Platzhalter; mehrere → aktive markiert;
+  Auswahl setzt aktive; neue Identität taucht auf; fail-soft ohne Modul/Key).
+- **`node --test` 117/117 grün** (Drift-Guard `modules.test.js` inklusive — web/tools unberührt).
+- **Nebenbei geheilt:** `test/spore_v02.test.js` importiert `fake-indexeddb`, das aber in
+  `package.json` **nie deklariert** war → jede frische Umgebung lief hier rot. `devDependencies:
+  {"fake-indexeddb": "^6.2.5"}` ergänzt (die Datei importiert es bereits). Reine Deklaration, kein
+  Test-/Modul-Eingriff.
+- **Vorbefund (NICHT von dieser Änderung):** `tests/smoke_bau22_such_widget.mjs` Probe 27 ist **schon
+  auf `main` rot** (146/148) — separater Modul-22-Befund, bewusst nicht angefasst (Kein-Modul-Mix).
+
+**Manual-Check:** Der **Dropdown im Browser** (zeigt Identität(en), aktive markiert; Wechseln setzt sie;
+nach „Identität erzeugen" taucht die neue auf) ist **ungeprüft, wartet auf Klaus' Browser-Lauf** (die
+DOM-Verdrahtung kann headless nicht bewiesen werden — kein jsdom im dependency-freien Repo).
+
+**Offen / nächster Schritt (Klaus, Browser):** Wizard öffnen → Test-Identitäten sichten → **eine** saubere
+v0.2-Identität etablieren + sauber verbinden. Dann erst weiter „mit den anderen Apps" (Mixarium →
+Rezeptbuch → BLP …), immer aus Sage propagiert. Empfehlung: erst der Hub sauber, dann propagieren.
+
 ## Nachtrag 2026-07-14 (4) — 2. Hub aus Sage neu bespielt (Modul-Ebene byte-1:1)
 
 **Grundsatz (Klaus 2026-07-14): Sage = Quelle der Wahrheit; SB-KIMTool-Point ist der 2. Hub (Klon).**
