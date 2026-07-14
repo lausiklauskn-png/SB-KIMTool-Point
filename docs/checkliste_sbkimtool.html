@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SB·KIMTool·Point — Checkliste (Stand 2026-07-14)</title>
+<style>
+  :root{ --bg:#0c0f12; --card:#141a20; --line:rgba(201,169,97,.28); --gold:#C9A961; --goldsoft:#F5E6B8;
+         --txt:#eef1f5; --muted:#9aa6b2; --good:#3fb37f; --warn:#e0a23b; --bad:#e5655f; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:1.2rem}
+  h1{font-size:1.35rem;margin:.2rem 0 .1rem;color:var(--goldsoft)}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 1.2rem}
+  h2{font-size:1.05rem;margin:1.4rem 0 .5rem;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:.3rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin:.6rem 0}
+  ul{list-style:none;margin:.3rem 0;padding:0}
+  li{display:flex;gap:.6rem;align-items:flex-start;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  li:last-child{border-bottom:0}
+  li .box{flex:0 0 auto;width:1.35em;height:1.35em;border:2px solid var(--gold);border-radius:5px;margin-top:.15em;
+          display:grid;place-items:center;cursor:pointer;user-select:none;font-size:.9em;color:var(--good);background:transparent}
+  li.done .box{background:rgba(63,179,127,.15)}
+  li.done .box::after{content:"✓"}
+  li.done .t{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(154,166,178,.5)}
+  .t{flex:1}
+  .t small{display:block;color:var(--muted);font-size:.82rem;margin-top:.1rem}
+  .pill{display:inline-block;font-size:.72rem;padding:.05rem .5rem;border-radius:999px;border:1px solid var(--line);margin-left:.4rem;vertical-align:middle}
+  .pill.ok{color:var(--good);border-color:rgba(63,179,127,.5)}
+  .pill.now{color:var(--warn);border-color:rgba(224,162,59,.5)}
+  .pill.later{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:.9rem;margin:.3rem 0}
+  th,td{text-align:left;padding:.35rem .5rem;border-bottom:1px solid rgba(255,255,255,.07)}
+  th{color:var(--gold);font-weight:600}
+  .up{color:var(--good)} .down{color:var(--bad)}
+  .foot{color:var(--muted);font-size:.82rem;margin-top:1.4rem;border-top:1px solid var(--line);padding-top:.7rem}
+  .reset{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .7rem;font:inherit;cursor:pointer;font-size:.8rem}
+</style>
+</head>
+<body>
+  <h1>SB·KIMTool·Point — Checkliste</h1>
+  <p class="sub">Stand 2026-07-14 · Haken bleiben im Browser gespeichert · <button class="reset" onclick="reset()">alle Haken zurücksetzen</button></p>
+
+  <h2>1 · Heute erledigt <span class="pill ok">abgeschlossen</span></h2>
+  <div class="card"><ul data-k="done">
+    <li class="done"><span class="box"></span><span class="t">Identitäts-Wechsler in den 🔑-Wizard portiert (Baustein 5)<small>PR #123 · node --test grün</small></span></li>
+    <li class="done"><span class="box"></span><span class="t">Wechsler zeigt <b>Slot · nodeId</b> (nicht nur „main") + volle aktive nodeId<small>PR #124 · Befund: aktiv war Test-Identität lZmu5nsP…</small></span></li>
+    <li class="done"><span class="box"></span><span class="t">„Kanon-Schlüssel importieren" gebaut (node_key.enc.json → Browser)<small>PR #125 · Krypto-Kette headless bewiesen, Modul 02 unberührt</small></span></li>
+    <li class="done"><span class="box"></span><span class="t">Kanon-Identität <b>CyunQNDR…</b> in den Browser geholt + aktiv gesetzt<small>Test-Identität überschrieben, kein Netz-Churn</small></span></li>
+    <li class="done"><span class="box"></span><span class="t">Mit dem Netz verbunden — Mycel-Karte bestätigt „toolpoint live, korrekt fusioniert"</span></li>
+    <li class="done"><span class="box"></span><span class="t">Spore auf <b>v0.2</b> neu signiert (volle Beschreibung, 3 Satz-Schnipsel, nodeId unverändert)<small>PR #127 · Signatur VALID, headless verifiziert</small></span></li>
+    <li class="done"><span class="box"></span><span class="t">Match-Werte ehrlich neu gemessen + Akten/Tests nachgezogen<small>node --test 120/120 · marktplatz.json · status.json · SIGNAL seq 34</small></span></li>
+  </ul></div>
+
+  <h2>2 · Netz-Stand nach v0.2 (aktuelle Match-Werte)</h2>
+  <div class="card">
+    <table>
+      <tr><th>Peer</th><th>vorher</th><th>jetzt</th><th>Einstufung</th></tr>
+      <tr><td>Sage</td><td>0.8485</td><td class="up">0.8618 ▲</td><td>verified-match ✓</td></tr>
+      <tr><td>Jasons-Tresor</td><td>0.8537</td><td class="up">0.8624 ▲</td><td>verified-match ✓</td></tr>
+      <tr><td>Mein-Tresor</td><td>0.8537</td><td class="up">0.8624 ▲</td><td>verified-match ✓</td></tr>
+      <tr><td>family-project</td><td>0.8311</td><td class="up">0.8492 ▲</td><td>verified-match ✓</td></tr>
+      <tr><td>Rezeptbuch</td><td>0.8320</td><td class="down">0.7961 ▼</td><td>verified-spore (&lt; 0.80)</td></tr>
+      <tr><td>Mixarium</td><td>0.8030</td><td class="down">0.7673 ▼</td><td>verified-spore (&lt; 0.80)</td></tr>
+      <tr><td>BookLedgerPro</td><td>— (_demo)</td><td>—</td><td>verified-spore (unverändert)</td></tr>
+    </table>
+    <p class="sub" style="margin:.5rem 0 0">Bewusst so: der <b>Werkzeug-Hub</b> trennt sich von den <b>Inhalts-Knoten</b> (Kochbuch/Cocktails). Das <b>beweist</b>, dass das Protokoll nach Bedeutung unterscheidet.</p>
+  </div>
+
+  <h2>3 · Nächste Sitzung — Rezeptbuch &amp; Mixarium <span class="pill now">als Nächstes</span></h2>
+  <div class="card"><ul data-k="next">
+    <li><span class="box"></span><span class="t">Rezeptbuch + Mixarium reziprok neu einstufen (sie sehen uns jetzt &lt; 0.80)<small>SIGNAL seq 34 bittet sie darum</small></span></li>
+    <li><span class="box"></span><span class="t">Kontroll-Versuch: hebt ein Zusatz <b>„Teil des SBKIM-Knotennetzes"</b> in <i>ihrer</i> Beschreibung den Match wieder über 0.80?<small>einmal mit, einmal ohne messen — nur ihr Vektor bewegt sich davon</small></span></li>
+    <li><span class="box"></span><span class="t">Beide Apps sauber auf v0.2 bringen (wie Toolpoint heute)</span></li>
+  </ul></div>
+
+  <h2>4 · Netz-Form entscheiden <span class="pill later">Gespräch</span></h2>
+  <div class="card"><ul data-k="form">
+    <li><span class="box"></span><span class="t">Was soll „Match" heißen: gleiches Thema — oder „gehört ins Netz / darf andocken"?</span></li>
+    <li><span class="box"></span><span class="t">Sternform (alle über einen Hub) oder echtes Netz unter Gleichen (Kochbuch↔Cocktails, Tresore↔Tresore)?</span></li>
+    <li><span class="box"></span><span class="t">Schwelle 0.80 beibehalten oder anders setzen?</span></li>
+  </ul></div>
+
+  <h2>5 · Das eigentliche Ziel — Firmen-Dokumenten-Suchwerkzeug <span class="pill later">Nordstern</span></h2>
+  <div class="card"><ul data-k="ziel">
+    <li><span class="box"></span><span class="t"><b>Machbar — die Bausteine sind da.</b> Pro Dokument ein Bedeutungs-Vektor (statt pro App)</span></li>
+    <li><span class="box"></span><span class="t">Cosinus als schneller, gratis Vorfilter → KI-Richter nur als Nachbrenner bei unklaren Fällen<small>Muster steckt in Modul 04 (hybridMatch) + Modul 22 (Such-Widget)</small></span></li>
+    <li><span class="box"></span><span class="t">PDF → Text via Modul 24 (OCR); Cross-Rechner-Suche via Modul 23 (Rendezvous)</span></li>
+    <li><span class="box"></span><span class="t">Jeder Rechner/Browser eine eigene ID — Fundament heute gelegt (eigene Identität pro Browser)</span></li>
+    <li><span class="box"></span><span class="t">Gedankengang weiter verfeinern (Klaus) — dann Spec fürs Firmen-Tool</span></li>
+  </ul></div>
+
+  <p class="foot">Ehrlich: gratis Cosinus liefert eine <b>Rangfolge</b>, kein perfektes Urteil — deshalb der KI-Richter als Nachbrenner. Browser-Beweise heute grün; „Beweis" = node --test 120/120 + Klaus' Browser-Sichttest.</p>
+
+<script>
+  var KEY="sbkimtool_checkliste_2026_07_14";
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return {}} }
+  function save(s){ try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){} }
+  var state=load();
+  document.querySelectorAll("ul[data-k]").forEach(function(ul){
+    var k=ul.getAttribute("data-k");
+    Array.prototype.forEach.call(ul.children,function(li,i){
+      var id=k+i;
+      if(state[id]) li.classList.add("done");
+      li.querySelector(".box").addEventListener("click",function(){
+        li.classList.toggle("done");
+        state[id]=li.classList.contains("done");
+        save(state);
+      });
+    });
+  });
+  function reset(){ state={}; save(state); document.querySelectorAll("li").forEach(function(li){ if(!li.closest('[data-k="done"]')) return; }); location.reload(); }
+  window.reset=function(){ localStorage.removeItem(KEY); location.reload(); };
+</script>
+</body>
+</html>
