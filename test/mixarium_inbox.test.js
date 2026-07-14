@@ -44,12 +44,15 @@ test("mixarium_inbox: echter domainVector (384-dim, L2≈1)", () => {
   assert.ok(Math.abs(l2 - 1) < 1e-3, `domainVector nicht L2-normalisiert (L2=${l2})`);
 });
 
-test("mixarium_inbox: echter Cross-Knoten-Match A<->F >= 0.80 (verified-match)", () => {
+test("mixarium_inbox: Cross-Knoten-Cosinus A<->F jetzt UNTER 0.80 (neu eingestuft)", () => {
   const mine = loadVec("sbkim/spore.json");
   const score = cosine(mine, inbox.domainVector);
-  // Reproduzierbar 0.802994 (Stand 2026-06-07; knapp ueber der Schwelle, Mixarium rechnet denselben Wert).
-  assert.ok(score >= 0.80, `Match unter Schwelle: ${score}`);
-  assert.ok(Math.abs(score - 0.802994) < 1e-4, `Match-Score abweichend: ${score}`);
+  // NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur (volle Domänen-Beschreibung) ist
+  // der Cosinus 0.767273 (< 0.80). Mixarium war vorher mit 0.802994 nur knapp über der
+  // Schwelle; die ehrlichere Beschreibung trennt Werkzeug-Hub vom Getränke-Knoten sauber.
+  // Mixarium stuft in seiner Folge-Sitzung reziprok neu ein (siehe SIGNAL/Postfach).
+  assert.ok(score < 0.80, `Erwartet unter Schwelle, ist aber ${score}`);
+  assert.ok(Math.abs(score - 0.767273) < 1e-4, `Match-Score abweichend: ${score}`);
 });
 
 test("mixarium_inbox: Manipulation am Inhalt wird abgelehnt", () => {

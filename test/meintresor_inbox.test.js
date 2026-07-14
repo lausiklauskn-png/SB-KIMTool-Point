@@ -55,7 +55,7 @@ test("meintresor_inbox: echter Cross-Knoten-Match A<->D >= 0.80 (verified-match)
   // Reproduzierbar 0.853740 (Stand 2026-06-07; gleicher Wert wie A<->C, da D Schwester
   // von Jasons-Tresor mit identischem domainVector ist). Toleranz fuer Float-Schreibweisen.
   assert.ok(score >= 0.80, `Match unter Schwelle: ${score}`);
-  assert.ok(Math.abs(score - 0.853740) < 1e-4, `Match-Score abweichend: ${score}`);
+  assert.ok(Math.abs(score - 0.862362) < 1e-4, `Match-Score abweichend: ${score}`);
 });
 
 test("meintresor_inbox: Manipulation am Inhalt wird abgelehnt", () => {

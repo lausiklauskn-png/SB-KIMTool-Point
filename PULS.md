@@ -2,6 +2,40 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 (7) — ✅ SB-KIMTool-Point v0.2 ABGESCHLOSSEN (Spore neu signiert + ehrliche Match-Neueinstufung)
+
+Klaus' Ziel: Toolpoint vollständig auf Sages v0.2-Stand, **keine halbe Baustelle**, dann weiter zu den
+anderen Apps. **Erreicht.**
+
+**Getan:**
+- **Kanon-Identität hergestellt** (Weg 2, kein Netz-Churn): `node_key.enc.json` per Browser-Knopf
+  importiert → aktive Identität `CyunQNDR…`, Test-Identität `lZmu5nsP…` überschrieben. **Live im Netz
+  verbunden** (Mycel-Karte-Analyse bestätigt: `toolpoint` live mit `CyunQNDR…`, korrekt fusioniert).
+- **Spore v0.2 mit VOLLER Domänen-Beschreibung** neu signiert (Browser-✍): nodeId `CyunQNDR…`
+  **unverändert**, Signatur VALID, **3 snippetVectors**. `sbkim/spore.json` committet.
+- **Node-Pfad konsistent:** `sbkim/domainVector.real.json` auf den neuen Vektor nachgezogen (sonst würde
+  ein Node-Re-Sign den alten Vektor zurückholen — Halb-offen vermieden). Snippets bleiben browser-seitig
+  (Node-Re-Sign fail-soft ohne `snippetVectors.real.json`, wie der Test verlangt).
+- **Ehrliche Match-Neueinstufung** (alle 7 Peers neu gemessen, headless verifiziert **vor** dem Commit):
+  Infrastruktur steigt — **Sage 0.8618, Jasons-/Mein-Tresor 0.8624, family 0.8492** (bleiben verified-match);
+  Inhalts-Knoten trennen sich ab — **Rezeptbuch 0.7961 + Mixarium 0.7673 < 0.80** → bewusst **neu eingestuft
+  auf verified-spore** (Identität echt, Domänen-Match nicht mehr bestätigt). BookLedgerPro unverändert
+  (verified-spore, `_demo`). **Das beweist, dass das Protokoll nach Bedeutung trennt** (Werkzeug-Hub vs.
+  Koch-/Getränke-Knoten) — genau Klaus' Ziel für das Firmen-Dokumenten-Suchwerkzeug.
+- Nachgezogen: `test/{match,jason_inbox,meintresor_inbox,rezeptbuch_inbox,mixarium_inbox}.test.js` (neue
+  Werte + Reklassifizierung), `web/data/marktplatz.json` (Scores + Rezeptbuch/Mixarium → verified-spore,
+  kein `matchScore` mehr → kein „voller Match"-Chip), `status.json` (Reklassifizierungs-Vermerke + Summen-
+  Eintrag), `sbkim/SIGNAL.json` **seq 34** (`forNodes` Rezeptbuch/Mixarium: bitte reziprok neu einstufen).
+- **`node --test` 120/120 grün.**
+
+**Manual-Check:** Browser-Sichttest der Neu-Signatur + Verbinden **GRÜN** (Klaus, live). Kanon-Import +
+Wechsler-nodeId ebenfalls grün.
+
+**Nächste Sitzung (eigener Brief):** Mein-Rezeptbuch + Mein-Mixarium — sie stufen reziprok neu ein UND
+wir testen dort Klaus' Idee: hebt ein Zusatz „Teil des SBKIM-Knotennetzes" in **ihrer** Beschreibung den
+Match wieder über 0.80? Kontrollierter Versuch (mit/ohne). Dann Netz-Form (Sternform vs. Netz unter
+Gleichen) + das Firmen-PDF-Suchwerkzeug als eigentliches Ziel weiter ausarbeiten.
+
 ## Nachtrag 2026-07-14 (6) — Identitäts-Wechsler zeigt nodeId + „Kanon-Schlüssel importieren"
 
 Folge aus Klaus' Browser-Sichttest (2026-07-14) des portierten Wechslers.

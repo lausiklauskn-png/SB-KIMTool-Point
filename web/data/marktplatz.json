@@ -8,20 +8,18 @@
       "nodeId": "uOpUBezUVbOM…",
       "kannDas": "Rezepte anbieten und passende Zutaten/Gerichte finden.",
       "andockLink": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
-      "status": "verified-match-2026-06-07",
+      "status": "verified-spore",
       "echt": true,
-      "matchScore": 0.832019,
-      "matchHinweis": "Knoten E — verified-MATCH 0.8320 (echter domainVector, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet uOpUBez… (dauerhaft, von Sage 2026-06-07 bestaetigt); beidseitig nachgerechnet."
+      "matchHinweis": "Knoten E — Identitaet reziprok verifiziert (verified-spore). War verified-MATCH 0.8320; NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur mit voller Domaenen-Beschreibung ist der Cosinus 0.796054 (< 0.80). Die ehrlichere Beschreibung trennt Werkzeug-Hub sauber vom Inhalts-Knoten (Kochbuch). Reziproke Neu-Einstufung mit Rezeptbuch in Folge-Sitzung."
     },
     {
       "name": "Mixarium",
       "nodeId": "B7Fke9CYTR1…",
       "kannDas": "Getraenke/Cocktails anbieten und passende Mixturen finden.",
       "andockLink": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
-      "status": "verified-match-2026-06-07",
+      "status": "verified-spore",
       "echt": true,
-      "matchScore": 0.802994,
-      "matchHinweis": "Knoten F — verified-MATCH 0.8030 (echter domainVector, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet B7Fke9…; beidseitig nachgerechnet (knapp ueber 0.80)."
+      "matchHinweis": "Knoten F — Identitaet reziprok verifiziert (verified-spore). War verified-MATCH 0.8030 (schon knapp); NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur (volle Beschreibung) ist der Cosinus 0.767273 (< 0.80). Werkzeug-Hub vs. Getraenke-Knoten sauber getrennt. Reziproke Neu-Einstufung mit Mixarium in Folge-Sitzung."
     },
     {
       "name": "Sage",
@@ -30,8 +28,8 @@
       "andockLink": "https://lausiklauskn-png.github.io/Sage-Protokol/",
       "status": "integriert-2026-05-21",
       "echt": true,
-      "matchScore": 0.848508,
-      "matchHinweis": "Voller Match mit uns am 2026-05-30 — beidseitig signatur-verifiziert, pingStatus verified-match."
+      "matchScore": 0.861808,
+      "matchHinweis": "Voller Match mit uns — beidseitig signatur-verifiziert. NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur (volle Beschreibung) auf 0.861808 gestiegen (vorher 0.848508) — Infrastruktur-Naehe."
     },
     {
       "name": "Jasons-Tresor",
@@ -40,8 +38,8 @@
       "andockLink": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
       "status": "verified-match-2026-06-06",
       "echt": true,
-      "matchScore": 0.853740,
-      "matchHinweis": "Knoten C — verified-MATCH 0.8537 (echter domainVector). Identitaetswechsel 2026-06-06: neue nodeId E13GDzIp… (alte 7F_zNopF… Demo, hinfaellig)."
+      "matchScore": 0.862362,
+      "matchHinweis": "Knoten C — verified-MATCH (echter domainVector). NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur auf 0.862362 gestiegen (vorher 0.8537) — Infrastruktur-Naehe. nodeId E13GDzIp…"
     },
     {
       "name": "Mein-Tresor",
@@ -50,8 +48,8 @@
       "andockLink": "https://lausiklauskn-png.github.io/Mein-Tresor/",
       "status": "verified-match-2026-06-07",
       "echt": true,
-      "matchScore": 0.853740,
-      "matchHinweis": "Knoten D — verified-MATCH 0.8537 (echter domainVector, am 2026-06-07 ergaenzt + mit gleichem Schluessel neu signiert, gleiche nodeId wRsGQouO…). Gleicher Wert wie A↔C, da D die Schwester von Jasons-Tresor mit identischem domainVector ist."
+      "matchScore": 0.862362,
+      "matchHinweis": "Knoten D — verified-MATCH (Schwester von Jasons-Tresor, identischer domainVector). NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur auf 0.862362 gestiegen (vorher 0.8537) — Infrastruktur-Naehe. nodeId wRsGQouO…"
     },
     {
       "name": "BookLedgerPro",
@@ -69,8 +67,8 @@
       "andockLink": "https://family-projekt.de/",
       "status": "verified-match-2026-06-27",
       "echt": true,
-      "matchScore": 0.831105,
-      "matchHinweis": "Knoten Family Projekt — verified-MATCH 0.8311 (echter domainVector, 384-dim, L2=1, Xenova/multilingual-e5-small). Eigenstaendige SBKIM-Identitaet HLXUEJFW…; beidseitig nachgerechnet (Family Projekt meldet denselben 0.8311). Selbst-Pruefung: Ed25519-Signatur VALID, id=base64url(SHA256(pubkey)). Werkzeug-/App-/Marktplatz-Achse — passt zu diesem Werkzeug-Hub."
+      "matchScore": 0.849154,
+      "matchHinweis": "Knoten Family Projekt — verified-MATCH (echter domainVector, 384-dim, L2=1). NEU 2026-07-14: nach Toolpoints v0.2-Neu-Signatur auf 0.849154 gestiegen (vorher 0.8311) — Werkzeug-/App-/Marktplatz-Achse, Infrastruktur-Naehe. nodeId HLXUEJFW…; Ed25519-Signatur VALID."
     }
   ],
   "werkzeuge_hinweis": "Eigenstaendige Werkzeuge am Markt (kein Knoten, sondern ein Tool zum Mitnehmen). Von Sage-Protokol uebernommen, hier 1:1 gespiegelt.",
