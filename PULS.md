@@ -2,6 +2,33 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 (2) — Browser-✍-Signier-Knopf auf v0.2 gehoben (kein Termux)
+
+Branch `claude/welle-spore-v02-qsiq2a`. **Befund:** SB-KIMTool-Point hat den Browser-Siegel mit
+✍-„Spore neu signieren"-Knopf **längst** (`assets/sbkim-siegel.js`, lädt Module aus `web/tools/`) —
+nur die Browser-Module waren noch v0.1. Also **kein** Umbau/Termux nötig, nur die Module heben.
+
+**Getan (headless bewiesen, `node --test` 111/111):**
+- `web/tools/sbkim-spore.js` **byte-1:1** auf Sages Modul 02 v0.2 aktualisiert (`diff -q` == Sage;
+  vorher 1 Zeile anders: `PROTOCOL_VERSION "0.1"` + 61 v0.2-Zeilen fehlten). → v0.2 + `snippetVectors`.
+- `web/tools/sbkim-embedding.js` chirurgisch um **`embedSnippets`** + `_splitIntoSentences` /
+  `_prepareSnippetTexts` ergänzt (A10, satz-weise, **kein Worker** — keine fremden Abhängigkeiten).
+- `assets/sbkim-siegel.js`: der ✍-Re-Sign bettet die Beschreibung jetzt zusätzlich **satz-weise**
+  ein und hängt `snippetVectors` an `generateOwnSpore` (fail-soft; Meldung nennt v0.2 + Schnipsel-Zahl).
+- `jasons-bibliothek/index.html`: das **inline eingebettete Modul 02** byte-genau nachgezogen
+  (Drift-Guard `jason_lib.test.js` wieder grün).
+- Neuer Test `test/spore_v02.test.js` (4 Proben): Browser-Modul erzeugt v0.2 + Schnipsel signiert +
+  verifiziert, harte Kürzung auf 20, ohne Eingabe kein Feld, A10-Helfer.
+
+**Offen / nächster Schritt (Klaus, Browser):**
+- SB-KIMTool-Point re-signiert jetzt per **Browser-Klick** (Siegel → ✍) zu v0.2 — **kein Termux**.
+- **Vorher prüfen (nur Klaus sichtbar):** zeigt der Siegel-✍ die nodeId **`CyunQNDR…`**? Die
+  committete Identität stammt vom Node-Schlüssel (`node_key.enc.json`); die Browser-Identität
+  (`getOrCreateIdentity`, Schublade `sbkim_toolpoint`) könnte abweichen. Stimmt sie → klicken +
+  `spore.json` hochladen. Weicht sie ab → erst Schlüssel importieren (Node-Schlüssel → Browser-Backup;
+  Krypto ist deckungsgleich, konvertierbar), damit die nodeId gleich bleibt.
+- **Manual-Check:** Browser-Sichttest des ✍-Knopfs (v0.2 + Schnipsel) **ungeprüft, wartet auf Klaus.**
+
 ## Nachtrag 2026-07-14 — Spore v0.2-Fähigkeit (A6+A10) + Sage-Mirror auf 0.2
 
 Branch `claude/welle-spore-v02-qsiq2a` (frisch von `origin/main`). Teil der netzweiten

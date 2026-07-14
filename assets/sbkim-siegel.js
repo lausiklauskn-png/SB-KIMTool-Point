@@ -264,21 +264,35 @@
       .then(function () { say("Berechne semantischen Vektor (384-dim) …");
         return window.SbkimEmbedding.embedPassage(beschreibung); })
       .then(function (vec) {
-        say("Signiere Spore …");
         var arr = Array.from(vec);
         var l2 = 0; for (var i = 0; i < arr.length; i++) l2 += arr[i] * arr[i];
         l2 = Math.sqrt(l2);
-        return window.SbkimSpore.generateOwnSpore({
-          domain: WIZ.domain, endpoint: WIZ.endpoint, nodeType: WIZ.nodeType, nodeName: WIZ.nodeName,
-          domainDescription: beschreibung, domainKeywords: WIZ.domainKeywords,
-          domainVector: arr, stammCategories: WIZ.stammCategories, guestCategories: WIZ.guestCategories
-        }).then(function (spore) { return { spore: spore, l2: l2 }; });
+        // A10 (Spore v0.2): Beschreibung zusätzlich SATZ-weise einbetten, damit die
+        // Spore snippetVectors trägt (reine Anzeige/Verwandt-Messung). Fail-soft:
+        // schlägt das Einbetten fehl, wird ohne Schnipsel weiter signiert (v0.2 bleibt).
+        say("Berechne Satz-Schnipsel (v0.2) …");
+        return window.SbkimEmbedding.embedSnippets(beschreibung)
+          .catch(function () { return []; })
+          .then(function (snips) {
+            var snippetVectors = (snips || []).map(function (s) {
+              return { vec: Array.from(s.vec), text: s.text };
+            });
+            say("Signiere Spore (v0.2" + (snippetVectors.length ? ", " + snippetVectors.length + " Schnipsel" : "") + ") …");
+            return window.SbkimSpore.generateOwnSpore({
+              domain: WIZ.domain, endpoint: WIZ.endpoint, nodeType: WIZ.nodeType, nodeName: WIZ.nodeName,
+              domainDescription: beschreibung, domainKeywords: WIZ.domainKeywords,
+              domainVector: arr, snippetVectors: snippetVectors,
+              stammCategories: WIZ.stammCategories, guestCategories: WIZ.guestCategories
+            }).then(function (spore) { return { spore: spore, l2: l2, snips: snippetVectors.length }; });
+          });
       })
       .then(function (res) {
         lastSpore = res.spore;
         downloadJson("spore.json", res.spore);
         say("Spore neu signiert + ⬇  ·  nodeId=" + res.spore.id +
-            "  ·  L2=" + res.l2.toFixed(4) + ". Datei nach sbkim/spore.json committen.");
+            "  ·  v" + (res.spore.protocolVersion || "0.2") +
+            "  ·  L2=" + res.l2.toFixed(4) + "  ·  " + res.snips +
+            " Schnipsel. Datei nach sbkim/spore.json committen.");
       })
       .catch(function (e) { say("Fehler: " + (e && e.message || e), true); })
       .then(function () {
