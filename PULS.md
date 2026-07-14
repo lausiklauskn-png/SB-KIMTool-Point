@@ -2,6 +2,34 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 (3) — ⚠ Identitäts-Tangel im Browser + fehlender Identitäts-Wechsler (GEPARKT)
+
+**Befund bei Klaus' Browser-Sichttest der v0.2-Neu-Signatur (2026-07-14):** SB-KIMTool-Points
+Siegel-🔑-Wizard hat **nur die Schritte 1–4** (Identität erzeugen · Spore signieren · Backup ·
+Wiederherstellen) — **der „Aktive Identität"-Umschalter (Baustein 5 der Andock-Wizard-Spec,
+`refreshAndockIdentities` / `andockSwitchIdentity`) FEHLT.** Genau der laut `status-leiste-siegel`-Skill
+„am häufigsten vergessene" Baustein.
+
+**Folge (Doppel-/Dreifach-Identität):** Die committete/netz-bekannte nodeId ist `CyunQNDR…`
+(erzeugt vom **Node-Schlüssel** `node_key.enc.json` via `generate_spore.mjs`). Der **Browser** hat davon
+getrennte Identitäten angelegt (`lZmu5nsP…` angezeigt, `Z5i5Es1A…` signiert) — jeder Klick auf
+„Identität erzeugen" macht eine neue, und **ohne Umschalter kann man nicht zu `CyunQNDR…` zurück**.
+
+**Entscheid (Klaus „keine Präferenz" → Sitzung entscheidet): GEPARKT.** Nichts committet — die Live-
+`sbkim/spore.json` bleibt `CyunQNDR…` **v0.1** (voll kompatibel, nichts kaputt). Die v0.2-Fähigkeit
+(PR #118 Node-Skript, PR #119 Browser-Module) liegt bereit.
+
+**Für die spätere Aufräum-Sitzung (NICHT blind neu signieren!):**
+1. **Identitäts-Wechsler (Baustein 5) in `assets/sbkim-siegel.js` ergänzen** — dann kann man Identitäten
+   sehen/wechseln/löschen (räumt die Junk-Identitäten auf).
+2. **Kanon-Identität `CyunQNDR…` in den Browser bringen:** Konverter `node_key.enc.json` (PBKDF2-600k +
+   AES-GCM, Klaus' Passwort) → Modul-02-`importBackup`-Backup → Schritt 4 „Wiederherstellen". Krypto ist
+   deckungsgleich (beide 600k/AES-GCM), also konvertierbar. **DANN erst** per Browser-✍ v0.2 neu signieren
+   → `CyunQNDR…` bleibt, KEINE Netz-Änderung.
+3. Alternativ (nur mit Klaus' ausdrücklicher Zustimmung — er warnt vor Identitäts-Churn): eine Browser-
+   Identität als neue Kanon-ID adoptieren + Netz einmalig nachziehen (alte `CyunQNDR…` → `previousNodeIds`,
+   Peers re-verifizieren).
+
 ## Nachtrag 2026-07-14 (2) — Browser-✍-Signier-Knopf auf v0.2 gehoben (kein Termux)
 
 Branch `claude/welle-spore-v02-qsiq2a`. **Befund:** SB-KIMTool-Point hat den Browser-Siegel mit
