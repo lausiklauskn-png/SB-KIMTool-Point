@@ -2,6 +2,27 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-14 (4) — 2. Hub aus Sage neu bespielt (Modul-Ebene byte-1:1)
+
+**Grundsatz (Klaus 2026-07-14): Sage = Quelle der Wahrheit; SB-KIMTool-Point ist der 2. Hub (Klon).**
+Erst in Sage richtig, dann byte-genau hierher. Erster Bespiel-Schritt (Modul-Ebene, `node --test` 111/111):
+
+- **Drift-Audit** aller 14 geteilten Module gegen `Sage-Protokol/src/modules/`. 10 waren schon byte-1:1;
+  **4 abgedriftet** → aus Sage byte-kopiert:
+  - `sbkim-embedding.js` (03) — Sages v0.2-Version **inkl. Web-Worker (A17, inline Blob, fail-soft) +
+    nativem `embedSnippets`** (ersetzt die frühere chirurgische Version).
+  - `sbkim-match.js` (04), `sbkim-rendezvous.js` (23), `sbkim-rendezvous-ui.js` (23ui — „Mit dem
+    Knotennetz verbinden", fail-soft ggü. fehlendem Modul 21).
+- **Jetzt: ALLE 14 geteilten Module byte-1:1 mit Sage.** `test/spore_v02.test.js` an Sages kanonische
+  `_prepareSnippetTexts({max})`-Signatur angepasst.
+
+**OFFEN (Browser-UI, wartet auf Klaus' Sichttest — kann ich nicht headless prüfen):**
+1. **Identitäts-Wechsler (Baustein 5) nach `assets/sbkim-siegel.js` portieren** — aus Sages
+   `index.html` (`refreshAndockIdentities` / `andockSwitchIdentity` + „Aktive Identität"-Dropdown).
+   Das ist der letzte fehlende Wizard-Baustein → behebt die Identitäts-Anhäufung.
+2. **Test-Identitäten aufräumen** (mit dem neuen Wechsler löschbar), **eine** saubere Identität,
+   v0.2-Spore neu signieren, sauber verbinden. Alles Test/reversibel (Klaus 2026-07-14).
+
 ## Nachtrag 2026-07-14 (3) — ⚠ Identitäts-Tangel im Browser + fehlender Identitäts-Wechsler (GEPARKT)
 
 **Befund bei Klaus' Browser-Sichttest der v0.2-Neu-Signatur (2026-07-14):** SB-KIMTool-Points

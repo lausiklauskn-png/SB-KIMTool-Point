@@ -214,6 +214,57 @@
     });
   }
 
+  // ---- Raum-Karten nach FRAGE-Passung ranken (A11, REINE ANZEIGE/AUSWAHL) ----
+  // Klaus' Befund 2026-07-11: bei vielen Knoten kann der Nutzer nicht wissen,
+  // wen er fragen soll. `relatednessForCards` vergleicht die EIGENE Spore mit
+  // jeder Karte (Badge) — hier vergleichen wir stattdessen den bereits
+  // eingebetteten QUERY-Vektor (die getippte Frage) mit jedem Karten-
+  // `domainVector`, damit der Aufrufer den bestpassenden Knoten automatisch
+  // anfragen und die Karten nach Passung sortieren kann.
+  //
+  // Reine Tool-Funktion: DOM-frei, headless testbar, Eingabe NICHT mutiert
+  // (neue Liste). Nutzt Modul 04 `relatedness` (zentrierter Cosinus — bessere
+  // Trennung; opts.raw → rohes `match`). GATET NICHTS — der 0.80-Andock-Riegel
+  // (Modul 05) bleibt unberührt; dies wählt/sortiert nur die Anzeige.
+  // Fail-soft: ohne Modul 04 / ohne Query-Vektor / ohne Karten-domainVector →
+  // Karten UNVERÄNDERT in Eingabe-Reihenfolge zurück, jede mit queryFit:null
+  // (der Aufrufer degradiert dann auf die heutige Recency-Reihenfolge).
+  function rankCardsByQuery(cards, queryVec, opts) {
+    var list = Array.isArray(cards) ? cards : [];
+    var o = opts || {};
+    var match = resolveMatch();
+    var qv = toVec(queryVec);
+    var useRaw = o.raw === true && match && typeof match.match === "function";
+    var enriched = list.map(function (c, i) {
+      var copy = {};
+      for (var k in c) { if (Object.prototype.hasOwnProperty.call(c, k)) copy[k] = c[k]; }
+      var fit = null;
+      if (match && qv && c && c.spore) {
+        var cv = toVec(c.spore.domainVector);
+        if (cv) {
+          try {
+            var s = useRaw ? match.match(qv, cv) : match.relatedness(qv, cv);
+            if (typeof s === "number" && isFinite(s)) fit = s;
+          } catch (_e) { fit = null; } // fail-soft, Karte bleibt
+        }
+      }
+      copy.queryFit = fit;
+      copy._idx = i; // stabiler Tie-Break
+      return copy;
+    });
+    // Ohne brauchbaren Query-Vektor NICHT umsortieren (Eingabe-Reihenfolge).
+    if (!qv || !match) {
+      return enriched.map(function (c) { delete c._idx; return c; });
+    }
+    enriched.sort(function (a, b) {
+      var fa = (typeof a.queryFit === "number") ? a.queryFit : -Infinity;
+      var fb = (typeof b.queryFit === "number") ? b.queryFit : -Infinity;
+      if (fb !== fa) return fb - fa;      // beste Passung zuerst
+      return a._idx - b._idx;             // sonst Eingabe-Reihenfolge (stabil)
+    });
+    return enriched.map(function (c) { delete c._idx; return c; });
+  }
+
   // VERKEHR-Lampe (Modul 17 / Status-Widget) ehrlich setzen: aktiv, solange
   // wir lauschen. Fail-soft — Render-Schicht ist optionaler Konsument.
   function signalListening(active) {
@@ -682,6 +733,13 @@
   var RDV_QUERY_TEXT_MAX = 300;      // Frage-Text hart gekappt (untrusted input)
   var RDV_QUERY_K_MAX = 5;           // maximal 5 Treffer je Antwort
   var RDV_ASK_TIMEOUT_MS = 60000; // 15 s war zu knapp: der Antworter lädt beim ersten Mal sein ~30-MB-Modell
+  // A12 Briefkasten (Klaus 2026-07-11): Fragen/Antworten sollen eine Zeitver-
+  // zögerung überleben (App war zu, als gefragt wurde). Statt nur „ab jetzt"
+  // lauscht der Antworter beim Einschalten LOOKBACK zurück und holt liegen-
+  // gebliebene Fragen nach; der Frager liest späte Antworten über dasselbe
+  // Fenster nach (fetchAnswers). Empfangsmodus-treu: nutzer-ausgelöst beim
+  // Öffnen, KEIN Dauer-Ticker. Reale Grenze = Aufbewahrungsdauer des Relais.
+  var RDV_ANSWER_LOOKBACK_SEC = 1800; // 30 min zurück (Frage/Antwort nachholen)
 
   var answerUnsub = null;            // aktiver Antwort-Lauscher (null = AUS)
   var answeredCount = 0;
@@ -757,7 +815,10 @@
     await ensureAnswerCorpus();
     try {
       answerUnsub = relay.subscribe(
-        { kinds: [NOSTR_KIND], "#t": [RDV_QUERY_TAG], since: nowSec() },
+        // A12 Briefkasten: LOOKBACK statt nur „ab jetzt" — beim Einschalten des
+        // Antwortrechts liegengebliebene Fragen der letzten ~30 min nachholen.
+        // qidSeen/rememberQid + Rate-Limit verhindern Doppel-/Flut-Antworten.
+        { kinds: [NOSTR_KIND], "#t": [RDV_QUERY_TAG], since: nowSec() - RDV_ANSWER_LOOKBACK_SEC },
         function onQuery(ev) {
           if (!ev || typeof ev.content !== "string") return;
           var q;
@@ -876,7 +937,7 @@
                 if (r && typeof r.anchorId === "string" && r.anchorId) o.anchorId = r.anchorId;
                 return o;
               });
-            finish({ ok: true, results: results, fromNodeId: a.fromNodeId || null, tookMs: Date.now() - started });
+            finish({ ok: true, qid: qid, results: results, fromNodeId: a.fromNodeId || null, tookMs: Date.now() - started });
           },
         );
       } catch (e) {
@@ -895,8 +956,67 @@
         finish({ ok: false, reason: "Frage-Zettel konnte nicht publiziert werden: " + (e && e.message ? e.message : e) });
       });
       timer = setTimeout(function () {
-        finish({ ok: false, reason: "Keine Antwort in " + Math.round(timeoutMs / 1000) + " s — Gegenknoten offline oder Antworten dort nicht eingeschaltet." });
+        // A12: qid mitgeben — der Frager merkt die Frage als „offen" und liest
+        // die Antwort später über fetchAnswers([qid]) nach (Briefkasten).
+        finish({ ok: false, pending: true, qid: qid, reason: "Noch keine Antwort in " + Math.round(timeoutMs / 1000) + " s — Gegenknoten evtl. offline. Die Frage bleibt offen; beim nächsten Öffnen „Antworten abholen“." });
       }, timeoutMs);
+    });
+  }
+
+  // ---- A12 Briefkasten: späte Antworten NACHLESEN ----
+  // askNode gibt nach dem Timeout auf; war der Gegenknoten da noch zu, landet
+  // seine Antwort später trotzdem auf dem Relais. fetchAnswers holt sie beim
+  // nächsten Öffnen (Nutzer-Aktion) über ein Lookback-Fenster ab — Briefkasten
+  // leeren, KEIN Dauer-Ticker. qids = Array offener Frage-IDs (aus askNode).
+  // Reale Grenze: Aufbewahrungsdauer des Relais. Fail-soft, DOM-frei.
+  async function fetchAnswers(qids, opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var want = {};
+    (Array.isArray(qids) ? qids : []).forEach(function (id) { if (typeof id === "string" && id) want[id] = true; });
+    if (!Object.keys(want).length) return { ok: true, answers: [] };
+    var relay = resolveRelay();
+    if (!relay) return { ok: false, reason: "Kein Nostr-Relais-Client (Modul 05b) verfügbar.", answers: [] };
+    var own = await getOwnLiveSpore();
+    if (!own || !own.id) return { ok: false, reason: "Noch keine Identität — zuerst anmelden.", answers: [] };
+    var ownId = own.id;
+    var lookbackSec = (typeof opts.lookbackSec === "number" && isFinite(opts.lookbackSec) && opts.lookbackSec > 0)
+      ? Math.floor(opts.lookbackSec) : RDV_ANSWER_LOOKBACK_SEC;
+    var waitMs = (typeof opts.waitMs === "number" && isFinite(opts.waitMs) && opts.waitMs > 0)
+      ? Math.floor(opts.waitMs) : cfg.listenMs;
+    return await new Promise(function (resolve) {
+      var byQid = {}, unsub = null, timer = null, done = false;
+      function finish() {
+        if (done) return; done = true;
+        if (timer) clearTimeout(timer);
+        if (unsub) { try { unsub(); } catch (_e) {} }
+        var out = Object.keys(byQid).map(function (q) { return byQid[q]; });
+        resolve({ ok: true, answers: out });
+      }
+      try {
+        unsub = relay.subscribe(
+          { kinds: [NOSTR_KIND], "#t": [RDV_QUERY_TAG], since: nowSec() - lookbackSec },
+          function onRes(ev) {
+            if (!ev || typeof ev.content !== "string") return;
+            var a; try { a = JSON.parse(ev.content); } catch (_e) { return; }
+            if (!a || a.kind !== RDV_QUERY_RES_KIND) return;      // nur Antwort-Zettel
+            if (a.toNodeId !== ownId) return;                     // nur an mich
+            if (typeof a.qid !== "string" || !want[a.qid]) return; // nur meine offenen Fragen
+            var ts = (typeof a.ts === "number") ? a.ts : 0;
+            var prev = byQid[a.qid];
+            if (prev && typeof prev.ts === "number" && prev.ts >= ts) return; // newest-per-qid
+            var results = (Array.isArray(a.results) ? a.results : []).slice(0, RDV_QUERY_K_MAX).map(function (r) {
+              var o = { label: String((r && r.label) || ""), score: (r && typeof r.score === "number") ? r.score : null };
+              if (r && typeof r.anchorId === "string" && r.anchorId) o.anchorId = r.anchorId;
+              return o;
+            });
+            byQid[a.qid] = { qid: a.qid, fromNodeId: a.fromNodeId || null, fromName: a.fromName || null, results: results, ts: ts };
+          },
+        );
+      } catch (e) {
+        resolve({ ok: false, reason: "Nachlese-Lauscher fehlgeschlagen: " + (e && e.message ? e.message : e), answers: [] });
+        return;
+      }
+      timer = setTimeout(finish, waitMs);
     });
   }
 
@@ -911,7 +1031,9 @@
     enableAnswering: enableAnswering,   // Bau 23.B — Antwortrecht bewusst AN (Default AUS)
     disableAnswering: disableAnswering, // Bau 23.B
     askNode: askNode,                   // Bau 23.B — nutzer-ausgelöste Cross-Knoten-Frage
+    fetchAnswers: fetchAnswers,         // A12 Briefkasten — späte Antworten nachlesen (Lookback)
     relatednessForCards: relatednessForCards, // pure (cards, ownSpore) → angereicherte Liste; reine Anzeige
+    rankCardsByQuery: rankCardsByQuery,       // A11 — pure (cards, queryVec) → nach Frage-Passung sortiert; reine Anzeige/Auswahl
     ensureIdentity: ensureIdentity,             // Modus A (sanft, automatisch, idempotent)
     cleanupSharedOrigin: cleanupSharedOrigin,   // Modus-B-Reinigung (nur eigene Origin)
     repairAndReconnect: repairAndReconnect,     // Modus B (zerstörend, nutzer-ausgelöst)
@@ -943,6 +1065,7 @@
         queryKind: RDV_QUERY_KIND,                // Bau 23.B
         queryResKind: RDV_QUERY_RES_KIND,         // Bau 23.B
         queryMaxPerMin: RDV_QUERY_MAX_PER_MIN,    // Bau 23.B
+        rankByQueryNote: "rankCardsByQuery(cards, queryVec, {raw?}) rankt Raum-Karten nach Frage-Passung (Modul 04 relatedness, zentriert; raw→match). REINE Anzeige/Auswahl, gatet nichts, 0.80-Riegel unberührt; fail-soft ohne Vektor → Eingabe-Reihenfolge.", // A11
       };
     },
   };

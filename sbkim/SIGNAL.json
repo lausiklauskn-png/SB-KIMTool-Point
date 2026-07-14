@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
   "lastBuild": "2026-07-14",
-  "seq": 30,
-  "headline": "Browser-✍-Signier-Knopf auf v0.2 gehoben: web/tools/sbkim-spore.js byte-1:1 auf Sages Modul 02 v0.2 aktualisiert (PROTOCOL_VERSION 0.2 + snippetVectors), sbkim-embedding.js um embedSnippets (A10, satz-weise, kein Worker) ergaenzt, assets/sbkim-siegel.js ✍-Re-Sign haengt jetzt snippetVectors an (fail-soft). jasons-bibliothek/index.html Modul-02-Embed byte-genau nachgezogen (Drift-Guard gruen). node --test 111/111. Damit re-signiert SB-KIMTool-Point per BROWSER-KLICK zu v0.2 (kein Termux). Live-Neu-Signatur = Klaus' Browser-Lauf; nodeId-Abgleich noetig (Browser-Identitaet vs. committete CyunQNDR...). snippetVectors = reine Anzeige, 0.80-Riegel unberuehrt.",
+  "seq": 31,
+  "headline": "2. Hub aus Sage neu bespielt (Modul-Ebene): 4 abgedriftete Browser-Module byte-1:1 auf Sage-Kanon aktualisiert — Embedding 03 (inkl. Worker + embedSnippets), Match 04, Rendezvous 23, Rendezvous-UI 23ui. Jetzt ALLE 14 geteilten Module byte-1:1 mit Sage. node --test 111/111. Sage = Quelle der Wahrheit; Klone werden aus Sage bespielt. OFFEN: Identitaets-Wechsler (Baustein 5) in assets/sbkim-siegel.js portieren (Browser-UI, wartet auf Klaus Sichttest) + Identitaets-Aufraeumung.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -172,6 +172,11 @@
       "seq": 30,
       "date": "2026-07-14",
       "headline": "Browser-Siegel auf Spore v0.2 (byte-Copy Modul 02 + embedSnippets + ✍ haengt Schnipsel an). node --test 111/111. Re-Sign per Browser-Klick statt Termux."
+    },
+    {
+      "seq": 31,
+      "date": "2026-07-14",
+      "headline": "Modul-Ebene aus Sage neu bespielt: 03/04/23/23ui byte-1:1, alle 14 Module kanonisch. node --test 111/111. Identitaets-Wechsler-Port + Browser-Sichttest offen."
     }
   ]
 }

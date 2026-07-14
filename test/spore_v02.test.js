@@ -82,5 +82,5 @@ test("Embedding-Modul: A10-Helfer (Satz-Zerlegung + Deckel) headless", () => {
   assert.equal(typeof E.embedSnippets, "function");
   assert.deepEqual(E._splitIntoSentences("Satz eins. Satz zwei! Und drei?"),
     ["Satz eins.", "Satz zwei!", "Und drei?"]);
-  assert.equal(E._prepareSnippetTexts("A. B. C. D.", 2).length, 2);
+  assert.equal(E._prepareSnippetTexts("A. B. C. D.", { max: 2 }).length, 2);
 });
