@@ -28,9 +28,17 @@ Konvertierung → `importBackup` → `getNodeId()` == kanonische nodeId, aktiver
 falsche Datei wird abgewiesen). **`node --test` 120/120 grün.** Die DOM-Verdrahtung (Datei-
 Knopf, prompt, fetch) ist headless nicht prüfbar → **wartet auf Klaus' Browser-Lauf.**
 
-**Nächster Schritt (Klaus, Browser):** Wizard → „Kanon-Schlüssel importieren" → `node_key.enc.json`
-+ Passwort → aktive Identität wird `CyunQNDR…`; danach per ✍ v0.2 neu signieren → `spore.json`
-nach `sbkim/spore.json` committen. Dann sauber verbinden.
+**✅ Browser-Sichttest GRÜN (Klaus 2026-07-14, live):** Import durchgeführt → Wechsler zeigt
+`main · CyunQNDR… (aktiv)`, „Aktive Spore-nodeId: CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY".
+Danach „Mit dem Knotennetz verbinden" → Panel: „Identität vorhanden: CyunQNDR…" + „✓ Du bist im
+Raum — deine Visitenkarte hängt, du lauschst", „lebt"-Lampe grün. **Der Hub ist sauber: EINE
+richtige Identität `CyunQNDR…`, überall aktiv (Wizard + Rendezvous teilen `sbkim_toolpoint`),
+verbunden — kein Netz-Churn.** Die Test-Identität `lZmu5nsP…` wurde beim Import überschrieben.
+
+**Offen (optional, kein Muss):** (1) Spore per ✍ v0.2 neu signieren (fügt snippetVectors hinzu) →
+`spore.json` nach `sbkim/spore.json` committen — Live-Spore ist aktuell v0.1 (kompatibel). (2)
+nodeId-Anzeige im Wechsler auch in **Sage** nachziehen (gleiche Slot-nur-Schwäche dort). (3) Dann
+„mit den anderen Apps" weiter (Mixarium → Rezeptbuch → BLP), immer aus Sage propagiert.
 
 ## Nachtrag 2026-07-14 (5) — Identitäts-Wechsler (Baustein 5) in den 🔑-Wizard portiert
 
