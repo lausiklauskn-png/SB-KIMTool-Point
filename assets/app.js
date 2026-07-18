@@ -369,6 +369,27 @@ function renderWerkstatt() {
   }
 }
 
+// --- Gerätename: frei wählbarer Anzeige-Name (lokal, kein PII) -------------
+// SICHERHEIT: nur Anzeige, nie Vertrauen — reist als Hinweis mit, wird immer
+// zusammen mit der Kennung gezeigt. Ein Name pro Browser/Origin, geteilt über
+// alle Apps derselben Adresse (Nutzer benennt „dieses Gerät" einmal). Fail-soft.
+// Der Rendezvous-Glue (assets/rendezvous-init.js) liest denselben Schlüssel und
+// hängt ihn NUR an die Anzeige/Anmeldung — NICHT an generateOwnSpore.
+const LS_GERAETENAME = "sbkim_geraetename";
+function getGeraetename() { try { return (localStorage.getItem(LS_GERAETENAME) || "").trim().slice(0, 40); } catch (_e) { return ""; } }
+function setGeraetename(v) { try { localStorage.setItem(LS_GERAETENAME, String(v || "").trim().slice(0, 40)); } catch (_e) { /* */ } }
+function wireGeraetename() {
+  const el = document.getElementById("geraetename");
+  if (!el) return;
+  el.value = getGeraetename();
+  el.addEventListener("input", () => {
+    setGeraetename(el.value);
+    // Kopplung: der Rendezvous-Glue hört darauf und setzt den Anzeige-Namen neu.
+    try { window.dispatchEvent(new CustomEvent("sbkim:geraetename-changed")); } catch (_e) {}
+  });
+}
+wireGeraetename();
+
 // --- Dispatch: each page only loads what it shows -------------------------
 // Render a section only if its anchor element exists on the current page
 // (Startseite has none → nothing runs; Modell page uses model.js instead).

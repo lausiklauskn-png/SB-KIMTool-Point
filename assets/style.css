@@ -125,6 +125,20 @@ a { color: var(--accent); }
 .version { margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
 a.brand { text-decoration: none; }
 
+/* --- Gerätename (frei wählbarer Anzeige-Name, nur Hinweis, kein Vertrauen) --- */
+.geraetename {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+}
+.geraetename .gn-ico { font-size: 0.85rem; line-height: 1; }
+.geraetename input {
+  border: none; background: transparent; color: var(--text);
+  font-family: var(--mono); font-size: 0.78rem; min-width: 120px; max-width: 180px; outline: none;
+}
+.geraetename input::placeholder { color: var(--muted); }
+.geraetename:focus-within { border-color: var(--accent-dim); }
+
 /* --- Seiten-Navigation (Knoepfe zwischen den drei Seiten) --- */
 .nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .nav a {

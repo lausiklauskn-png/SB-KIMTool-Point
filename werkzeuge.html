@@ -23,6 +23,12 @@
       <span class="lamp" id="lamp-traffic" title="verkehr — pulst bei echtem Netz-Verkehr (status/SIGNAL/spore)"><span class="lamp-label">verkehr</span></span>
       <span class="lamp" id="lamp-fremd" title="fremd — rot nur bei echtem Fremdzugriff (Membran 15 warnt, zerstört nichts)"><span class="lamp-label">fremd</span></span>
     </div>
+    <!-- Gerätename: frei wählbarer Anzeige-Name für dieses Gerät. NUR ein Hinweis
+         im Netz-Raum, KEIN Vertrauens-Beweis — die Kennung bleibt immer daneben. -->
+    <label class="geraetename" title="Frei wählbarer Anzeige-Name für dieses Gerät (z. B. „Klaus-Handy“). Nur ein Hinweis im Netz — kein Vertrauens-Beweis; die Kennung bleibt daneben.">
+      <span class="gn-ico" aria-hidden="true">🏷️</span>
+      <input id="geraetename" type="text" maxlength="40" placeholder="Gerätename (frei wählbar)" autocomplete="off" spellcheck="false" aria-label="Gerätename (frei wählbar)" />
+    </label>
     <span class="version">v0.2</span>
   </header>
 
