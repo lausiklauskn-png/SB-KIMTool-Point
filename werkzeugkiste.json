@@ -255,7 +255,7 @@
       "datei": "web/tools/andock.html",
       "quelle": "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/docs/observatorium/tools/andock.html",
       "herkunft": "Sage-Protokol (Spec-Hub)",
-      "sha256": "af8a265b87c33bf7b0ce64a4b0ab413a3a34cb0da569fa55b351478b59110816",
+      "sha256": "74944dbfc63b5a26820b1535f04b91981b9e6716ccfe20eaf41db75d20506e4a",
       "point_status": "real-browser-tauglich · extern · von Sage gepflegt · lokal gespiegelt 2026-06-20",
       "was": "Vollstaendige Ein-Datei-PWA. Erzeugt im Browser eine eigene Ed25519-Identitaet, eine signierte spore.json (byte-kompatibel mit Sages Verifizierer), ein echtes e5-small-Domain-Embedding (384-dim), das SBKIM-Siegel (SVG + PNG) und die Briefkasten-Dateien (SIGNAL.json + AUSTAUSCH-Sage.md).",
       "nutzen": "Ein Forker wird in einem Rutsch andock-faehig: eigene Identitaet, Netz-Visitenkarte, Siegel und serverloser Briefkasten — ohne Build, ohne Abhaengigkeiten.",
