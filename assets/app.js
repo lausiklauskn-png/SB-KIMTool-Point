@@ -244,7 +244,7 @@ async function renderMarkt() {
     const el = document.createElement("div");
     el.className = "pwa";
     el.innerHTML = `
-      <div class="p-head"><span class="p-mark">${monogram}</span><span class="name">${e.name}</span></div>
+      <div class="p-head"><span class="p-mark">${monogram}${e.icon ? `<img src="${e.icon}" alt="" loading="lazy" onerror="this.remove()">` : ""}</span><span class="name">${e.name}</span></div>
       <div class="p-chips">${statusChip}${echtChip}${matchChip}${sporeChip}</div>
       <div class="can">„${e.kannDas}"</div>
       <div class="nodeid">${e.nodeId}</div>
