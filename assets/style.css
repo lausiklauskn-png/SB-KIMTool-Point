@@ -556,7 +556,10 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
   display: grid; place-items: center; font-size: 1.3rem;
   background: radial-gradient(circle at 35% 30%, var(--card-2), #0e1419);
   border: 1px solid var(--line); box-shadow: inset 0 0 10px #0007;
+  position: relative; overflow: hidden;
 }
+/* App-Icon liegt ueber dem Buchstaben; faellt es aus (onerror), bleibt der Buchstabe */
+.pwa .p-mark img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .pwa .name { font-weight: 700; font-size: 1.05rem; }
 .pwa .p-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.55rem; }
 .chip.c-live { color: var(--lamp-live); border-color: var(--lamp-live); }
