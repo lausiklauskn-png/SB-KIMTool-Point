@@ -2,6 +2,17 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-07-25 — WorkFloh (15. Knoten) im Markt-/Adressbuch registriert
+
+Mein-WorkFloh ist seit 2026-07-25 ein funktionierender SBKIM-Endknoten (Klaus'
+Browser-Andock über den Andock-Wizard im Siegel; echte v0.2-Spore, nodeId
+`6YOPHbnK…`, reziprok VALID; live im gemeinsamen Raum mit 13 weiteren Knoten;
+echte Matches Tomys-Hub 0.8335 + Kimseek 0.8110 ≥ 0.80). Hier nachgezogen:
+`web/data/marktplatz.json` (neuer Eintrag WorkFloh, `verified-match`) +
+`web/data/nodes.json` (Adressbuch), `lastUpdated` 2026-07-25. **WorkFloh ist
+seit 2026-07-25 nicht mehr privat, sondern von Klaus öffentlich zum Verkauf
+angeboten** (funktionierende PWA mit Siegel). `npm test` grün, JSON valide.
+
 ## Nachtrag 2026-07-14 (7) — ✅ SB-KIMTool-Point v0.2 ABGESCHLOSSEN (Spore neu signiert + ehrliche Match-Neueinstufung)
 
 Klaus' Ziel: Toolpoint vollständig auf Sages v0.2-Stand, **keine halbe Baustelle**, dann weiter zu den

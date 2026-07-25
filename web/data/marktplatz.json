@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-07-22",
+  "lastUpdated": "2026-07-25",
   "hinweis": "Schicht 3 — PWA-Marktplatz. Saat = echte Live-Endknoten aus dem Sage-Protokoll (verifiziert). „→ andocken\" öffnet die echte Live-Seite des Knotens in einem neuen Tab. Heute bezeugt: erster vollständiger semantischer Match SB·KIMTool·Point ⟷ Sage (0.848508 ≥ 0.80, beidseitig signatur-verifiziert). NEU 2026-06-19: sechster Peer BookLedgerPro reziprok verifiziert (verified-spore). NEU 2026-06-21: erstes eigenständiges Werkzeug am Markt — das semantische Such-Werkzeug (Modul 22, von Sage übernommen) zum Öffnen/Herunterladen; siehe Werkzeuge unten. NEU 2026-06-27: Knoten Family Projekt (family-projekt.de) reziprok verifiziert — verified-match 0.831105.",
   "eintraege": [
     {
@@ -86,6 +86,16 @@
       "status": "verified-spore",
       "echt": true,
       "matchHinweis": "Zwoelfter Knoten im Mycel — erste eigene Identitaet 2026-07-20 im Browser erzeugt (Spore v0.2 mit echtem domainVector 384-dim L2=1, reziprok verifiziert VALID). Cross-Knoten-Match-Score zu Toolpoint/Sage noch offen (verified-spore). Fundament byte-kopiert aus Company-Brain, fuer die Privatperson umgewidmet. nodeId 6rmW2Q…"
+    },
+    {
+      "name": "WorkFloh",
+      "icon": "https://lausiklauskn-png.github.io/Mein-WorkFloh/icon-192.png",
+      "nodeId": "6YOPHbnKWreoF5og4PGc3fre7du1FhVc7dY1d5jZyHs",
+      "kannDas": "Digitaler Auftragszettel eines Werbetechnik-Betriebs: von der Kundenannahme ueber die Produktion (Schilder, Folierung, Beschriftung, Druck) bis zur Uebergabe, samt Zeiterfassung sowie Angebot und Rechnung. Offline-PWA, server-los im Browser.",
+      "andockLink": "https://lausiklauskn-png.github.io/Mein-WorkFloh/",
+      "status": "verified-match",
+      "echt": true,
+      "matchHinweis": "15. Knoten im Mycel (Klaus' Browser-Andock 2026-07-25, funktionierender Knoten). Echte v0.2-Spore ueber den Andock-Wizard im Siegel erzeugt+committet: domainVector 384-dim L2=1 + 3 Schnipsel, reziprok verifiziert VALID (id==base64url(SHA256(rawPub))==6YOPHbnK, Ed25519 gueltig, kein _demo). Live-Beleg (Mycel-Analyse 2026-07-25): WorkFloh live im gemeinsamen Raum mit 13 weiteren Knoten. Echte Cross-Knoten-Matches: Tomys-Hub 0.8335 + Kimseek 0.8110 >= 0.80 -> verified-match (fachverwandt Werbetechnik/Druck). Ehrlich: Toolpoint<->WorkFloh 0.7971 < 0.80 und Sage<->WorkFloh 0.7824 < 0.80 (fachfremd zum Hub, wie Tomys). WorkFloh wird seit 2026-07-25 von Klaus oeffentlich angeboten (zum Verkauf) — funktionierende PWA-App mit Siegel."
     }
   ],
   "werkzeuge_hinweis": "Eigenstaendige Werkzeuge am Markt (kein Knoten, sondern ein Tool zum Mitnehmen). Von Sage-Protokol uebernommen, hier 1:1 gespiegelt.",
