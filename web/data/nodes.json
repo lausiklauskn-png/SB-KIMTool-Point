@@ -1,10 +1,45 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-29",
+  "lastUpdated": "2026-07-25",
   "hinweis": "Adressbuch-Stub. Vorbereitet fuer eine spaetere Such-Option (Schicht 3). Die Suche selbst ist bewusst noch NICHT gebaut.",
   "knoten": [
-    { "nodeId": "BSWxXmXvxF8F…", "label": "Rezeptbuch", "tags": ["rezepte", "kochen", "zutaten"] },
-    { "nodeId": "JOlHK31XEiyl…", "label": "Mixarium", "tags": ["getraenke", "cocktails", "bar"] },
-    { "nodeId": "nysOZE3VuKqZ…", "label": "Sage", "tags": ["hub", "protokoll", "verbinden"] }
+    {
+      "nodeId": "BSWxXmXvxF8F…",
+      "label": "Rezeptbuch",
+      "tags": [
+        "rezepte",
+        "kochen",
+        "zutaten"
+      ]
+    },
+    {
+      "nodeId": "JOlHK31XEiyl…",
+      "label": "Mixarium",
+      "tags": [
+        "getraenke",
+        "cocktails",
+        "bar"
+      ]
+    },
+    {
+      "nodeId": "nysOZE3VuKqZ…",
+      "label": "Sage",
+      "tags": [
+        "hub",
+        "protokoll",
+        "verbinden"
+      ]
+    },
+    {
+      "nodeId": "6YOPHbnKWreoF5og4PGc3fre7du1FhVc7dY1d5jZyHs",
+      "label": "WorkFloh",
+      "tags": [
+        "werbetechnik",
+        "auftrag",
+        "rechnung",
+        "druck",
+        "zeiterfassung"
+      ]
+    }
   ]
 }
