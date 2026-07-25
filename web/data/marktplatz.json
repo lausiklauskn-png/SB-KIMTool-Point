@@ -95,7 +95,8 @@
       "andockLink": "https://lausiklauskn-png.github.io/Mein-WorkFloh/",
       "status": "verified-match",
       "echt": true,
-      "matchHinweis": "15. Knoten im Mycel (Klaus' Browser-Andock 2026-07-25, funktionierender Knoten). Echte v0.2-Spore ueber den Andock-Wizard im Siegel erzeugt+committet: domainVector 384-dim L2=1 + 3 Schnipsel, reziprok verifiziert VALID (id==base64url(SHA256(rawPub))==6YOPHbnK, Ed25519 gueltig, kein _demo). Live-Beleg (Mycel-Analyse 2026-07-25): WorkFloh live im gemeinsamen Raum mit 13 weiteren Knoten. Echte Cross-Knoten-Matches: Tomys-Hub 0.8335 + Kimseek 0.8110 >= 0.80 -> verified-match (fachverwandt Werbetechnik/Druck). Ehrlich: Toolpoint<->WorkFloh 0.7971 < 0.80 und Sage<->WorkFloh 0.7824 < 0.80 (fachfremd zum Hub, wie Tomys). WorkFloh wird seit 2026-07-25 von Klaus oeffentlich angeboten (zum Verkauf) — funktionierende PWA-App mit Siegel."
+      "matchScore": 0.896641,
+      "matchHinweis": "15. Knoten im Mycel (Klaus' Browser-Andock 2026-07-25, funktionierender Knoten mit LIVE-Handshake). Spore v0.2 im Siegel erzeugt, dann domainDescription nach dem Rezeptbuch-Muster umgestaltet (Endknoten im SBKIM-Mycel/Sage-Protokoll, wandelbares Branchen-Tool) + NEU SIGNIERT -> nodeId unveraendert 6YOPHbnK, neuer domainVector + 6 Schnipsel, reziprok VALID. WIRKUNG (echte Vektoren, Modul-04-Cosinus): der fruehere Unter-Schwellen-Match wurde gehoben -> Toolpoint<->WorkFloh 0.896641, Sage<->WorkFloh 0.906269; 12 Knoten >= 0.80 (nur Private Brain 0.771 drunter). LIVE-HANDSHAKE bewiesen (Mycel-Analyse 2026-07-25 19:37 + 19:43): WorkFloh <-> Sage beidseitig 'established' uebers echte Relais. WorkFloh wird seit 2026-07-25 von Klaus oeffentlich angeboten (zum Verkauf) — funktionierende PWA-App mit Siegel."
     }
   ],
   "werkzeuge_hinweis": "Eigenstaendige Werkzeuge am Markt (kein Knoten, sondern ein Tool zum Mitnehmen). Von Sage-Protokol uebernommen, hier 1:1 gespiegelt.",
