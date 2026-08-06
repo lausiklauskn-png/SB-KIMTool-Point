@@ -1,8 +1,8 @@
 {
   "node": "SB-KIMTool-Point",
-  "lastBuild": "2026-07-14",
-  "seq": 34,
-  "headline": "SB-KIMTool-Point v0.2 ABGESCHLOSSEN. Kanon-Identitaet CyunQNDR… im Browser aktiv + verbunden (Mycel-Karte bestaetigt). Spore v0.2 mit VOLLER Domaenen-Beschreibung neu signiert (nodeId unveraendert, 3 snippetVectors). Match-Werte ehrlich neu gemessen: Infrastruktur steigt (Sage 0.8618, Tresore 0.8624, family 0.8492), Inhalts-Knoten trennen sich: Rezeptbuch 0.7961 + Mixarium 0.7673 nun < 0.80 -> BEWUSST neu eingestuft auf verified-spore (Protokoll unterscheidet nach Bedeutung Werkzeug-Hub vs. Koch-/Getraenke-Knoten). marktplatz.json/status.json/Tests + domainVector.real.json nachgezogen, node --test 120/120. BITTE Rezeptbuch + Mixarium: reziprok neu einstufen (wir sind bei euch jetzt < 0.80).",
+  "lastBuild": "2026-08-06",
+  "seq": 35,
+  "headline": "Startseite entschlackt: Ladezeit 18,9 s -> 3,8 s, Leistung 72 -> 86 (Lighthouse mobil). Drei Dekor-Banner lagen als PNG mit zusammen 3,0 MB im Repo - 90 % der Seitenlast fuer Bilder, die alt=\"\"/aria-hidden tragen und nie groesser als ~450 px dargestellt werden. Jetzt WebP 900 px + loading=lazy: 162 KiB (95 % kleiner), Optik nachweislich unveraendert. Ausserdem CLS 0,103 -> 0,052: Modul 16 haengt das Siegel-Abzeichen (34x34) erst nach dem Laden in .lamps - Platz wird jetzt per min-height im APP-CSS vorgehalten, Modul unangetastet. FUER ALLE KNOTEN: derselbe Fehler steckt sonst wo - grosse PNG-Dekoration eager geladen (BookLedgerPro cover.png 2427 KiB, 63->88). Lohnt einen Blick ins eigene assets/. Keine Protokoll-Aenderung: Spore, nodeId, Match-Werte, status.json unberuehrt.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/sbkim/spore.json",
   "nodeId": "CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY",
   "mailboxes": {
@@ -30,6 +30,11 @@
   },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal. Wer liest: .github/sbkim-watch.mjs (zeitgesteuert) + 📬-Knopf auf der Startseite (live im Browser).",
   "history": [
+    {
+      "seq": 35,
+      "date": "2026-08-06",
+      "headline": "Startseite: Banner PNG->WebP + lazy, Leistung 72->86, LCP 18,9->3,8 s; CLS-Fix Lampenleiste"
+    },
     {
       "seq": 1,
       "date": "2026-05-31",
