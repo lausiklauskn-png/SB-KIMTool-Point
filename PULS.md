@@ -2,6 +2,80 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-06 — Startseite: Ladezeit 18,9 s → 3,8 s, Leistung 72 → 86
+
+**Auslöser.** Klaus fragte, warum Mein-WorkFloh schlechtere Werte hat als Tomys
+WorkFloh. Beim Nachmessen fiel auf, dass drei weitere Seiten im Netz auffällig
+sind — diese hier war mit **Leistung 60** (Googles Messung) die schlechteste.
+Klaus: „mach Point als Erstes."
+
+**Der Befund war eindeutig und hatte nichts mit SBKIM zu tun.** Drei
+Banner-Bilder lagen als PNG im Repo:
+
+| Datei | vorher | jetzt |
+|---|---|---|
+| `banner-werkzeuge` | 1194 KiB PNG, 1150×767 | **64 KiB WebP, 900×600** |
+| `banner-markt` | 991 KiB PNG, 1400×467 | **54 KiB WebP, 900×300** |
+| `banner-modell` | 866 KiB PNG, 1400×467 | **44 KiB WebP, 900×300** |
+| **zusammen** | **3051 KiB** | **162 KiB** (95 % kleiner) |
+
+Das waren **90 % der gesamten Seitenlast** — für Bilder, die `alt=""` und
+`aria-hidden="true"` tragen, also reine Dekoration sind, und die per
+`object-fit: contain` ohnehin nie größer als rund 450 px breit dargestellt
+werden. Sie standen zudem auf `loading="eager"`, wurden also sofort geholt,
+obwohl sie unterhalb des `#puls`-Abschnitts liegen.
+
+**Gebaut:** alle drei nach WebP (900 px breit) umgerechnet, `loading="lazy"`
+statt `eager`, `width`/`height` auf die echten Maße, Cache-Kennung `?v=5` → `?v=6`.
+Die alten PNGs sind entfernt (3,0 MB weniger im Repo). Die Umstellung wirkt auf
+**vier** Seiten: `index.html` (drei Karten) **und** `modell.html` /
+`werkzeuge.html` / `markt.html`, die dieselben Bilder als Kopf-Hintergrund
+(`--art`) laden.
+
+**Zusatz, beim Messen gefunden:** die Lampen-Leiste sprang beim Laden von 9 px
+auf 34 px Höhe und schob die ganze Seite nach unten. Grund: Modul 16 hängt das
+Siegel-Abzeichen (34×34) erst nach dem Laden in `.lamps`. Behoben durch
+`min-height: 34px` im **app-eigenen** `assets/style.css` — der Platz wird
+vorgehalten. **Das Modul selbst bleibt unangetastet.**
+
+**Gemessen** (Lighthouse 13.4.1, mobil, gedrosselt; drei Runden je Stand, alt und
+neu im Wechsel, damit Maschinen-Schwankungen beide gleich treffen):
+
+| | vorher | Bilder-Fix | + Lampen-Fix |
+|---|---|---|---|
+| Leistung | 72 · 72 · 72 | 84 · 83 · 83 | **86 · 86 · 85** |
+| Ladezeit (LCP) | 18,9 s | 3,8 s | **3,8 s** |
+| Blockierzeit | 60–90 ms | 30–40 ms | **40 ms** |
+| Layout-Sprung (CLS) | 0,103 | 0,103 | **0,052** |
+
+**Optik geprüft:** alte und neue Bilder in der echten Anzeigegröße (180 px hoch,
+`contain`) nebeneinander gerendert und angesehen — **kein sichtbarer
+Unterschied**. Die Umrechnung lief über Chromium, weil im Container kein
+Bildwerkzeug verfügbar war (kein `cwebp`, kein ImageMagick, `pip` kam nicht durch).
+
+**`assets/img/README.md` nachgezogen**, sonst legt die nächste Sitzung wieder ein
+1-MB-PNG ab: die Tabelle nennt jetzt `.webp`, 900 px, ≤70 KiB, mit dem Hinweis,
+dass eine Bild-KI meist PNG liefert und man einmal umrechnen muss.
+
+### Ehrlich offen
+
+- **`npm test` steht bei 146/148** — unverändert. Die zwei roten Proben
+  („Probe 27: Netz-Link gerendert" / „Klick öffnet URL") waren **schon auf
+  `origin/main` rot** (gegengeprüft) und betreffen den Netz-Link im
+  Rendezvous-Panel, nicht die Bilder. Sie gehören zur alten Modul-Generation und
+  damit in den netzweiten Modul-Rollout.
+- **Klaus' Browser-Sichttest steht aus.** Headless sagt nichts darüber, ob die
+  Banner am Tablet gefallen.
+- **CLS 0,052 bleibt.** Die zweite Hälfte des Sprungs entsteht *vor* dem
+  `DOMContentLoaded`: die Kopfleiste (`flex-wrap`) bricht bei 412 px Breite von
+  drei auf vier Zeilen um und wächst dabei um 50 px. Das sauber zu lösen heißt,
+  das Umbruch-Verhalten der Statusleiste zu ändern — eine **sichtbare
+  Design-Entscheidung**, kein Nebenbei-Schritt. Bewusst liegen gelassen.
+- **`assets/img/icon-512.png` ist 342 KiB** und wird nicht angefasst. Es ist ein
+  Manifest-Icon, wird beim Seitenaufruf nicht geholt und war in keiner Messung
+  auffällig. Trotzdem ein Kandidat, wenn jemand ohnehin an den Bildern ist.
+- **Auffindbarkeit 80** unverändert — eigener Punkt, hier nicht angefasst.
+
 ## Nachtrag 2026-07-25 — WorkFloh (15. Knoten) im Markt-/Adressbuch registriert
 
 Mein-WorkFloh ist seit 2026-07-25 ein funktionierender SBKIM-Endknoten (Klaus'

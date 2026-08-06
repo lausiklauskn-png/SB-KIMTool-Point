@@ -121,7 +121,12 @@ a { color: var(--accent); }
   color: var(--text);
 }
 .brand .dot { color: var(--accent); }
-.lamps { display: flex; gap: 1rem; flex-wrap: wrap; }
+/* min-height: Platz für das Siegel-Abzeichen VORHER freihalten.
+   Modul 16 hängt `#sbkim-siegel-badge` (34x34) erst nach dem Laden hier hinein.
+   Ohne Reservierung wächst die Leiste von 9 px auf 34 px und schiebt die ganze
+   Seite nach unten — gemessen als Layout-Verschiebung (CLS). Das Modul bleibt
+   unangetastet; hier wird nur der Platz vorgehalten. (2026-08-06) */
+.lamps { display: flex; gap: 1rem; flex-wrap: wrap; min-height: 34px; align-items: center; }
 .version { margin-left: auto; font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
 a.brand { text-decoration: none; }
 
