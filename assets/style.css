@@ -647,8 +647,22 @@ body::after {
 }
 
 /* --- Wiederverwendbarer Bild-Banner (Seitenkopf) ------------------------- */
-/* Nutzung: <div class="page-banner" style="--art:url('img/banner-x.png')">…</div>
-   Ohne --art bleibt der Gradient-Fallback — nie ein kaputtes Bild-Icon. */
+/* Nutzung: <div class="page-banner pb-modell">…</div>
+   Ohne --art bleibt der Gradient-Fallback — nie ein kaputtes Bild-Icon.
+
+   ⚠ Das Bild wird HIER zugewiesen, NICHT per style="--art:…" in der HTML.
+   Grund (gefunden 2026-08-07, Klaus' Sichttest): eine relative url() in einer
+   CSS-Variablen wird gegen das STYLESHEET aufgelöst, in dem sie verbraucht
+   wird — nicht gegen das HTML-Dokument. In der HTML stand `assets/img/x`, und
+   weil diese Datei selbst in `assets/` liegt, machte der Browser daraus
+   `assets/assets/img/x` → 404. Die Kopf-Bilder der drei Unterseiten waren
+   dadurch von Anfang an unsichtbar, ohne dass jemand es gemerkt hätte (der
+   Gradient-Fallback sieht ja nicht kaputt aus).
+   Von hier aus ist `img/x` der richtige Pfad. Wer ein neues Banner ergänzt,
+   legt die Zeile hier an — nicht in der Seite. */
+.page-banner.pb-modell    { --art: url('img/banner-modell.webp'); }
+.page-banner.pb-werkzeuge { --art: url('img/banner-werkzeuge.webp'); }
+.page-banner.pb-markt     { --art: url('img/banner-markt.webp'); }
 .page-banner {
   position: relative; overflow: hidden;
   border: 1px solid var(--line); border-radius: 16px;

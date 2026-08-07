@@ -2,6 +2,81 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-07 — Klaus' Sichttest: Kopf-Bilder der Unterseiten waren NIE da
+
+Klaus hat nach dem Merge hingesehen und drei Dinge gemeldet. Alle drei geprüft,
+zwei behoben, eines widerlegt.
+
+### 1 · Die Kopf-Bilder der drei Unterseiten fehlten — seit jeher
+
+Klaus: *„auf den anderen beiden Seiten Netzwerk und Markt ist oben gar kein
+Bild."* Stimmt — und auf `modell.html` auch nicht.
+
+**Ursache, und sie ist lehrreich:** das Bild wurde in der HTML als
+`style="--art:url('assets/img/banner-x.webp')"` gesetzt. Eine **relative `url()`
+in einer CSS-Variablen** wird aber gegen das **Stylesheet** aufgelöst, in dem sie
+verbraucht wird — nicht gegen das HTML-Dokument. Weil `style.css` selbst in
+`assets/` liegt, machte der Browser daraus `assets/assets/img/banner-x.webp`
+→ **404**.
+
+**Das war NICHT die WebP-Umstellung.** Gegenprobe gefahren: der Stand von **vor**
+dem Merge (`c6dfa11`, noch mit PNG) lieferte exakt denselben Fehler,
+`assets/assets/img/banner-modell.png` → 404. Die Kopf-Streifen waren also **seit
+dem ersten Tag unsichtbar** — der Gradient-Fallback sieht nicht kaputt aus, darum
+ist es niemandem aufgefallen. Der Kommentar in `style.css` sagte sogar schon
+`url('img/banner-x.png')`; die Seiten schrieben es nur anders.
+
+**Behoben:** `--art` wird jetzt **in `assets/style.css`** zugewiesen
+(`.page-banner.pb-modell` / `.pb-werkzeuge` / `.pb-markt`), wo `img/…` der
+richtige Pfad ist. Die Seiten tragen nur noch die Klasse. Gegengeprüft: alle drei
+Streifen erscheinen, kein 404 mehr.
+
+### 2 · Markt-Banner wirkte neblig — behoben
+
+Klaus: *„Der Kontrast beim rechten Bild ist durch den Nebel nicht so stark."*
+Der Nebel steckt im Bild selbst. Beim Neu-Rechnen jetzt **`contrast(1.18)
+saturate(1.14)`** mitgegeben (drei Stufen gerendert und verglichen, die mittlere
+gewählt). Betrifft nur `banner-markt`.
+
+### 3 · „Nicht scharf" — widerlegt, da war nichts zu holen
+
+Klaus: *„das ganze Bild ist nicht so sehr scharf, aber nicht pixelig."*
+Nachgemessen und nachgesehen:
+
+- Die Karten sind **nie breiter als 335 px**, egal ob 1350er oder 2560er Fenster
+  (das Raster deckelt). 900 px Quelle sind also reichlich.
+- Original-PNG, 900-px-WebP und volle Auflösung nebeneinander auf 850 px Breite
+  gerendert (Klaus' Zoom-Stufe): **nicht zu unterscheiden.** Die Weichheit steckt
+  im Originalbild.
+- Volle Auflösung (1400 px) wurde gebaut und gemessen: kostet **4 Punkte**
+  (Handy 86 → 82, LCP 3,8 → 4,4 s) und zeigt **keinen sichtbaren Unterschied**.
+  **Wieder verworfen.** Geblieben ist 900 px, Güte leicht angehoben (0,80 → 0,84).
+
+### Stand nach diesem Nachtrag
+
+| | Handy | Computer |
+|---|---|---|
+| Leistung | **85 · 85 · 85** | **97 · 97 · 97** |
+
+Bilder zusammen 192 KiB (vorher 3051 KiB als PNG). `npm test` **146/148**,
+unverändert — die zwei roten waren schon vorher rot.
+
+### Ehrlich offen
+
+- **`assets/img/ambient.png` fehlt** und wird auf **jeder** Seite angefragt →
+  404 bei jedem Aufruf. Kein sichtbarer Bruch (Gradient-Fallback), aber eine
+  vergebliche Anfrage. Entweder Bild anlegen oder die Zeile in `style.css`
+  (`--ambient-img`) auskommentieren. Klaus' Entscheidung — er wollte dort
+  vielleicht noch ein Bild hinlegen.
+- **Karten wachsen bei Mausberührung nicht** (Klaus' Beobachtung). Das ist so
+  gebaut: `@media (hover: none)` schaltet das Wachsen ab, damit auf Handys der
+  Text lesbar bleibt. Android meldet auch im DeX-Modus mit Maus meist
+  `hover: none`. Änderbar, aber eine bewusste Design-Entscheidung — **nicht
+  angefasst**.
+- **CLS 0,052 (Handy) / 0,103 (Computer)** unverändert offen, eigener Brief.
+
+---
+
 ## Nachtrag 2026-08-06 — Startseite: Ladezeit 18,9 s → 3,8 s, Leistung 72 → 86
 
 **Auslöser.** Klaus fragte, warum Mein-WorkFloh schlechtere Werte hat als Tomys
