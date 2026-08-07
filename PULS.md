@@ -2,6 +2,71 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-07 (abends) — Kopf-Streifen: Nebel weg, volle Auflösung
+
+Klaus: *„Die sind sehr neblig, nicht scharf. Auf der Startseite sind sie gut.
+Es sieht eher aus, als hättest Du Nebel drübergesetzt. Sie müssen gestochen
+scharf sein — das sind hochwertige Vorlagen gewesen."*
+
+Beides zutreffend, und es waren **zwei getrennte Ursachen**.
+
+### 1 · Der Nebel war ein Verlauf über der vollen Breite
+
+`.page-banner` legte
+`linear-gradient(90deg, rgba(12,15,18,0.92) 0%, 0.55 45%, 0.2 100%)` **über das
+ganze Bild** — als Lesbarkeits-Hilfe für Kicker und Titel gedacht, wirkte aber
+über die volle Breite wie Schleier. Selbst rechts außen lagen noch 20 % Schwarz
+darüber.
+
+**Jetzt:** die Abdunklung sitzt nur noch dort, wo der Text steht — links kurz
+stark (0,90), ab **78 %** der Breite **ganz weg**. Damit die Überschrift auch auf
+einem hellen Motiv sicher lesbar bleibt, trägt `.pb-body` stattdessen einen
+**Textschatten**. Das ist die robustere Lösung: sie schützt den Text, ohne dem
+Bild einen Grauschleier zu geben.
+
+### 2 · Die Datei war für diesen Platz zu klein — hier hatte Klaus recht
+
+Gemessen: der Kopf-Streifen ist **1042 px breit** (unabhängig vom Fenster, das
+Raster deckelt). Bei doppelter Pixeldichte oder Browser-Zoom braucht er über
+**2000 echte Pixel**. Die 900-px-Datei der Start-Karten wurde dort auf **mehr als
+das Doppelte** gezogen.
+
+Das ist **nicht** derselbe Fall wie am 2026-08-07 morgens: dort ging es um die
+**Start-Karten**, die nie breiter als 335 px sind — da war 900 px reichlich und
+volle Auflösung brachte messbar nichts. Der **Kopf-Streifen** ist ein anderer
+Platz mit anderem Bedarf. Die frühere Messung war richtig, sie galt nur nicht
+hier.
+
+**Jetzt zwei Größen pro Motiv:**
+
+| Datei | wo | Größe |
+|---|---|---|
+| `banner-*.webp` | Start-Karten (335 px breit) | 900 px, 51–76 KiB |
+| `banner-*-gross.webp` | Kopf-Streifen (1042 px breit) | volle Originalgröße, 113–141 KiB |
+
+Die Startseite lädt **nur** die kleinen — ihr Wert bleibt dadurch unberührt.
+
+### Gemessen
+
+| | Handy | Computer |
+|---|---|---|
+| Leistung | **85 · 85** | **96 · 97** |
+
+Unverändert gegenüber vorher — die großen Dateien liegen ausschließlich auf den
+Unterseiten. `npm test` **146/148**, unverändert.
+`assets/img/README.md` nachgezogen (beide Größen erklärt, mit dem Grund).
+
+### Ehrlich offen
+
+- **Klaus' Browser-Sichttest steht aus.**
+- Der **Bildausschnitt** bleibt wie er war: `cover` in einem 1042 × 132-Kasten
+  zeigt bei `banner-werkzeuge` (Hochformat-Motiv) nur ein schmales Band aus der
+  Bildmitte. Klaus hat das nicht bemängelt — **nicht angefasst**, aber hier
+  notiert, falls es später stört.
+- `ambient.png` und das Hover-Wachsen der Karten weiterhin offen (siehe unten).
+
+---
+
 ## Nachtrag 2026-08-07 — Klaus' Sichttest: Kopf-Bilder der Unterseiten waren NIE da
 
 Klaus hat nach dem Merge hingesehen und drei Dinge gemeldet. Alle drei geprüft,
