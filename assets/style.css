@@ -660,9 +660,15 @@ body::after {
    Gradient-Fallback sieht ja nicht kaputt aus).
    Von hier aus ist `img/x` der richtige Pfad. Wer ein neues Banner ergänzt,
    legt die Zeile hier an — nicht in der Seite. */
-.page-banner.pb-modell    { --art: url('img/banner-modell.webp'); }
-.page-banner.pb-werkzeuge { --art: url('img/banner-werkzeuge.webp'); }
-.page-banner.pb-markt     { --art: url('img/banner-markt.webp'); }
+/* ⚠ Hier die -gross-Fassung (volle Originalauflösung), NICHT die der Karten.
+   Der Kopf-Streifen ist 1042 px breit (gemessen) — bei doppelter Pixeldichte
+   oder Browser-Zoom braucht er über 2000 echte Pixel. Die 900-px-Datei der
+   Startseiten-Karten wird dabei auf mehr als das Doppelte gezogen und wirkt
+   weich (Klaus' Befund 2026-08-07: „müssen gestochen scharf sein").
+   Die Karten behalten die kleine Fassung — sie sind nie breiter als 335 px. */
+.page-banner.pb-modell    { --art: url('img/banner-modell-gross.webp'); }
+.page-banner.pb-werkzeuge { --art: url('img/banner-werkzeuge-gross.webp'); }
+.page-banner.pb-markt     { --art: url('img/banner-markt-gross.webp'); }
 .page-banner {
   position: relative; overflow: hidden;
   border: 1px solid var(--line); border-radius: 16px;
@@ -670,7 +676,17 @@ body::after {
   display: flex; align-items: flex-end; gap: 0.8rem;
   padding: 1rem 1.1rem;
   background:
-    linear-gradient(90deg, rgba(12,15,18,0.92) 0%, rgba(12,15,18,0.55) 45%, rgba(12,15,18,0.2) 100%),
+    /* Abdunklung NUR unter dem Text, nicht über dem ganzen Bild.
+       Vorher lief sie mit 0.92 → 0.55 → 0.20 über die volle Breite und legte
+       sich wie Nebel über das Motiv (Klaus' Befund 2026-08-07). Jetzt ist sie
+       links kurz stark (die Überschrift bleibt lesbar) und ab etwa der Mitte
+       ganz weg, sodass das Bild rechts klar durchkommt. */
+    linear-gradient(90deg,
+      rgba(12,15,18,0.90) 0%,
+      rgba(12,15,18,0.74) 20%,
+      rgba(12,15,18,0.34) 42%,
+      rgba(12,15,18,0.08) 62%,
+      rgba(12,15,18,0.00) 78%),
     var(--art, none) center / cover no-repeat,
     radial-gradient(120% 140% at 0% 0%, rgba(54,214,195,0.16), transparent 55%),
     linear-gradient(135deg, #11181e, #0b0e12);
@@ -685,7 +701,13 @@ body::after {
   text-transform: uppercase; color: var(--accent);
 }
 .page-banner .pb-title { font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0.1rem 0 0; }
-.page-banner .pb-body { position: relative; z-index: 1; }
+/* Schatten statt Abdunklung: hält Kicker und Titel auf JEDEM Motiv lesbar —
+   auch auf einem hellen, das später einmal hier landet — ohne dem Bild einen
+   Grauschleier überzuziehen. Ersetzt die frühere flächige Abdunklung. */
+.page-banner .pb-body {
+  position: relative; z-index: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 14px rgba(0,0,0,0.60);
+}
 
 /* --- Startseite: Hero als Layered-Komposition + Halo --------------------- */
 .hero { position: relative; padding: 2.2rem 1.1rem 1.3rem; border-radius: 18px; overflow: hidden; }

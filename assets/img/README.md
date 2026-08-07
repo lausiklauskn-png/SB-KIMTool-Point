@@ -21,9 +21,17 @@ Offline — Dateien liegen lokal im Repo, keine externen Links.
 |---|---|---|---|
 | `ambient.png` | alle Seiten (fixer Hintergrund) | quer, ~2000×1400, dunkel | ruhige Tiefen-Textur hinter allem |
 | `hero.png` | Startseite (Hero-Backdrop) | quer, ~1600×900 | optionaler Hintergrund hinter dem Titel (Fallback: nur Glow) |
-| `banner-modell.webp` | Modell-Kopf + **Start-Karte 1 (links)** | quer, **900×300**, ≤70 KiB | Motiv „Pipeline / Knotenkette" |
-| `banner-werkzeuge.webp` | Werkzeuge-Kopf + **Start-Karte 2 (Mitte) = Werkzeugkiste-Knopf** | quer, **900×600**, ≤70 KiB | Motiv „Werkzeug-Truhe / Werkbank" |
-| `banner-markt.webp` | Markt-Kopf + Start-Karte 3 | quer, **900×300**, ≤70 KiB | Motiv „Schaufenster / Andocken" |
+| `banner-modell.webp` | **Start-Karte 1 (links)** | quer, **900×300**, ≤70 KiB | Motiv „Pipeline / Knotenkette" |
+| `banner-werkzeuge.webp` | **Start-Karte 2 (Mitte) = Werkzeugkiste-Knopf** | quer, **900×600**, ≤70 KiB | Motiv „Werkzeug-Truhe / Werkbank" |
+| `banner-markt.webp` | Start-Karte 3 | quer, **900×300**, ≤70 KiB | Motiv „Schaufenster / Andocken" |
+| `banner-*-gross.webp` | **Kopf-Streifen der Unterseiten** (`modell`/`werkzeuge`/`markt`) | volle Originalgröße, ≤150 KiB | dieselben Motive, nur größer |
+
+> **Warum ZWEI Größen pro Motiv (2026-08-07).** Die Start-Karten sind nie breiter
+> als **335 px** — dort reichen 900 px im Überfluss. Der **Kopf-Streifen** der
+> Unterseiten ist dagegen **1042 px** breit und braucht bei doppelter Pixeldichte
+> oder Browser-Zoom über **2000 echte Pixel**; die kleine Datei wirkt dort weich.
+> Darum: kleine Fassung für die Karten (schnelle Startseite), `-gross` für die
+> Kopf-Streifen (scharf). Wer ein Motiv tauscht, legt **beide** an.
 | `icon-192.png` | Favicon / App-Icon (alle Seiten) | quadratisch, 192×192 (+ optional 512×512) | Marke „SB·KIMTool·Point" |
 
 ## Generierungs-Prompts (Englisch, für gängige Bild-KIs)
