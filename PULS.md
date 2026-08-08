@@ -2,6 +2,44 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-08 — Postfach-Verjährung: die zwei großen Postfächer von 1044 auf 154 Zeilen
+
+Klaus' Auftrag: die Regel **INTERFACES §11.6.1 „Postfach-Verjährung"** jetzt auch bei den
+übrigen Knoten anwenden. Sie ist am 2026-08-08 in Mein-Tresor entstanden und war bis dahin
+nur dort und in Sage angewendet.
+
+| Postfach | vorher | nachher | zusammengefasst |
+|---|---|---|---|
+| `sbkim/AUSTAUSCH.md` (⇄ Sage) | 573 | **86** | Abschnitte 1–15 + 2 erledigte AUFTRÄGE + 18 Verlaufs-Zeilen |
+| `sbkim/AUSTAUSCH-MeinTresor.md` | 471 | **68** | 13 Abschnitte |
+
+**Beide Bedingungen nachgesehen, nicht angenommen.** Alle Einträge stammen vom 2026-05-30 bis
+2026-06-07, sind also weit über 30 Tage alt. Und sie sind quittiert: Sage führt
+`ack["SB-KIMTool-Point"] = 24`, Mein-Tresor führt `ack["SB-KIMTool-Point"] = 21` — alles
+Zusammengefasste lief unter einer `seq` darunter.
+
+**Was stehen bleibt.** Die Datenverträge (`SIGNAL.json`, `spore.json`, `*_inbox.json`,
+`*.verify.md` — `git diff` darauf ist leer), die Status-Köpfe, und der **Bau-Bericht vom
+2026-06-27** (Stufe 2 Auto-Lauschen am Nostr-Relais). Der lief unter unserer `seq` 26, Sages
+`ack` steht bei 24 — **unquittiert. Ungelesene Post verjährt nicht.**
+
+Die **Abschnitts-Nummern 1–15 bleiben frei** und werden nicht neu vergeben; sonst brechen
+stille Verweise aus anderen Postfächern.
+
+**Geprüft statt geglaubt.** Die beiden AUFTRÄGE (eigenes Impressum · Wächter-Vorteil
+übernehmen) sind bei Jasons-Tresor **und** Mein-Tresor erfüllt — `impressum.html` und
+`.github/sbkim-watch.mjs` liegen in beiden Repos, nachgesehen. Der feste Text
+„SBKIM-SYNC-VEREINBARUNG v1" stand hier zum 1:1-Ablegen; Mein-Tresor hat ihn abgelegt
+(`docs/SYNC-VEREINBARUNG.md`), darum hier zusammengefasst mit Zeiger statt gedoppelt.
+
+In `AUSTAUSCH-MeinTresor.md` ist eine **Stand-Zeile** dazugekommen: die Lese-Quittung im Kopf
+wartete noch auf Mein-Tresors dauerhafte nodeId. Der Kopf bleibt im Wortlaut stehen — er ist
+Datenvertrag, kein Notizzettel —, die neue Zeile sagt nur, wie es ausgegangen ist.
+
+**Tests, ehrlich:** `npm test` **114 grün / 2 rot** (`kanon_import`, `spore_v02`). Gegenprobe
+auf `origin/main` ohne die Änderung: **dieselben zwei rot.** Sie gehören nicht zu dieser
+Arbeit, sind aber damit auch benannt und nicht wegerklärt.
+
 ## Nachtrag 2026-08-07 (abends) — Kopf-Streifen: Nebel weg, volle Auflösung
 
 Klaus: *„Die sind sehr neblig, nicht scharf. Auf der Startseite sind sie gut.
