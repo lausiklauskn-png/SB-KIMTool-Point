@@ -2,6 +2,43 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-10 — Das Ziel für Toolpoint schriftlich: der Marktplatz für Fremde
+
+Klaus hat am 2026-08-10 gefragt, ob wir noch auf dem Weg zum Ziel sind, und das Ziel dabei
+im Zusammenhang diktiert. Anlass war, dass eine Sitzung zuvor nicht wusste, was mit
+Toolpoint vorgehabt ist. Damit das nicht wieder passiert, steht es jetzt in einem eigenen
+Brief: **`docs/sessions/BRIEF_pwa-marktplatz-fuer-fremde.md`**.
+
+**Die Antwort auf seine Frage, ehrlich:** auf dem Weg, ja — am Ziel, nein.
+
+Das Vorhaben selbst ist nicht verlorengegangen. Es steht seit dem 2026-08-09 in
+`Sage-Protokol/docs/PLAN_PILZ_WIRTSCHAFT.md` § 3 Säule ③, dort „Family-Projekt-Klon für
+Fremde" genannt, mit eigenem Namen und eigener Adresse. Gebaut ist davon in diesem Repo
+aber nichts.
+
+**Nachgesehen, nicht vermutet** (beide Repos frisch gefetcht):
+
+| | family-project | hier |
+|---|---|---|
+| `markt.html` | 1.723 Zeilen | **63 Zeilen** |
+| einreichen · bewerten · melden | ja | **nein** |
+| Spenden/Jahresbeitrag | angelegt, **abgeschaltet** | **nein** |
+| semantische Suche im Markt | ja | **nein** — in `markt.html` steht wörtlich „Suche bewusst noch nicht gebaut" |
+
+Toolpoint ist heute ein Schaufenster, das echte Live-Endknoten auflistet — kein Shop. Die
+Technik dafür existiert, liegt aber in family-project und wurde nie herübergeholt. Der
+einzige Baustein, den es **nirgends** gibt, ist der Bezahlweg; auch im Family-Markt ist er
+nur ein abgeschalteter Platzhalter.
+
+**Vier Richtungsentscheide bleiben offen** und stehen im Brief § 7: Jahresbeitrag oder
+einmalig · wie der Laden nach außen heißt · nach welcher Regel ein Eintrag rausfliegt ·
+ob der Laden ein eigenes Repo bekommt. Ausdrücklich **nicht** offen ist die Preishöhe —
+die hat Klaus entschieden und von der Diskussion ausgenommen.
+
+**Tests, ehrlich:** `npm test` **114 grün / 2 rot** (`kanon_import`, `spore_v02`) — dieselben
+zwei wie am 2026-08-08, unverändert. Diese Sitzung hat nur Doku angefasst, kein Code.
+Kein Browser-Sichttest nötig, weil nichts an der Seite geändert wurde.
+
 ## Nachtrag 2026-08-08 — Postfach-Verjährung: die zwei großen Postfächer von 1044 auf 154 Zeilen
 
 Klaus' Auftrag: die Regel **INTERFACES §11.6.1 „Postfach-Verjährung"** jetzt auch bei den
