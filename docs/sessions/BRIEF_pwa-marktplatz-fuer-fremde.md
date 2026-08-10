@@ -1,5 +1,41 @@
 # BRIEF — PWA·Toolpoint wird der Marktplatz für Fremde
 
+> ## 🚨 KORREKTUR, wenige Stunden nach dem Schreiben (2026-08-10)
+>
+> **Der Laden hat längst ein eigenes Repo: [`lausiklauskn-png/PWA-Toolpoint`](https://github.com/lausiklauskn-png/PWA-Toolpoint)**,
+> live unter **pwa-toolpoint.de** (dazu **pwa-toolpoint.com**). Er trägt 14
+> Einträge, Wort- und Bedeutungs-Suche, Siegel, Pflege-Studio, nächtlichen
+> Mess-Lauf — und seit dem 2026-08-10 den Melde-Knopf.
+>
+> **Dieser Brief wurde geschrieben, als das noch nicht sichtbar war**: die
+> beiden Toolpoint-Repos lagen nicht im Zugriff der Sitzung, also stand hier
+> die Frage, ob der Laden ein eigenes Repo bekommt (§ 7 Frage 4). Sie war zu
+> dem Zeitpunkt schon beantwortet — nur nicht für mich sichtbar.
+>
+> **Was daraus folgt:**
+>
+> | Teil dieses Briefes | gilt noch? |
+> |---|---|
+> | § 1 — **das Ziel**, Klaus' Worte, das Geld-Modell | **ja**, unverändert |
+> | § 2 — der Ist-Stand-Vergleich | **nein** — er vergleicht das falsche Repo |
+> | § 3–6 — die Bau-Anweisungen | **nein** — sie zielen hierher statt nach PWA-Toolpoint |
+> | § 7 Frage 2 + 4 (Name, eigenes Repo) | **beantwortet** — PWA Toolpoint, eigenes Repo |
+> | § 7 Frage 1 (Beitragsform) | **beantwortet** am 2026-08-10 — siehe unten |
+> | § 7 Frage 3 (Rauswurf-Regel) | **weiter offen** |
+>
+> **Wer am Marktplatz baut, baut in `PWA-Toolpoint`, nicht hier.** Der dortige
+> Einstieg ist `CLAUDE.md` → `docs/sessions/BRIEF_naechste-sitzung.md`, und der
+> Geld-Beschluss steht in `docs/GELD-ENTSCHEIDUNGEN.md`.
+>
+> **SB·KIMTool·Point bleibt, was es ist:** Werkstatt, Werkzeugkiste und
+> Observatorium für Forker — nicht der Laden.
+>
+> *Stehen gelassen statt gelöscht: der Ziel-Teil ist Klaus' Diktat und gilt.
+> Und eine Korrektur, die man sehen kann, ist mehr wert als ein Brief, der so
+> tut, als hätte er von Anfang an gestimmt.*
+
+---
+
 > Folge-Brief. Setzt die Brief-Kette aus `CLAUDE.md` fort. **Stand: 2026-08-10.**
 >
 > **Zweck dieses Briefes:** damit keine Sitzung mehr fragen muss, wohin Toolpoint
@@ -217,17 +253,19 @@ der Gewerbeanmeldung.
 
 Diese Fragen **nicht selbst entscheiden** — sie sind Richtungsentscheide:
 
-1. **Jahresbeitrag oder einmalig?** Beides ist genannt („10 € im Jahr" *oder*
-   „10 € einmalig für unbegrenzt"). Nur eines kann gelten. Klaus hat gesagt, das
-   sei noch offen.
-2. **Wie heißt der Marktplatz nach außen?** Das Pilz-Papier verlangt einen
-   eigenen Namen und eine eigene Adresse. „SB·KIMTool·Point" ist ein
-   Werkstatt-Name, kein Ladenname.
-3. **Wer entscheidet, dass ein Eintrag rausfliegt?** Ab welcher Bewertung, nach
-   wie vielen Stimmen, und darf der Anbieter widersprechen? Ohne Regel ist der
-   Rauswurf angreifbar.
-4. **Bleibt Toolpoint in diesem Repo** oder bekommt der Laden ein eigenes? Das
-   Papier spricht von zwei Instanzen — das kann auch zwei Repos bedeuten.
+1. ~~**Jahresbeitrag oder einmalig?**~~ **Beantwortet (Klaus 2026-08-10):**
+   **einmalig für unbegrenzt**, nicht jährlich. Der Beschluss steht in
+   `PWA-Toolpoint/docs/GELD-ENTSCHEIDUNGEN.md` — hier bewusst ohne Betrag,
+   damit keine Sitzung eine Zahl aus einem Arbeitsauftrag auf eine Seite hebt.
+2. ~~**Wie heißt der Marktplatz nach außen?**~~ **Beantwortet:** „PWA Toolpoint",
+   live unter pwa-toolpoint.de und pwa-toolpoint.com.
+3. **Wer entscheidet, dass ein Eintrag rausfliegt?** — **weiter offen.** Ab
+   welcher Bewertung, nach wie vielen Stimmen, und darf der Anbieter
+   widersprechen? Ohne Regel ist der Rauswurf angreifbar. Bei einer einmaligen
+   Zahlung wiegt das schwerer als bei einem Jahresbeitrag: ein Rauswurf nimmt
+   jemandem dann etwas weg, das er bezahlt hat.
+4. ~~**Bleibt Toolpoint in diesem Repo?**~~ **Beantwortet:** nein, eigenes Repo
+   `lausiklauskn-png/PWA-Toolpoint`. Siehe die Korrektur ganz oben.
 
 **Nicht zu fragen:** ob 10 € richtig sind, ob 1–2 € pro App sinnvoll sind, ob das
 Modell trägt. Das hat Klaus entschieden und ausdrücklich von der Diskussion
