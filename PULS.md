@@ -2,6 +2,35 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-10 (später am Tag) — Korrektur: der Laden hat ein eigenes Repo
+
+Der Eintrag darunter ist im Ziel richtig und im Ort falsch. **Der Marktplatz für
+Fremde existiert bereits als eigenes Repo: `lausiklauskn-png/PWA-Toolpoint`,
+live unter pwa-toolpoint.de** (dazu pwa-toolpoint.com). Vierzehn Einträge,
+Wort- und Bedeutungs-Suche, Siegel, Pflege-Studio, nächtlicher Mess-Lauf.
+
+**Warum es der Sitzung entgangen ist:** die beiden Toolpoint-Repos lagen nicht
+im Zugriff. Die Frage „bekommt der Laden ein eigenes Repo?" stand deshalb als
+offen im Brief, obwohl sie längst beantwortet war. Aufgefallen ist es erst über
+die Server-Konfiguration von family-project: `freigabe-config.example.php` nennt
+unter `ziele` ein Repo `PWA-Toolpoint` mit eigener Kennung `PT_LISTINGS` und die
+Domains — eingebaut am 2026-08-09.
+
+**Die Lehre, in einem Satz:** *dass eine Sitzung ein Repo nicht sieht, heißt
+nicht, dass es nicht existiert.* Wer über die Landschaft urteilt, prüft vorher,
+welchen Ausschnitt er überhaupt vor sich hat (`list_repos`), statt aus dem
+Vorhandenen auf das Ganze zu schließen. Das ist dieselbe Familie von Fehler wie
+der veraltete Klon, nur eine Ebene höher: nicht der Stand war alt, sondern der
+Ausschnitt zu klein.
+
+**Nachgezogen:** der Brief trägt jetzt oben eine Korrektur, die Absatz für
+Absatz sagt, was noch gilt (das Ziel, § 1) und was nicht (der Ist-Stand-
+Vergleich und die Bau-Anweisungen, § 2–6). Drei der vier offenen Fragen sind
+beantwortet; offen bleibt allein die Rauswurf-Regel.
+
+**SB·KIMTool·Point bleibt Werkstatt und Werkzeugkiste für Forker — nicht der
+Laden.** Wer am Marktplatz baut, baut in `PWA-Toolpoint`.
+
 ## Nachtrag 2026-08-10 — Das Ziel für Toolpoint schriftlich: der Marktplatz für Fremde
 
 Klaus hat am 2026-08-10 gefragt, ob wir noch auf dem Weg zum Ziel sind, und das Ziel dabei
