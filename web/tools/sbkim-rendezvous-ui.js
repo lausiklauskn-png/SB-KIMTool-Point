@@ -33,7 +33,7 @@
  *   init(opts) -> Promise<void>   (self-mount; idempotent)
  *   show() / hide() -> void
  *   isOpen() -> boolean
- *   _meta -> { version, mounted, open, nodeName, hasRendezvous, relatedOnly }
+ *   _meta -> { version, mounted, open, nodeName, hasRendezvous, relatedOnly, identity }
  *
  * Verfassungstreu: alle Aktionen sind nutzer-ausgelöst (Knöpfe). Kein Dauer-
  * Piepser, kein Auto-Connect beim Laden (init mountet nur den Knopf).
@@ -46,6 +46,8 @@
   var cfg = { nodeName: "SBKIM-Knoten", createIdentity: null, dbSuffix: null, prepareCorpus: null, corner: "bl", accent: null, euOnly: false };
   var mounted = false;
   var btnEl = null, panelEl = null, outEl = null, cardsEl = null, relOnlyBtn = null, incomingEl = null;
+  // Stufe 0a (Identität haltbar machen) — zwei ehrliche Status-Zeilen im Panel.
+  var idValEl = null, persistValEl = null, persistHintEl = null;
 
   // Empfänger-Hinweis (Klaus 2026-07-11): wenn ein FREMDER Knoten sich mit
   // diesem hier verbindet, beantwortet Modul 05 den Handshake live und meldet
@@ -83,6 +85,24 @@
       try { if (btnEl) btnEl.title = "Ein Knoten hat sich verbunden — öffnen"; } catch (_e) {}
     };
     try { global.addEventListener("sbkim:handshake", _hsHandler); } catch (_e) {}
+  }
+
+  // Stufe 0b Nachtrag (Klaus' Frage 2026-07-30: „übernimmt das Netz-Panel die im
+  // Siegel erzeugte Kennung automatisch?"). Antwort: ja — beide greifen in
+  // DIESELBE Schublade, es gibt pro App nur EINE Identität, nichts wird kopiert.
+  // Was fehlte, war die ANZEIGE: entstand die Kennung woanders (Siegel-Wizard,
+  // Andock-Werkzeug) während das Panel offen stand, blieb hier der alte Stand
+  // stehen. Modul 02 feuert beim ersten getOrCreateIdentity `sbkim:alive` —
+  // darauf hören wir und frischen die zwei Statuszeilen + den Sicherungs-Hinweis
+  // auf. REINE Anzeige, fail-soft, kein Netz-Verkehr, keine eigene Anlage.
+  var _aliveHandler = null;
+  function startIdentityWatch() {
+    if (_aliveHandler) return;
+    _aliveHandler = function () {
+      try { refreshStatus(); } catch (_e) { /* fail-soft */ }
+      try { refreshIdentityBox(); } catch (_e) { /* fail-soft */ }
+    };
+    try { global.addEventListener("sbkim:alive", _aliveHandler); } catch (_e) {}
   }
 
   // ── A12 Phase 2: Briefkasten-UI (offene Fragen + Antworten nachlesen) ──
@@ -336,6 +356,7 @@
 
   var askInputEl = null, answerBtn = null;   // Bau 23.B — Frage-Feld + Antwortrecht-Schalter
   var voiceBtnEl = null, activeRecognizer = null;   // 🎤 Spracheingabe (Modul 21)
+  var voiceLangEl = null, voiceLangChosen = null;  // gesprochene Sprache (Wahl + Anzeige)
   var answerFetchBtn = null;   // A11 — „🔎 Antwort holen": bestpassenden Knoten automatisch fragen
   // A11-Last-Schoner (Klaus 2026-07-11, Tablet friert bei Mehrfach-Klick ein):
   // eine laufende Auto-Suche sperrt weitere Klicks, und dieselbe Frage wird nicht
@@ -376,6 +397,420 @@
   function embedMod() { var e = global.SbkimEmbedding; return (e && typeof e.embedQuery === "function") ? e : null; }
   // Modul 04 nur, wenn der KI-Richter (hybridMatch) wirklich da ist — fail-soft.
   function matchMod() { var m = global.SbkimMatch; return (m && typeof m.hybridMatch === "function") ? m : null; }
+  // Modul 02 nur, wenn getOwnSpore wirklich da ist — fail-soft (Stufe 0a).
+  function sporeMod() { var s = global.SbkimSpore; return (s && typeof s.getOwnSpore === "function") ? s : null; }
+
+  // Stufe 0a — die zwei Status-Zeilen aktualisieren (Kennung + Speicher-
+  // Dauerhaftigkeit). Beide Werte existieren schon im Code; hier werden sie nur
+  // gelesen und angezeigt. REINE Anzeige, konsequent fail-soft. Wird beim Mount,
+  // beim Öffnen und nach Verbinden/Anmelden/Aufräumen gerufen — die Identität
+  // kann gerade erst entstanden sein.
+  function refreshStatus() {
+    // „Speicher dauerhaft" — true|false|null aus Modul 01 _meta.storagePersisted.
+    if (persistValEl) {
+      var p = null;
+      try { var st = global.SbkimStorage; p = (st && st._meta) ? st._meta.storagePersisted : null; } catch (_e) { p = null; }
+      if (p === true) {
+        persistValEl.textContent = "ja"; persistValEl.style.color = "#8fe0b0";
+        if (persistHintEl) persistHintEl.style.display = "none";
+      } else if (p === false) {
+        persistValEl.textContent = "nein"; persistValEl.style.color = "#e6b980";
+        if (persistHintEl) {
+          persistHintEl.textContent = "→ Der Browser darf diesen Speicher später aufräumen — dann wäre deine Kennung weg. Am sichersten: die App auf den Startbildschirm legen (installieren). Eine Sicherung deiner Identität schützt zusätzlich.";
+          persistHintEl.style.display = "block";
+        }
+      } else {
+        persistValEl.textContent = "unbekannt"; persistValEl.style.color = "#9aa7b6";
+        if (persistHintEl) persistHintEl.style.display = "none";
+      }
+    }
+    // „Meine Kennung" — aus Modul 02 getOwnSpore() (async, fail-soft).
+    if (idValEl) {
+      var sp = sporeMod();
+      if (!sp) { idValEl.textContent = "noch keine (erst verbinden)"; return; }
+      try {
+        Promise.resolve(sp.getOwnSpore()).then(function (own) {
+          if (idValEl) idValEl.textContent = (own && own.id) ? own.id : "noch keine (erst verbinden)";
+        }).catch(function () { if (idValEl) idValEl.textContent = "noch keine (erst verbinden)"; });
+      } catch (_e) { idValEl.textContent = "noch keine (erst verbinden)"; }
+    }
+  }
+  // ==== Stufe 0b — die Identität REPARIERBAR machen (2026-07-30) ====
+  //
+  // Auslöser (Klaus' Messläufe 2026-07-29/30): eine Kennung kann verschwinden —
+  // auch bei „Speicher dauerhaft: ja". Ehrliche Grenze, die darum auch in der
+  // Oberfläche steht: eine Räumung durch den Browser lässt sich aus dem Browser
+  // heraus NICHT verhindern. Man kann sie nur unwahrscheinlicher machen (App
+  // installieren) und den Verlust REPARIERBAR halten (Sicherung).
+  //
+  // Drei Teile, alle über die öffentlichen Flächen von Modul 02 — die Kern-
+  // Module 01/02/05/23 bleiben unangetastet:
+  //   1. Sicherung anlegen    (exportBackup: PBKDF2-SHA256 600k + AES-GCM-256)
+  //   2. Sicherung einspielen (importBackup — Gegenprobe: ALTE Kennung zurück)
+  //   3. Schluss mit stummer Neu-Anlage: ist die Schublade leer, FRAGT der
+  //      Verbinden-Knopf erst, statt wortlos eine neue Kennung zu erzeugen.
+  // Dazu ein Aufräum-Knopf für die schon entstandenen Mehrfach-Fächer.
+  // Konsequent fail-soft (Fremdnutzer-/Marktplatz-Brille): fehlt Modul 02 oder
+  // eine Fläche daraus, sagt der Knopf das ehrlich — nie ein Crash, nie ein
+  // toter Knopf, die App bleibt voll nutzbar.
+  var idBoxEl = null, idHintEl = null, idFormEl = null, werkstattRowEl = null, slotsBtnEl = null;
+
+  function backupStampKey() { return "sbkim_backup_made_" + (cfg.dbSuffix || "default"); }
+  function loadBackupStamp() {
+    try { return global.localStorage ? global.localStorage.getItem(backupStampKey()) : null; } catch (_e) { return null; }
+  }
+  function saveBackupStamp(day) {
+    try { if (global.localStorage) global.localStorage.setItem(backupStampKey(), day); } catch (_e) { /* fail-soft */ }
+  }
+  // Modul 02 nur, wenn die Sicherungs-Fläche wirklich da ist — fail-soft.
+  function backupMod() {
+    var s = global.SbkimSpore;
+    return (s && typeof s.exportBackup === "function" && typeof s.importBackup === "function") ? s : null;
+  }
+  function errText(e) { return (e && e.message) ? e.message : String(e); }
+  function isoDay() {
+    try { return new Date().toISOString().slice(0, 10); } catch (_e) { return "heute"; }
+  }
+  // Liest den Identitäts-Stand, OHNE etwas anzulegen. `known:false` heißt „Modul
+  // 02 fehlt / Lesen ging schief" — dann wird NICHT gefragt und der bisherige
+  // Weg läuft unverändert weiter (keine neue Hürde durch ein Lese-Problem).
+  function readIdentityState() {
+    var s = global.SbkimSpore;
+    if (!s || typeof s.listIdentities !== "function") {
+      return Promise.resolve({ known: false, slots: [], nodeId: null });
+    }
+    return Promise.resolve(s.listIdentities()).then(function (slots) {
+      slots = Array.isArray(slots) ? slots : [];
+      var nidP = (typeof s.getNodeId === "function")
+        ? Promise.resolve(s.getNodeId()).catch(function () { return null; })
+        : Promise.resolve(null);
+      // Klaus' Sichttest 2026-07-30 hat einen HALBEN Zustand ans Licht gebracht:
+      // im Fach liegen SCHLÜSSEL, aber noch KEINE Spore (Visitenkarte). Dann
+      // sagte die Statuszeile „noch keine Kennung" (sie liest getOwnSpore),
+      // während das Einspielen meldete „hier liegt schon eine" (es sieht das
+      // Fach) — und die Sicherung scheiterte erst NACH der Passwort-Eingabe mit
+      // SporeMissingError. Drei Stellen, drei Antworten. Darum wird der Zustand
+      // jetzt gelesen und beim Namen genannt.
+      var sporeP = (typeof s.getOwnSpore === "function")
+        ? Promise.resolve(s.getOwnSpore()).catch(function () { return null; })
+        : Promise.resolve(null);
+      return Promise.all([nidP, sporeP]).then(function (r) {
+        return {
+          known: true, slots: slots, nodeId: r[0] || null,
+          hasSpore: !!(r[1] && r[1].id),
+        };
+      });
+    }).catch(function () { return { known: false, slots: [], nodeId: null, hasSpore: false }; });
+  }
+
+  function refreshIdentityBox() {
+    if (!idHintEl) return;
+    readIdentityState().then(function (st) {
+      if (!idHintEl) return;
+      var stamp = loadBackupStamp();
+      var lines = [], warn = false;
+      if (st.known && !st.nodeId) {
+        lines.push("Noch keine Kennung in diesem Browser — „🌐 Mit dem Knotennetz verbinden“ fragt dich vorher.");
+        warn = true;
+      } else if (st.known && st.nodeId && !st.hasSpore) {
+        // Halbe Kennung: Schlüssel da, Visitenkarte fehlt. Kein Fehler, aber
+        // auch nicht sicherbar — und der Weg heraus gehört dazu, nicht nur die
+        // Feststellung.
+        lines.push("⚠ Angefangene Kennung: der Schlüssel liegt hier, die Visitenkarte (Spore) fehlt noch.\n" +
+          "Solange sie fehlt, lässt sich nichts sichern. Einmal „🌐 Mit dem Knotennetz verbinden“ " +
+          "vervollständigt sie — oder im Siegel Schritt 2 „Spore erzeugen“.");
+        warn = true;
+      } else if (!stamp) {
+        lines.push("⚠ Für diesen Knoten liegt hier noch KEINE Sicherung. Ohne sie ist ein Verlust nicht reparierbar.");
+        warn = true;
+      } else {
+        lines.push("Letzte Sicherung: " + stamp + " (nur hier vermerkt — die Datei selbst musst du aufbewahren).");
+      }
+      // Der Aufräum-Knopf erscheint NUR, wenn es mehr als ein Fach gibt. Sonst
+      // stünde ein Knopf da, der nichts zu tun hat — und der sich mit dem
+      // Alt-Speicher-Aufräumen weiter unten verwechseln ließe.
+      if (slotsBtnEl) slotsBtnEl.style.display = (st.slots.length > 1) ? "" : "none";
+      if (st.slots.length > 1) {
+        lines.push("🗂 " + st.slots.length + " Kennungs-Fächer belegt (" + st.slots.join(", ") +
+          ") — Aufräumen behält das aktive.");
+        warn = true;
+      }
+      idHintEl.textContent = lines.join("\n");
+      idHintEl.style.color = warn ? "#e6b980" : "#9aa7b6";
+    });
+    // Das Siegel mountet sein Abzeichen ggf. später als dieses Panel — darum
+    // bei jedem Auffrischen erneut nachsehen, ob die Werkstatt erreichbar ist.
+    renderWerkstattRow(werkstattRowEl);
+  }
+
+  function idBtnCss(primary) {
+    return primary
+      ? "padding:6px 11px;border-radius:8px;border:1px solid " + accent() + ";background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit;font-size:.74rem"
+      : "padding:6px 11px;border-radius:8px;border:1px solid var(--line,#2a3340);background:transparent;color:#eef2f8;cursor:pointer;font:inherit;font-size:.74rem";
+  }
+  function idNote(text, warn) {
+    var n = el("div", "margin-top:6px;font-size:.72rem;line-height:1.45;white-space:pre-wrap;color:" + (warn ? "#e6b980" : "#8fe0b0"));
+    n.textContent = text;
+    return n;
+  }
+  function idField(placeholder, type) {
+    var i = el("input", "flex:1;min-width:130px;padding:6px 9px;border-radius:8px;" +
+      "border:1px solid rgba(154,167,182,.35);background:rgba(10,16,24,.6);color:#e8eef6;font-size:.78rem");
+    i.type = type || "password";
+    if (type !== "file") { i.placeholder = placeholder; i.autocomplete = "new-password"; }
+    return i;
+  }
+  function setIdForm(node) {
+    if (!idFormEl) return;
+    clear(idFormEl);
+    if (node) {
+      idFormEl.appendChild(node);
+      idFormEl.style.display = "block";
+      try { if (idBoxEl && idBoxEl.scrollIntoView) idBoxEl.scrollIntoView({ block: "nearest" }); } catch (_e) { /* fail-soft */ }
+    } else {
+      idFormEl.style.display = "none";
+    }
+  }
+  function idCancelBtn() {
+    var b = el("button", idBtnCss(false), "Abbrechen");
+    b.type = "button";
+    b.addEventListener("click", function () { setIdForm(null); });
+    return b;
+  }
+
+  // Die Sicherungs-Datei ohne Umweg über eine Konsole herunterladen (Klaus'
+  // Regel: Knöpfe statt Konsole). Blob-URL wenn möglich, sonst data:-URI.
+  function downloadJson(obj, filename) {
+    var d = doc();
+    if (!d || !d.body) return false;
+    var text;
+    try { text = JSON.stringify(obj, null, 2); } catch (_e) { return false; }
+    var url = null;
+    try {
+      var B = global.Blob, U = global.URL || global.webkitURL;
+      if (B && U && typeof U.createObjectURL === "function") {
+        url = U.createObjectURL(new B([text], { type: "application/json" }));
+      }
+    } catch (_e) { url = null; }
+    if (!url) url = "data:application/json;charset=utf-8," + encodeURIComponent(text);
+    var a = d.createElement("a");
+    a.href = url; a.download = filename; a.style.display = "none";
+    d.body.appendChild(a);
+    a.click();
+    global.setTimeout(function () {
+      try { d.body.removeChild(a); } catch (_e) { /* fail-soft */ }
+      try { if (url.indexOf("blob:") === 0 && global.URL) global.URL.revokeObjectURL(url); } catch (_e) { /* fail-soft */ }
+    }, 0);
+    return true;
+  }
+
+  // ---- Teil 1: Sicherung anlegen ----
+  function openBackupForm() {
+    var s = backupMod();
+    if (!s) { setIdForm(idNote("Modul 02 (Sicherung) ist in dieser App nicht geladen — Sicherung nicht möglich.", true)); return; }
+    // Erst prüfen, dann fragen: ohne Visitenkarte (Spore) kann Modul 02 gar kein
+    // Backup schreiben. Es dem Nutzer VOR der Passwort-Eingabe sagen, statt ihn
+    // zweimal tippen zu lassen und dann zu scheitern (Klaus' Sichttest 2026-07-30).
+    readIdentityState().then(function (st) {
+      if (st.known && st.nodeId && !st.hasSpore) {
+        setIdForm(idNote("Noch nichts zu sichern: der Schlüssel liegt hier, aber die Visitenkarte (Spore) fehlt.\n" +
+          "Einmal „🌐 Mit dem Knotennetz verbinden“ vervollständigt die Kennung — oder im Siegel Schritt 2 " +
+          "„Spore erzeugen“. Danach lässt sie sich sichern.", true));
+        return;
+      }
+      buildBackupForm(s);
+    });
+  }
+  function buildBackupForm(s) {
+    var box = el("div", "");
+    box.appendChild(el("div", "font-size:.72rem;color:#9aa7b6;line-height:1.45",
+      "Passwort für die Sicherungs-Datei (mindestens 8 Zeichen). Ohne dieses Passwort ist die Datei wertlos — es wird nirgends gespeichert, auch nicht hier."));
+    var row = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    var p1 = idField("Passwort"), p2 = idField("Passwort wiederholen");
+    row.appendChild(p1); row.appendChild(p2);
+    box.appendChild(row);
+    var row2 = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    var go = el("button", idBtnCss(true), "💾 Datei erzeugen"); go.type = "button";
+    row2.appendChild(go); row2.appendChild(idCancelBtn());
+    box.appendChild(row2);
+    go.addEventListener("click", function () {
+      var pw = String(p1.value || "");
+      if (pw.length < 8) { box.appendChild(idNote("Passwort zu kurz — mindestens 8 Zeichen.", true)); return; }
+      if (pw !== String(p2.value || "")) { box.appendChild(idNote("Die beiden Passwörter sind nicht gleich.", true)); return; }
+      go.disabled = true;
+      box.appendChild(idNote("→ Verschlüssele die Sicherung … (das dauert bewusst einen Moment)", false));
+      Promise.resolve(s.exportBackup(pw)).then(function (blob) {
+        var name = "sbkim-sicherung-" + (cfg.dbSuffix || "knoten") + "-" + isoDay() + ".json";
+        var ok = downloadJson(blob, name);
+        saveBackupStamp(isoDay());
+        refreshIdentityBox();
+        setIdForm(idNote(ok
+          ? "✓ Sicherung erzeugt: " + name + "\nBewahre die Datei getrennt vom Gerät auf. Mit ihr und dem Passwort ist eine verlorene Kennung wiederherstellbar."
+          : "✓ Sicherung erzeugt, aber der Download ging in diesem Browser nicht. Bitte nochmal versuchen.", !ok));
+      }).catch(function (e) {
+        go.disabled = false;
+        box.appendChild(idNote("✗ Sicherung fehlgeschlagen: " + errText(e), true));
+      });
+    });
+    setIdForm(box);
+  }
+
+  // ---- Teil 2: Sicherung einspielen ----
+  function runImport(blob, pw, force) {
+    var s = backupMod();
+    if (!s) { setIdForm(idNote("Modul 02 (Sicherung) ist in dieser App nicht geladen.", true)); return; }
+    setIdForm(idNote("→ Spiele die Sicherung ein …", false));
+    Promise.resolve(s.importBackup(blob, pw, force ? { force: true } : undefined)).then(function () {
+      refreshStatus();
+      refreshIdentityBox();
+      setIdForm(idNote("✓ Sicherung eingespielt — die Kennung aus der Datei ist wieder aktiv.\nOben unter „Meine Kennung“ steht sie jetzt. Danach einmal „🌐 Mit dem Knotennetz verbinden“, damit die Visitenkarte wieder im Raum hängt.", false));
+    }).catch(function (e) {
+      if (e && e.name === "BackupOverwriteError") {
+        // Der Normalfall nach einem Verlust: es liegt bereits eine (neue)
+        // Kennung im Fach. Ersetzen ist gewollt — aber nur ausdrücklich.
+        var box = el("div", "");
+        box.appendChild(idNote("In diesem Browser liegt schon eine Kennung. Einspielen ERSETZT sie durch die aus der Datei.\nDie jetzige Kennung ist danach weg — andere Knoten kennen wieder die alte.", true));
+        var row = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+        var yes = el("button", idBtnCss(true), "📥 Ja, ersetzen"); yes.type = "button";
+        yes.addEventListener("click", function () { runImport(blob, pw, true); });
+        row.appendChild(yes); row.appendChild(idCancelBtn());
+        box.appendChild(row);
+        setIdForm(box);
+        return;
+      }
+      setIdForm(idNote("✗ Einspielen fehlgeschlagen: " + errText(e) +
+        "\n(Häufigster Grund: falsches Passwort oder eine Datei, die keine SBKIM-Sicherung ist.)", true));
+    });
+  }
+  function openImportForm() {
+    if (!backupMod()) { setIdForm(idNote("Modul 02 (Sicherung) ist in dieser App nicht geladen — Einspielen nicht möglich.", true)); return; }
+    var box = el("div", "");
+    box.appendChild(el("div", "font-size:.72rem;color:#9aa7b6;line-height:1.45",
+      "Sicherungs-Datei wählen und ihr Passwort eingeben. Danach ist die Kennung aus der Datei wieder die deine."));
+    var fileIn = idField("", "file");
+    fileIn.accept = ".json,application/json";
+    fileIn.style.cssText += ";padding:4px";
+    var frow = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    frow.appendChild(fileIn);
+    box.appendChild(frow);
+    var prow = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    var pw = idField("Passwort der Datei");
+    prow.appendChild(pw);
+    box.appendChild(prow);
+    var row2 = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    var go = el("button", idBtnCss(true), "📥 Einspielen"); go.type = "button";
+    row2.appendChild(go); row2.appendChild(idCancelBtn());
+    box.appendChild(row2);
+    go.addEventListener("click", function () {
+      var f = (fileIn.files && fileIn.files[0]) ? fileIn.files[0] : null;
+      if (!f) { box.appendChild(idNote("Erst eine Datei wählen.", true)); return; }
+      if (String(pw.value || "").length < 8) { box.appendChild(idNote("Passwort fehlt (mindestens 8 Zeichen).", true)); return; }
+      var FR = global.FileReader;
+      if (!FR) { box.appendChild(idNote("Dieser Browser kann keine Datei lesen (FileReader fehlt).", true)); return; }
+      var r = new FR();
+      r.onerror = function () { box.appendChild(idNote("Datei konnte nicht gelesen werden.", true)); };
+      r.onload = function () {
+        var blob;
+        try { blob = JSON.parse(String(r.result || "")); }
+        catch (_e) { box.appendChild(idNote("Das ist keine lesbare JSON-Sicherung.", true)); return; }
+        runImport(blob, String(pw.value || ""), false);
+      };
+      try { r.readAsText(f); } catch (_e) { box.appendChild(idNote("Datei konnte nicht gelesen werden.", true)); }
+    });
+    setIdForm(box);
+  }
+
+  // ---- Aufräumen: Mehrfach-Fächer entfernen, aktives behalten ----
+  function openCleanupForm() {
+    var s = global.SbkimSpore;
+    if (!s || typeof s.listIdentities !== "function" || typeof s.removeIdentity !== "function" ||
+        typeof s.getActiveIdentityKey !== "function") {
+      setIdForm(idNote("Modul 02 (Identitäts-Fächer) ist in dieser App nicht geladen.", true));
+      return;
+    }
+    setIdForm(idNote("→ Lese die Fächer …", false));
+    Promise.resolve(s.listIdentities()).then(function (slots) {
+      slots = Array.isArray(slots) ? slots : [];
+      if (slots.length < 2) { setIdForm(idNote("Nichts aufzuräumen — es gibt nur ein Fach.", false)); return null; }
+      return Promise.resolve(s.getActiveIdentityKey()).then(function (active) {
+        var others = slots.filter(function (k) { return k !== active; });
+        if (others.length === 0) { setIdForm(idNote("Nichts aufzuräumen — nur das aktive Fach ist belegt.", false)); return; }
+        var box = el("div", "");
+        box.appendChild(idNote("Aktives Fach BLEIBT: " + active +
+          "\nEntfernt werden: " + others.join(", ") +
+          "\nDas ist nicht umkehrbar. Wenn du unsicher bist: erst „💾 Sicherung anlegen“.", true));
+        var row = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+        var yes = el("button", idBtnCss(true), "🧹 Ja, alte Fächer entfernen"); yes.type = "button";
+        yes.addEventListener("click", function () {
+          setIdForm(idNote("→ Entferne " + others.length + " Fach/Fächer …", false));
+          var chain = Promise.resolve(), removed = 0, failed = [];
+          others.forEach(function (k) {
+            chain = chain.then(function () {
+              return Promise.resolve(s.removeIdentity(k)).then(function () { removed++; },
+                function (e) { failed.push(k + " (" + errText(e) + ")"); });
+            });
+          });
+          chain.then(function () {
+            refreshStatus();
+            refreshIdentityBox();
+            setIdForm(idNote("✓ " + removed + " Fach/Fächer entfernt. Aktive Kennung unverändert: " + active +
+              (failed.length ? "\n⚠ Nicht entfernt: " + failed.join(", ") : ""), failed.length > 0));
+          });
+        });
+        row.appendChild(yes); row.appendChild(idCancelBtn());
+        box.appendChild(row);
+        setIdForm(box);
+      });
+    }).catch(function (e) { setIdForm(idNote("✗ Fächer lesen fehlgeschlagen: " + errText(e), true)); });
+  }
+
+  // ---- Werkstatt-Verweis (Klaus' Arbeitsteilung 2026-07-30) ----
+  // „Das Netz-Panel ist die Alltagsansicht — was gerade los ist, wer da ist.
+  //  Sehe ich, dass etwas fehlt, gehe ich ins Siegel: dort liegt das ganze
+  //  Werkzeug (erzeugen · Spore signieren · wechseln · sichern · zurückholen)."
+  // Darum steht hier nur das Nötigste für den Alltag plus ein Weg dorthin.
+  // Fail-soft: ohne Siegel (Forker, fremde App) fehlt der Knopf, der Hinweis
+  // bleibt weg — nie ein toter Knopf.
+  function siegelBadge() {
+    var d = doc();
+    if (!d || typeof d.getElementById !== "function") return null;
+    try { return d.getElementById("sbkim-siegel-badge"); } catch (_e) { return null; }
+  }
+  function renderWerkstattRow(row) {
+    if (!row) return;
+    clear(row);
+    var badge = siegelBadge();
+    if (!badge) { row.style.display = "none"; return; }
+    row.style.display = "block";
+    row.appendChild(el("div", "color:#7e8b9a;font-size:.7rem;line-height:1.45",
+      "Hier steht nur das Nötigste für den Alltag. Das ganze Werkzeug — Identität erzeugen, wechseln, sichern, zurückholen — liegt im Siegel."));
+    var b = el("button", idBtnCss(false) + ";margin-top:5px", "🏅 Werkstatt im Siegel öffnen");
+    b.type = "button";
+    b.title = "Siegel öffnen";
+    b.addEventListener("click", function () {
+      var t = siegelBadge();
+      if (!t) { setIdForm(idNote("Das Siegel ist in dieser App nicht geladen.", true)); return; }
+      try { t.click(); } catch (_e) { setIdForm(idNote("Das Siegel ließ sich nicht öffnen — bitte das Siegel-Abzeichen direkt anklicken.", true)); }
+    });
+    row.appendChild(b);
+  }
+
+  // ---- Teil 3: keine stumme Neu-Anlage — erst fragen ----
+  function askBeforeCreate() {
+    var box = el("div", "");
+    box.appendChild(idNote("In diesem Browser ist für diese App noch KEINE Kennung hinterlegt.\n" +
+      "Eine neue Kennung ist NICHT dieselbe wie eine frühere — andere Knoten sehen dich danach als neuen Knoten.\n" +
+      "Hast du eine Sicherung, spiel sie lieber ein.", true));
+    var row = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    var neu = el("button", idBtnCss(true), "🆕 Neue Kennung anlegen"); neu.type = "button";
+    neu.addEventListener("click", function () { setIdForm(null); onConnect({ skipIdentityGate: true }); });
+    var imp = el("button", idBtnCss(false), "📥 Sicherung einspielen"); imp.type = "button";
+    imp.addEventListener("click", function () { openImportForm(); });
+    row.appendChild(neu); row.appendChild(imp); row.appendChild(idCancelBtn());
+    box.appendChild(row);
+    setIdForm(box);
+  }
+
   // Anbieter-Liste aus Modul 04 (id/label/region), EU-gefiltert bei cfg.euOnly.
   function kiProviders() {
     var m = matchMod();
@@ -461,6 +896,39 @@
     } catch (_e) { /* fail-soft — dann bleibt es beim Label ohne Tooltip */ }
   }
 
+  // ── Kollision mit der Lampen-Leiste (Modul 17) auf schmalen Schirmen ────────
+  // Befund 2026-08-03 (gemessen an BookLedgerPro, 412 px breit): die Lampen-
+  // Leiste sitzt unten rechts, wird mit allen vier Lampen aber so breit, dass
+  // sie bis an den linken Rand reicht. Der 🌐-Knopf sitzt unten links — und lag
+  // damit MITTEN AUF der Leiste. Der Prüfer meldete beide Elemente zugleich
+  // ("teilweise verdeckt", nur 8,2 px der LEBT-Lampe blieben frei); mit dem
+  // Finger war die Lampe nicht mehr zu treffen.
+  //
+  // Klaus' Entscheid 2026-08-03: der 🌐-Knopf rückt hoch, die Leiste bleibt, wo
+  // sie ist. Nur unterhalb von 560 px — darüber stehen beide nebeneinander und
+  // es ändert sich nichts. 78 px = 16 px Abstand der Leiste vom Rand + rund
+  // 56 px Leisten-Höhe + 6 px Luft.
+  //
+  // Warum als eingehängte Regel und nicht am Knopf: die Position steht inline
+  // am Element, und inline schlägt jedes Stylesheet — nur `!important` in einer
+  // Medien-Abfrage kommt dagegen an. Sie greift ausdrücklich NUR bei den beiden
+  // unteren Ecken (`data-ecke-unten`); wer den Knopf oben verankert, ist von der
+  // Leiste ohnehin weit weg. Fail-soft: ohne `head` passiert schlicht nichts.
+  var RDV_STIL_ID = "sbkim-rdv-stil";
+  function stilEinhaengen() {
+    var d = doc();
+    if (!d || !d.head || d.getElementById(RDV_STIL_ID)) return;
+    try {
+      var st = d.createElement("style");
+      st.id = RDV_STIL_ID;
+      st.textContent =
+        "@media (max-width: 560px){" +
+        "#sbkim-rdv-btn[data-ecke-unten=\"1\"]{bottom:78px !important;}" +
+        "}";
+      d.head.appendChild(st);
+    } catch (e) { /* fail-soft: ohne die Regel ueberlappt es nur wieder */ }
+  }
+
   function cornerCss(corner, panel) {
     var off = panel ? "64px" : "14px";
     switch (corner) {
@@ -528,10 +996,29 @@
     // Klemme, dass das GANZE Panel auf den Schirm passt — ein hohes Panel klemmte
     // dann vertikal fest (nur horizontal verschiebbar). Oben nie ganz raus, weil
     // die Kopfzeile der Ziehgriff ist.
+    //
+    // ⚠ WAAGERECHT gilt das NICHT MEHR (Klaus 2026-08-11: „der selbe Bug ist
+    // überall, auch auf den iOS-Handys"). Gemessen im echten Browser:
+    //
+    //   1100 px  Panel @980..1400 (420 breit)  →  nur 120 px sichtbar
+    //    500 px  Blase @980..1045              →  sichtbar −480 px (ganz weg)
+    //
+    // Ein 420 px breites Panel, geklemmt auf `vw - 56`, zeigt einen 56 px
+    // schmalen, hohen Streifen am rechten Rand — genau das, was Klaus als
+    // „wandert nach rechts und ist schmaler" beschrieben hat. Und auf dem
+    // Handy war der Knopf gar nicht mehr zu treffen.
+    //
+    // Klaus' Entscheid von 2026-07-24 bleibt trotzdem gültig — er zielte auf
+    // die HÖHE: ein hohes Panel soll über den unteren Rand ragen dürfen, statt
+    // senkrecht festzukleben. Genau diese Hälfte bleibt. Waagerecht passt das
+    // Panel dagegen IMMER (`width:min(420px,92vw)`), also gibt es keinen Grund,
+    // es halb aus dem Bild zu schieben: was hineinpasst, bleibt ganz drin.
     var vw = global.innerWidth || 1024, vh = global.innerHeight || 768;
     var w = (node && node.offsetWidth) || 60;
     var KEEP = 56;
-    var loX = Math.min(4, KEEP - w), hiX = Math.max(loX, vw - KEEP);
+    var loX, hiX;
+    if (w + 8 <= vw) { loX = 4; hiX = Math.max(loX, vw - w - 4); }   // passt → ganz sichtbar
+    else { loX = Math.min(4, KEEP - w); hiX = Math.max(loX, vw - KEEP); } // breiter als der Schirm
     var loY = 4, hiY = Math.max(loY, vh - KEEP);
     return { x: Math.min(Math.max(loX, x), hiX), y: Math.min(Math.max(loY, y), hiY) };
   }
@@ -539,6 +1026,25 @@
     if (!node || !p) return;
     node.style.left = p.x + "px"; node.style.top = p.y + "px";
     node.style.right = "auto"; node.style.bottom = "auto";
+    // ⚠ Und das Ecken-Merkmal abnehmen (Klaus 2026-08-11, zweiter Befund:
+    // „das Mizel ist immer noch son langer Container … in Kombination mit dem
+    // Minimieren").
+    //
+    // Die Regel `#sbkim-rdv-btn[data-ecke-unten="1"]{bottom:78px !important}`
+    // hebt einen in der UNTEREN ECKE verankerten Knopf über die Lampen-Leiste.
+    // `!important` schlaegt aber auch das `bottom:auto`, das eine Zeile darueber
+    // inline gesetzt wird. Sobald hier eine freie Position anliegt, gelten also
+    // `top` UND `bottom` gleichzeitig — und ein `position:fixed`-Element mit
+    // beidem zieht sich ueber die ganze Hoehe dazwischen. Genau das: ein
+    // fingerbreiter, schirmhoher Kasten mit der Schrift in der Mitte, auf zwei
+    // Geraeten fotografiert. Nur unter 560 px, und nur nachdem eine Position
+    // gesetzt wurde (Ziehen, Minimieren, gemerkte Position beim Laden) — darum
+    // sah es beim ersten Aufruf richtig aus.
+    //
+    // Wer frei positioniert ist, steht nicht mehr in der Ecke; die Ausnahme fuer
+    // die Ecke gilt fuer ihn nicht mehr. Zurueck kommt sie beim naechsten Laden
+    // ohne gemerkte Position — dann steht der Knopf wieder in der Ecke.
+    try { if (node.removeAttribute) node.removeAttribute("data-ecke-unten"); } catch (_e) {}
   }
   function makeDraggable(node, handle) {
     handle = handle || node;
@@ -593,11 +1099,27 @@
 
     btnEl = el("button", "position:fixed;" + cornerCss(cfg.corner, false) + ";z-index:2147483600;" +
       "font:600 .8rem var(--mono,system-ui,sans-serif);padding:8px 12px;border-radius:10px;" +
-      "border:1px solid " + ac + ";background:rgba(10,12,20,.7);color:" + ac + ";cursor:pointer;" +
+      // LESBARKEIT (Lighthouse-Runde 2026-08-03, gemessen an BookLedgerPro):
+      // Die Schrift stand auf der Akzentfarbe der App. Das geht gut, solange die
+      // App einen HELLEN Akzent auf dunklem Grund hat (Sage: #6ee7d3, Minze).
+      // BookLedgerPro hat aber ein dunkles Petrol (#0f766e) — dunkle Schrift auf
+      // dunklem Grund, gemessen 1,35:1 statt der geforderten 4,5:1. Praktisch
+      // unlesbar, und es faellt nur niemandem auf, weil man ahnt, was da steht.
+      //
+      // Der Knopf uebernimmt jetzt dieselbe Schriftfarbe wie das Panel, das er
+      // oeffnet (#eef2f8) — dort stand sie von Anfang an. Der Akzent bleibt als
+      // Rahmen erhalten, die App bleibt also erkennbar; nur die Schrift ist nicht
+      // mehr von einer Farbe abhaengig, die die App fuer HELLE Flaechen gewaehlt
+      // hat. Wer den Knopf bewusst anders faerben will, setzt weiterhin
+      // `cfg.accent` — das faerbt den Rahmen.
+      "border:1px solid " + ac + ";background:rgba(10,12,20,.7);color:#eef2f8;cursor:pointer;" +
       "backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.35)", RDV_BUBBLE_BASE);
     btnEl.type = "button";
     btnEl.id = "sbkim-rdv-btn";
     btnEl.title = "Mit dem Knotennetz verbinden";
+    // Nur die unteren Ecken koennen mit der Lampen-Leiste kollidieren.
+    if (cfg.corner !== "tl" && cfg.corner !== "tr") btnEl.setAttribute("data-ecke-unten", "1");
+    stilEinhaengen();
 
     panelEl = el("div", "position:fixed;" + cornerCss(cfg.corner, true) + ";z-index:2147483600;" +
       "width:min(420px,92vw);display:none;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;" +
@@ -648,6 +1170,74 @@
     panelEl.appendChild(el("p", "margin:0 0 10px;color:#9aa7b6",
       "Triff andere SBKIM-Knoten im gemeinsamen Raum — server-los, direkt aus deinem Browser. Du kannst dieses Fenster schließen und normal weiterarbeiten; nur die App-Seite selbst offen lassen, damit du erreichbar bleibst."));
 
+    // Stufe 0a — zwei ehrliche Status-Zeilen: „Meine Kennung" (aus Modul 02
+    // getOwnSpore) und „Speicher dauerhaft" (aus Modul 01 _meta.storagePersisted).
+    // Beide Werte existieren längst im Code; hier werden sie nur sichtbar, damit
+    // Klaus messen kann, ob die Kennung eine Sitzung überlebt. REINE Anzeige,
+    // konsequent fail-soft: fehlt ein Wert, steht „unbekannt"/„noch keine" da —
+    // nie ein Fehler, nie ein toter Knopf (Fremdnutzer-/Marktplatz-Brille).
+    var statusBox = el("div", "margin:0 0 10px;padding:8px 10px;border-radius:8px;" +
+      "border:1px solid rgba(154,167,182,.22);background:rgba(10,16,24,.35);font-size:.74rem;line-height:1.5");
+    var idRow = el("div", "color:#9aa7b6;margin-bottom:2px");
+    idRow.appendChild(el("span", "color:#c7d2de", "Meine Kennung: "));
+    idValEl = el("span", "font:.68rem/1.3 var(--mono,monospace);color:#cfe0ff;word-break:break-all", "…");
+    idValEl.id = "sbkim-rdv-myid";
+    idRow.appendChild(idValEl);
+    statusBox.appendChild(idRow);
+    var persistRow = el("div", "color:#9aa7b6");
+    persistRow.appendChild(el("span", "color:#c7d2de", "Speicher dauerhaft: "));
+    persistValEl = el("span", "color:#cfe0ff", "…");
+    persistValEl.id = "sbkim-rdv-persist";
+    persistRow.appendChild(persistValEl);
+    statusBox.appendChild(persistRow);
+    persistHintEl = el("div", "display:none;margin-top:3px;color:#e6b980;font-size:.7rem;line-height:1.45");
+    statusBox.appendChild(persistHintEl);
+    panelEl.appendChild(statusBox);
+    refreshStatus();
+
+    // Stufe 0b — „🪪 Kennung sichern". Drei Knöpfe (Sicherung anlegen /
+    // einspielen / Fächer aufräumen), ein ehrlicher Hinweis darüber und die
+    // ehrliche Grenze darunter. Alles nutzer-ausgelöst; nichts läuft von selbst.
+    idBoxEl = el("div", "margin:0 0 10px;padding:8px 10px;border-radius:8px;" +
+      "border:1px solid rgba(154,167,182,.22);background:rgba(10,16,24,.35);font-size:.74rem;line-height:1.5");
+    idBoxEl.id = "sbkim-rdv-idbox";
+    idBoxEl.appendChild(el("div", "color:#c7d2de;margin-bottom:4px", "🪪 Kennung sichern"));
+    idHintEl = el("div", "color:#9aa7b6;font-size:.72rem;line-height:1.45;white-space:pre-wrap", "…");
+    idHintEl.id = "sbkim-rdv-idhint";
+    idBoxEl.appendChild(idHintEl);
+    var idRow2 = el("div", "display:flex;gap:6px;flex-wrap:wrap;margin-top:6px");
+    var backupBtn = el("button", idBtnCss(false), "💾 Sicherung anlegen"); backupBtn.type = "button";
+    backupBtn.title = "Kennung in eine verschlüsselte Datei sichern";
+    var restoreBtn = el("button", idBtnCss(false), "📥 Sicherung einspielen"); restoreBtn.type = "button";
+    restoreBtn.title = "Kennung aus einer Sicherungs-Datei zurückholen";
+    // Eigenes Symbol (🗂) + eindeutiger Name — NICHT 🧹 wie der Alt-Speicher-Knopf
+    // weiter unten. Klaus' Befund 2026-07-30: zwei Knöpfe, die beide „🧹 aufräumen"
+    // heißen, aber Verschiedenes tun, sind eine Doppelung im Kopf des Nutzers,
+    // auch wenn sie es im Code nicht sind. Zusätzlich: dieser Knopf erscheint nur,
+    // wenn es wirklich mehr als ein Fach gibt — im Normalfall steht er gar nicht da.
+    var slotsBtn = el("button", idBtnCss(false) + ";display:none", "🗂 Mehrfach-Kennungen aufräumen"); slotsBtn.type = "button";
+    slotsBtn.title = "Alte Identitäts-Fächer entfernen, aktives behalten";
+    slotsBtnEl = slotsBtn;
+    backupBtn.addEventListener("click", function () { openBackupForm(); });
+    restoreBtn.addEventListener("click", function () { openImportForm(); });
+    slotsBtn.addEventListener("click", function () { openCleanupForm(); });
+    idRow2.appendChild(backupBtn); idRow2.appendChild(restoreBtn); idRow2.appendChild(slotsBtn);
+    idBoxEl.appendChild(idRow2);
+    idFormEl = el("div", "display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(154,167,182,.18)");
+    idFormEl.id = "sbkim-rdv-idform";
+    idBoxEl.appendChild(idFormEl);
+    // Die ehrliche Grenze — sie gehört sichtbar in die Oberfläche, nicht nur
+    // in die Doku: verhindern kann man eine Räumung nicht.
+    idBoxEl.appendChild(el("div", "margin-top:6px;color:#7e8b9a;font-size:.7rem;line-height:1.45",
+      "Eine Räumung durch den Browser lässt sich nicht verhindern — nur unwahrscheinlicher machen (App auf den Startbildschirm legen) und der Verlust reparierbar halten (Sicherung)."));
+    werkstattRowEl = el("div", "display:none;margin-top:7px;padding-top:7px;border-top:1px solid rgba(154,167,182,.14)");
+    werkstattRowEl.id = "sbkim-rdv-werkstatt";
+    idBoxEl.appendChild(werkstattRowEl);
+    renderWerkstattRow(werkstattRowEl);
+    panelEl.appendChild(idBoxEl);
+    refreshIdentityBox();
+    startIdentityWatch();   // Kennung anderswo entstanden (Siegel) → Anzeige zieht nach
+
     // A15 — Zwei-Stufen-Hinweis (ehrliche Kosten-Benennung, reine Anzeige):
     // „nur stöbern" ist anonym (kein Modell/keine Identität, man wird nicht
     // gefunden); „voll mitmachen" legt einmal eine lokale Identität an und macht
@@ -690,8 +1280,8 @@
     var repairRow = el("div", "margin-top:8px");
     var repairBtn = el("button", "padding:6px 11px;border-radius:8px;border:1px dashed var(--line,#5a4a3a);" +
       "background:transparent;color:#e6b980;cursor:pointer;font:inherit;font-size:.74rem",
-      "🧹 Aufräumen & neu anmelden"); repairBtn.type = "button";
-    repairBtn.title = "Aufräumen & neu anmelden";
+      "🧹 Alt-Speicher aufräumen & neu anmelden"); repairBtn.type = "button";
+    repairBtn.title = "Den geteilten Alt-Speicher dieser Adresse leeren und neu im Raum anmelden — die eigene Kennung bleibt";
     repairBtn.addEventListener("click", function () { onRepair(); });
     repairRow.appendChild(repairBtn);
     panelEl.appendChild(repairRow);
@@ -710,6 +1300,7 @@
     voiceBtnEl = el("button", bsGhost + ";font-size:.9rem;padding:5px 8px", "🎤");
     voiceBtnEl.type = "button";
     voiceBtnEl.title = "Frage einsprechen";
+    voiceLangEl = buildVoiceLangPicker();
     answerBtn = el("button", bsGhost + ";font-size:.74rem;padding:5px 10px", "💬 Antworten: aus");
     answerBtn.type = "button";
     answerBtn.title = "Anderen Knoten antworten";
@@ -725,6 +1316,7 @@
     askRow.appendChild(askInputEl);
     askRow.appendChild(answerFetchBtn);
     askRow.appendChild(voiceBtnEl);
+    if (voiceLangEl) askRow.appendChild(voiceLangEl);
     askRow.appendChild(answerBtn);
     panelEl.appendChild(askRow);
     voiceBtnEl.addEventListener("click", function () { onVoiceClick(); });
@@ -750,6 +1342,15 @@
     // Anbieters. Sichtbar nur, wenn KI-Richter an ist UND noch KEIN Schlüssel
     // eingegeben wurde (dann braucht man ihn ja gerade). Neuer Tab, fail-soft.
     kiKeyLinkEl = doc().createElement("a");
+    // Eine Adresse MUSS schon hier stehen (Lighthouse „crawlable-anchors",
+    // 2026-08-01): `kiProvider` ist beim Bauen noch leer, das Element wäre sonst
+    // bis zum ersten `updateKiKeyLink()` ein Link ins Nichts — für Suchmaschinen
+    // und für Vorlesewerkzeuge. Der erste bekannte Anbieter ist der Platzhalter;
+    // sobald ein Anbieter gewählt ist, überschreibt `updateKiKeyLink()` ihn.
+    // Die SICHTBARKEIT bleibt unberührt an der echten Kenntnis hängen
+    // (unbekannter Anbieter → kein Link, fail-soft) — hier wird nur verhindert,
+    // dass ein verborgenes <a> ohne Ziel im Dokument steht.
+    kiKeyLinkEl.href = KI_KEY_URLS[kiProvider] || KI_KEY_URLS[Object.keys(KI_KEY_URLS)[0]] || "";
     kiKeyLinkEl.textContent = "🔑 Schlüssel holen ↗";
     kiKeyLinkEl.target = "_blank"; kiKeyLinkEl.rel = "noopener noreferrer";
     kiKeyLinkEl.title = "Schlüssel beim Anbieter holen";
@@ -815,8 +1416,24 @@
     answerBtn.addEventListener("click", function () { onToggleAnswering(); });
 
     // Flying-Widget: gemerkte Position wiederherstellen + Drag verdrahten.
+    /* Die gemerkte Position IMMER klemmen, auch beim Laden (Klaus 2026-08-11).
+     *
+     * Vorher stand hier `applyPos(btnEl, savedPos)` ohne Klemme, und geklemmt
+     * wurde nur im `resize`-Zuhoerer darunter. Beim NEULADEN feuert aber kein
+     * `resize` — wer die Blase am breiten Schirm nach rechts zieht und die
+     * Seite dann am Handy oder im Splitscheirm oeffnet, findet sie ausserhalb
+     * des Bildes. Gemessen: bei 390 px lag sie bei x=980, also 590 px
+     * jenseits des rechten Randes. Nicht zu sehen, nicht zu treffen, nicht
+     * zurueckzuholen — ausser man dreht das Geraet, damit ein `resize` kommt.
+     *
+     * Die Klemme braucht die echte Breite des Elements. Beim Mount steht die
+     * noch nicht im Layout, darum erst anhaengen, dann klemmen. */
     var savedPos = loadPos();
-    if (savedPos) applyPos(btnEl, savedPos);
+    if (savedPos) {
+      var sicher = clampInts(savedPos.x, savedPos.y, btnEl);
+      applyPos(btnEl, sicher);
+      if (sicher.x !== savedPos.x || sicher.y !== savedPos.y) savePos(sicher.x, sicher.y);
+    }
     makeDraggable(btnEl, btnEl);   // Blase direkt ziehbar
     makeDraggable(panelEl, head);  // Panel an der Kopfzeile ziehbar
     // Bei Fenster-/Splitscreen-Änderung ins Sichtfeld zurückklemmen (fail-soft).
@@ -866,6 +1483,8 @@
     startModelProgress("🧹 Räume auf & melde neu an …");
     r.repairAndReconnect().then(function (res) {
       stopModelProgress(); if (outEl) outEl.textContent = "🧹 Aufgeräumt & neu angemeldet:\n";
+      refreshStatus();   // Stufe 0a: Identität kann sich geändert haben
+      refreshIdentityBox();   // Stufe 0b: Fächer/Sicherungs-Hinweis frisch
       var c = res && res.cleaned;
       if (c) {
         appendOut("• Alt-Topf „sbkim“ gelöscht: " + (c.dbDeleted ? "ja" : "nein") + "\n");
@@ -883,13 +1502,31 @@
     }).catch(function (e) { stopModelProgress(); setOut("✗ Aufräumen fehlgeschlagen: " + (e && e.message ? e.message : e)); });
   }
 
-  function onConnect() {
+  function onConnect(opts) {
     var r = ensureRdv();
     if (!r) return;
+    // Stufe 0b Teil 3 — Schluss mit stummer Neu-Anlage. Ist die Schublade leer,
+    // wird EINMAL gefragt (neu anlegen ODER Sicherung einspielen), statt wortlos
+    // eine neue Kennung zu erzeugen. Ist eine Kennung da, ändert sich nichts —
+    // kein zusätzlicher Klick. Lässt sich der Stand nicht lesen, läuft der alte
+    // Weg unverändert weiter (ein Lese-Problem darf keine neue Hürde bauen).
+    if (!(opts && opts.skipIdentityGate)) {
+      readIdentityState().then(function (st) {
+        if (st.known && !st.nodeId) {
+          setOut("🪪 Bitte einmal entscheiden — siehe „Kennung sichern“ oben.");
+          askBeforeCreate();
+          return;
+        }
+        onConnect({ skipIdentityGate: true });
+      });
+      return;
+    }
     setOut("→ Verbinde mit dem Netz …\n");
     startModelProgress("→ Verbinde mit dem Netz …");
     r.connectAndAnnounce({ createIdentity: cfg.createIdentity || undefined }).then(function (res) {
       stopModelProgress(); if (outEl) outEl.textContent = "";
+      refreshStatus();   // Stufe 0a: Kennung kann gerade erst entstanden sein
+      refreshIdentityBox();   // Stufe 0b
       if (res.ok) {
         if (res.created) appendOut("✓ Identität erzeugt: " + res.nodeId + "\n");
         else appendOut("Identität vorhanden: " + res.nodeId + "\n");
@@ -909,6 +1546,8 @@
     startModelProgress("→ Hefte deine Visitenkarte in den gemeinsamen Raum …");
     r.announce().then(function (res) {
       stopModelProgress(); if (outEl) outEl.textContent = "";
+      refreshStatus();   // Stufe 0a
+      refreshIdentityBox();   // Stufe 0b
       if (res.ok) appendOut("✓ Du bist im Raum (nodeId " + res.nodeId + "). Fenster darf zu — nur die App-Seite offen lassen.");
       else appendOut("✗ " + (res.reason || "Anmelden fehlgeschlagen."));
     }).catch(function (e) { stopModelProgress(); setOut("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
@@ -1245,6 +1884,77 @@
   // Kurze, transiente Notiz im Ausgabe-Bereich (Spracheingabe-Status/Fehler).
   function setVoiceHint(t) { if (outEl) outEl.textContent = t; }
 
+  /* ---- Die Sprache, in der gesprochen wird -------------------------------
+   *
+   * Vorher stand hier `var lang = (langs[0] || ["de-DE"])[0]` — IMMER der erste
+   * Eintrag, also immer Deutsch, und niemand konnte etwas daran ändern. Dieses
+   * 🎤 sitzt im „Mit dem Netz verbinden"-Feld JEDER App mit Modul 23; für alle,
+   * die kein Deutsch sprechen, war es damit unbrauchbar. Klaus 2026-08-11:
+   * „wenn ich in Arabisch etwas hineinspreche, muss auch Arabisch als Text
+   * herauskommen."
+   *
+   * Die Wahl wird pro App gemerkt (`cfg.dbSuffix`), weil Geschwister-Apps auf
+   * GitHub Pages denselben Origin teilen — ohne eigenen Namen stellte eine App
+   * der anderen die Sprache um. */
+  function voiceLangKey() { return "sbkim_rdv_miclang_" + (cfg.dbSuffix || "default"); }
+  function storedVoiceLang() {
+    try { return global.localStorage ? global.localStorage.getItem(voiceLangKey()) : null; }
+    catch (_e) { return null; }
+  }
+  function rememberVoiceLang(code) {
+    try { if (global.localStorage) global.localStorage.setItem(voiceLangKey(), code); } catch (_e) {}
+  }
+  // Ohne Modul 21 gibt es keine Liste — dann bleibt es bei Deutsch, und der
+  // 🎤-Knopf sagt beim Antippen ehrlich, dass das Modul fehlt.
+  function voiceLang() {
+    var speech = global.SbkimSpeech;
+    if (speech && typeof speech.preferredLanguage === "function") {
+      return speech.preferredLanguage(voiceLangChosen || storedVoiceLang());
+    }
+    return voiceLangChosen || "de-DE";
+  }
+
+  /* Die Auswahl erscheint NUR, wenn Modul 21 geladen ist. Ein Wähler ohne
+   * Spracheingabe wäre ein toter Knopf — schlimmer als keiner (Fremdnutzer-
+   * Brille: fail-soft heißt „das Feature verschwindet still", nicht „es steht
+   * da und tut nichts"). */
+  function buildVoiceLangPicker() {
+    var speech = global.SbkimSpeech;
+    if (!speech || typeof speech.getLanguages !== "function") return null;
+    var langs = speech.getLanguages();
+    if (!langs || langs.length < 2) return null;
+    var sel = global.document.createElement("select");
+    sel.id = "sbkim-rdv-miclang";
+    sel.title = "🎤 Sprache, in der du sprichst";
+    sel.setAttribute("aria-label", sel.title);
+    sel.style.cssText = "padding:5px 6px;border-radius:8px;border:1px solid rgba(154,167,182,.35);" +
+      "background:rgba(10,16,24,.6);color:#e8eef6;font:inherit;font-size:.72rem;max-width:9.5rem";
+    for (var i = 0; i < langs.length; i++) {
+      var o = global.document.createElement("option");
+      o.value = langs[i][0]; o.textContent = langs[i][1];
+      sel.appendChild(o);
+    }
+    sel.value = voiceLang();
+    sel.addEventListener("change", function () {
+      voiceLangChosen = sel.value;
+      rememberVoiceLang(voiceLangChosen);
+      applyAskDirection();
+    });
+    return sel;
+  }
+
+  /* Ein Feld, in das arabisch gesprochen wird, muss von rechts lesen.
+   * `dir="auto"` lässt den Browser am INHALT entscheiden — richtiger als ein
+   * festes `dir`, das lügt, sobald jemand die Sprache wechselt oder deutsch
+   * dazwischentippt. */
+  function applyAskDirection() {
+    if (!askInputEl) return;
+    try {
+      askInputEl.setAttribute("dir", "auto");
+      askInputEl.setAttribute("lang", String(voiceLang()).split("-")[0]);
+    } catch (_e) {}
+  }
+
   // 🎤 Spracheingabe (Modul 21) — Frage einsprechen. Spiegelt Modul 22
   // onVoiceClick, fail-soft. Fremdnutzer-sicher: ohne Modul 21 / ohne
   // Browser-Unterstützung bleibt das Textfeld voll nutzbar.
@@ -1258,17 +1968,29 @@
     try { engine = speech.pickEngine(cfg.euOnly ? "bindend" : "frei"); }
     catch (e) { setVoiceHint(speech.speechErrorHint ? speech.speechErrorHint(e) : "🎤 nicht möglich — bitte tippen."); return; }
     if (engine === "browser" && typeof speech.isBrowserSupported === "function" && speech.isBrowserSupported()) {
-      var langs = (typeof speech.getLanguages === "function") ? speech.getLanguages() : [];
-      var lang = (langs[0] || ["de-DE"])[0];
+      var lang = voiceLang();
+      var label = (typeof speech.languageLabel === "function") ? speech.languageLabel(lang) : lang;
+      applyAskDirection();
       try {
         activeRecognizer = speech.makeBrowserRecognizer({
           lang: lang,
-          onResult: function (t) { if (askInputEl) { askInputEl.value = t; } setVoiceHint("Erkannt: " + t + "  — jetzt „🔎 Antwort holen“ drücken."); },
+          onResult: function (t) {
+            if (askInputEl) { askInputEl.value = t; }
+            /* Der STILLE Fehlschlag (Klaus' Sichttest 2026-08-11): Paschtu kam
+             * als „Salaam" in LATEINISCHEN Buchstaben zurück, ganz OHNE Fehler —
+             * der Browser hatte stillschweigend etwas anderes gehört. Ein
+             * Fehler-Hinweis kann da nicht greifen, weil es keinen Fehler gibt.
+             * Also wird die Schrift geprüft. */
+            var schief = (typeof speech.scriptMismatchHint === "function")
+              ? speech.scriptMismatchHint(t, lang) : null;
+            setVoiceHint(schief ? ("🎤 " + schief)
+              : ("Erkannt: " + t + "  — jetzt „🔎 Antwort holen“ drücken."));
+          },
           onError: function (h) { setVoiceHint("🎤 " + h); },
           onEnd: function () { activeRecognizer = null; },
         });
         activeRecognizer.start();
-        setVoiceHint("🎤 Sprich jetzt deine Frage …");
+        setVoiceHint("🎤 Sprich jetzt deine Frage in " + label + " …");
       } catch (e) {
         setVoiceHint(speech.speechErrorHint ? speech.speechErrorHint(e) : "🎤 nicht möglich — bitte tippen.");
       }
@@ -1383,8 +2105,22 @@
   }
 
   function show() {
-    if (panelEl) { panelEl.style.display = "block"; var p = loadPos(); if (p) applyPos(panelEl, p); }
+    /* Panel und Blase teilen sich EINE gemerkte Position — aber das Panel ist
+     * rund 420 px breit und die Blase knapp 90. Eine Stelle, an der die Blase
+     * gut sitzt, schiebt das Panel zu drei Vierteln aus dem Bild. Genau so
+     * entstand der schmale hohe Streifen (gemessen: 120 von 420 px sichtbar).
+     * Darum wird hier fuer die BREITE DES PANELS neu geklemmt, erst nachdem
+     * es sichtbar ist — vorher hat es keine Masse.
+     * Die gemerkte Position bleibt unveraendert: sie gehoert der Blase, und
+     * beim Minimieren soll die wieder dort stehen, wo Klaus sie hingezogen hat. */
+    if (panelEl) {
+      panelEl.style.display = "block";
+      var p = loadPos();
+      if (p) applyPos(panelEl, clampInts(p.x, p.y, panelEl));
+    }
     if (btnEl) btnEl.style.display = "none";      // Panel offen → Blase weg (Flying-Widget)
+    refreshStatus();                              // Stufe 0a: Kennung + Speicher-Status frisch
+    refreshIdentityBox();                         // Stufe 0b: Sicherungs-/Fächer-Hinweis frisch
     // A12: beim Öffnen automatisch nachlesen; sind neue Antworten da, zeigen.
     recheckMail({ surfaceIfNews: true });
   }
@@ -1439,6 +2175,10 @@
         version: VERSION, mounted: mounted, open: isOpen(), nodeName: cfg.nodeName,
         hasRendezvous: rdv() !== null, relatedOnly: relatedOnly, euOnly: cfg.euOnly,
         kiRichter: { on: kiOn, provider: kiProvider, hasKey: !!(kiKey && kiKey.length) },
+        // Stufe 0b — Sicherungs-/Fächer-Fläche vorhanden + ob in DIESEM Browser
+        // schon einmal eine Sicherung angelegt wurde (nur ein Vermerk, kein Beweis,
+        // dass die Datei noch existiert — darum steht das auch so in der Oberfläche).
+        identity: { box: idBoxEl !== null, canBackup: backupMod() !== null, backupStamp: loadBackupStamp() },
       };
     },
     // Test-Brücke (headless): KI-Richter-Zustand setzen + eine Antwort rendern.
@@ -1458,6 +2198,46 @@
       saveToVault: function () { return onKiSaveToVault(); },
       unlockFromVault: function () { return onKiUnlockVault(); },
       vaultBtns: function () { return { save: !!(kiSaveBtnEl && kiSaveBtnEl.style.display !== "none"), unlock: !!(kiUnlockBtnEl && kiUnlockBtnEl.style.display !== "none") }; },
+      // Stufe 0b — Sicherung/Wiederherstellen/Aufräumen headless prüfbar machen.
+      identityState: function () { return readIdentityState(); },
+      idHint: function () { return idHintEl ? idHintEl.textContent : null; },
+      idFormText: function () { return (idFormEl && idFormEl.style.display !== "none") ? idFormEl.textContent : null; },
+      idFormButtons: function () {
+        if (!idFormEl || idFormEl.style.display === "none") return [];
+        var out = [], list = idFormEl.getElementsByTagName("button");
+        for (var i = 0; i < list.length; i++) out.push(list[i].textContent);
+        return out;
+      },
+      clickIdFormButton: function (label) {
+        if (!idFormEl) return false;
+        var list = idFormEl.getElementsByTagName("button");
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].textContent.indexOf(label) !== -1) { list[i].click(); return true; }
+        }
+        return false;
+      },
+      idFormInputs: function () {
+        if (!idFormEl) return [];
+        var out = [], list = idFormEl.getElementsByTagName("input");
+        for (var i = 0; i < list.length; i++) out.push(list[i]);
+        return out;
+      },
+      openBackupForm: function () { openBackupForm(); },
+      openImportForm: function () { openImportForm(); },
+      openCleanupForm: function () { openCleanupForm(); },
+      refreshIdentityBox: function () { refreshIdentityBox(); },
+      hasIdentityWatch: function () { return _aliveHandler !== null; },
+      werkstattVisible: function () { return !!(werkstattRowEl && werkstattRowEl.style.display !== "none"); },
+      slotsBtnVisible: function () { return !!(slotsBtnEl && slotsBtnEl.style.display !== "none"); },
+      werkstattText: function () { return werkstattRowEl ? werkstattRowEl.textContent : null; },
+      clickWerkstatt: function () {
+        if (!werkstattRowEl) return false;
+        var list = werkstattRowEl.getElementsByTagName("button");
+        if (!list.length) return false;
+        list[0].click();
+        return true;
+      },
+      connect: function (o) { onConnect(o); },
     },
   };
 

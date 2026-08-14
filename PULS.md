@@ -2,6 +2,44 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-14 — Modul-23-Oberfläche auf den Kanon + ein Drift-Guard
+
+`web/tools/sbkim-rendezvous-ui.js` stand auf `f117096e` und lag rund **780 Zeilen**
+hinter dem Sage-Kanon. Jetzt byte-1:1 mit `4882c3b6`. Alle zwölf verschwindenden
+Zeilen einzeln geprüft — **keine ist gestrichen, alle sind im Kanon ersetzt**
+(vier Mikrofon-Zeilen, drei aus der Schmale-Handy-Arbeit vom 11.08., der
+Aufräum-Knopf, `onConnect(opts)`, die `_meta`-Doku). Die Datei war byte-gleich mit
+den Kopien in Kim-Bell und Mein-WorkFloh, also ein reiner älterer Kanon-Stand ohne
+Point-eigene Logik.
+
+**Neu: `test/kopien_drift.test.js`.** „Kopieren, nicht klonen" stand bisher nur als
+Versprechen da, ohne Prüfung — und der Drift blieb monatelang unsichtbar. Bei
+diesem Repo wiegt das am schwersten: **Kim-Bell und Mein-WorkFloh nennen
+ausdrücklich `SB-KIMTool-Point/web/tools/*` als Quelle ihrer eigenen Kopien.** Ein
+Drift hier wandert also weiter. Alle 18 Dateien sind jetzt per sha256 genagelt,
+dazu eine Vollzähligkeits-Prüfung und eine dritte Regel: **eine Abweichung ohne
+Begründung ist selbst ein Fehler.**
+
+Ehrliche Grenze: der Kanon liegt in einem anderen Repo und ist hier nicht lesbar.
+Geprüft wird „unverändert seit der Nagelung", **nicht** „gleich dem Kanon".
+
+**Offen — sieben Kopien weichen ab** (je eine eigene geprüfte Runde nötig, im Test
+namentlich benannt): `sbkim-match` · `sbkim-membran` · `sbkim-siegel` (hängt an 15)
+· `sbkim-spore` · `sbkim-storage` · `sbkim-such-widget` · `noble-secp256k1`
+(Fremd-Bibliothek, liegt bei Sage unter anderem Pfad — keine echte Abweichung).
+
+**Beweis:** `npm test` **123/123**. Gegenprobe: drei Sabotagen (geändertes Byte,
+neue Datei, Abweichung ohne Begründung) werfen den Wächter je um.
+
+**Nebenbefund:** die zwei „roten" Proben, die dieses Repo im frischen Container
+zeigt (`kanon_import`, `spore_v02`), sind **nicht rot, sondern nicht lauffähig** —
+`fake-indexeddb` ist nicht installiert. Nach `npm install`: 120/120. Genau die
+Unterscheidung, die Sage am selben Tag in seinen Suite-Läufer eingebaut hat.
+Dazu passend: `package.json` nagelt die Fassung mit `^6.2.5` **nicht exakt** —
+zwei Container können damit Verschiedenes prüfen. Nicht geändert, nur gemeldet.
+
+**Nicht geprüft:** die Oberfläche im Browser — wartet auf Klaus' Browser-Lauf.
+
 ## Nachtrag 2026-08-10 (später am Tag) — Korrektur: der Laden hat ein eigenes Repo
 
 Der Eintrag darunter ist im Ziel richtig und im Ort falsch. **Der Marktplatz für
