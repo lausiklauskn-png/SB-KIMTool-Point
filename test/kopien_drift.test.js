@@ -16,8 +16,14 @@
 // und ist hier nicht lesbar. Geprüft wird deshalb, dass die Dateien seit
 // dieser Nagelung UNVERÄNDERT sind — eine Änderung an der Kopie fällt sofort
 // auf. Ob eine Kopie noch dem Kanon ENTSPRICHT, kann nur ein Abgleich gegen
-// Sage sagen. Welche am 2026-08-14 nicht entsprachen, steht unten ehrlich
-// dabei: `kanon: false` ist KEIN Freibrief, sondern eine offene Aufgabe.
+// Sage sagen; `kanon: false` ist deshalb KEIN Freibrief, sondern eine offene
+// Aufgabe mit Begründung.
+//
+// Stand 2026-08-15: alle Sage-Module stehen auf dem Kanon. Die sechs
+// Abweichungen vom Vortag (match, membran, siegel, spore, storage,
+// such-widget) sind nachgezogen — jede war reines Hinterherhinken, keine
+// trug Point-eigene Logik. Offen bleibt nur `noble-secp256k1.js`, und das
+// ist gar kein Sage-Modul (Fremd-Bibliothek, dort unter anderem Pfad).
 //
 // Lauf: node --test test/kopien_drift.test.js
 
@@ -42,22 +48,16 @@ const KOPIEN = [
   { datei: "sbkim-embedding.js", sha: "e4bb8bd6a237914e", kanon: true },
   { datei: "sbkim-floating-widget.js", sha: "dd3e0d7fb5963904", kanon: true },
   { datei: "sbkim-heterokaryose.js", sha: "9b2224af8ff13bfb", kanon: true },
-  { datei: "sbkim-match.js", sha: "9e2648729758f644", kanon: false,
-    grund: "hinterher (-53/+65); nicht einzeln geprueft, eigene Runde noetig" },
-  { datei: "sbkim-membran.js", sha: "fbf9f42d8a2720b0", kanon: false,
-    grund: "hinterher (-6/+255); haengt mit Modul 16 zusammen, eigene Runde" },
+  { datei: "sbkim-match.js", sha: "5de95923c3f62f14", kanon: true },
+  { datei: "sbkim-membran.js", sha: "f88b5d04bc089192", kanon: true },
   { datei: "sbkim-nostr-relay.js", sha: "030aa2d260149f56", kanon: true },
   { datei: "sbkim-rendezvous-ui.js", sha: "4882c3b682035bfa", kanon: true },
   { datei: "sbkim-rendezvous.js", sha: "3caa0bb1fbe7bf52", kanon: true },
   { datei: "sbkim-safe.js", sha: "e7e25c9070e93f82", kanon: true },
-  { datei: "sbkim-siegel.js", sha: "4e11ef0d0390d155", kanon: false,
-    grund: "hinterher (+6); muss zusammen mit Modul 15 nachgezogen werden" },
-  { datei: "sbkim-spore.js", sha: "0dcde79489a5884f", kanon: false,
-    grund: "hinterher (+18); nicht einzeln geprueft, eigene Runde noetig" },
-  { datei: "sbkim-storage.js", sha: "e507aec18d75bde6", kanon: false,
-    grund: "hinterher (-21/+112); nicht einzeln geprueft, eigene Runde noetig" },
-  { datei: "sbkim-such-widget.js", sha: "d0656ca11dacf8a5", kanon: false,
-    grund: "hinterher (-19/+652); nicht einzeln geprueft, eigene Runde noetig" },
+  { datei: "sbkim-siegel.js", sha: "95003d2088921ef4", kanon: true },
+  { datei: "sbkim-spore.js", sha: "6789fe6e903ad2e5", kanon: true },
+  { datei: "sbkim-storage.js", sha: "5a5a4bf64dfcc107", kanon: true },
+  { datei: "sbkim-such-widget.js", sha: "45f42a54e224a2c4", kanon: true },
   { datei: "sbkim-tool-pwa.js", sha: "dcba8e6ee67081f9", kanon: true },
   { datei: "sbkim-ui-demo.js", sha: "b75f3ce227ca495f", kanon: true },
 ];

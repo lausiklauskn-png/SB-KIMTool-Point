@@ -464,6 +464,48 @@
     });
   }
 
+  // Härtung „Löschen nur bei zweifelsfreier Leere" (2026-07-30, Auslöser:
+  // Klaus' Über-Nacht-Identitätsverlust). Vor JEDEM Selbst-Heilungs-Löschen
+  // eine ZWEITE, UNABHÄNGIGE Probe. Grund: die Store-Liste der ersten Probe
+  // kann unvollständig sein, wenn ein ANDERES Fenster derselben Origin gerade
+  // einen Schema-Umbau fährt (`objectStoreNames` ist während einer
+  // versionchange-Transaktion transient). Ein Fehlurteil ist hier NICHT
+  // harmlos: `indexedDB.deleteDatabase()` lässt sich NICHT zurücknehmen — bei
+  // `onblocked` (ein anderes Fenster hält die DB) bleibt die Löschung im
+  // Browser VORGEMERKT und greift, sobald die letzte Verbindung fällt
+  // (typisch: der Tab schläft über Nacht ein). Genau so verschwand eine
+  // Identität, ohne dass je ein Fehler sichtbar wurde. Regel deshalb:
+  // **im Zweifel NICHT löschen** — Löschen ist unumkehrbar, ein ehrlicher
+  // Fehler ist reparierbar.
+  //
+  // Resolves `true` NUR, wenn der Identitäts-Store zweifelsfrei fehlt. Jede
+  // Unklarheit (Öffnen scheitert, blockiert, Store doch vorhanden) → `false`.
+  function confirmIdentityStoreMissing(name) {
+    return new Promise(function (resolve) {
+      var req;
+      try { req = indexedDB.open(name); } catch (_e) { return resolve(false); }
+      var settled = false;
+      function finish(value, db) {
+        if (settled) return;
+        settled = true;
+        if (db) { try { db.close(); } catch (_e) {} }
+        resolve(value);
+      }
+      // Blockiert = ein anderes Fenster hält die DB → NIE löschen.
+      req.onblocked = function () { finish(false, null); };
+      req.onerror = function () { finish(false, null); };
+      req.onsuccess = function () {
+        var db = req.result;
+        var contains;
+        try {
+          contains = !!(db.objectStoreNames && db.objectStoreNames.contains(IDENTITY_KEYS_STORE));
+        } catch (_e) { return finish(false, db); }
+        // Store vorhanden → die erste Probe hat sich geirrt (Race) → NICHT löschen.
+        finish(!contains, db);
+      };
+    });
+  }
+
   // Härtung „Identitäts-Isolierung" (2026-07-11): behandelt einen Folge-
   // init({dbSuffix}) mit ABWEICHENDEM Namen. Ist die offene DB identitäts-
   // leer → sicheres Re-Point (alte Verbindung schließen, State zurücksetzen,
@@ -574,10 +616,33 @@
               // Pflicht-Store fehlt, könnte eine Identität existieren → dann
               // bleibt es beim fail-fast (kein stiller Datenverlust, Klaus'
               // ausdrückliche „ich repariere nicht"-Regel gilt weiter).
+              //
+              // Härtung 2026-07-30 (Klaus' Über-Nacht-Identitätsverlust): das
+              // Urteil „identitäts-leer" wird durch eine ZWEITE, unabhängige
+              // Probe BESTÄTIGT, bevor gelöscht wird. Ein Race mit einem
+              // anderen Fenster kann die Store-Liste transient unvollständig
+              // zeigen; ein `deleteDatabase()` ist unumkehrbar und wirkt bei
+              // `onblocked` sogar VERZÖGERT (vorgemerkt bis die letzte
+              // Verbindung fällt). Widerspricht die zweite Probe → NICHT
+              // löschen, sondern ehrlich melden.
               if (missing.indexOf(IDENTITY_KEYS_STORE) !== -1) {
-                deleteDb(dbNameInUse).then(function () {
-                  openFreshAtDbVersion(resolve, reject);
-                });
+                confirmIdentityStoreMissing(dbNameInUse).then(function (reallyMissing) {
+                  if (!reallyMissing) {
+                    reject(makeError(
+                      "StorageOpenError",
+                      "Selbst-Heilung abgebrochen: die erste Probe meldete den Identitaets-Store '" +
+                        IDENTITY_KEYS_STORE + "' als fehlend, die Gegenprobe widerspricht " +
+                        "(anderes Fenster haelt die DB oder Schema-Umbau laeuft). Es wird NICHT " +
+                        "geloescht — Loeschen ist unumkehrbar. Bitte alle weiteren Fenster dieser " +
+                        "App schliessen und neu laden.",
+                    ));
+                    return;
+                  }
+                  // Zweifelsfrei leer → gefahrlos neu aufbaubar.
+                  deleteDb(dbNameInUse).then(function () {
+                    openFreshAtDbVersion(resolve, reject);
+                  }, reject);   // Härtung: fehlte — eine blockierte Loeschung liess die Kette still sterben.
+                }, reject);
                 return;
               }
               reject(makeError(
@@ -882,20 +947,51 @@
     });
   }
 
+  // Selbstheilung „database connection is closing" (2026-07-29). Fasst ein
+  // ZWEITES Fenster / eine zweite App auf DERSELBEN Origin denselben Speicher
+  // an, feuert der Browser `onversionchange` → `db.close()`. Die gecachte
+  // Verbindung ist dann tot; `db.transaction()` wirft SYNCHRON einen
+  // InvalidStateError („The database connection is closing"). Bisher brach jede
+  // Operation an dieser Stelle ab — mit zwei Folgen: (a) der Handshake schlug
+  // fehl, und (b) ein fehlgeschlagener Identitäts-Lesevorgang konnte als „keine
+  // Identität" missverstanden werden → neue Kennung (Identitäts-Churn, Klaus'
+  // Mycel-Analyse 2026-07-29). `onversionchange` invalidiert `dbPromise`/
+  // `currentDb` bereits — ein ZWEITER Versuch bekommt also eine FRISCHE
+  // Verbindung. `beginTx` baut die Transaktion mit genau EINEM Reopen-Retry auf.
+  // Schlägt auch der zweite Versuch fehl, wird der Fehler EHRLICH weitergereicht
+  // (kein stilles `undefined` → kein fälschliches „keine Identität").
+  function isConnectionClosing(err) {
+    if (!err) return false;
+    if (err.name === "InvalidStateError") return true;
+    return /connection is closing/i.test(String(err.message || ""));
+  }
+  function beginTx(storeName, mode) {
+    return init().then(function (db) {
+      try {
+        return { db: db, store: db.transaction(storeName, mode).objectStore(storeName) };
+      } catch (err) {
+        if (!isConnectionClosing(err)) throw err;
+        // Tote Verbindung fallenlassen, frisch öffnen, EINMAL neu versuchen.
+        if (currentDb === db) currentDb = null;
+        dbPromise = null;
+        return init().then(function (db2) {
+          return { db: db2, store: db2.transaction(storeName, mode).objectStore(storeName) };
+        });
+      }
+    });
+  }
+
   function get(storeName, key) {
     assertKnownStore(storeName);
-    return init().then(function (db) {
-      var tx = db.transaction(storeName, "readonly");
-      var store = tx.objectStore(storeName);
-      return wrapRequest(store.get(key), "get(" + storeName + ", " + key + ")");
+    return beginTx(storeName, "readonly").then(function (h) {
+      return wrapRequest(h.store.get(key), "get(" + storeName + ", " + key + ")");
     });
   }
 
   function put(storeName, key, value) {
     assertKnownStore(storeName);
-    return init().then(function (db) {
-      var tx = db.transaction(storeName, "readwrite");
-      var store = tx.objectStore(storeName);
+    return beginTx(storeName, "readwrite").then(function (h) {
+      var store = h.store;
       var req;
       try {
         req = store.put(value, key);
@@ -919,19 +1015,16 @@
 
   function del(storeName, key) {
     assertKnownStore(storeName);
-    return init().then(function (db) {
-      var tx = db.transaction(storeName, "readwrite");
-      var store = tx.objectStore(storeName);
-      return wrapRequest(store.delete(key), "del(" + storeName + ", " + key + ")").then(function () { /* void */ });
+    return beginTx(storeName, "readwrite").then(function (h) {
+      return wrapRequest(h.store.delete(key), "del(" + storeName + ", " + key + ")").then(function () { /* void */ });
     });
   }
 
   function all(storeName) {
     assertKnownStore(storeName);
-    return init().then(function (db) {
+    return beginTx(storeName, "readonly").then(function (h) {
       return new Promise(function (resolve, reject) {
-        var tx = db.transaction(storeName, "readonly");
-        var store = tx.objectStore(storeName);
+        var store = h.store;
         var results = [];
         var cursorReq = store.openCursor();
         cursorReq.onsuccess = function () {
@@ -957,10 +1050,8 @@
 
   function clear(storeName) {
     assertKnownStore(storeName);
-    return init().then(function (db) {
-      var tx = db.transaction(storeName, "readwrite");
-      var store = tx.objectStore(storeName);
-      return wrapRequest(store.clear(), "clear(" + storeName + ")").then(function () { /* void */ });
+    return beginTx(storeName, "readwrite").then(function (h) {
+      return wrapRequest(h.store.clear(), "clear(" + storeName + ")").then(function () { /* void */ });
     });
   }
 
