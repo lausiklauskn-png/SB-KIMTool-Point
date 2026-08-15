@@ -63,6 +63,9 @@
   var LS_KEY_MERK = "sbkim_search_widget_merkliste"; // Merkliste (Text+Link, gruppiert)
   var LS_KEY_LAST = "sbkim_search_widget_lastsearch"; // letzte Suche (Frage+Treffer), Reload-Schutz
   var LS_KEY_VIEW = "sbkim_search_widget_view"; // Anzeige-Sicht {mode,relatedOnly,kiRelated} (verbunden/verwandt)
+  var LS_KEY_RERANK = "sbkim_search_widget_reranker"; // A16: gelerntes Sortier-Modell (Token/Source→Gewicht), aus 📌-Merkliste
+  var LS_KEY_FEEDBACK = "sbkim_search_widget_feedback"; // A16 Phase B: Treffer-Bewertungen (key→{rating gut/okay/nein})
+  var LS_KEY_PENDING = "sbkim_search_widget_feedback_pending"; // A16 Phase B: geöffnete, noch nicht bewertete Treffer
 
   // Frei wählbare Web-Suchmaschinen für den Internet-Neuer-Tab-Weg (Klaus
   // 2026-06-21: DuckDuckGo ODER eine andere). Query wird angehängt (URL-encoded).
@@ -140,6 +143,7 @@
   var aiAutoBtnEl = null;      // „⚡ Automatisch"-Knopf (B2-Probe, Claude)
   var aiProgressEl = null;     // Fortschrittsbalken während des Web-Such-Aufrufs
   var internetCheckboxEl = null; // Referenz auf die Internet-Bereichs-Checkbox
+  var internetHintEl = null;   // Klartext-Hinweis am Internet-Bereich (Web ≠ Knotennetz)
   var vaultSectionEl = null;   // Tresor-Bedien-Sektion (🔐)
   var vaultSectionOpen = false;// Tresor-Sektion ein-/ausgeklappt
   var fullscreenBtnEl = null;  // ⛶ Vollbild-Umschalter
@@ -255,9 +259,9 @@
   //              nutzer-ausgelöste Eigen-Anfrage ins Netz, daher KEIN Widerspruch
   //              zum Empfangsmodus (CLAUDE.md § Vier-Schichten-Lesart Schicht 2).
   var areas = {
-    app:      { enabled: true,  label: "App" },
-    knoten:   { enabled: true,  label: "Knoten" },
-    internet: { enabled: false, label: "Netz" },
+    app:      { enabled: true,  label: "App",      hidden: false },
+    knoten:   { enabled: true,  label: "Knoten",   hidden: false },
+    internet: { enabled: false, label: "Internet", hidden: false },
   };
   // KI-Richter an/aus. DEFAULT AUS (gratis: reine semantische Cosinus-Suche „über
   // die Bedeutung"). AN nur sinnvoll mit BYOK-Schlüssel — dann urteilt die KI
@@ -282,6 +286,12 @@
   // (Modul 05 + Relais). Im Standalone-Such-Tool ohne Modul 05 = null → der
   // Knoten-Bereich bleibt rein lokal (fail-soft, kein Bruch).
   var queryNodeFn = null;
+  // A11B-Inc-3 — optional via options.connectNode injizierte Funktion (nodeId)
+  // -> {ok, outcome, score, reason, nodeName}. Auf der Sage-Seite verdrahtet mit
+  // SbkimRendezvous (discover Raum → Karte finden → handshakeCard, 0.80-Riegel
+  // entscheidet). Ohne Injektion (Standalone/Forker ohne Modul 23) = null →
+  // der „🤝 verbinden"-Knopf bleibt aus (fail-soft, kein toter Knopf).
+  var connectNodeFn = null;
   var LIVE_NODE_MAX = 2;          // top-N Nachbarn pro Suche live fragen (Deckel)
   var SEARXNG_MAX_RESULTS = 50;   // wie viele Roh-Treffer wir holen + sortieren
 
@@ -530,12 +540,25 @@
 
   function onViewportChange() { clampPositionIntoView(); }
 
+  // A16 Phase B: kommt der Nutzer nach dem Seiten-Besuch in den Tab zurück und es gibt
+  // noch offene (geöffnete, unbewertete) Treffer → die Bewertungs-Zeilen frisch zeichnen.
+  function onTabReturn() {
+    try { if (pendingCount() > 0) refreshFeedbackViews(); } catch (_e) { /* fail-soft */ }
+  }
+
   function attachViewportListener() {
     if (viewportListenerAttached) return;
     if (!global || typeof global.addEventListener !== "function") return;
     try {
       global.addEventListener("resize", onViewportChange);
       global.addEventListener("orientationchange", onViewportChange);
+      global.addEventListener("focus", onTabReturn);
+      var doc = global.document;
+      if (doc && typeof doc.addEventListener === "function") {
+        doc.addEventListener("visibilitychange", function () {
+          if (!doc.hidden) onTabReturn();
+        });
+      }
       viewportListenerAttached = true;
     } catch (_e) { /* fail-soft — ohne Listener bleibt nur die statische Position */ }
   }
@@ -690,6 +713,13 @@
       "  padding: 0.1rem 0.45rem;",
       "}",
       "#" + WIDGET_ID + " .sbkim-sw-check input { margin: 0; cursor: pointer; accent-color: #6EE7D3; }",
+      "#" + WIDGET_ID + " .sbkim-sw-internet-hint {",
+      "  display: none;",
+      "  margin-top: 0.35rem;",
+      "  font-size: 0.64rem;",
+      "  line-height: 1.35;",
+      "  color: rgba(245, 245, 255, 0.62);",
+      "}",
       "#" + WIDGET_ID + " .sbkim-sw-searxng {",
       "  width: 100%;",
       "  box-sizing: border-box;",
@@ -923,6 +953,32 @@
       "  line-height: 1.3;",
       "  margin-top: 0.12rem;",
       "}",
+      // A16 Phase B — Bewertungs-Zeile am Treffer („Hat's getroffen? 👍 🙂 👎").
+      "#" + WIDGET_ID + " .sbkim-sw-feedback {",
+      "  display: flex;",
+      "  flex-wrap: wrap;",
+      "  align-items: center;",
+      "  gap: 0.3rem;",
+      "  margin-top: 0.3rem;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-feedback-q {",
+      "  font-size: 0.68rem;",
+      "  color: rgba(245, 245, 255, 0.7);",
+      "  margin-right: 0.15rem;",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-feedback-btn {",
+      "  cursor: pointer;",
+      "  font-size: 0.68rem;",
+      "  padding: 0.12rem 0.4rem;",
+      "  background: rgba(255, 255, 255, 0.06);",
+      "  border: 1px solid rgba(255, 255, 255, 0.16);",
+      "  border-radius: 7px;",
+      "  color: rgba(245, 245, 255, 0.88);",
+      "}",
+      "#" + WIDGET_ID + " .sbkim-sw-feedback-btn:hover { background: rgba(255, 255, 255, 0.14); }",
+      "#" + WIDGET_ID + " .sbkim-sw-fb-gut:hover { border-color: rgba(120, 220, 140, 0.7); }",
+      "#" + WIDGET_ID + " .sbkim-sw-fb-nein:hover { border-color: rgba(230, 120, 120, 0.7); }",
+      "#" + WIDGET_ID + " .sbkim-sw-feedback-change { opacity: 0.75; }",
       "#" + WIDGET_ID + " .sbkim-sw-more {",
       "  width: 100%;",
       "  box-sizing: border-box;",
@@ -1127,6 +1183,7 @@
 
   function updateSearxngFieldVisibility() {
     var show = areas.internet.enabled ? "block" : "none";
+    if (internetHintEl) internetHintEl.style.display = show;
     if (searxngFieldEl) searxngFieldEl.style.display = show;
     if (engineSelectEl) engineSelectEl.style.display = show;
     if (aiSelectEl) aiSelectEl.style.display = show;
@@ -1256,6 +1313,7 @@
     var areaIds = ["app", "knoten", "internet"];
     for (var ai = 0; ai < areaIds.length; ai++) {
       (function (id) {
+        if (areas[id].hidden) return; // ausgeblendeter Bereich → keine Checkbox
         var box = makeCheckbox(doc, "sbkim-sw-area-" + id, areas[id].label, areas[id].enabled,
           function (checked) {
             areas[id].enabled = checked;
@@ -1266,6 +1324,17 @@
       })(areaIds[ai]);
     }
     panelEl.appendChild(areaRowEl);
+
+    // Klartext-Hinweis zum Internet-Bereich (nur sichtbar, wenn er angekreuzt ist).
+    // Klaus 2026-07-12: klar benennen, dass „Internet" die Web-Suche meint (NICHT das
+    // Knotennetz — das ist der 🌐-Knopf „Mit dem Knotennetz verbinden"), und was mit
+    // bzw. ohne SearXNG-URL passiert.
+    internetHintEl = doc.createElement("div");
+    internetHintEl.className = "sbkim-sw-internet-hint";
+    internetHintEl.textContent =
+      "Internet = Suche im Web (nicht das Knotennetz). Mit SearXNG-URL: Web-Treffer direkt hier. " +
+      "Ohne: die gewählte Suchmaschine öffnet in einem neuen Tab.";
+    panelEl.appendChild(internetHintEl);
 
     // Anzeige-Sicht-Zeile (Brief „Wählen"-UI): „verbunden" (grob, alle erreichbaren)
     // ↔ „verwandt" (genau, nach zentriertem Cosinus sortiert). REINE ANZEIGE — der
@@ -1280,7 +1349,7 @@
         if (lastRenderRes) renderResults(lastRenderRes);
       });
     viewModeCheckboxEl.setAttribute("title",
-      "Aus: verbunden (grob) — alle erreichbaren Treffer. An: verwandt (genau) — eine Rangfolge nach Themen-Bezug (gratis zentrierter Cosinus). Mit „· KI“ urteilt der KI-Richter über die Bedeutung.");
+      "Nach Themen-Bezug sortieren");
     viewRowEl.appendChild(viewModeCheckboxEl);
 
     viewRelatedOnlyCheckboxEl = makeCheckbox(doc, "sbkim-sw-view-onlyrelated", "nur verwandte",
@@ -1290,7 +1359,7 @@
         if (lastRenderRes) renderResults(lastRenderRes);
       });
     viewRelatedOnlyCheckboxEl.setAttribute("title",
-      "Nur im verwandt-Modus: blendet fremde Domänen (nicht wirklich verwandt) ganz aus.");
+      "Nur verwandte Treffer zeigen");
 
     // „· KI" — verwandt-Maß vom KI-Richter beurteilen lassen (opt-in, BYOK).
     // Nutzt das vorhandene Richter-Anbieter-Dropdown + Schlüsselfeld (unten).
@@ -1305,7 +1374,7 @@
         if (lastRenderRes) renderResults(lastRenderRes);
       });
     viewKiCheckboxEl.setAttribute("title",
-      "Nur im verwandt-Modus: das echte Verwandtschafts-Maß vom KI-Richter (über die Bedeutung) beurteilen lassen. Braucht einen Schlüssel; ohne Schlüssel bleibt der gratis zentrierte Cosinus.");
+      "Verwandtschaft von der KI beurteilen lassen");
     viewRowEl.appendChild(viewRelatedOnlyCheckboxEl);
     viewRowEl.appendChild(viewKiCheckboxEl);
     panelEl.appendChild(viewRowEl);
@@ -1316,7 +1385,7 @@
     optRow.className = "sbkim-sw-optrow";
     richterToggleEl = makeCheckbox(doc, "sbkim-sw-richter", "KI-Richter", richterOn,
       function (checked) { richterOn = checked; });
-    richterToggleEl.setAttribute("title", "KI-Richter an: urteilt zusätzlich (braucht Schlüssel, kostet). Aus: gratis, rein semantisch.");
+    richterToggleEl.setAttribute("title", "KI bewertet die Treffer (eigener Schlüssel)");
     optRow.appendChild(richterToggleEl);
 
     euChipEl = doc.createElement("button");
@@ -1489,7 +1558,7 @@
       resizeHandleEl = doc.createElement("div");
       resizeHandleEl.className = "sbkim-sw-resize";
       resizeHandleEl.setAttribute("aria-label", "Größe ziehen — Breite und Lesefeld-Höhe");
-      resizeHandleEl.setAttribute("title", "Ziehen, um das Such-Panel breiter/höher zu machen");
+      resizeHandleEl.setAttribute("title", "Größer ziehen");
       attachResizeHandlers(resizeHandleEl);
       panelEl.appendChild(resizeHandleEl);
     }
@@ -1750,6 +1819,33 @@
     if (areas.knoten.enabled) out.push("knoten");
     if (areas.internet.enabled) out.push("internet");
     return out;
+  }
+
+  // Hat ein Bereich hier überhaupt eine Quelle? (Klaus 2026-07-12: „Knoten findet
+  // nichts" — der Bereich war angehakt, aber die App hatte ihn nicht bestückt.)
+  //   app     = eigener Korpus (localCorpus) oder ein Korpus-Builder gesetzt
+  //   knoten  = Knoten-Korpus, ein Builder ODER der Live-Pfad (queryNode)
+  //   internet= immer (Web-Fallback / neuer Tab)
+  function areaHasSource(id) {
+    if (id === "app") {
+      return (Array.isArray(localCorpus) && localCorpus.length > 0) || typeof corpusPreparer === "function";
+    }
+    if (id === "knoten") {
+      return (Array.isArray(nodeCorpus) && nodeCorpus.length > 0) ||
+        typeof nodeCorpusPreparer === "function" || typeof queryNodeFn === "function";
+    }
+    return true; // internet
+  }
+
+  // Ehrlicher Hinweis: welche ANGEHAKTEN Bereiche sind hier gar nicht bestückt?
+  // Gibt einen deutschen Satz zurück (oder null), damit ein leeres Ergebnis nicht
+  // fälschlich als „nichts gefunden" erscheint (fail-soft, reine Anzeige).
+  function unpopulatedAreaNote() {
+    var reasons = [];
+    if (areas.app.enabled && !areaHasSource("app")) reasons.push("„" + areas.app.label + "“ hat hier keinen eigenen Inhalt");
+    if (areas.knoten.enabled && !areaHasSource("knoten")) reasons.push("„" + areas.knoten.label + "“ ist hier nicht mit dem Netz verbunden");
+    if (!reasons.length) return null;
+    return "Hier nicht bestückt: " + reasons.join("; ") + ". (Dieser Bereich findet in dieser App nichts — kein Fehler.)";
   }
 
   function engineById(id) {
@@ -2854,7 +2950,9 @@
 
       if (top.length === 0) {
         lastSearchMode = webLink ? "semantisch" : "leer";
-        return { mode: lastSearchMode, treffer: [], webLink: webLink };
+        // Ehrlicher Hinweis, wenn ein angehakter Bereich hier gar nicht bestückt ist
+        // (statt stumm „Keine Treffer.") — Klaus 2026-07-12.
+        return { mode: lastSearchMode, treffer: [], webLink: webLink, reason: unpopulatedAreaNote() || undefined };
       }
       if (richterOn && optApiKey && match && typeof match.hybridMatch === "function") {
         return richterRerank(query, top).then(function (judged) {
@@ -2915,7 +3013,7 @@
     });
   }
 
-  var SOURCE_LABELS = { app: "App", knoten: "Knoten", internet: "Netz" };
+  var SOURCE_LABELS = { app: "App", knoten: "Knoten", internet: "Internet" };
 
   // Neuen Tab öffnen — explizit, weil ein <a target="_blank"> auf Touch durch
   // setPointerCapture verschluckt werden kann. window.open im click-Handler
@@ -3005,7 +3103,7 @@
       if (r.begruendung) lines.push("    → " + r.begruendung);
       lines.push("");
     }
-    if (res && res.webLink && res.webLink.url) lines.push("↗ Im Netz weitersuchen: " + res.webLink.url);
+    if (res && res.webLink && res.webLink.url) lines.push("↗ Im Internet weitersuchen: " + res.webLink.url);
     return lines.join("\n").replace(/\n+$/, "\n");
   }
 
@@ -3085,8 +3183,12 @@
   // sortiert sind.
   function displayTreffer(res) {
     var kiByKey = kiRelatedActive() ? kiRelatedState.byKey : null;
-    return rankView((res && res.treffer) || [], lastQueryVec,
+    var ranked = rankView((res && res.treffer) || [], lastQueryVec,
       { mode: viewMode, relatedOnly: viewRelatedOnly, kiByKey: kiByKey });
+    // A16: die explizite Verwandt-/KI-Sortierung bleibt unberührt; nur die grobe
+    // „verbunden"-Standardsicht bekommt den gelernten Nudge (reine Anzeige, fail-soft).
+    if (viewMode === "verwandt") return ranked;
+    return learnedRerank(ranked, {});
   }
 
   function renderResults(res) {
@@ -3105,7 +3207,7 @@
       "leer": res.reason || "Keine Treffer.",
       "semantisch": treffer.length
         ? "Semantische Suche" + (richterOn && !optApiKey ? " (Richter aus — kein Schlüssel)." : ".")
-        : (res.webLink ? "Im Netz weitersuchen:" : "Keine Treffer."),
+        : (res.webLink ? "Im Internet weitersuchen:" : "Keine Treffer."),
       "richter": "KI-Richter-Urteil." + (res.reason ? " (Hinweis: " + res.reason + ")" : ""),
     };
     setHint(modeHint[res.mode] || "");
@@ -3132,7 +3234,7 @@
       sayBtn.type = "button";
       sayBtn.className = "sbkim-sw-saybtn";
       sayBtn.textContent = "🔊 Vorlesen";
-      sayBtn.setAttribute("title", "Zusammenfassung vorlesen (nochmal tippen stoppt)");
+      sayBtn.setAttribute("title", "Vorlesen");
       sayBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
       (function (txt) {
         sayBtn.addEventListener("click", function (ev) {
@@ -3156,12 +3258,23 @@
       var copyBtn = doc.createElement("button");
       copyBtn.type = "button";
       copyBtn.className = "sbkim-sw-copyall";
-      copyBtn.textContent = "🖨 Block kopieren (" + treffer.length + ")";
+      var copyLabel = "🖨 Block kopieren (" + treffer.length + ")";
+      copyBtn.textContent = copyLabel;
       copyBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
       copyBtn.addEventListener("click", function (ev) {
         if (ev && ev.preventDefault) ev.preventDefault();
         copyToClipboard(buildResultsText(lastRenderRes)).then(function (ok) {
           setHint(ok ? "Treffer-Block kopiert — einfügen und losschicken." : "Kopieren nicht möglich (Browser blockiert).");
+          // Sichtbare Rückmeldung DIREKT am Knopf (Klaus-Befund 2026-07-17: „ein
+          // Link ohne sichtbares Ergebnis" — der Hint allein wird leicht übersehen).
+          copyBtn.textContent = ok ? "✓ kopiert!" : "✗ nicht möglich";
+          copyBtn.style.background = ok ? "#166534" : "#7f1d1d";
+          copyBtn.style.color = "#fff";
+          if (global.setTimeout) global.setTimeout(function () {
+            copyBtn.textContent = copyLabel;
+            copyBtn.style.background = "";
+            copyBtn.style.color = "";
+          }, 1600);
         });
       });
       resultsEl.appendChild(copyBtn);
@@ -3238,6 +3351,11 @@
         reasonEl.textContent = t.begruendung;
         el.appendChild(reasonEl);
       }
+      // A16 Phase B: hat der Nutzer diese Seite geöffnet (oder schon bewertet)? →
+      // Bewertungs-Zeile direkt an der Trefferzeile (ohne Detail-Karte öffnen zu müssen).
+      if (isPending(detailItemForRow) || feedbackRatingOf(detailItemForRow)) {
+        el.appendChild(makeFeedbackRow(doc, detailItemForRow));
+      }
       resultsEl.appendChild(el);
     }
 
@@ -3281,7 +3399,7 @@
       webCopyBtn.type = "button";
       webCopyBtn.className = "sbkim-sw-more sbkim-sw-webcopy";
       webCopyBtn.textContent = "📋 Frage kopieren";
-      webCopyBtn.setAttribute("title", "Frage kopieren; Suchmaschine selbst öffnen (Splitscreen) und einfügen — App bleibt offen");
+      webCopyBtn.setAttribute("title", "Frage kopieren");
       webCopyBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
       (function (q) {
         webCopyBtn.addEventListener("click", function (ev) {
@@ -3291,6 +3409,11 @@
             setHint(ok
               ? "Frage kopiert — Suchmaschine selbst öffnen (Splitscreen) und einfügen. Die App bleibt offen."
               : "Konnte nicht kopieren — Frage oben markieren und kopieren.");
+            // Sichtbare Rückmeldung direkt am Knopf (Klaus-Befund 2026-07-17).
+            webCopyBtn.textContent = ok ? "✓ kopiert!" : "✗ nicht möglich";
+            if (global.setTimeout) global.setTimeout(function () {
+              webCopyBtn.textContent = "📋 Frage kopieren";
+            }, 1600);
           });
         });
       })(res.webLink.query || "");
@@ -3299,7 +3422,7 @@
       webOpenBtn.type = "button";
       webOpenBtn.className = "sbkim-sw-more sbkim-sw-webopen";
       webOpenBtn.textContent = "↗ Im Browser öffnen";
-      webOpenBtn.setAttribute("title", "Suchmaschine direkt öffnen — kann die App neu laden, Frage/Treffer sind aber gesichert");
+      webOpenBtn.setAttribute("title", "Im Browser öffnen");
       webOpenBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
       (function (url) {
         webOpenBtn.addEventListener("click", function (ev) {
@@ -3364,6 +3487,7 @@
       source: t.source || "app",
       score: typeof t.score === "number" ? t.score : null,
       begruendung: t.begruendung || null,
+      nodeId: t.nodeId || null,   // A11B — Knoten-Treffer: gezielt fragen/verbinden
     };
   }
 
@@ -3412,6 +3536,7 @@
     });
     saveMerkliste(m);
     updateMerkBtn();
+    retrainReranker(); // A16: aus dem neuen positiven Beispiel lernen (fail-soft)
   }
 
   function removeMerk(groupKey, key) {
@@ -3421,6 +3546,7 @@
     if (m[groupKey].length === 0) delete m[groupKey];
     saveMerkliste(m);
     updateMerkBtn();
+    retrainReranker(); // A16: Modell nach Entfernen neu berechnen (fail-soft)
   }
 
   function toggleMerk(groupKey, item) {
@@ -3431,11 +3557,304 @@
   function clearMerkliste() {
     lsRemove(LS_KEY_MERK);
     updateMerkBtn();
+    retrainReranker(); // A16: leere Merkliste → leeres Modell (Nudge zurück auf Identität)
     if (merkOverlayOpen) renderMerkOverlay();
   }
 
   function getMerkliste() {
     try { return JSON.parse(JSON.stringify(loadMerkliste())); } catch (_e) { return {}; }
+  }
+
+  // ---- A16: Lernender Sortierer (display-only Re-Ranker) ----
+  // Klaus 2026-07-11: das mitgelieferte Sortierprogramm soll mit jedem 📌-Merken
+  // BESSER werden (Geist der BLP-„selbstlernenden Kalkulation", aber auf die SUCHE).
+  // Ein kleiner, gelernter Nudge auf die grobe „verbunden"-Sicht — REINE ANZEIGE:
+  //   • kreuzt NIE den 0.80-Andock-Riegel (Modul 05), ändert NIE die Mitgliedschaft
+  //   • entfernt NICHTS, fügt NICHTS hinzu — nur eine stabile, BEGRENZTE Umsortierung
+  //   • Kalt-Start (kein Modell / keine Gewichte) = Identität (Eingabe-Reihenfolge)
+  //   • on-device, KEIN PII (nur Token/Source/Gewicht, wie die Merkliste selbst)
+  // Lern-Signal (positiv): die 📌-Merkliste. Ein gemerkter Treffer {titel/text/source}
+  // ist ein positives Beispiel. Modul 04 bleibt UNBERÜHRT (kein PROTOCOL_VERSION-Bump).
+
+  var RERANK_MODEL_VERSION = 1;
+  var RERANK_NUDGE_STRENGTH = 3;   // max. Positionen, die ein Volltreffer aufsteigt
+  var RERANK_TOKEN_WEIGHT = 0.7;   // Anteil Token-Übereinstimmung am Boost
+  var RERANK_SOURCE_WEIGHT = 0.3;  // Anteil Quelle-Übereinstimmung am Boost
+  var RERANK_MAX_TOKENS = 24;      // pro Treffer/Merk-Item betrachtete Tokens
+  var RERANK_STOPWORDS = {
+    und: 1, oder: 1, der: 1, die: 1, das: 1, ein: 1, eine: 1, mit: 1, für: 1,
+    von: 1, aus: 1, den: 1, dem: 1, the: 1, and: 1, for: 1, with: 1, from: 1,
+  };
+
+  // Einfacher Wortzerleger (klein, ohne PII): kleinschreiben, an Nicht-Buchstaben
+  // trennen, Kurz-/Stoppwörter raus, deduplizieren, deckeln.
+  function rerankTokenize(text) {
+    var out = [];
+    if (!text) return out;
+    var raw = String(text).toLowerCase().split(/[^0-9a-zà-ÿäöüß]+/);
+    var seen = {};
+    for (var i = 0; i < raw.length && out.length < RERANK_MAX_TOKENS; i++) {
+      var tok = raw[i];
+      if (!tok || tok.length < 3) continue;
+      if (RERANK_STOPWORDS[tok]) continue;
+      if (seen[tok]) continue;
+      seen[tok] = 1;
+      out.push(tok);
+    }
+    return out;
+  }
+
+  // Ein gewichtetes Beispiel (Titel/Text/Quelle) ins Modell verrechnen. Positives
+  // Gewicht zieht später hoch, negatives runter (Phase B: „passt nicht").
+  function accumulateExample(model, titel, text, source, weight) {
+    if (!isFinite(weight) || weight === 0) return;
+    model.n++;
+    var toks = rerankTokenize((titel || "") + " " + (text || ""));
+    for (var t = 0; t < toks.length; t++) {
+      model.tokens[toks[t]] = (model.tokens[toks[t]] || 0) + weight;
+    }
+    var src = source || "app";
+    model.sources[src] = (model.sources[src] || 0) + weight;
+  }
+
+  // Note-Stufe → Gewicht (Phase B, Klaus 2026-07-12): „sehr gut" zieht stärker als
+  // „okay"; „nein" ist das Negativ-Signal (zieht runter).
+  function feedbackWeight(rating) {
+    if (rating === "gut") return 2;
+    if (rating === "okay") return 1;
+    if (rating === "nein") return -2;
+    return 0;
+  }
+
+  // REIN: aus Merkliste (+ optional Bewertungen) ein Modell {tokens, sources, n} lernen.
+  // Merkliste: jeder gemerkte Treffer = positives Beispiel (Gewicht +1). Bewertungen
+  // (feedback, Map key→{rating,titel,text,source}): gestuftes Gewicht via feedbackWeight.
+  // Gewichte dürfen negativ werden (Phase B). Backward-kompatibel: feedback optional.
+  function computeRerankerModel(merkliste, feedback) {
+    var model = { v: RERANK_MODEL_VERSION, tokens: {}, sources: {}, n: 0 };
+    if (merkliste && typeof merkliste === "object") {
+      for (var q in merkliste) {
+        if (!Object.prototype.hasOwnProperty.call(merkliste, q)) continue;
+        var arr = merkliste[q];
+        if (!Array.isArray(arr)) continue;
+        for (var i = 0; i < arr.length; i++) {
+          var it = arr[i];
+          if (it && typeof it === "object") accumulateExample(model, it.titel, it.text, it.source, 1);
+        }
+      }
+    }
+    if (feedback && typeof feedback === "object") {
+      for (var k in feedback) {
+        if (!Object.prototype.hasOwnProperty.call(feedback, k)) continue;
+        var fb = feedback[k];
+        if (fb && typeof fb === "object") {
+          accumulateExample(model, fb.titel, fb.text, fb.source, feedbackWeight(fb.rating));
+        }
+      }
+    }
+    return model;
+  }
+
+  function loadRerankerModel() {
+    var raw = lsGet(LS_KEY_RERANK);
+    if (!raw) return null;
+    try {
+      var m = JSON.parse(raw);
+      if (!m || typeof m !== "object" || !m.tokens || !m.sources) return null;
+      return m;
+    } catch (_e) { return null; }
+  }
+
+  function saveRerankerModel(model) {
+    try { lsSet(LS_KEY_RERANK, JSON.stringify(model || {})); } catch (_e) { /* fail-soft */ }
+  }
+
+  // ---- A16 Phase B: Treffer-Bewertung (👍 sehr gut · 🙂 okay · 👎 nein) ----
+  // Klaus 2026-07-12: nach der Gegenprüfung (Seite geöffnet, angeschaut) bewertet der
+  // Nutzer an GENAU diesem Treffer, wie gut er war. „nein" ist das Negativ-Signal.
+  // Nur Text/Link/Note (KEIN PII, kein Protokoll) — wie die Merkliste.
+
+  function loadFeedback() {
+    var raw = lsGet(LS_KEY_FEEDBACK);
+    if (!raw) return {};
+    try {
+      var o = JSON.parse(raw);
+      return (o && typeof o === "object" && !Array.isArray(o)) ? o : {};
+    } catch (_e) { return {}; }
+  }
+
+  function saveFeedback(obj) {
+    try { lsSet(LS_KEY_FEEDBACK, JSON.stringify(obj || {})); } catch (_e) { /* fail-soft */ }
+  }
+
+  function feedbackKeyOf(item) {
+    return String((item && (item.url || item.titel || item.label)) || "");
+  }
+
+  function feedbackRatingOf(item) {
+    var fb = loadFeedback()[feedbackKeyOf(item)];
+    return (fb && fb.rating) ? fb.rating : null;
+  }
+
+  function feedbackCount() {
+    var f = loadFeedback(), n = 0;
+    for (var k in f) { if (Object.prototype.hasOwnProperty.call(f, k)) n++; }
+    return n;
+  }
+
+  // Bewertung ablegen (rating: "gut" | "okay" | "nein"), aus der Warteliste nehmen,
+  // Modell neu lernen. Fail-soft.
+  function recordFeedback(item, rating) {
+    if (!item || (rating !== "gut" && rating !== "okay" && rating !== "nein")) return;
+    var key = feedbackKeyOf(item);
+    if (!key) return;
+    var f = loadFeedback();
+    f[key] = {
+      rating: rating,
+      titel: String(item.titel || item.label || item.url || "").slice(0, 300),
+      text: item.text ? String(item.text).slice(0, 600) : null,
+      source: item.source || "app",
+      at: Date.now(),
+    };
+    saveFeedback(f);
+    clearPending(key);
+    retrainReranker();
+  }
+
+  // Warteliste: Treffer, deren Seite geöffnet wurde und die noch keine Note haben.
+  // Persistiert, damit die Bewertungs-Zeile den Tab-Wechsel/Reload übersteht.
+  function loadPending() {
+    var raw = lsGet(LS_KEY_PENDING);
+    if (!raw) return {};
+    try {
+      var o = JSON.parse(raw);
+      return (o && typeof o === "object" && !Array.isArray(o)) ? o : {};
+    } catch (_e) { return {}; }
+  }
+
+  function savePending(obj) {
+    try { lsSet(LS_KEY_PENDING, JSON.stringify(obj || {})); } catch (_e) { /* fail-soft */ }
+  }
+
+  function markPending(item) {
+    if (!item) return;
+    var key = feedbackKeyOf(item);
+    if (!key) return;
+    if (feedbackRatingOf(item)) return; // schon bewertet → keine Rückfrage mehr
+    var p = loadPending();
+    p[key] = {
+      titel: String(item.titel || item.label || item.url || "").slice(0, 300),
+      text: item.text ? String(item.text).slice(0, 600) : null,
+      source: item.source || "app",
+      url: item.url ? String(item.url) : null,
+      at: Date.now(),
+    };
+    savePending(p);
+  }
+
+  function clearPending(key) {
+    var p = loadPending();
+    if (p[key]) { delete p[key]; savePending(p); }
+  }
+
+  function isPending(item) {
+    var p = loadPending();
+    return !!p[feedbackKeyOf(item)];
+  }
+
+  function pendingCount() {
+    var p = loadPending(), n = 0;
+    for (var k in p) { if (Object.prototype.hasOwnProperty.call(p, k)) n++; }
+    return n;
+  }
+
+  // Nach JEDER Änderung an Merkliste ODER Bewertungen neu lernen. Fail-soft.
+  function retrainReranker() {
+    var model = computeRerankerModel(loadMerkliste(), loadFeedback());
+    saveRerankerModel(model);
+    return model;
+  }
+
+  function rerankerIsEmpty(model) {
+    if (!model || typeof model !== "object") return true;
+    var hasTok = model.tokens && typeof model.tokens === "object" && Object.keys(model.tokens).length > 0;
+    var hasSrc = model.sources && typeof model.sources === "object" && Object.keys(model.sources).length > 0;
+    return !(hasTok || hasSrc);
+  }
+
+  // Größtes |Gewicht| einer Map (Modell kann jetzt negative Gewichte tragen).
+  function maxAbsWeight(map) {
+    var mx = 0;
+    if (!map || typeof map !== "object") return 0;
+    for (var k in map) {
+      if (!Object.prototype.hasOwnProperty.call(map, k)) continue;
+      var w = map[k];
+      if (typeof w === "number" && isFinite(w) && Math.abs(w) > mx) mx = Math.abs(w);
+    }
+    return mx;
+  }
+
+  // Boost b ∈ [−1,1] für EINEN Treffer aus dem gelernten Modell. Vorzeichen-tragend:
+  // positiv zieht hoch (Merken/„sehr gut"), negativ zieht runter („nein"). Token- und
+  // Quell-Anteil je saturierend normiert (nichts explodiert). Fail-soft: kaputte
+  // Gewichte / fehlende Felder → 0.
+  function rerankBoostFor(t, model, tokScale, srcScale) {
+    var bTok = 0;
+    if (tokScale > 0) {
+      var toks = rerankTokenize(
+        (t && (t.label || t.titel) || "") + " " + (t && (t.snippet || t.text) || ""));
+      var sum = 0;
+      for (var i = 0; i < toks.length; i++) {
+        var w = model.tokens[toks[i]];
+        if (typeof w === "number" && isFinite(w)) sum += w;
+      }
+      // saturierend & vorzeichen-tragend: |sum| == tokScale → ±0.5; |sum| ≫ scale → ±1.
+      bTok = sum !== 0 ? (sum / (Math.abs(sum) + tokScale)) : 0;
+    }
+    var bSrc = 0;
+    if (srcScale > 0 && t) {
+      var sw = model.sources[t.source || "app"];
+      if (typeof sw === "number" && isFinite(sw) && sw !== 0) bSrc = sw / (Math.abs(sw) + srcScale);
+    }
+    var b = RERANK_TOKEN_WEIGHT * bTok + RERANK_SOURCE_WEIGHT * bSrc;
+    if (!isFinite(b)) b = 0;
+    if (b > 1) b = 1;
+    if (b < -1) b = -1;
+    return b;
+  }
+
+  // REINE Funktion (headless testbar): stabile, BEGRENZTE Umsortierung nach gelerntem
+  // Modell. opts.model optional (Default: aus localStorage). Kalt-Start / leeres /
+  // kaputtes Modell → Eingabeliste UNVERÄNDERT (gleiche Reihenfolge, gleiche Objekte).
+  // Ein Volltreffer steigt höchstens RERANK_NUDGE_STRENGTH Plätze — Nudge, kein Umbruch.
+  // Entfernt NIE etwas, kreuzt NIE den 0.80-Riegel (reine Anzeige).
+  function learnedRerank(treffer, opts) {
+    opts = opts || {};
+    var list = Array.isArray(treffer) ? treffer.slice() : [];
+    if (list.length < 2) return list;
+    var model = (opts.model !== undefined) ? opts.model : loadRerankerModel();
+    if (rerankerIsEmpty(model)) return list;
+    var tokScale = maxAbsWeight(model.tokens || {});
+    var srcScale = maxAbsWeight(model.sources || {});
+    var decorated = list.map(function (t, i) {
+      var b = 0;
+      try { b = rerankBoostFor(t, model, tokScale, srcScale); }
+      catch (_e) { b = 0; } // fail-soft je Treffer
+      return { t: t, i: i, key: i - b * RERANK_NUDGE_STRENGTH, b: b };
+    });
+    decorated.sort(function (a, b) {
+      if (a.key !== b.key) return a.key - b.key;
+      return a.i - b.i; // stabil bei Gleichstand
+    });
+    var moved = false;
+    var out = decorated.map(function (d, pos) {
+      if (d.i !== pos) moved = true;
+      if (d.b <= 0) return d.t; // unveränderter Treffer → Objekt-Identität erhalten
+      var copy = shallowCopyTreffer(d.t);
+      copy.rerankBoost = d.b;   // Diagnose (reine Anzeige)
+      return copy;
+    });
+    return moved ? out : list; // nichts bewegt → Original-Liste (Identität)
   }
 
   // Kleiner Haken pro Treffer-Zeile (📌). Klick togglet Merken; stopPropagation,
@@ -3444,7 +3863,7 @@
     var item = merkItemOf(t);
     var wrap = doc.createElement("label");
     wrap.className = "sbkim-sw-check sbkim-sw-merkbox";
-    wrap.setAttribute("title", "Merken — in die Merkliste legen");
+    wrap.setAttribute("title", "Merken");
     var input = doc.createElement("input");
     input.type = "checkbox";
     input.checked = isMerkt(groupKey, item);
@@ -3459,12 +3878,75 @@
     return wrap;
   }
 
+  // A16 Phase B — nach dem Re-Render die Bewertungs-Zeilen frisch zeichnen (Detail-
+  // Karte offen? Trefferliste?). Wird nach einer Note UND bei Rückkehr zum Tab gerufen.
+  function refreshFeedbackViews() {
+    if (detailOverlayOpen) renderDetailOverlay();
+    if (lastRenderRes) renderResults(lastRenderRes);
+  }
+
+  // Bewertungs-Zeile für EINEN Treffer (Klaus 2026-07-12, „nach dem Seiten-Öffnen"):
+  // „Hat's getroffen? 👍 sehr gut · 🙂 okay · 👎 nein". Schon bewertet → Note + „ändern".
+  // Reine Anzeige/Lern-Eingabe; stopPropagation, damit Drag/Detail nicht mitspringen.
+  function makeFeedbackRow(doc, item) {
+    var row = doc.createElement("div");
+    row.className = "sbkim-sw-feedback";
+    row.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    row.addEventListener("click", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+    var rated = feedbackRatingOf(item);
+    var label = doc.createElement("span");
+    label.className = "sbkim-sw-feedback-q";
+    var STUFEN = [
+      { rating: "gut", txt: "👍 sehr gut" },
+      { rating: "okay", txt: "🙂 okay" },
+      { rating: "nein", txt: "👎 nein" },
+    ];
+    if (rated) {
+      var noteTxt = { gut: "👍 sehr gut", okay: "🙂 okay", nein: "👎 nein" }[rated] || rated;
+      label.textContent = "Bewertet: " + noteTxt;
+      row.appendChild(label);
+      var changeBtn = doc.createElement("button");
+      changeBtn.type = "button";
+      changeBtn.className = "sbkim-sw-feedback-btn sbkim-sw-feedback-change";
+      changeBtn.textContent = "ändern";
+      changeBtn.setAttribute("title", "Bewertung ändern");
+      changeBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+      changeBtn.addEventListener("click", function (ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        markPending(item);          // wieder offen für eine neue Note
+        refreshFeedbackViews();
+      });
+      row.appendChild(changeBtn);
+      return row;
+    }
+    label.textContent = "Hat's getroffen?";
+    row.appendChild(label);
+    STUFEN.forEach(function (s) {
+      var b = doc.createElement("button");
+      b.type = "button";
+      b.className = "sbkim-sw-feedback-btn sbkim-sw-fb-" + s.rating;
+      b.textContent = s.txt;
+      b.setAttribute("title", "Bewerten — die App lernt daraus");
+      b.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+      b.addEventListener("click", function (ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        recordFeedback(item, s.rating);
+        setHint("Danke — die App lernt aus deiner Bewertung.");
+        refreshFeedbackViews();
+      });
+      row.appendChild(b);
+    });
+    return row;
+  }
+
   function updateMerkBtn() {
     if (!merkBtnEl) return;
     var n = merkCount();
     merkBtnEl.textContent = "📌";
     merkBtnEl.setAttribute("aria-label", "Merkliste" + (n ? " (" + n + " gemerkt)" : " (leer)"));
-    merkBtnEl.setAttribute("title", "Merkliste — Gemerktes, gruppiert nach Suchfrage" + (n ? " (" + n + ")" : ""));
+    merkBtnEl.setAttribute("title", "Merkliste" + (n ? " (" + n + ")" : ""));
     if (merkBtnEl.classList) {
       if (n) merkBtnEl.classList.add("sbkim-sw-has-merk");
       else merkBtnEl.classList.remove("sbkim-sw-has-merk");
@@ -3556,6 +4038,121 @@
       detailOverlayEl.appendChild(urlEl);
     }
 
+    // A11B-Inc-2 — Knoten-Detail-Frage: ist der Treffer ein Mycel-KNOTEN
+    // (nodeId vorhanden), kann man DIESEN Knoten gezielt fragen — der natürliche
+    // Erst-Kontakt-Fluss (erst fragen, dann verbinden). Fail-soft: ohne Live-Pfad
+    // (queryNode nicht injiziert / noch nicht „🌐 voll mitmachen") ein ehrlicher
+    // Hinweis statt totem Knopf. REINE Anzeige/Auswahl — der 0.80-Andock-Riegel
+    // + Kern (Modul 05) bleiben unberührt (nur die öffentliche queryNode-Fläche).
+    if (item.nodeId) {
+      var askWrap = doc.createElement("div");
+      askWrap.setAttribute("style", "margin-top:10px;padding-top:9px;border-top:1px solid rgba(154,167,182,.18)");
+      var askTitle = doc.createElement("div");
+      askTitle.setAttribute("style", "font-size:.78rem;font-weight:600;margin-bottom:5px");
+      askTitle.textContent = "Frage an diesen Knoten:";
+      askWrap.appendChild(askTitle);
+      if (typeof queryNodeFn === "function") {
+        var askIn = doc.createElement("input");
+        askIn.type = "text";
+        askIn.setAttribute("style", "width:100%;box-sizing:border-box;padding:6px 9px;border-radius:8px;" +
+          "border:1px solid rgba(154,167,182,.35);background:rgba(10,16,24,.5);color:#e8eef6;font:inherit;font-size:.78rem");
+        askIn.value = (inputEl ? inputEl.value : queryValue) || "";
+        askIn.setAttribute("placeholder", "z.B. " + (item.titel || "…"));
+        askIn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+        askWrap.appendChild(askIn);
+        var askBtn = makeBtn(doc, "sbkim-sw-aibtn sbkim-sw-detail-ask", "🔎 Antwort holen", "Diesen Knoten fragen");
+        var askOut = doc.createElement("div");
+        askOut.setAttribute("style", "font-size:.76rem;color:#9aa7b6;margin-top:7px;white-space:pre-wrap;word-break:break-word");
+        askOut.style.display = "none";
+        askBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+        askBtn.addEventListener("click", function (ev) {
+          if (ev && ev.preventDefault) ev.preventDefault();
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          var frage = (askIn.value || "").trim();
+          askOut.style.display = "";
+          if (!frage) { askOut.textContent = "Zuerst eine Frage eintippen."; return; }
+          while (askOut.firstChild) askOut.removeChild(askOut.firstChild);
+          askOut.textContent = "⏳ Frage unterwegs an " + (item.titel || "den Knoten") + " …";
+          askBtn.disabled = true;
+          Promise.resolve().then(function () { return queryNodeFn(item.nodeId, frage); })
+            .then(function (hits) {
+              askBtn.disabled = false;
+              hits = Array.isArray(hits) ? hits : [];
+              while (askOut.firstChild) askOut.removeChild(askOut.firstChild);
+              if (!hits.length) {
+                askOut.textContent = "Keine Live-Antwort (Knoten evtl. gerade zu — oder du bist noch nicht angemeldet: „🌐 Voll mitmachen“). Die Frage bleibt server-los offen.";
+                return;
+              }
+              var lead = doc.createElement("div");
+              lead.setAttribute("style", "font-weight:600;color:#c7d2de;margin-bottom:4px");
+              lead.textContent = "Antwort von " + (item.titel || "dem Knoten") + " (nach Bedeutung):";
+              askOut.appendChild(lead);
+              for (var j = 0; j < Math.min(hits.length, 5); j++) {
+                var h = hits[j];
+                var hrow = doc.createElement("div");
+                hrow.setAttribute("style", "padding:2px 0");
+                var pct = (h && typeof h.score === "number") ? (" · " + Math.round(h.score * 100) + " %") : "";
+                hrow.textContent = "• " + ((h && (h.label || h.text)) || "(Treffer)") + pct;
+                askOut.appendChild(hrow);
+              }
+              // A11B-Inc-3: „🤝 mit diesem Knoten verbinden" — erscheint ERST NACH
+              // einer Antwort (Erst-Kontakt über Neugier). Der Handshake läuft über
+              // den injizierten connectNode (Sage: discover→handshakeCard); der
+              // 0.80-Andock-Riegel (Modul 05) entscheidet UNVERÄNDERT. Fail-soft:
+              // ohne connectNode kein Knopf; Ergebnis wird ehrlich benannt.
+              if (typeof connectNodeFn === "function") {
+                var connWrap = doc.createElement("div");
+                connWrap.setAttribute("style", "margin-top:9px");
+                var connBtn = makeBtn(doc, "sbkim-sw-aibtn sbkim-sw-detail-connect", "🤝 mit diesem Knoten verbinden", "Mit diesem Knoten verbinden");
+                var connOut = doc.createElement("div");
+                connOut.setAttribute("style", "font-size:.76rem;color:#9aa7b6;margin-top:6px;white-space:pre-wrap;word-break:break-word");
+                connOut.style.display = "none";
+                connBtn.addEventListener("pointerdown", function (ev) { if (ev && ev.stopPropagation) ev.stopPropagation(); });
+                connBtn.addEventListener("click", function (ev) {
+                  if (ev && ev.preventDefault) ev.preventDefault();
+                  if (ev && ev.stopPropagation) ev.stopPropagation();
+                  connOut.style.display = "";
+                  connOut.textContent = "⏳ verbinde mit " + (item.titel || "dem Knoten") + " …";
+                  connBtn.disabled = true;
+                  Promise.resolve().then(function () { return connectNodeFn(item.nodeId); })
+                    .then(function (r) {
+                      connBtn.disabled = false;
+                      r = r || {};
+                      var pct = (typeof r.score === "number") ? (" (" + Math.round(r.score * 100) + " %)") : "";
+                      if (r.ok || r.outcome === "established") {
+                        connOut.textContent = "✓ Verbunden mit " + (r.nodeName || item.titel || "dem Knoten") + pct + ".";
+                      } else if (r.outcome === "rejected" || (typeof r.score === "number" && r.score < 0.80)) {
+                        connOut.textContent = "Geprüft, aber (noch) keine Verbindung — andere Domäne / unter der Andock-Schwelle" + pct + ".";
+                      } else {
+                        connOut.textContent = "Nicht verbunden: " + (r.reason || "Gegenknoten evtl. gerade zu, oder du bist noch nicht angemeldet („🌐 Voll mitmachen“).");
+                      }
+                    })
+                    .catch(function (e) {
+                      connBtn.disabled = false;
+                      connOut.textContent = "Verbinden fehlgeschlagen (" + ((e && e.message) || e) + ").";
+                    });
+                });
+                connWrap.appendChild(connBtn);
+                connWrap.appendChild(connOut);
+                askOut.appendChild(connWrap);
+              }
+            })
+            .catch(function (e) {
+              askBtn.disabled = false;
+              askOut.textContent = "Frage fehlgeschlagen (" + ((e && e.message) || e) + "). Evtl. noch nicht angemeldet: „🌐 Voll mitmachen“.";
+            });
+        });
+        askWrap.appendChild(askBtn);
+        askWrap.appendChild(askOut);
+      } else {
+        var askHint = doc.createElement("div");
+        askHint.setAttribute("style", "font-size:.74rem;color:#9aa7b6");
+        askHint.textContent = "Live-Fragen an einen Knoten brauchen einmal „🌐 Voll mitmachen“ (eigene Identität). Danach erscheint hier „🔎 Antwort holen“.";
+        askWrap.appendChild(askHint);
+      }
+      detailOverlayEl.appendChild(askWrap);
+    }
+
     // [📌 Merken] / [📌 Gemerkt ✓] — Merken aus dem Overlay; gilt sofort.
     var merkBtn = makeBtn(doc, "sbkim-sw-aibtn sbkim-sw-detail-merk", "", "Merken");
     function refreshMerkBtnLabel() {
@@ -3579,8 +4176,19 @@
         if (ev && ev.preventDefault) ev.preventDefault();
         if (ev && ev.stopPropagation) ev.stopPropagation();
         openUrl(item.url);
+        // A16 Phase B: Seite geöffnet → nach der Gegenprüfung soll HIER an diesem
+        // Treffer die Bewertungs-Zeile stehen (Klaus 2026-07-12). Sofort einblenden,
+        // damit sie beim Zurückkommen schon da ist.
+        markPending(item);
+        renderDetailOverlay();
       });
       detailOverlayEl.appendChild(openBtn);
+    }
+
+    // A16 Phase B: Bewertungs-Zeile — erscheint, sobald die Seite geöffnet wurde
+    // (oder schon bewertet ist). „Hat's getroffen? 👍 🙂 👎".
+    if (isPending(item) || feedbackRatingOf(item)) {
+      detailOverlayEl.appendChild(makeFeedbackRow(doc, item));
     }
   }
 
@@ -4283,6 +4891,7 @@
     if (typeof options.prepareNodeCorpus === "function") nodeCorpusPreparer = options.prepareNodeCorpus;
     // Live-Cross-Knoten-Frage (Bau Query-über-Relais): (nodeId, text) -> Promise<Array<{label,score,anchorId}>>.
     if (typeof options.queryNode === "function") queryNodeFn = options.queryNode;
+    if (typeof options.connectNode === "function") connectNodeFn = options.connectNode;
     if (typeof options.searxngUrl === "string") searxngUrl = options.searxngUrl.trim();
     if (typeof options.webSearchEngine === "string") {
       for (var wi = 0; wi < WEB_ENGINES.length; wi++) {
@@ -4302,6 +4911,14 @@
     if (options.areas && typeof options.areas === "object") {
       ["app", "knoten", "internet"].forEach(function (id) {
         if (typeof options.areas[id] === "boolean") areas[id].enabled = options.areas[id];
+      });
+    }
+    // Bereiche ganz ausblenden (Klaus 2026-07-12): eine App ohne eigenen Inhalt
+    // (z.B. Kimseek) blendet „App" aus, statt einen leeren Bereich anzubieten.
+    // Ausgeblendete Bereiche werden auch zwangs-deaktiviert (keine Suche darüber).
+    if (options.areasHidden && typeof options.areasHidden === "object") {
+      ["app", "knoten", "internet"].forEach(function (id) {
+        if (options.areasHidden[id]) { areas[id].hidden = true; areas[id].enabled = false; }
       });
     }
 
@@ -4395,6 +5012,15 @@
     },
     getKiRelated: function () { return viewKiRelated; },
     rankView: rankView,   // reine Funktion (treffer, queryVec, {mode,relatedOnly,kiByKey}) — headless testbar
+    // A16 — Lernender Sortierer (display-only, on-device, fail-soft).
+    learnedRerank: learnedRerank,           // reine Funktion (treffer, {model?}) — headless testbar
+    computeRerankerModel: computeRerankerModel, // rein: Merkliste → Modell
+    trainReranker: retrainReranker,         // aus Merkliste + Bewertungen neu lernen (+ speichern)
+    getRerankerModel: loadRerankerModel,    // aktuelles gelerntes Modell (oder null)
+    // A16 Phase B — Treffer-Bewertung (👍 gut · 🙂 okay · 👎 nein), on-device.
+    recordFeedback: recordFeedback,         // (item, "gut"|"okay"|"nein") → lernen
+    getFeedback: function () { try { return JSON.parse(JSON.stringify(loadFeedback())); } catch (_e) { return {}; } },
+    feedbackWeight: feedbackWeight,         // reine Note→Gewicht-Abbildung (headless testbar)
     buildPrompt: buildAiPrompt,
     parseAiAnswer: parseAiAnswer,
     parseAiSummary: extractAiSummary,
@@ -4417,6 +5043,7 @@
       get corpusReady() { return corpusReady; },
       get nodeCorpusSize() { return Array.isArray(nodeCorpus) ? nodeCorpus.length : 0; },
       get liveNodeQuery() { return typeof queryNodeFn === "function"; },
+      get liveNodeConnect() { return typeof connectNodeFn === "function"; },
       get areas() { return { app: areas.app.enabled, knoten: areas.knoten.enabled, internet: areas.internet.enabled }; },
       get richterOn() { return richterOn; },
       // A1/A4-Verdrahtung (reine Diagnose): Vorfilter läuft hybrid, Multi-Query
@@ -4429,6 +5056,12 @@
       get kiRelated() { return viewKiRelated; },
       get kiRelatedActive() { return kiRelatedActive(); },
       get hasQueryVec() { return !!lastQueryVec; },
+      // A16 — Diagnose des gelernten Sortierers (reine Anzeige).
+      get rerankerReady() { return !rerankerIsEmpty(loadRerankerModel()); },
+      get rerankerTrained() { var m = loadRerankerModel(); return m ? (m.n || 0) : 0; },
+      get rerankerTokens() { var m = loadRerankerModel(); return (m && m.tokens) ? Object.keys(m.tokens).length : 0; },
+      get feedbackCount() { return feedbackCount(); },
+      get pendingFeedbackCount() { return pendingCount(); },
       get hasSearxng() { return !!searxngUrl; },
       get webEngine() { return optWebEngine; },
       get aiProvider() { return optAiProvider; },

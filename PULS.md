@@ -2,6 +2,36 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-15 — die sechs offenen Abweichungen sind zu
+
+Der Wächter vom Vortag hat seine Liste abgearbeitet: **match · membran · siegel ·
+spore · storage · such-widget** stehen jetzt byte-1:1 auf dem Sage-Kanon. Vor jedem
+Überschreiben wurden die verschwindenden Zeilen gelesen — **keine trug Point-eigene
+Logik**, alles war reines Hinterherhinken (bei `match` nur Kommentare zum
+`RELATEDNESS_CENTER`-Wechsel v1→v2, bei `siegel` und `spore` verschwand gar nichts).
+
+**Modul 15 bringt die neue Kanon-Option `queryInclusion` mit** (Sage PR #852): eine
+App kann ihre eigenen Fachworte mitgeben, damit eine anders formulierte Frage
+trotzdem trifft. Standardmäßig **aus** — Point stellt nichts ein und verhält sich
+unverändert. Modul 16 trägt den dazugehörigen Aspekt vom 2026-08-14.
+
+**Ein Wächter hat unterwegs zugeschlagen, zu Recht:** `jasons-bibliothek/index.html`
+bettet Modul 01 + 02 **byte-genau** ein (eine Datei, offline). Nach dem Kopieren war
+die Einbettung veraltet; sie ist neu gesetzt.
+
+**Beweis:** `npm test` **123/123**. Gegenproben: ein geändertes Byte in einer Kopie
+(1 rot) · eine echt veraltete Einbettung (1 rot).
+
+**Ehrlich zur Grenze eines Wächters:** die Einbettungs-Probe fragt
+`html.includes(quelltext)`. Sie fängt damit **veraltete** Einbettung — ihren Zweck —
+aber nicht zusätzlichen Text innerhalb des Bereichs. Der Name sagt „byte-genau" und
+verspricht damit einen Tick mehr, als er hält. Nicht in dieser Runde umgebaut, aber
+benannt, statt es zu verschweigen.
+
+**Nicht geprüft:** die Seite im Browser — wartet auf Klaus' Browser-Lauf.
+
+---
+
 ## Nachtrag 2026-08-14 — Modul-23-Oberfläche auf den Kanon + ein Drift-Guard
 
 `web/tools/sbkim-rendezvous-ui.js` stand auf `f117096e` und lag rund **780 Zeilen**
