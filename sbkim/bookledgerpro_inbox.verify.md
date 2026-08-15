@@ -45,34 +45,46 @@ nicht in den buchhaltungs-lastigen `domainKeywords`. Mit dem echten Vektor ist s
 Schwelle, während reine Inhalts-Knoten (Rezeptbuch 0,7961 · Mixarium 0,7673)
 darunter bleiben. Die damalige Vermutung war richtig.
 
-## Warum das zwei Monate lag
+## Warum das zwei Monate lag — und wo der Fehler wirklich liegt
 
 Der alte Vermerk nannte die Bedingung für die Hochstufung wörtlich:
 
 > **Hochstufung auf `verified-match`** erst, wenn BookLedgerPro einen echten
 > `domainVector` liefert.
 
-BookLedgerPro hat sie am **2026-06-21** erfüllt — zwei Tage nach dem Einfrieren
-der Momentaufnahme (Commit `b42b303` *„echten Domänen-Vektor angedockt"*, später
-`9a1a135` *„cap/needs-Vektoren aktiviert"*). Die Momentaufnahme und dieser Vermerk
-blieben stehen; niemand hat nachgesehen.
+BookLedgerPro hat sie am **2026-06-21** erfüllt (Commit `b42b303` *„echten
+Domänen-Vektor angedockt"*, später `9a1a135` *„cap/needs-Vektoren aktiviert"*) — und
+**es uns gemeldet**: am **2026-06-20** im gemeinsamen Postfach, mit eigenem Abschnitt
+*„Embedding-Rück-Quittung: echter `domainVector` ist live"*, `SIGNAL.json` `seq` → 12.
 
-**Die Aufzeichnung war zu keinem Zeitpunkt falsch — sie war nur alt.** Das ist der
-gefährlichere Fall: eine falsche Angabe fällt auf, eine veraltete sieht bis zuletzt
-aus wie ein Befund. Eine eingefrorene Momentaufnahme ist ein Beweis über **einen
-Zeitpunkt**, nie über den Zustand einer Gegenstelle *heute* — wer aus ihr eine
-Aussage über den heutigen Stand macht, zitiert eine Akte und nennt es eine Messung.
+**Unser `ack["BookLedgerPro"]` stand bis zum 2026-08-15 auf `5`, ihre `seq` inzwischen
+auf `22`.** Der Briefkasten hat funktioniert. Siebzehn Signale lagen ungelesen da.
 
-**Folgerung für die anderen Peers:** dieselbe Konstellation kann überall stehen, wo
-ein Vermerk eine Bedingung nennt und niemand ihr Eintreten prüft. Betroffen sind
-zurzeit Rezeptbuch und Mixarium — beide 2026-07-14 auf `verified-spore`
-zurückgestuft, beide mit ausstehender reziproker Neu-Einstufung.
+Das ist ein schärferer Befund als „niemand hat nachgesehen": die Sitzungsstart-Pflicht
+aus §11.6 — *fremde `SIGNAL.json` lesen, mit eigenem `ack` vergleichen, quittieren* —
+ist schlicht ausgeblieben. Nicht das Protokoll hat versagt, sondern seine Ausführung.
+
+**Und die Aufzeichnung war dabei zu keinem Zeitpunkt falsch — nur alt.** Das ist der
+gefährlichere Fall: eine falsche Angabe fällt auf, eine veraltete sieht bis zuletzt aus
+wie ein Befund. Eine eingefrorene Momentaufnahme beweist einen **Zeitpunkt**, nie den
+Zustand einer Gegenstelle *heute*.
+
+**Abhilfe, an BookLedgerPro vorgeschlagen:** `.github/sbkim-watch.mjs` liest fremde
+`SIGNAL.json` bereits zeitgesteuert. Meldet er zusätzlich, wenn `seq_fremd > ack_eigen`
+länger als ~14 Tage offen steht, fällt genau dieser Fall auf, ohne dass jemand daran
+denken muss.
+
+**Gleiche Konstellation möglich bei:** Rezeptbuch und Mixarium — beide 2026-07-14 auf
+`verified-spore` zurückgestuft, beide mit ausstehender reziproker Neu-Einstufung. Deren
+`ack` sollte beim nächsten Sitzungsstart mit geprüft werden.
 
 ## Status
 **Endknoten BookLedgerPro → `verified-match`** (2026-08-15). Identität reziprok,
 offline und unabhängig geprüft (nicht das Wort der Gegenseite übernommen), Cosinus
 selbst nachgerechnet. Eingetragen in `status.json`, `web/data/marktplatz.json`;
-Postfach `sbkim/AUSTAUSCH-BookLedgerPro.md`; `SIGNAL.json` fortgeschrieben.
+Postfach `sbkim/AUSTAUSCH-BookLedgerPro.md`; `SIGNAL.json` fortgeschrieben (`seq` 36, `ack[BookLedgerPro]` 5 → 22 quittiert).
+
+**Reziprok bestätigt:** BookLedgerPro hat mit dem eigenen `domainVector` unabhängig nachgerechnet und kommt auf **denselben** Wert 0,828033 (deren Vermerk `sbkim/SB-KIMTool-Point_inbox.verify.md`, `ack[SB-KIMTool-Point]` = 36, `seq` 23). Nebenbefund: deren Momentaufnahme unserer Spore war ebenfalls veraltet (noch v0.1) und ist auf v0.2 erneuert — die Blindheit war beidseitig.
 
 ## Re-Verifikation (jederzeit reproduzierbar)
 ```
