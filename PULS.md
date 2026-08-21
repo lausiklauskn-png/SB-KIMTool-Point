@@ -2,6 +2,48 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-21 — die Werkstatt steht neben dem Modell
+
+Die Werkzeugkiste hat eine vierte Komplett-Kachel: **Kimhub — die Werkstatt
+(echter Lauf)**, link-first auf <https://lausiklauskn-png.github.io/Kimhub/>.
+Die alte Klemme (privates Depot, keine Adresse) ist weg.
+
+**Der Gegensatz ist der ganze Grund für die Kachel** und steht deshalb in ihrem
+Text, nicht nur in dieser Notiz: das Modell hier spielt einen **aufgezeichneten**
+Lauf ab — es führt nichts aus. Die Werkstatt zeigt einen **echten**: echte
+Aufträge, echte Modelle, echte Kosten. Eine Probe besteht darauf, dass beide
+Wörter in der Kachel stehen bleiben.
+
+Die Modell-Seite verlinkt jetzt **beides** — die Seite zum Ansehen und den
+Quelltext. Bisher stand dort nur das Depot; die Adresse gab es noch nicht. Ihr
+ehrlicher Satz („spielt ab, führt nichts live aus") bleibt und bleibt bewacht.
+
+**Zwei Dinge, die die neue Kachel aufgedeckt hat** — beide älter als sie:
+
+- Der Knopf für nicht gespiegelte Werkzeuge hieß fest **„↗ Live öffnen (Sage)"**.
+  Bei der Kimhub-Kachel hätte da eine falsche Herkunft gestanden, direkt neben
+  einem Chip, der „Quelle: Kimhub" sagt. Jetzt heißt er schlicht „Live öffnen";
+  die Herkunft steht im Chip.
+- Der **Vorspann** über der Liste behauptete, alles komme von Sage und sei 1:1
+  gespiegelt und über sha256 gegenprüfbar. Für die **Pinnwand** stimmte das schon
+  vorher nicht — sie ist bewusst nur verlinkt. Er beschreibt jetzt beide
+  Gestalten und nennt, welche Einträge nur verlinkt sind. Ein Vorspann, der mehr
+  verspricht als die Einträge halten, ist die stillste Sorte Unwahrheit: er steht
+  über allem und wird von niemandem geprüft.
+
+**Beweis:** `npm test` **131/131**. Gegenprobe von Hand (dieses Repo hat kein
+`gegenprobe.sh`): sechs Eingriffe, alle sechs gefangen — Kachel weg · falsche
+Adresse · Gegensatz aus dem Text gestrichen · „(Sage)" wieder am Knopf · Vorspann
+wieder allzuständig · Adresse aus der Modell-Seite.
+
+**Nebenbefund zum Prüfen selbst:** ohne `npm install` fallen `kanon_import` und
+`spore_v02` um — nicht rot, sondern **nicht lauffähig** (`fake-indexeddb` fehlt).
+Wer das verwechselt, sucht am falschen Ende.
+
+**Nicht geprüft:** die Seite im Browser — wartet auf Klaus' Browser-Lauf.
+
+---
+
 ## Nachtrag 2026-08-15 — die sechs offenen Abweichungen sind zu
 
 Der Wächter vom Vortag hat seine Liste abgearbeitet: **match · membran · siegel ·

@@ -205,8 +205,8 @@ async function renderKomplettWerkzeuge() {
         <p class="getnote">Lokal gespiegelt (<code>${t.datei}</code>) · byte-kompatibel · sha256 ${t.sha256}</p>
       </div>` : `
       <div class="actions">
-        <a class="get" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live öffnen (Sage)</a>
-        <p class="getnote">${t.point_status || "Live bei Sage gepflegt · hier (noch) nicht lokal gespiegelt"}</p>
+        <a class="get" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live öffnen</a>
+        <p class="getnote">${t.point_status || `Live bei ${t.herkunft} gepflegt · hier (noch) nicht lokal gespiegelt`}</p>
       </div>`}`;
     grid.appendChild(el);
   }

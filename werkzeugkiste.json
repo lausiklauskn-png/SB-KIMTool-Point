@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-29",
+  "lastUpdated": "2026-08-21",
   "hinweis": "Quelle der Werkzeugkiste-Kacheln. sage_status = Reife im Sage-Protokol (verifiziert aus Sage/status.json, 2026-05-29). point_status = Stand hier im Tool-Point. 'vorgebaut-schlummert' heisst: bereits gebaut, springt bei Bedarf an (z.B. Angriff) — NICHT leer. Optionales Feld 'datei' = echte, offline einbaubare Datei in diesem Repo (Seite bietet sie zum Kopieren/Laden an).",
   "stufen": {
     "basic": "Pflicht — bringt den Point/SBKIM ueberhaupt zum Laufen.",
@@ -248,7 +248,7 @@
       "aktiviert_durch": "Nutzer verbindet sich mit dem Raum / sucht Anwesende."
     }
   ],
-  "komplett_werkzeuge_hinweis": "Komplett-Werkzeuge sind vollstaendige Ein-Datei-PWAs (kein Build, keine Abhaengigkeiten), gepflegt von Sage-Protokol (Spec-Hub). Hier 1:1 lokal gespiegelt (Offline-Default, web/tools/) PLUS Live-Link zur Sage-Quelle. byte-kompatibel mit Sage; nicht veraendert; gegenpruefbar ueber sha256. Quelle/Stand: Sage docs/observatorium/tools (PR #318), geholt 2026-06-20.",
+  "komplett_werkzeuge_hinweis": "Komplett-Werkzeuge sind fertige, eigenstaendige PWAs. ZWEI Gestalten, und der Unterschied steht an jeder Kachel: (a) EIN-DATEI-PWAs, hier 1:1 lokal gespiegelt (Offline-Default, web/tools/) PLUS Live-Link — byte-kompatibel, nicht veraendert, gegenpruefbar ueber sha256 (andock, mycelknoten; Quelle Sage docs/observatorium/tools, PR #318, geholt 2026-06-20). (b) MEHRTEILIGE PWAs, bewusst NICHT gespiegelt, um Drift zu vermeiden — dort gilt die Live-Quelle, und es gibt weder datei noch sha256 (pinnwand bei Sage, kimhub-werkstatt bei Kimhub). Bis 2026-08-21 stand hier, alles sei von Sage und alles sei gespiegelt; beides stimmte schon vorher nicht fuer die Pinnwand.",
   "komplett_werkzeuge": [
     {
       "id": "andock", "name": "Andock-Werkzeug", "kategorie": "komplett-werkzeug",
@@ -286,6 +286,19 @@
       "verwendung": "Live-Seite oeffnen, Frage aufs Brett legen, optional 'nach Bedeutung sortieren', optional KI-Richter zuschalten (eigener Schluessel oder gratis Browser-KI).",
       "einbau": "Vollstaendige PWA von Sage; als Vorlage/Studie fuer eigene Q&A-Bretter. Mehrteilig (index.html + modules/) — bewusst nicht lokal gespiegelt, um Drift zu vermeiden; die Live-Quelle gilt.",
       "aktiviert_durch": "Nutzer oeffnet das Brett / sortiert nach Bedeutung / schaltet den KI-Richter zu."
+    },
+    {
+      "id": "kimhub-werkstatt",
+      "name": "Kimhub — die Werkstatt (echter Lauf)",
+      "kategorie": "komplett-werkzeug",
+      "quelle": "https://lausiklauskn-png.github.io/Kimhub/",
+      "herkunft": "Kimhub (Werkstatt)",
+      "point_status": "real-browser-tauglich · extern · live bei Kimhub gepflegt · hier (noch) nicht lokal gespiegelt (mehrteilige PWA, Drift-Vermeidung)",
+      "was": "Dieselbe Rollen-Kette wie das Modell auf der Modell-Seite — nur laeuft sie dort wirklich. Fuenf Agenten mit Namen (Nora schlaegt vor, Emil baut, Vera prueft, Sten sucht die Fehler, Jonas schreibt auf, wo es steht) arbeiten an einem Auftrag. Die Seite zeigt vier Raeume daraus: die Ideen-Konferenz, die Uebergabe an die Hand, die baut, das Ergebnis und die Buchhaltung.",
+      "nutzen": "Der Gegensatz ist der ganze Punkt. Das Modell hier im Point spielt einen AUFGEZEICHNETEN Lauf ab — es fuehrt nichts aus. Die Werkstatt zeigt einen ECHTEN: echte Auftraege, echte Modelle, echte Kosten, mit Zahlen daneben. Wer wissen will, was so eine Kette wirklich kostet und wo sie danebengreift, sieht es dort statt in einer Vorfuehrung.",
+      "verwendung": "Live-Seite oeffnen und durch die vier Reiter gehen. Sie ist installierbar (Manifest + Service-Worker) — auf dem Tablet wird ueber 'App installieren' eine eigene App daraus. Die Seite loest nichts aus und kostet nichts: eine Schicht startet nur von Hand auf der Kommandozeile und nur mit ausdruecklichem --echt.",
+      "einbau": "Nichts einzubauen, es ist eine eigenstaendige PWA. Als Vorlage taugt vor allem das Drumherum: drei Bremsen uebereinander (Tageskontingent, Schicht-Deckel, Guthaben ohne automatisches Nachladen), eine Gegenpruefung ohne den Bauer, und Lauf-Ergebnisse, die der Maschine gehoeren statt dem Depot.",
+      "aktiviert_durch": "Nutzer oeffnet die Werkstatt-Seite. Eine Schicht selbst: nur von Hand, mit ausdruecklichem --echt."
     }
   ]
 }
