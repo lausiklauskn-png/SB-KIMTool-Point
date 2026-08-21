@@ -48,9 +48,33 @@ test("die Seite sagt weiterhin, dass sie nichts live ausfuehrt", () => {
     "das Wort „aufgezeichnet“ fehlt im Einleitungs-Absatz");
 });
 
-test("und sie verweist auf die echte Werkstatt", () => {
-  assert.ok(seite.includes("https://github.com/lausiklauskn-png/Kimhub"),
-    "der Link zum Quelltext der Werkstatt fehlt");
+/*
+ * KEIN DIREKTER LINK AUF DAS DEPOT — Klaus' Anweisung vom 2026-08-21, und sein
+ * Bild dazu trifft es besser als jede Regel:
+ *
+ *   „Entweder ich gebe das Geld heraus, wie man Geld an jemanden gibt, der
+ *    etwas von mir haben möchte — oder ich lasse direkt ins Portemonnaie
+ *    greifen, indem ich es einfach aufmache."
+ *
+ * Wer den Quelltext will, kommt an ihn heran: die Werkstatt ist eine Web-App,
+ * ihr Quelltext steht im Browser. Ihn von hier aus ANZUBIETEN ist etwas
+ * anderes — dann führt eine öffentliche Seite an einem Konto vorbei direkt in
+ * ein Depot, dessen Sichtbarkeit dem Besitzer gehört und die er dreht, wie er
+ * will. Zwischen „auffindbar" und „hingehalten" liegt genau dieser Unterschied.
+ *
+ * Bis zum 2026-08-21 verlangte diese Probe das GEGENTEIL („der Link zum
+ * Quelltext fehlt"). Sie ist umgedreht, nicht gelöscht — damit sichtbar bleibt,
+ * dass hier eine Entscheidung getroffen wurde und nicht etwas verlorenging.
+ */
+test("die Seite bietet den Quelltext NICHT an", () => {
+  assert.ok(!/github\.com\/lausiklauskn-png\/Kimhub/.test(seite),
+    "ein direkter Link ins Depot — den holt sich, wer ihn will, nicht von hier");
+});
+
+test("aber sie verweist auf die Werkstatt als APP, und zwar als Knopf", () => {
+  assert.match(seite, /class="ctl ctl-link"[^>]*href="https:\/\/lausiklauskn-png\.github\.io\/Kimhub\/"/s,
+    "der Knopf zur Werkstatt fehlt oder ist wieder ein blosser Text-Link");
+  assert.ok(/↗ Die Werkstatt öffnen/.test(seite), "die Beschriftung des Knopfes fehlt");
 });
 
 /*
@@ -64,7 +88,7 @@ test("und sie verweist auf die echte Werkstatt", () => {
  * einer Aenderung uebersehen wird, weil man sie beim Draufschauen gar nicht
  * sieht. Deshalb wird gezaehlt, nicht nur gesucht.
  */
-test("die Seiten-Adresse steht bei JEDER Kimhub-Erwaehnung, auch der zugeklappten", () => {
+test("die App-Adresse steht bei JEDER Kimhub-Erwaehnung, auch der zugeklappten", () => {
   const seitenLink = /https:\/\/lausiklauskn-png\.github\.io\/Kimhub\//g;
   const treffer = (seite.match(seitenLink) || []).length;
   assert.ok(treffer >= 2,
