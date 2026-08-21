@@ -2,6 +2,49 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-21 (3) — der Quelltext wird nicht mehr angeboten
+
+Klaus hat den Widerspruch im Bild gezeigt: diese Seite ist **öffentlich** und
+hielt einen direkten Link in sein **privates** Kimhub-Depot hin. Sein Bild dazu:
+
+> „Entweder ich gebe das Geld heraus, wie man Geld an jemanden gibt, der etwas
+> von mir haben möchte — oder ich lasse direkt ins Portemonnaie greifen, indem
+> ich es einfach aufmache."
+
+**Der Unterschied ist nicht Zugriff, sondern Angebot.** Die Werkstatt ist eine
+Web-App; wer ihren Quelltext will, liest ihn im Browser. Ihn von hier aus
+hinzuhalten ist etwas anderes.
+
+Also: **beide `github.com/…/Kimhub`-Links sind raus, die App-Adresse bleibt.**
+Die Kachel bleibt ebenfalls — sie zeigt ohnehin auf die App, nicht aufs Depot.
+Aus dem Text-Link oben ist ein **Knopf** geworden (`.ctl .ctl-link`), dieselbe
+Pille wie die Steuerung darunter, aber in der Akzentfarbe und mit ↗, weil er von
+der Seite wegführt statt eine Wiedergabe zu steuern.
+
+**Der Wächter durchsucht die ganze Auslieferung**, nicht nur `modell.html`
+(`test/keine_depot_links.test.js`). Der Link kann überall wieder auftauchen — in
+`werkzeugkiste.json`, in `assets/app.js`, auf einer neuen Seite. Ein Wächter, der
+nur die eine Datei kennt, in der es einmal passierte, fängt genau den nächsten
+Fall nicht. Die Gegenprobe schleust ihn deshalb an drei verschiedenen Stellen
+wieder ein.
+
+Die alte Probe verlangte das **Gegenteil** („der Link zum Quelltext fehlt"). Sie
+ist umgedreht, nicht gelöscht — damit sichtbar bleibt, dass hier entschieden
+wurde und nichts verlorenging.
+
+**Allgemein, für die nächste Sitzung:** stellt Klaus ein Repo privat, ist das
+eine **Anweisung**, keine Einstellung. Dann gehört sein Depot-Link hier heraus —
+ohne Rückfrage und ohne Auswahlliste.
+
+**Beweis:** `npm test` **135/135**. Gegenprobe von Hand: sechs Eingriffe, sechs
+gefangen — Quelltext-Link zurück in die Seite · in die Kachel · in eine
+Skript-Datei · Knopf wieder Text · Beschriftung weg · Werkstatt gar nicht mehr
+erreichbar.
+
+**Nicht geprüft:** wie der Knopf am Tablet aussieht — wartet auf Klaus' Blick.
+
+---
+
 ## Nachtrag 2026-08-21 (2) — beide Kimhub-Stellen tragen die Adresse
 
 Klaus hat nachgefragt, ob der Link zur Werkstatt wirklich **im Modell** steckt.

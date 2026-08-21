@@ -202,6 +202,17 @@ main { max-width: 1080px; margin: 0 auto; padding: 1.2rem; }
 }
 .ctl:hover { border-color: var(--accent-dim); }
 
+/* Ein LINK in Knopf-Gestalt. Gleiche Pille wie die Steuerung daneben, damit er
+   dazugehoert — aber in der Akzentfarbe und mit ↗, weil er von der Seite
+   wegfuehrt und keine Wiedergabe steuert. `.ctl` war fuer <button> geschrieben;
+   ein <a> braucht display + text-decoration dazu. */
+a.ctl { display: inline-block; text-decoration: none; }
+.ctl-link {
+  border-color: var(--accent); color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--card));
+}
+.ctl-link:hover { background: color-mix(in srgb, var(--accent) 18%, var(--card)); }
+
 /* Klartext-Statusleiste */
 .statusline {
   display: flex; align-items: center; gap: 0.7rem;
