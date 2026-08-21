@@ -14,10 +14,71 @@ const box = JSON.parse(readFileSync(join(ROOT, "werkzeugkiste.json"), "utf8"));
 
 const MANDATORY = ["was", "nutzen", "verwendung", "einbau", "aktiviert_durch"];
 
-test("catalog: komplett_werkzeuge lists the Sage tools (two lokal gespiegelt + Pinnwand link-first)", () => {
+test("catalog: komplett_werkzeuge — zwei lokal gespiegelt, zwei link-first", () => {
   assert.ok(Array.isArray(box.komplett_werkzeuge), "komplett_werkzeuge is an array");
   const ids = box.komplett_werkzeuge.map((t) => t.id).sort();
-  assert.deepEqual(ids, ["andock", "mycelknoten", "pinnwand"]);
+  assert.deepEqual(ids, ["andock", "kimhub-werkstatt", "mycelknoten", "pinnwand"]);
+});
+
+/*
+ * Der Hinweis ueber der Liste sagt, was die Liste ist. Bis zum 2026-08-21 sagte
+ * er „alles von Sage, alles 1:1 gespiegelt, gegenpruefbar ueber sha256" — und
+ * das stimmte schon damals fuer die Pinnwand nicht, die bewusst nur verlinkt
+ * ist. Mit Kimhub stimmte auch die Herkunft nicht mehr. Ein Vorspann, der mehr
+ * verspricht als die Eintraege halten, ist die stillste Sorte Unwahrheit: er
+ * steht ueber allem und wird von niemandem geprueft.
+ */
+test("der Vorspann verspricht nicht mehr, als die Eintraege halten", () => {
+  const h = box.komplett_werkzeuge_hinweis || "";
+  const gespiegelt = box.komplett_werkzeuge.filter((t) => t.datei);
+  const nurLink = box.komplett_werkzeuge.filter((t) => !t.datei);
+  assert.ok(gespiegelt.length > 0 && nurLink.length > 0,
+    "es gibt wirklich beide Gestalten — sonst misst diese Probe nichts");
+  assert.ok(/nicht gespiegelt|NICHT gespiegelt/i.test(h),
+    "der Vorspann nennt die nicht gespiegelte Gestalt");
+  for (const t of nurLink)
+    assert.ok(h.includes(t.id), `der Vorspann nennt den nur verlinkten Eintrag ${t.id}`);
+  // Und er darf nicht behaupten, ALLES komme von Sage — zwei Herkuenfte stehen
+  // in der Liste, und eine Kachel traegt eine fremde Adresse.
+  const herkuenfte = new Set(box.komplett_werkzeuge.map((t) => t.herkunft));
+  if (herkuenfte.size > 1)
+    assert.ok(!/^Komplett-Werkzeuge sind [^.]*gepflegt von Sage-Protokol/.test(h),
+      "der Vorspann schreibt alles Sage zu, obwohl es mehrere Herkuenfte gibt");
+});
+
+/*
+ * Die Werkstatt-Kachel traegt EINE Aussage, und es ist genau die, wegen der sie
+ * hier steht: das Modell im Point spielt einen aufgezeichneten Lauf ab, die
+ * Werkstatt fuehrt einen echten. Faellt der Gegensatz aus dem Text, bleibt eine
+ * beliebige Kachel mit einem Link uebrig.
+ */
+test('tool "kimhub-werkstatt": der Gegensatz aufgezeichnet/echt steht im Text', () => {
+  const t = box.komplett_werkzeuge.find((x) => x.id === "kimhub-werkstatt");
+  assert.ok(t, "entry exists");
+  for (const f of MANDATORY) assert.ok(t[f] && t[f].length > 0, `field ${f} present`);
+  const text = [t.was, t.nutzen].join(" ");
+  assert.match(text, /AUFGEZEICHNET/, "das aufgezeichnete Modell wird benannt");
+  assert.match(text, /ECHTEN|echte/, "der echte Lauf wird benannt");
+  assert.equal(t.quelle, "https://lausiklauskn-png.github.io/Kimhub/",
+    "die Kachel zeigt auf die Adresse, die es seit dem 2026-08-21 gibt");
+  assert.ok(!t.datei, "kein lokaler Spiegel (mehrteilige PWA, Drift-Vermeidung)");
+  assert.ok(!/Sage/.test(t.herkunft), "die Herkunft ist Kimhub, nicht Sage");
+});
+
+/*
+ * Ein nur verlinkter Eintrag bekommt in app.js den Zweig OHNE Spiegel. Der
+ * beschriftete den Knopf bis zum 2026-08-21 fest mit „(Sage)" — bei der
+ * Kimhub-Kachel haette da eine falsche Herkunft am Knopf gestanden, und zwar
+ * neben einer Kachel, die im Chip daneben „Quelle: Kimhub" sagt.
+ */
+test("der Live-Knopf schreibt keine feste Herkunft mehr hinein", () => {
+  const app = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const stelle = app.slice(app.indexOf("renderKomplettWerkzeuge"),
+                           app.indexOf("renderMarkt"));
+  assert.ok(stelle.includes("↗ Live öffnen<"),
+    "der Knopf ohne Spiegel heisst schlicht „Live öffnen“");
+  assert.ok(!/Live öffnen \(Sage\)/.test(stelle),
+    "keine fest eingetragene Herkunft am Knopf");
 });
 
 // Pinnwand is a MULTI-file PWA — bewusst NICHT lokal gespiegelt (Drift-Vermeidung),
