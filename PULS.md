@@ -2,6 +2,39 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-08-21 (2) — beide Kimhub-Stellen tragen die Adresse
+
+Klaus hat nachgefragt, ob der Link zur Werkstatt wirklich **im Modell** steckt.
+Nachgesehen: ja, oben im Einleitungs-Absatz. Aber Kimhub steht auf der Seite
+**zweimal** — die zweite Erwähnung liegt im zugeklappten „Warum ein Modell?"
+und trug nur den Quelltext-Link. Wer bis dahin liest, erfährt, dass die Kette
+echt läuft, und bekommt Quelltext statt Seite. Jetzt tragen beide Stellen die
+Adresse, der Quelltext steht daneben.
+
+**Die Gegenprobe hat dabei zwei blinde Wächter aufgedeckt** — beide älter als
+diese Änderung, beide gemessen statt vermutet:
+
+- **`nicht live` steht zweimal in der Datei.** Einmal im ehrlichen Satz über das
+  Modell, einmal im Satz über die Werkstatt („die Werkstatt zeigt sie nicht live
+  an"). Die Probe suchte die Zeichenkette in der ganzen Seite: nimmt man den
+  ehrlichen Satz weg, bleibt der andere stehen, und sie meldet grün. Sie war seit
+  dem Tag blind, an dem der zweite Satz dazukam. Das ist die alte Lehre vom
+  doppelten Anker — nur andersherum: nicht der Anker der Sabotage stand zweimal
+  da, sondern **der Anker der Prüfung**. Sie ist jetzt auf den SATZ verankert
+  (`führt das Modell … nicht live … aus`), nicht auf ein Wort.
+- **Der Riegel gegen eine behauptete Live-Anzeige kannte keinen Bindestrich.**
+  Er suchte `live\s*(anzeige|…)` — „**Live-Anzeige**", die normale deutsche
+  Schreibweise und genau die Wendung, gegen die er gebaut ist, rutschte vorbei.
+
+**Beweis:** `npm test` **132/132**. Gegenprobe von Hand: acht Eingriffe, **acht
+gefangen** — und diesmal werden ALLE Fundstellen getauscht. Ein Eingriff, der
+nur die erste erwischt, misst die Zusicherung nicht: der Quelltext-Link steht
+zweimal, nach dem Tausch eines einzelnen verwies die Seite immer noch richtig.
+
+**Nicht geprüft:** die Seite im Browser — wartet auf Klaus' Browser-Lauf.
+
+---
+
 ## Nachtrag 2026-08-21 — die Werkstatt steht neben dem Modell
 
 Die Werkzeugkiste hat eine vierte Komplett-Kachel: **Kimhub — die Werkstatt
