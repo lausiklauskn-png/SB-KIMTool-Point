@@ -9,8 +9,11 @@
   },
   "module": [
     {
-      "id": "02", "name": "Spore", "stufe": "basic",
-      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "02",
+      "name": "Spore",
+      "stufe": "basic",
+      "sage_status": "code-stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-spore.js (1:1 aus Sage-Protokol/src/modules/02_spore.js, Multi-Identitaet Bau 02.Y). Ed25519 ueber WebCrypto; persistiert ueber Modul 01 (window.SbkimStorage). Headless: Laden + API-Registrierung per npm test bewiesen; voller Browser-Pfad ungeprueft (wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-spore.js",
       "was": "Kryptografische Identitaet eines Knotens (Ed25519-Schluesselpaar, node_id = SHA-256 des oeffentlichen Schluessels).",
@@ -20,8 +23,11 @@
       "aktiviert_durch": "Immer aktiv (Grundbaustein)."
     },
     {
-      "id": "01", "name": "Storage", "stufe": "basic",
-      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "01",
+      "name": "Storage",
+      "stufe": "basic",
+      "sage_status": "code-stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-storage.js (1:1 aus Sage-Protokol/src/modules/01_storage.js). IndexedDB-Wrapper fuer alle sbkim_* Stores. Headless: Laden + API-Registrierung per npm test bewiesen; IndexedDB-Pfad laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-storage.js",
       "was": "Speicher-Wrapper (im Browser IndexedDB, headless ein In-Memory-Mock) fuer alle sbkim_* Daten.",
@@ -31,8 +37,11 @@
       "aktiviert_durch": "Immer aktiv (Grundbaustein)."
     },
     {
-      "id": "19", "name": "Andock-Wizard (Witstart)", "stufe": "basic",
-      "sage_status": "vorgebaut-kopierbar", "point_status": "noch-nicht-kopiert",
+      "id": "19",
+      "name": "Andock-Wizard (Witstart)",
+      "stufe": "basic",
+      "sage_status": "vorgebaut-kopierbar",
+      "point_status": "noch-nicht-kopiert",
       "was": "Kopierbares Onboarding-Modul: fuehrt eine fremde PWA Schritt fuer Schritt ins Protokoll.",
       "nutzen": "Sporen-Erzeugung und Erst-Andockung ohne Vorwissen — der Eingang fuer neue Knoten.",
       "verwendung": "Wizard einbinden; er erstellt die Spore, fragt 'das kann meine PWA' ab und meldet am Marktplatz an.",
@@ -40,8 +49,11 @@
       "aktiviert_durch": "Erstkontakt eines neuen Knotens."
     },
     {
-      "id": "03", "name": "Embedding", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert",
+      "id": "03",
+      "name": "Embedding",
+      "stufe": "basic",
+      "sage_status": "fertig",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-embedding.js (1:1 aus Sage-Protokol/src/modules/03_embedding.js, in Sage 'fertig', Live-Beweis 2026-05-16). NETZ-ANFORDERUNG: laedt das Modell Xenova/multilingual-e5-small per CDN (transformers.js) — NICHT offline. Headless: Laden + API-Registrierung bewiesen; Vektor-Erzeugung laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-embedding.js",
       "was": "Wandelt 'das kann ich'-Texte in 384-dim Vektoren (Xenova/multilingual-e5-small).",
@@ -51,8 +63,11 @@
       "aktiviert_durch": "Immer aktiv (Live-Beweis Sage 2026-05-16)."
     },
     {
-      "id": "04", "name": "Match", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert · headless getestet",
+      "id": "04",
+      "name": "Match",
+      "stufe": "basic",
+      "sage_status": "fertig",
+      "point_status": "1:1 aus Sage kopiert · headless getestet",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-match.js (1:1 aus Sage-Protokol/src/modules/04_match.js, in Sage 'fertig', Sichttest 5/5 gruen). Der Kern match()/isAboveProviderThreshold/matchDimensions ist eine reine OFFLINE-Funktion und per npm test voll bewiesen (Schwellen 0.80/0.60). Optionaler explainMatchLLM-Pfad ruft die Anthropic-API (braucht Netz+Key).",
       "datei": "web/tools/sbkim-match.js",
       "was": "Cosine-Aehnlichkeit ueber Embedding-Vektoren (Schwelle PROVIDER_MIN_MATCH = 0.80).",
@@ -62,8 +77,11 @@
       "aktiviert_durch": "Immer aktiv (Sichttest 5/5 gruen)."
     },
     {
-      "id": "05", "name": "Anastomose (Handshake)", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert",
+      "id": "05",
+      "name": "Anastomose (Handshake)",
+      "stufe": "basic",
+      "sage_status": "fertig",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-anastomose.js (1:1 aus Sage-Protokol/src/modules/05_anastomose.js, in Sage 'fertig', Cross-Node-Beweis 2026-05-16). Signierter bidirektionaler Handshake ueber WebCrypto; Transport per HTTP oder MessageChannel. Headless: Laden + API-Registrierung bewiesen; der echte Handshake laeuft erst im Browser zwischen zwei Knoten (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-anastomose.js",
       "was": "Verbindungsaufbau zwischen zwei Knoten (Hyphen-Verschmelzung).",
@@ -73,18 +91,23 @@
       "aktiviert_durch": "Bestaetigter Match (Cross-Node-Beweis Sage 2026-05-16)."
     },
     {
-      "id": "09", "name": "Einbau-PWA", "stufe": "basic",
-      "sage_status": "fertig", "point_status": "noch-nicht-kopiert",
+      "id": "09",
+      "name": "Einbau-PWA",
+      "stufe": "basic",
+      "sage_status": "fertig",
+      "point_status": "noch-nicht-kopiert",
       "was": "Der Mechanismus, der das Protokoll in eine bestehende PWA einsetzt.",
       "nutzen": "Jede PWA wird zum Knoten, ohne neu gebaut zu werden.",
       "verwendung": "Init-Skript + Service-Worker einbinden; Rest laeuft automatisch.",
       "einbau": "sbkim-init.js / sbkim-sw.js einhaengen (live an 2 Endknoten seit 2026-05-16).",
       "aktiviert_durch": "Einbindung in eine PWA."
     },
-
     {
-      "id": "00", "name": "Doku-Fenster", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "id": "00",
+      "name": "Doku-Fenster",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "noch-nicht-kopiert",
       "was": "Verstecktes Status-Panel (5-Klick) in einer Endpunkt-PWA.",
       "nutzen": "Zeigt ehrlich, was lebt / was tot ist — die Lampen-Sicht direkt am Knoten.",
       "verwendung": "Fuenfmal tippen oeffnet das Panel; zeigt Modul-Status und Identitaet.",
@@ -92,8 +115,11 @@
       "aktiviert_durch": "5-Klick-Geste."
     },
     {
-      "id": "06", "name": "Heterokaryose", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "06",
+      "name": "Heterokaryose",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-heterokaryose.js (1:1 aus Sage-Protokol/src/modules/06_heterokaryose.js). Signierter Geschwister-Datenaustausch (opt-in) ueber WebCrypto; Transport per HTTP/Channel. Headless: Laden + API-Registrierung per npm test bewiesen; echter Austausch laeuft erst im Browser zwischen Knoten (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-heterokaryose.js",
       "was": "Daten-Austausch zwischen Geschwister-Knoten (opt-in).",
@@ -103,8 +129,11 @@
       "aktiviert_durch": "Opt-in des Nutzers."
     },
     {
-      "id": "07", "name": "Apoptose", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "07",
+      "name": "Apoptose",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-apoptose.js (1:1 aus Sage-Protokol/src/modules/07_apoptose.js). Zweistufige Selbstloeschung mit signiertem Vermaechtnis (WebCrypto, ueber Spore 02 + Storage 01). Headless: Laden + API-Registrierung per npm test bewiesen; voller Pfad ungeprueft (wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-apoptose.js",
       "was": "Geordneter Selbst-Tod eines Knotens mit signiertem Vermaechtnis.",
@@ -114,8 +143,11 @@
       "aktiviert_durch": "Homoeostase-Ueberlast ODER kollektives Misstrauen."
     },
     {
-      "id": "08", "name": "UI-Demo", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "08",
+      "name": "UI-Demo",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-ui-demo.js (1:1 aus Sage-Protokol/src/modules/08_ui_demo.js). Endknoten-Pflege-UI fuer Heterokaryose-Outbox + Sibling-Opt-In; liest/schreibt ueber Storage 01. Headless: Laden + API-Registrierung per npm test bewiesen; UI laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-ui-demo.js",
       "was": "Wartungs-/Konfigurations-UI (u.a. fuer Heterokaryose).",
@@ -125,8 +157,11 @@
       "aktiviert_durch": "Nutzer oeffnet die Wartungs-UI."
     },
     {
-      "id": "15", "name": "Membran", "stufe": "pro",
-      "sage_status": "fertig", "point_status": "1:1 aus Sage kopiert",
+      "id": "15",
+      "name": "Membran",
+      "stufe": "pro",
+      "sage_status": "fertig",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-membran.js (1:1 aus Sage-Protokol/src/modules/15_membran.js, in Sage 'fertig' 2026-05-25). Aussenhuelle PWA-Zelle<->Browser: read()-Snapshot + postMessage-Bedienung, Fremdzugriff-Detektor. Headless: Laden + read/init-API bewiesen; volle Wirkung erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-membran.js",
       "was": "Aussenhuelle zwischen PWA-Zelle und Browser (Sub a + b spezifiziert).",
@@ -136,8 +171,11 @@
       "aktiviert_durch": "Direkter Angriff von aussen (sonst schlummernd — fertig 2026-05-25)."
     },
     {
-      "id": "16", "name": "SBKIM-Siegel", "stufe": "pro",
-      "sage_status": "stub", "point_status": "1:1 aus Sage kopiert · headless getestet",
+      "id": "16",
+      "name": "SBKIM-Siegel",
+      "stufe": "pro",
+      "sage_status": "stub",
+      "point_status": "1:1 aus Sage kopiert · headless getestet",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-siegel.js (1:1 aus Sage-Protokol/src/modules/16_siegel.js). Selbst-einschreibendes Zertifikat: isCertified/getCertifiedModules/getAspects (Anti-Greenwashing — kein Siegel ohne erfuellte Selbstpruefung). getAspects() ist eine reine Lese-Funktion und per npm test offline bewiesen; Badge/Modal laeuft erst im Browser (ungeprueft, wartet auf Klaus). RELEVANT FUER DEN MARKT: dieses Modul stellt das Geprueft-Zertifikat aus.",
       "datei": "web/tools/sbkim-siegel.js",
       "was": "Selbst-einschreibendes Zertifikat einer bezeugten Bau-Tat ('Tun statt Sein').",
@@ -147,8 +185,11 @@
       "aktiviert_durch": "Bestandene Artefakt-Pruefung (Sichttest 4/4 gruen)."
     },
     {
-      "id": "17", "name": "Floating-Widget", "stufe": "pro",
-      "sage_status": "stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "17",
+      "name": "Floating-Widget",
+      "stufe": "pro",
+      "sage_status": "stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-floating-widget.js (1:1 aus Sage-Protokol/src/modules/17_floating_widget.js). Schwebendes Live-Status-Panel (LEBT/VERKEHR/FREMD/SIEGEL) + Drag + X + localStorage; buendelt Modul-15/16-Render. Headless: Laden + show/hide/minimize-API bewiesen; sichtbares Panel laeuft erst im Browser (ungeprueft, wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-floating-widget.js",
       "was": "Schwebendes Bedien-Widget mit Event-Bus (fuenf Custom-Events).",
@@ -157,10 +198,12 @@
       "einbau": "Ein Skript-Tag; kommuniziert ueber den Event-Bus.",
       "aktiviert_durch": "Immer aktiv, sobald eingebunden (headless-smoke 19/19 gruen)."
     },
-
     {
-      "id": "10", "name": "Reputation", "stufe": "profi",
-      "sage_status": "vorgebaut-schlummert", "point_status": "modell-prototyp",
+      "id": "10",
+      "name": "Reputation",
+      "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert",
+      "point_status": "modell-prototyp",
       "was": "Misstrauens-/Reputationswert je Knoten (Sybil-Abwehr).",
       "nutzen": "Wehrt Sybil-Angriffe ab, ohne legitime Knoten zu behindern.",
       "verwendung": "Andere Module fragen den Wert ab, bevor sie einer Stimme/Spore vertrauen; Stimmgewicht = bezeugte Bau-Taten.",
@@ -168,8 +211,11 @@
       "aktiviert_durch": "Sybil-Effekt (viele Identitaeten ohne bezeugte Bau-Tat)."
     },
     {
-      "id": "11", "name": "Rate-Limit & TTL", "stufe": "profi",
-      "sage_status": "vorgebaut-schlummert", "point_status": "noch-nicht-kopiert",
+      "id": "11",
+      "name": "Rate-Limit & TTL",
+      "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert",
+      "point_status": "noch-nicht-kopiert",
       "was": "Begrenzt Anfrage-Rate und Lebensdauer (Time-To-Live) von Nachrichten/Sporen.",
       "nutzen": "Schuetzt vor Fluten und haelt alte Daten nicht ewig am Leben.",
       "verwendung": "Schwellen setzen; ueberzaehlige Anfragen werden gebremst/verworfen.",
@@ -177,8 +223,11 @@
       "aktiviert_durch": "Flooding (zu viele Anfragen in kurzer Zeit)."
     },
     {
-      "id": "12", "name": "Blocklist", "stufe": "profi",
-      "sage_status": "vorgebaut-schlummert", "point_status": "modell-prototyp",
+      "id": "12",
+      "name": "Blocklist",
+      "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert",
+      "point_status": "modell-prototyp",
       "was": "Liste geflaggter Angreifer (manuell oder durch Reputation gefuellt).",
       "nutzen": "Bekannte boese Knoten werden gemieden.",
       "verwendung": "Vor jeder Interaktion pruefen, ob die Gegenseite gelistet ist.",
@@ -186,8 +235,11 @@
       "aktiviert_durch": "Geflaggter Angreifer (Schwelle ueberschritten)."
     },
     {
-      "id": "14", "name": "Diffusion", "stufe": "profi",
-      "sage_status": "vorgebaut-schlummert", "point_status": "modell-prototyp",
+      "id": "14",
+      "name": "Diffusion",
+      "stufe": "profi",
+      "sage_status": "vorgebaut-schlummert",
+      "point_status": "modell-prototyp",
       "was": "Verbreitet Spore-/Vermaechtnis-Konsens unter Nachbarn.",
       "nutzen": "Wissen (z.B. eine Apoptose-Anklage) erreicht das Netz, ohne zentrale Stelle.",
       "verwendung": "Signierte Vermaechtnisse weiterreichen; doppelt Empfangenes verwerfen.",
@@ -195,8 +247,11 @@
       "aktiviert_durch": "Konsens-Bedarf (z.B. verbreitetes Misstrauens-Vermaechtnis)."
     },
     {
-      "id": "18", "name": "Tool-PWA-Container", "stufe": "profi",
-      "sage_status": "teil-fertig", "point_status": "1:1 aus Sage kopiert (Sub a)",
+      "id": "18",
+      "name": "Tool-PWA-Container",
+      "stufe": "profi",
+      "sage_status": "teil-fertig",
+      "point_status": "1:1 aus Sage kopiert (Sub a)",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-tool-pwa.js (1:1 aus Sage-Protokol/src/modules/18_tool_pwa.js, Sub (a) Andocken vorab). openAndockTab/close/isOpen. Headless: Laden + API bewiesen; weitere Sub-Bereiche (b-i) in Sage noch offen; Browser-Pfad ungeprueft (wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-tool-pwa.js",
       "was": "Container, der ein Werkzeug als eigenstaendige PWA kapselt (Sub a 17/17 gruen, Rest offen).",
@@ -206,8 +261,11 @@
       "aktiviert_durch": "Auslieferung eines selbstgebauten Tools."
     },
     {
-      "id": "22", "name": "Such-Werkzeug (semantische Suche)", "stufe": "profi",
-      "sage_status": "teil-fertig", "point_status": "1:1 aus Sage kopiert · headless 148/148",
+      "id": "22",
+      "name": "Such-Werkzeug (semantische Suche)",
+      "stufe": "profi",
+      "sage_status": "teil-fertig",
+      "point_status": "1:1 aus Sage kopiert · headless 148/148",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-such-widget.js (1:1 aus Sage-Protokol/src/modules/22_such_widget.js). Semantische, server-lose Bedeutungs-Suche: versteht die Absicht hinter den Worten statt Stichwoerter zu zaehlen. Drei waehlbare Bereiche (App-Korpus / verbundene Knoten / Internet-KI-Bruecke), eigener Schluessel-Tresor (Shamir 2/3), Treffer als Prozent + Block-Kopieren. Abhaengigkeiten 03 Embedding + 04 Match liegen hier (web/tools/), Tresor-Krypto self-contained. Headless-Smoke tests/smoke_bau22_such_widget.mjs 148/148 gruen (Widget-Logik bewiesen). EHRLICH OFFEN: die semantische Haelfte (Bedeutung verstehen + sortieren) ist bewiesen; die volle bidirektionale Cross-Knoten-Suche server-los ist noch NICHT end-to-end gezeigt (siehe docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md). Sichtbares Panel im Browser ungeprueft (wartet auf Klaus' Browser-Lauf).",
       "datei": "web/tools/sbkim-such-widget.js",
       "was": "Frei bewegliches Floating-Such-Tool (Blase -> Panel): semantische Bedeutungs-Suche ueber App-Korpus, verbundene Knoten und Internet (KI-Such-Bruecke, BYOK).",
@@ -217,8 +275,11 @@
       "aktiviert_durch": "Nutzer oeffnet die Such-Blase (semantische Suche on demand)."
     },
     {
-      "id": "20", "name": "Schluessel-Safe", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "id": "20",
+      "name": "Schluessel-Safe",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "noch-nicht-kopiert",
       "point_hinweis": "Reif als Code-Stub in Sage (src/modules/20_schluessel_safe.js, Headless-Smoke 19/19 gruen), hier noch NICHT kopiert. Lokal verschluesselter Safe fuer die SBKIM-Identitaet (nodeId + privater Schluessel + Spore): PBKDF2-SHA256 >=600k + AES-GCM-256, Shamir-Recovery 2-von-3 ueber das Passwort. Oeffnet auf Abruf (nicht beim Seitenstart). Browser-Sichttest in Sage ausstehend.",
       "was": "Lokal verschluesselter Safe fuer die eigene SBKIM-Identitaet (Schluessel + Spore), mit Passwort + Shamir-2-von-3-Wiederherstellung.",
       "nutzen": "Die Identitaet ueberlebt geloeschte Browserdaten — der private Schluessel liegt verschluesselt, nicht im Klartext, und ist 2-von-3 wiederherstellbar.",
@@ -227,8 +288,11 @@
       "aktiviert_durch": "Nutzer oeffnet den Safe (SbkimSafe.open())."
     },
     {
-      "id": "21", "name": "Spracheingabe", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "noch-nicht-kopiert",
+      "id": "21",
+      "name": "Spracheingabe",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "noch-nicht-kopiert",
       "point_hinweis": "Reif als Code-Stub in Sage (src/modules/21_spracheingabe.js, Headless-Smoke 45/45 gruen), hier noch NICHT kopiert. Input-agnostische Sprach-Eingabe-Schicht: Dual-Engine Browser Web-Speech + EU Cloud Speech-to-Text (BYOK), mehrsprachig DE/EN/RU, konsequent fail-soft (kein Mic/Key/Netz -> Textfeld bleibt). EU-Politik per Knoten (bindend/frei). Browser-Sichttest (Live-Mic) in Sage ausstehend.",
       "was": "Sprach-zu-Text-Schicht fuer beliebige Eingabefelder: Browser-Spracherkennung oder EU-Cloud (BYOK), mehrsprachig (DE/EN/RU).",
       "nutzen": "Eine Frage/Suche einsprechen statt tippen — fail-soft, das Textfeld bleibt immer nutzbar.",
@@ -237,8 +301,11 @@
       "aktiviert_durch": "Nutzer tippt aufs Mikrofon-Symbol."
     },
     {
-      "id": "23", "name": "Rendezvous (gemeinsamer Raum)", "stufe": "pro",
-      "sage_status": "code-stub", "point_status": "1:1 aus Sage kopiert",
+      "id": "23",
+      "name": "Rendezvous (gemeinsamer Raum)",
+      "stufe": "pro",
+      "sage_status": "code-stub",
+      "point_status": "1:1 aus Sage kopiert",
       "point_hinweis": "Echte Sage-Datei web/tools/sbkim-rendezvous.js (1:1 aus Sage-Protokol/src/modules/23_rendezvous.js). Loest die Adress-Wand (committete nodeId != lebende nodeId): lebende Knoten treffen sich im geteilten Nostr-Tag sbkim-rdv, heften auf Nutzer-Aktion ihre lebende Visitenkarte ans Brett, ein Suchender liest die Karten und handshaket die LEBENDE ID. DOM-frei + fail-soft, nutzt nur die oeffentlichen Flaechen von 05/05b/02. In Sage LIVE cross-app bewiesen (Sage <-> Mein-Mixarium beidseitig 'ANDOCK ETABLIERT', 2026-06-28). Hier auf werkzeuge.html via assets/rendezvous-init.js gemountet; Browser-Sichttest am Point ungeprueft.",
       "datei": "web/tools/sbkim-rendezvous.js",
       "was": "Gemeinsamer Raum, in dem lebende Knoten ihre echte Visitenkarte (Spore) ans Brett heften und einander finden — server-los ueber ein Nostr-Relais.",
@@ -251,7 +318,9 @@
   "komplett_werkzeuge_hinweis": "Komplett-Werkzeuge sind fertige, eigenstaendige PWAs. ZWEI Gestalten, und der Unterschied steht an jeder Kachel: (a) EIN-DATEI-PWAs, hier 1:1 lokal gespiegelt (Offline-Default, web/tools/) PLUS Live-Link — byte-kompatibel, nicht veraendert, gegenpruefbar ueber sha256 (andock, mycelknoten; Quelle Sage docs/observatorium/tools, PR #318, geholt 2026-06-20). (b) MEHRTEILIGE PWAs, bewusst NICHT gespiegelt, um Drift zu vermeiden — dort gilt die Live-Quelle, und es gibt weder datei noch sha256 (pinnwand bei Sage, kimhub-werkstatt bei Kimhub). Bis 2026-08-21 stand hier, alles sei von Sage und alles sei gespiegelt; beides stimmte schon vorher nicht fuer die Pinnwand.",
   "komplett_werkzeuge": [
     {
-      "id": "andock", "name": "Andock-Werkzeug", "kategorie": "komplett-werkzeug",
+      "id": "andock",
+      "name": "Andock-Werkzeug",
+      "kategorie": "komplett-werkzeug",
       "datei": "web/tools/andock.html",
       "quelle": "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/docs/observatorium/tools/andock.html",
       "herkunft": "Sage-Protokol (Spec-Hub)",
@@ -264,7 +333,9 @@
       "aktiviert_durch": "Erstkontakt / Andocken eines neuen Knotens."
     },
     {
-      "id": "mycelknoten", "name": "Komplett-Knoten", "kategorie": "komplett-werkzeug",
+      "id": "mycelknoten",
+      "name": "Komplett-Knoten",
+      "kategorie": "komplett-werkzeug",
       "datei": "web/tools/mycelknoten.html",
       "quelle": "https://raw.githubusercontent.com/lausiklauskn-png/Sage-Protokol/main/docs/observatorium/tools/mycelknoten.html",
       "herkunft": "Sage-Protokol (Spec-Hub)",
@@ -277,7 +348,9 @@
       "aktiviert_durch": "Oeffnen der Datei (Live-Lampen springen an); FREMD-Lampe bei Angriff (Membran 15)."
     },
     {
-      "id": "pinnwand", "name": "Pinnwand (Frage-Antwort-Brett)", "kategorie": "komplett-werkzeug",
+      "id": "pinnwand",
+      "name": "Pinnwand (Frage-Antwort-Brett)",
+      "kategorie": "komplett-werkzeug",
       "quelle": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
       "herkunft": "Sage-Protokol (Spec-Hub)",
       "point_status": "real-browser-tauglich · extern · live bei Sage gepflegt · hier (noch) nicht lokal gespiegelt (mehrteilige PWA, Drift-Vermeidung)",
@@ -291,12 +364,11 @@
       "id": "kimhub-werkstatt",
       "name": "Kimhub — die Werkstatt (echter Lauf)",
       "kategorie": "komplett-werkzeug",
-      "quelle": "https://lausiklauskn-png.github.io/Kimhub/",
       "herkunft": "Kimhub (Werkstatt)",
-      "point_status": "real-browser-tauglich · extern · live bei Kimhub gepflegt · hier (noch) nicht lokal gespiegelt (mehrteilige PWA, Drift-Vermeidung)",
+      "point_status": "nicht oeffentlich — die Werkstatt laeuft auf Klaus' Geraet. Die Pages-Seite ist seit dem 2026-08-22 abgeschaltet: ueber sie war seine Buchhaltung lesbar, weil GitHub eine gebaute Seite weiter ausliefert, auch wenn das Depot privat steht. Kein Link, kein lokaler Spiegel.",
       "was": "Dieselbe Rollen-Kette wie das Modell auf der Modell-Seite — nur laeuft sie dort wirklich. Fuenf Agenten mit Namen (Nora schlaegt vor, Emil baut, Vera prueft, Sten sucht die Fehler, Jonas schreibt auf, wo es steht) arbeiten an einem Auftrag. Die Seite zeigt vier Raeume daraus: die Ideen-Konferenz, die Uebergabe an die Hand, die baut, das Ergebnis und die Buchhaltung.",
       "nutzen": "Der Gegensatz ist der ganze Punkt. Das Modell hier im Point spielt einen AUFGEZEICHNETEN Lauf ab — es fuehrt nichts aus. Die Werkstatt zeigt einen ECHTEN: echte Auftraege, echte Modelle, echte Kosten, mit Zahlen daneben. Wer wissen will, was so eine Kette wirklich kostet und wo sie danebengreift, sieht es dort statt in einer Vorfuehrung.",
-      "verwendung": "Live-Seite oeffnen und durch die vier Reiter gehen. Sie ist installierbar (Manifest + Service-Worker) — auf dem Tablet wird ueber 'App installieren' eine eigene App daraus. Die Seite loest nichts aus und kostet nichts: eine Schicht startet nur von Hand auf der Kommandozeile und nur mit ausdruecklichem --echt.",
+      "verwendung": "Nicht von hier aus zu oeffnen. Wer sie sehen will, faehrt sie auf dem eigenen Geraet: Depot holen, `bash tools/ansicht.sh`. Diese Kachel steht hier wegen des Gegensatzes zum Modell, nicht als Angebot.",
       "einbau": "Nichts einzubauen, es ist eine eigenstaendige PWA. Als Vorlage taugt vor allem das Drumherum: drei Bremsen uebereinander (Tageskontingent, Schicht-Deckel, Guthaben ohne automatisches Nachladen), eine Gegenpruefung ohne den Bauer, und Lauf-Ergebnisse, die der Maschine gehoeren statt dem Depot.",
       "aktiviert_durch": "Nutzer oeffnet die Werkstatt-Seite. Eine Schicht selbst: nur von Hand, mit ausdruecklichem --echt."
     }

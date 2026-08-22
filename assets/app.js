@@ -203,10 +203,13 @@ async function renderKomplettWerkzeuge() {
         <a class="get download" href="${t.datei}" download>⬇ Herunterladen</a>
         <a class="get download" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live-Quelle (Sage)</a>
         <p class="getnote">Lokal gespiegelt (<code>${t.datei}</code>) · byte-kompatibel · sha256 ${t.sha256}</p>
-      </div>` : `
+      </div>` : t.quelle ? `
       <div class="actions">
         <a class="get" href="${t.quelle}" target="_blank" rel="noopener noreferrer">↗ Live öffnen</a>
         <p class="getnote">${t.point_status || `Live bei ${t.herkunft} gepflegt · hier (noch) nicht lokal gespiegelt`}</p>
+      </div>` : `
+      <div class="actions">
+        <p class="getnote">${t.point_status || `Nicht oeffentlich erreichbar.`}</p>
       </div>`}`;
     grid.appendChild(el);
   }

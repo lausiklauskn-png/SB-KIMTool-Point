@@ -59,8 +59,15 @@ test('tool "kimhub-werkstatt": der Gegensatz aufgezeichnet/echt steht im Text', 
   const text = [t.was, t.nutzen].join(" ");
   assert.match(text, /AUFGEZEICHNET/, "das aufgezeichnete Modell wird benannt");
   assert.match(text, /ECHTEN|echte/, "der echte Lauf wird benannt");
-  assert.equal(t.quelle, "https://lausiklauskn-png.github.io/Kimhub/",
-    "die Kachel zeigt auf die Adresse, die es seit dem 2026-08-21 gibt");
+  /* ⚠ HIER STAND: „die Kachel zeigt auf die Adresse, die es seit dem
+     2026-08-21 gibt." Es gibt sie nicht mehr — ueber sie war Klaus'
+     Buchhaltung oeffentlich lesbar, und er hat die Seite abgeschaltet.
+     Die Kachel BLEIBT (sie traegt den Gegensatz zum Modell), aber ohne
+     anklickbare Quelle. Geprueft wird jetzt genau das. */
+  assert.ok(!t.quelle,
+    "die Kachel zeigt wieder auf eine Adresse — die Werkstatt ist nicht oeffentlich");
+  assert.match(t.point_status, /nicht oeffentlich/,
+    "die Kachel sagt nicht, warum kein Knopf dasteht — ein stiller Wegfall wirft eine Frage auf");
   assert.ok(!t.datei, "kein lokaler Spiegel (mehrteilige PWA, Drift-Vermeidung)");
   assert.ok(!/Sage/.test(t.herkunft), "die Herkunft ist Kimhub, nicht Sage");
 });

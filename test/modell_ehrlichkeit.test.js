@@ -15,6 +15,23 @@ import { readFileSync } from "node:fs";
 const seite = readFileSync(new URL("../modell.html", import.meta.url), "utf8");
 
 /*
+ * ⚠ WAS DIE SEITE ANBIETET, STEHT NICHT IM KOMMENTAR.
+ *
+ * Gemessen am 2026-08-22: der Riegel „der Knopf ist wieder da" fiel um — und
+ * zwar an der ERKLAERUNG, warum der Knopf weg ist. Ein HTML-Kommentar, der die
+ * alte Beschriftung zitiert, bietet nichts an; er ist der Grund, aus dem hier
+ * nichts mehr angeboten wird.
+ *
+ * Ein Waechter, der den Quelltext durchsucht, findet auch die Begruendung. Wer
+ * ihn so laesst, verbietet damit jede Doku ueber das Entfernte — und genau die
+ * ist es, was eine spaetere Sitzung vor dem Rueckbau bewahrt.
+ *
+ * Geprueft wird deshalb der SICHTBARE Teil. Die Kommentare bleiben stehen und
+ * werden fuer diese Fragen weggeschnitten.
+ */
+const sichtbar = seite.replace(/<!--[\s\S]*?-->/g, "");
+
+/*
  * Der ehrliche Satz steht im EINLEITUNGS-ABSATZ, gleich unter der Ueberschrift —
  * dort, wo ihn jeder liest, bevor er die Buehne sieht.
  *
@@ -67,33 +84,52 @@ test("die Seite sagt weiterhin, dass sie nichts live ausfuehrt", () => {
  * dass hier eine Entscheidung getroffen wurde und nicht etwas verlorenging.
  */
 test("die Seite bietet den Quelltext NICHT an", () => {
-  assert.ok(!/github\.com\/lausiklauskn-png\/Kimhub/.test(seite),
+  assert.ok(!/github\.com\/lausiklauskn-png\/Kimhub/.test(sichtbar),
     "ein direkter Link ins Depot — den holt sich, wer ihn will, nicht von hier");
 });
 
-test("aber sie verweist auf die Werkstatt als APP, und zwar als Knopf", () => {
-  assert.match(seite, /class="ctl ctl-link"[^>]*href="https:\/\/lausiklauskn-png\.github\.io\/Kimhub\/"/s,
-    "der Knopf zur Werkstatt fehlt oder ist wieder ein blosser Text-Link");
-  assert.ok(/↗ Die Werkstatt öffnen/.test(seite), "die Beschriftung des Knopfes fehlt");
+/*
+ * ⚠ ZUM ZWEITEN MAL UMGEDREHT, und beide Male auf Klaus' Wort.
+ *
+ * 2026-08-21: der Depot-Link raus, die APP-Adresse rein — „wer die Werkstatt
+ * sehen will, will sie ansehen, nicht ihren Quelltext lesen".
+ *
+ * 2026-08-22: die App-Adresse ebenfalls raus. Ueber sie war seine BUCHHALTUNG
+ * oeffentlich lesbar — GitHub liefert eine gebaute Pages-Seite weiter aus, auch
+ * wenn das Depot privat steht. Die Einstellung sagt es selbst: „This repository
+ * is private but the published site will be public." Klaus hat die Seite
+ * abgeschaltet und den Link hier abbestellt.
+ *
+ * Umgedreht, nicht geloescht — damit sichtbar bleibt, dass hier zweimal eine
+ * Entscheidung getroffen wurde und nicht etwas verlorenging.
+ */
+test("sie bietet die Werkstatt auch nicht mehr als APP an", () => {
+  assert.ok(!/lausiklauskn-png\.github\.io\/Kimhub/.test(sichtbar),
+    "die Werkstatt-Adresse steht wieder auf der Seite — sie ist abgeschaltet");
+  assert.ok(!/↗ Die Werkstatt öffnen/.test(sichtbar),
+    "der Knopf ist wieder da und zeigt ins Leere");
+});
+
+test("und sagt stattdessen, dass es sie gibt, aber nicht oeffentlich", () => {
+  assert.ok(/Werkstatt ist nicht oeffentlich|Werkstatt ist nicht öffentlich/.test(seite),
+    "ein stiller Wegfall wirft eine Frage auf, die niemand mehr beantwortet");
 });
 
 /*
- * Seit dem 2026-08-21 gibt es die Werkstatt auch als SEITE, nicht nur als Depot.
- * Bis dahin stand hier zwangslaeufig nur der Quelltext-Link — die Adresse gab es
- * nicht. Jetzt gibt es sie, und ein Leser, der „echte Werkstatt" liest, will sie
- * ansehen und nicht ihren Quelltext lesen.
+ * ⚠ HIER STAND DAS GEGENTEIL: „die App-Adresse steht bei JEDER
+ * Kimhub-Erwaehnung, auch der zugeklappten" — gezaehlt, nicht nur gesucht,
+ * weil der zugeklappte Abschnitt „Warum ein Modell?" genau die Sorte Stelle
+ * ist, die man beim Draufschauen nicht sieht.
  *
- * Beide Kimhub-Erwaehnungen muessen sie tragen. Die zweite steht in einem
- * ZUGEKLAPPTEN Abschnitt („Warum ein Modell?") — genau die Sorte Stelle, die bei
- * einer Aenderung uebersehen wird, weil man sie beim Draufschauen gar nicht
- * sieht. Deshalb wird gezaehlt, nicht nur gesucht.
+ * Dieselbe Sorge gilt jetzt in die andere Richtung: eine Adresse, die dort
+ * stehen bleibt, sieht niemand. Also wird weiter GEZAEHLT — nur auf null.
  */
-test("die App-Adresse steht bei JEDER Kimhub-Erwaehnung, auch der zugeklappten", () => {
+test("die Werkstatt-Adresse steht NIRGENDS mehr, auch nicht im zugeklappten Teil", () => {
   const seitenLink = /https:\/\/lausiklauskn-png\.github\.io\/Kimhub\//g;
-  const treffer = (seite.match(seitenLink) || []).length;
-  assert.ok(treffer >= 2,
-    `die Pages-Adresse steht nur ${treffer}× da — erwartet mindestens 2 ` +
-    "(oben im Absatz UND im zugeklappten „Warum ein Modell?“)");
+  const treffer = (sichtbar.match(seitenLink) || []).length;
+  assert.equal(treffer, 0,
+    `die Pages-Adresse steht noch ${treffer}× da — auch im zugeklappten ` +
+    "im zugeklappten Abschnitt nachsehen");
 });
 
 test("der Link verspricht keine Live-Anzeige", () => {
