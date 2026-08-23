@@ -60,7 +60,7 @@ Volltext + Tabelle in unserem Postfach §6.
    `Datum · Knoten · WAS · WO (Datei/Commit/PR) · real|demo`.
 4. **Abgleich-Frage:** zu jedem gemeldeten Bau prüft die Gegenseite „kann/soll das bei uns
    eingebaut werden?" → **Ja / Nein / Wie**, mit Datum.
-5. **Quelle der Wahrheit:** Identität=`spore.json`, Status=`status.json`, Verträge=ANDOCK ↔
+5. **Quelle:** Identität=`spore.json`, Status=`status.json`, Verträge=ANDOCK ↔
    euer Pendant; Spec vor Code.
 6. **Heartbeat:** kein gemeldeter Schritt bleibt länger als **eine Gegen-Sitzung** unquittiert.
 7. **Klaus = Taktgeber:** startet er eine Seite mit Andock-Bezug, ist Sync Pflicht.

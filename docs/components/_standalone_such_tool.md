@@ -64,9 +64,9 @@ such-tool/
 - **Kein** Modul 01 (Storage) / 02 (Spore) nötig — die Standalone-Seite hat keine
   Identität und kein IndexedDB.
 
-### Drift-Guard (Quelle der Wahrheit liegt in Sage)
+### Drift-Guard (Quelle liegt in Sage)
 
-`such-tool/modules/*.js` sind **Kopien**. Die Quelle der Wahrheit ist
+`such-tool/modules/*.js` sind **Kopien**. Die Quelle ist
 `Sage-Protokol/src/modules`. Ändert sich dort 03/04/21/22, **müssen die Kopien
 hier nachgezogen werden** (in Sage sichert ein byte-identischer Smoke-Test das ab;
 in diesem Repo gibt es diesen Test (noch) nicht — also bewusst manuell nachziehen).

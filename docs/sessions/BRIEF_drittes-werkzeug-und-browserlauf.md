@@ -42,7 +42,7 @@ gelten **immer**.
 ## 2. Ziel dieser Aufgabe **[Pflicht]**
 (a) Browser-Lauf bestätigt vier Seiten + Liefer-Knöpfe (01+02) + IndexedDB- und WebCrypto-Pfad;
 (b) drittes echtes, offline einbaubares Werkzeug geliefert + getestet; (c) PR #11 final
-entschieden (eine Quelle der Wahrheit für die Werkzeuge-Ansicht).
+entschieden (eine Quelle für die Werkzeuge-Ansicht).
 
 ## 3. Was gebaut / gepflegt / getestet werden soll **[Pflicht]**
 - **Bauen:** nächstes reifes Modul als echte Datei `web/tools/sbkim-<name>.js` (Vorschlag
@@ -72,7 +72,7 @@ entschieden (eine Quelle der Wahrheit für die Werkzeuge-Ansicht).
 1. `npm test` grün (inkl. neuer Werkzeug-Tests).
 2. Neue `sbkim-<name>.js` offline, eine Datei; Seite bietet „Code kopieren/Datei laden";
    Browser-Anforderung ehrlich vermerkt (Kopf + `point_hinweis`).
-3. PR #11 final entschieden; **eine** Quelle der Wahrheit für die Werkzeuge-Ansicht.
+3. PR #11 final entschieden; **eine** Quelle für die Werkzeuge-Ansicht.
 4. `status.json`/`werkzeugkiste.json`/`docs`/`README` nachgezogen.
 5. Browser-Teile ehrlich: „ungeprüft, wartet auf Klaus".
 

@@ -74,7 +74,7 @@ Zusätzlich existiert ein leichter **Drift-Guard** für die Modul-Kopien.
 
 - Keine neuen Datenverträge. Der Drift-Guard liest **nur** vorhandene Dateien
   (`such-tool/sbkim-sw.js`, `index.html`, `manifest.json`) und prüft deren Konsistenz.
-  Ändert sich die App-Schale, ist `APP_SHELL` in `sbkim-sw.js` die Quelle der Wahrheit.
+  Ändert sich die App-Schale, ist `APP_SHELL` in `sbkim-sw.js` die Quelle.
 
 ## 5. Akzeptanzkriterien (Erfolgsmerkmale) **[Pflicht]**
 

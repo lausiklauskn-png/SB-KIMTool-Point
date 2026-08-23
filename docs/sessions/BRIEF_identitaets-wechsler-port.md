@@ -10,7 +10,7 @@
 
 In dieser Reihenfolge:
 
-1. `CLAUDE.md` (Verfassung) — u. a. § „Quelle der Wahrheit": **Sage gilt, hier nachziehen.**
+1. `CLAUDE.md` (Verfassung) — u. a. § „Quelle": **Sage gilt, hier nachziehen.**
 2. `PULS.md` (aktueller Stand)
 3. **diesen Brief**
 4. `status.json` (Real-Anteil, jetzt protocolVersion 0.2)

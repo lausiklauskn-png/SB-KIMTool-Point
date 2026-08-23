@@ -14,7 +14,7 @@ Identität — es ist **nicht** „Sage minus Dateien".
 
 ## Verifizierte Faktenlage (gelesen 2026-05-29 aus `Sage-Protokol/status.json`)
 
-Echte Konstanten (Quelle der Wahrheit, in `sandbox/00_config.js` gespiegelt):
+Echte Konstanten (Quelle, in `sandbox/00_config.js` gespiegelt):
 `PROTOCOL_VERSION="0.1"`, `EMBEDDING_MODEL="Xenova/multilingual-e5-small"`,
 `EMBEDDING_DIM=384`, `PROVIDER_MIN_MATCH=0.80`, `QUERY_TIMEOUT_MS=4000`.
 

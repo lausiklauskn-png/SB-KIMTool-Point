@@ -630,7 +630,7 @@ Rezeptbuch → BLP …), immer aus Sage propagiert. Empfehlung: erst der Hub sau
 
 ## Nachtrag 2026-07-14 (4) — 2. Hub aus Sage neu bespielt (Modul-Ebene byte-1:1)
 
-**Grundsatz (Klaus 2026-07-14): Sage = Quelle der Wahrheit; SB-KIMTool-Point ist der 2. Hub (Klon).**
+**Grundsatz (Klaus 2026-07-14): Sage = Quelle; SB-KIMTool-Point ist der 2. Hub (Klon).**
 Erst in Sage richtig, dann byte-genau hierher. Erster Bespiel-Schritt (Modul-Ebene, `node --test` 111/111):
 
 - **Drift-Audit** aller 14 geteilten Module gegen `Sage-Protokol/src/modules/`. 10 waren schon byte-1:1;

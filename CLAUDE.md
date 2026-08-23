@@ -21,7 +21,7 @@ Leitfaden für jede Sitzung an SB-KIMTool-Point.
   (in `werkzeugkiste.json` + `docs/WERKZEUGE.md`).
 - **Keine** Massenproduktion, **kein** vorgetäuschtes Wissen, **nichts** im Hintergrund vorbauen.
 
-## Quelle der Wahrheit
+## Quelle
 
 Echte Konstanten und Modul-Status stammen aus `Sage-Protokol/status.json` und sind in
 `sandbox/00_config.js` gespiegelt. Bei Abweichung gilt Sage; hier nachziehen.

@@ -34,7 +34,7 @@ in `werkzeugkiste.json` registriert (Feld `datei`). Sie laden headless (Beweis:
 
 ## Werkzeug-Vertrag (verbindlich, bevor Live-Code entsteht)
 
-1. **Quelle der Wahrheit ist `werkzeugkiste.json`.** Ein Werkzeug gilt als
+1. **Quelle ist `werkzeugkiste.json`.** Ein Werkzeug gilt als
    „verfügbar für Agenten", wenn es das Feld `datei` trägt und unter `web/tools/`
    liegt. Live-Code zieht die Liste aus dieser Datei — keine zweite Tool-Liste.
 2. **Laden über die echte Datei.** Eine Rolle „nimmt" ein Werkzeug, indem sie die
