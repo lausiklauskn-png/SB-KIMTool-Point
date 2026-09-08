@@ -15,7 +15,7 @@
  */
 "use strict";
 
-var CACHE_VERSION = "sbkim-such-tool-v9";
+var CACHE_VERSION = "sbkim-such-tool-v10";
 
 
 /* ⚠ NUR EIGENE VORRAETE AUFRAEUMEN — `caches` gehoert dem URSPRUNG, nicht dem
