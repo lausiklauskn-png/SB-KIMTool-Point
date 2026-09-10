@@ -22,10 +22,17 @@ test("sage_inbox: Sages Spore verifiziert mit unserer kanonischen Form (✔ VALI
 });
 
 test("sage_inbox: erwartete Sage-Identität (nodeId + Domäne)", () => {
+  // ⚠ BEIDE WERTE HABEN SICH AM 2026-09-10 GEAENDERT, und diese Probe hat es zu
+  // Recht gemeldet — genau dafuer ist sie gebaut. Sage hat neu signiert: neue
+  // Kennung (BgjXhSApoOrJ... statt nysOZE3VuKqZ...) und eine neue Bedeutungs-
+  // Beschreibung. Die hier abgelegte Adresskarte stammte ausserdem noch aus der
+  // Protokoll-Fassung 0.1 mit 135 Zeichen und OHNE Satz-Schnipsel; die neue ist
+  // 0.2 mit 3028 Zeichen und 17 Schnipsel. Die alte Kennung steht als
+  // previousNodeId daneben, damit ein Verlauf nachvollziehbar bleibt.
   assert.equal(inbox.nodeName, "Sage");
   assert.equal(inbox.nodeType, "hybrid");
-  assert.equal(inbox.id, "nysOZE3VuKqZA23i5G2XL67s41JIIykI58zXMtJkYfA");
-  assert.equal(inbox.protocolVersion, "0.1");
+  assert.equal(inbox.id, "BgjXhSApoOrJD6zFJ4uuEpAliGWPokpKn7UMWRm94PA");
+  assert.equal(inbox.protocolVersion, "0.2");
 });
 
 test("sage_inbox: Manipulation am Inhalt wird abgelehnt", () => {
