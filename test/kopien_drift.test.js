@@ -54,7 +54,7 @@ const KOPIEN = [
   { datei: "sbkim-rendezvous-ui.js", sha: "709c4364026ed2c3", kanon: true },
   { datei: "sbkim-rendezvous.js", sha: "3caa0bb1fbe7bf52", kanon: true },
   { datei: "sbkim-safe.js", sha: "e7e25c9070e93f82", kanon: true },
-  { datei: "sbkim-siegel.js", sha: "7589f18d59dcaaa7", kanon: true },
+  { datei: "sbkim-siegel.js", sha: "d84fa539e76e0cc5", kanon: true },
   { datei: "sbkim-spore.js", sha: "6789fe6e903ad2e5", kanon: true },
   { datei: "sbkim-storage.js", sha: "5a5a4bf64dfcc107", kanon: true },
   { datei: "sbkim-such-widget.js", sha: "052eb5f844fd0657", kanon: true },
