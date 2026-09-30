@@ -227,3 +227,15 @@ Diese und die übrigen netzweiten Regeln — Selbst-Merge-Freibrief, frisch von
 20 Repos. Verträge: **[`INTERFACES.md`](https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/INTERFACES.md)** · die Fallen beim
 Abzweigen und Veröffentlichen: **[`LEHREN.md`](https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/LEHREN.md)** · alte Fassung dieser
 Datei: [`docs/archiv/CLAUDE-2026-08-22.md`](docs/archiv/CLAUDE-2026-08-22.md).
+
+## ⬇ Als App installierbar (Klaus 2026-09-30)
+
+Klaus: *„SB·KIMTool·Point soll installierbar sein."* Vorher gab es kein Manifest,
+Chrome legte nur eine Verknüpfung an. Neu: `manifest.webmanifest`
+(id `/SB-KIMTool-Point/`, Symbole `assets/img/icon-192/512.png?v=2`), `sw.js`
+(**Netz zuerst**, Vorrat nur offline, nur eigene Adressen, nur eigene Vorräte
+aufräumen: Präfix `kimtool-point-`), in Start, Modell, Werkzeuge, Markt verlinkt
+und registriert. `assets/installieren.js` ist dieselbe Datei wie in Sage und den
+Tresoren; der Knopf steht auf der Startseite unter der Überschrift (in der
+Kopfleiste war kein Platz, sie brach um). Wer eine Datei aus `SHELL` ändert,
+erhöht `CACHE` in `sw.js`. ⚠ Am Tablet nicht gemessen.

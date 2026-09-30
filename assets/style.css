@@ -843,3 +843,14 @@ body::after {
   .puls-body { gap: 1rem; }
   .ring-wrap { margin: 0 auto; }
 }
+
+/* Installieren-Knopf (Klaus 2026-09-30). installieren.js übernimmt die Klasse
+   des Nachbarn (hier der Hero-Absatz) — die id gewinnt hier gegen dessen Aussehen. */
+#installieren {
+  font: inherit; font-size: 0.72rem; letter-spacing: 0.04em; cursor: pointer;
+  color: var(--text, #e6edf3); background: transparent; opacity: 1;
+  border: 1px solid var(--accent-dim, #2f5f55); border-radius: 999px;
+  padding: 5px 14px; white-space: nowrap; margin: 0 0 0.6rem;
+  font-size: 0.85rem; max-width: none;
+}
+#installieren:hover { border-color: var(--accent, #4fd1b5); }
