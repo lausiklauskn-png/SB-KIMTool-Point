@@ -451,8 +451,13 @@ async function run() {
   const searchBtn = queryFirst(root, ".sbkim-sw-search");
   searchBtn.dispatchEvent({ type: "click", target: searchBtn, stopPropagation: () => {} });
   await new Promise((r) => setTimeout(r, 0));
-  const link = queryFirst(root, ".sbkim-sw-result-link");
-  record("Probe 27: Netz-Link gerendert", "true", String(!!link), !!link);
+  // Tafel-Evolution (2026-10-13): seit Klaus' Wort vom 2026-06-22 traegt die
+  // Web-Karte KEINEN Link mehr, sondern zwei Knoepfe ("Frage kopieren" und
+  // "Im Browser oeffnen"). Gesucht wurde hier weiter `.sbkim-sw-result-link`,
+  // und die Probe war rot, ohne dass eine Zusicherung gefallen war. Die
+  // Zusicherung bleibt: ein Tipp oeffnet die Suche per window.open.
+  const link = queryFirst(root, ".sbkim-sw-webopen");
+  record("Probe 27: Knopf 'Im Browser oeffnen' gerendert", "true", String(!!link), !!link);
   if (link) {
     link.dispatchEvent({ type: "click", target: link, preventDefault: () => {}, stopPropagation: () => {} });
   }
