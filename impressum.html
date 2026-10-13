@@ -123,9 +123,10 @@ ab. Dabei werden nur die für diese Abrufe technisch notwendigen Verbindungsdate
 jeweiligen Anbieter übertragen. Es werden keine personenbezogenen Inhalte des Nutzers
 übermittelt.</p>
 <p><strong>6. Embedding-Modell</strong><br>
-Für die semantische Match-Funktion wird ein Embedding-Modell beim ersten Gebrauch vom
-CDN (jsDelivr / Hugging Face) in den Browser geladen und läuft anschließend lokal. Beim
-Laden gelten die Datenschutzbestimmungen des jeweiligen CDN-Anbieters.</p>
+Für die semantische Match-Funktion wird ein Embedding-Modell beim ersten Gebrauch in den
+Browser geladen und läuft anschließend lokal: das Programmteil von jsDelivr, die
+Modelldateien vom Server des Betreibers (family-projekt.de), antwortet er nicht, von
+Hugging Face. Beim Laden gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>
 <p><strong>6a. Such-Werkzeug — externe KI-/Web-Suche &amp; Schlüssel (BYOK)</strong><br>
 Das Such-Werkzeug (Modul 22) kann auf <strong>ausdrückliche Nutzer-Aktion</strong> eine
 externe KI-/Web-Suche anstoßen (ein vom Nutzer gewählter KI-Anbieter mit Web-Suche). Das
@@ -200,9 +201,10 @@ of other SBKIM nodes (e.g. via <code>raw.githubusercontent.com</code>). Only the
 connection data technically required for these requests is transmitted to the respective
 providers. No personal user content is transmitted.</p>
 <p><strong>6. Embedding model</strong><br>
-For the semantic match function, an embedding model is loaded into the browser from a CDN
-(jsDelivr / Hugging Face) on first use and then runs locally. The CDN provider's privacy
-terms apply during loading.</p>
+For the semantic match function, an embedding model is loaded into the browser on first
+use and then runs locally: the program part from jsDelivr, the model files from the
+operator's server (family-projekt.de), or from Hugging Face if it does not answer. The
+respective provider's privacy terms apply during loading.</p>
 <p><strong>6a. Search tool — external AI/web search &amp; keys (BYOK)</strong><br>
 The search tool (module 22) may trigger an external AI/web search on
 <strong>deliberate user action</strong> (an AI provider with web search chosen by the user).

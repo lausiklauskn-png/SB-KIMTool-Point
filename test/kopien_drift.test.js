@@ -45,7 +45,7 @@ const KOPIEN = [
     grund: "Fremd-Bibliothek, kein Sage-Modul — liegt dort unter anderem Pfad" },
   { datei: "sbkim-anastomose.js", sha: "255ac79aeb3b0203", kanon: true },
   { datei: "sbkim-apoptose.js", sha: "0acdd6ab2d95e131", kanon: true },
-  { datei: "sbkim-embedding.js", sha: "e4bb8bd6a237914e", kanon: true },
+  { datei: "sbkim-embedding.js", sha: "a6ac64d7536da3fa", kanon: true },
   { datei: "sbkim-floating-widget.js", sha: "e4ee076c1295910d", kanon: true },
   { datei: "sbkim-heterokaryose.js", sha: "9b2224af8ff13bfb", kanon: true },
   { datei: "sbkim-match.js", sha: "5de95923c3f62f14", kanon: true },
