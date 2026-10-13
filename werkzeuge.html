@@ -167,6 +167,7 @@
   <!-- Werkzeuge laden sich selbst auf window.Sbkim* (IIFE), dann die Werkstatt-Brücke.
        01 Storage zuerst (02/06/07 haengen daran); 03/05/06 fuer die Netz-Bereitschaftsprobe. -->
   <script>window.SBKIM_DB_SUFFIX="toolpoint";</script>
+  <script>/* Sprachmodell vom eigenen Server (Klaus 2026-10-13, Weg A: die App setzt die Adresse, Modul 03 bleibt neutral). Antwortet er nicht, nimmt Modul 03 Hugging Face. */window.SBKIM_MODEL_ROOT=window.SBKIM_MODEL_ROOT||"https://family-projekt.de/models/";</script>
   <script src="web/tools/sbkim-storage.js"></script>
   <script src="web/tools/sbkim-safe.js"></script>
   <!-- Identitäts-Hygiene: EIGENE Schublade sbkim_toolpoint statt Default sbkim.
