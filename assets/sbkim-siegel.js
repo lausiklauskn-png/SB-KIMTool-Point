@@ -24,7 +24,7 @@
   var BASE = "web/tools/";
   // Reihenfolge zählt: 01 Storage zuerst, dann 02; 15/16 zuletzt.
   var SCRIPTS = [
-    "sbkim-storage.js", "sbkim-spore.js", "sbkim-match.js",
+    "sbkim-storage.js", "sbkim-spore.js", "sbkim-match.js", "pruefer-mail.js",
     "sbkim-embedding.js", "sbkim-anastomose.js", "sbkim-apoptose.js",
     "sbkim-membran.js", "sbkim-siegel.js"
   ];

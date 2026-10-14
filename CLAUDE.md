@@ -239,3 +239,16 @@ und registriert. `assets/installieren.js` ist dieselbe Datei wie in Sage und den
 Tresoren; der Knopf steht auf der Startseite unter der Überschrift (in der
 Kopfleiste war kein Platz, sie brach um). Wer eine Datei aus `SHELL` ändert,
 erhöht `CACHE` in `sw.js`. ⚠ Am Tablet nicht gemessen.
+
+## 🛡 Prüfliste vor dem KI-Richter (Sage Bau 04.J, 2026-10-14)
+
+Modul 04 und 22 kommen neu aus dem Kanon (Sage #1082, `kanon-verteilen`), in `web/tools/` und `such-tool/modules/`.
+Der KI-Richter prüft Suchfrage und Kandidaten mit der Prüfliste (`pruefer-mail.js`, byte-1:1 aus dem
+Auslieferungsprüfer); fehlt sie, läuft er nicht. Sie steht überall direkt nach 04: `index.html`, `werkzeuge.html`,
+`markt.html`, `such-tool/index.html` (samt Vorrat), im Siegel-Lader `assets/sbkim-siegel.js` und inline in
+`such-werkzeug.html` (`npm run build:such-pwa`). Gepinnt in `test/kopien_drift.test.js` (als `kanon: false`, weil
+kein Sage-Modul) und bewacht von `test/pruefliste.test.js`.
+
+Gemessen im Browser auf allen fünf Seiten: `prueflisteGeladen === true`. Von Hand gegengeprüft (Zeile weg in
+`such-tool/index.html`, in `markt.html`, im Siegel-Lader, im Bau-Skript): je genau eine rote Zeile mit ihrem Namen.
+⚠ Das Tablet ist nicht gemessen; ein Urteil der echten KI auch nicht.

@@ -27,6 +27,7 @@ const read = (p) => readFileSync(resolve(root, p), "utf8");
 const parts = {
   mod03: read("web/tools/sbkim-embedding.js"),
   mod04: read("web/tools/sbkim-match.js"),
+  pruef: read("web/tools/pruefer-mail.js"),   // Prüfliste vor dem KI-Richter (Sage Bau 04.J)
   mod22: read("web/tools/sbkim-such-widget.js"),
   init: read("assets/such-widget-init.js"),
 };
@@ -163,6 +164,7 @@ const html = `<!DOCTYPE html>
 
   <script>${parts.mod03}</script>
   <script>${parts.mod04}</script>
+  <script>${parts.pruef}</script>
   <script>${parts.mod22}</script>
   <script>${parts.init}</script>
 </body>
