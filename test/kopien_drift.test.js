@@ -47,7 +47,7 @@ const KOPIEN = [
     grund: "Pruefliste vor dem KI-Richter (Sage Bau 04.J): byte-1:1 aus dem Auslieferungspruefer, kein Sage-Modul" },
   { datei: "sbkim-anastomose.js", sha: "255ac79aeb3b0203", kanon: true },
   { datei: "sbkim-apoptose.js", sha: "0acdd6ab2d95e131", kanon: true },
-  { datei: "sbkim-embedding.js", sha: "a6ac64d7536da3fa", kanon: true },
+  { datei: "sbkim-embedding.js", sha: "2e31baa09a2959c9", kanon: true },
   { datei: "sbkim-floating-widget.js", sha: "e4ee076c1295910d", kanon: true },
   { datei: "sbkim-heterokaryose.js", sha: "9b2224af8ff13bfb", kanon: true },
   { datei: "sbkim-match.js", sha: "721eecc3c0d6ea4c", kanon: true },

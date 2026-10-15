@@ -8,11 +8,11 @@
  * Adressen (Relais, andere Knoten) kommen nie in den Vorrat.
  * Nur EIGENE Vorräte aufräumen: `caches` gehört dem Ursprung, nicht dem Pfad —
  * auf lausiklauskn-png.github.io liegen rund zwanzig Apps. */
-var CACHE = "kimtool-point-v11";
+var CACHE = "kimtool-point-v12";
 var PRAEFIX = "kimtool-point-";
 var SHELL = [
   "./", "./index.html", "./modell.html", "./werkzeuge.html", "./markt.html",
-  "./manifest.webmanifest", "./assets/style.css", "./assets/installieren.js?v=11",
+  "./manifest.webmanifest", "./assets/style.css", "./assets/installieren.js?v=12",
   "./assets/img/icon-192.png?v=3", "./assets/img/icon-512.png?v=3"
 ];
 
