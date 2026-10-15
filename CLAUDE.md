@@ -252,3 +252,15 @@ kein Sage-Modul) und bewacht von `test/pruefliste.test.js`.
 Gemessen im Browser auf allen fünf Seiten: `prueflisteGeladen === true`. Von Hand gegengeprüft (Zeile weg in
 `such-tool/index.html`, in `markt.html`, im Siegel-Lader, im Bau-Skript): je genau eine rote Zeile mit ihrem Namen.
 ⚠ Das Tablet ist nicht gemessen; ein Urteil der echten KI auch nicht.
+
+## 🛡 Echtheit im Raum (Sage Bau 23.R, nachgezogen 2026-10-15)
+
+Modul 02, 16, 23 und 23-UI kommen neu aus dem Kanon (`kanon-verteilen`, Sammel-Brief Schritt 2, Paket A1) — die echten
+Kopien in `web/tools/`. Der Loader `assets/sbkim-siegel.js` bleibt, wie er ist. Die Echtheit einer Karte im Raum wird jetzt
+wirklich geprüft (`.valid`), vor dem Zusammenfassen gleicher Namen; Antworten tragen Spore und Unterschrift und gelten nur
+vom gefragten Knoten. Pins (16 Zeichen) in `test/kopien_drift.test.js`, Cache `kimtool-point-v11`.
+`jasons-bibliothek/index.html` trägt Modul 02 eingebettet und ist neu eingebettet (`test/jason_lib.test.js` verlangt es
+byte-genau). ⚠ **Benannt, nicht geändert:** `web/tools/mycelknoten.html` trägt 02 und 16 eingebettet, aber **kein Modul 23** —
+dort Modul 16 nachzuziehen hieße, das Siegel eine 23.R-Prüfung behaupten zu lassen, die die Seite nicht leistet. Gemessen:
+`npm test` **140 bestanden · 0 fehlgeschlagen**. Gegenprobe von Hand (alte 23-Fassung zurück): Drift-Guard rot.
+⚠ Nicht gemessen: das Tablet, ein Raum mit echten fremden Knoten.
