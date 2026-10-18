@@ -2,6 +2,23 @@
 
 Stand: 2026-06-27 · Branch `claude/sbkim-lauschen-rollout-stufe2-ob0lrm`
 
+## Nachtrag 2026-10-18 — eigene Manifest-id für das Such-Werkzeug
+
+Klaus hat am Tablet (chrome://webapks) gemessen: Chrome löst die Manifest-`id`
+gegen den **Ursprung** auf, nicht gegen den App-Ordner. `such-tool/manifest.json`
+trug `"id": "./"` — das wird zu `https://lausiklauskn-png.github.io/`, derselben
+id wie zehn andere installierte Apps. Folge: „Diese App wurde bereits
+installiert" im Chrome-Menü, „App konnte nicht geöffnet werden" beim Öffnen.
+
+- `such-tool/manifest.json`: `"id": "/SB-KIMTool-Point/such-tool/"` (= start_url `./`).
+  Das Wurzel-Manifest trug schon `/SB-KIMTool-Point/` und bleibt.
+- `such-tool/sbkim-sw.js`: `sbkim-such-tool-v14 → v15` (das Manifest liegt in der App-Schale).
+- Neuer Wächter `test/manifest_id.test.js`: rechnet die id wie Chrome, verlangt sie im
+  eigenen scope und eindeutig über beide Manifeste. Von Hand gegengeprüft: mit `"./"`
+  und mit der id der Wurzel-App je rot.
+- ⚠ Eine schon installierte Fassung einmal deinstallieren und neu installieren — Chrome
+  behält für eine installierte WebAPK die alte id. Ungeprüft am Tablet, wartet auf Klaus.
+
 ## Nachtrag 2026-08-21 (3) — der Quelltext wird nicht mehr angeboten
 
 Klaus hat den Widerspruch im Bild gezeigt: diese Seite ist **öffentlich** und
