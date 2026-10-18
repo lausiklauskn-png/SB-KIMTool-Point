@@ -276,3 +276,15 @@ dort Modul 16 nachzuziehen hieße, das Siegel eine 23.R-Prüfung behaupten zu la
 ## ⬇ Installieren-Knopf im Such-Werkzeug (2026-10-18)
 
 `such-tool/` hat keine Kopfleiste und keine Einstellungen; der Knopf steht deshalb fest oben rechts (`data-fest`, Anker `#install-platz`). Eigene byte-gleiche Kopie `such-tool/assets/installieren.js` aus Sage (SHA-256 `e0644084…c3`), weil das Werkzeug eigenständig bleiben muss; im Vorrat, Cache `sbkim-such-tool-v16`. Als App verschwindet er. Gemessen im Browser: sichtbar, als App weg, Meldung lesbar, keine Installierbarkeits-Fehler, 360 px ohne Überlauf. ⚠ Am Tablet nicht gemessen.
+
+## ⬇ Installieren oben in der Kopfleiste, auf allen vier Seiten (Klaus 2026-10-18)
+
+Klaus: *„setze den Installationsbutton oben in die Navi-Leiste zusätzlich … verschwinden, wenn die App installiert ist …
+Macht das bitte überall so.“* ⚠ **Tafel-Evolution, benannt:** oben steht *„der Knopf steht auf der Startseite unter der
+Überschrift (in der Kopfleiste war kein Platz, sie brach um)“*. Jetzt steht er in der Statusleiste vor `v0.2`, auf
+Start, Modell, Werkzeuge und Markt (vorher nur Start). Platzhalter `#install-anker`, Klasse `.kopf-install`. Platz
+geschaffen statt neue Zeile: bis 1500 px nur ⬇, `column-gap` 1rem, Gerätename-Feld 100–140 px, und „v0.2“ tritt zurück,
+solange der Knopf steht (als App kommt es zurück). Die alte `#installieren`-Regel (Abstand unten 0,6rem) ist raus — sie
+machte die Leiste 8 px höher. Gemessen 300–1600 px: Kopfleiste nirgends höher als auf main (einzige Ausnahme: Start/Werkzeuge
+bei 300–340 px +2 px), kein Querlauf; als App weg; Meldung lesbar; `getInstallabilityErrors` leer. Cache v24,
+`installieren.js?v=24`. `npm test` 144 bestanden (mit `fake-indexeddb`, sonst 2 nicht lauffähig). Am Tablet nicht gemessen.
