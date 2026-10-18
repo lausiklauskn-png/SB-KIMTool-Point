@@ -264,3 +264,7 @@ byte-genau). ⚠ **Benannt, nicht geändert:** `web/tools/mycelknoten.html` trä
 dort Modul 16 nachzuziehen hieße, das Siegel eine 23.R-Prüfung behaupten zu lassen, die die Seite nicht leistet. Gemessen:
 `npm test` **140 bestanden · 0 fehlgeschlagen**. Gegenprobe von Hand (alte 23-Fassung zurück): Drift-Guard rot.
 ⚠ Nicht gemessen: das Tablet, ein Raum mit echten fremden Knoten.
+
+## ⬇ Installieren-Erklärtext ohne „Daten löschen“ (2026-10-18)
+
+`assets/installieren.js` neu byte-1:1 aus Sage-Protokol (PR #1151, SHA-256 `09c533b3…2193`). Der alte Rat „Websiteeinstellungen → Daten löschen“ ist ersetzt: auf `lausiklauskn-png.github.io` teilen sich alle Apps einen Speicher, das hätte die Daten ALLER Apps gelöscht. Cache `kimtool-point-v21`, `installieren.js?v=21`. ⚠ Hier pinnt keine Probe die Datei (benannt, nicht nachgebaut).
