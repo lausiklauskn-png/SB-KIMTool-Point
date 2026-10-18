@@ -272,3 +272,7 @@ dort Modul 16 nachzuziehen hieße, das Siegel eine 23.R-Prüfung behaupten zu la
 **Nachtrag 2026-10-18 · Kontrast:** am Handy stand das Erklärfenster hell auf weiß (`color:inherit` erbt helle Schrift, `--flaeche` fehlt → weiß). `assets/installieren.js` neu byte-1:1 aus Sage (#1152, sha `874d2a29…8dc4`): nach dem Einhängen wird der Kontrast gemessen, unter 4,5 steht die Meldung fest `#1a1a1a` auf `#fff`. `installieren.js?v=22`, Cache `kimtool-point-v22`. ⚠ Am Tablet nicht gemessen.
 
 **Nachtrag 2026-10-18 · Knopf in den Einstellungen:** `assets/installieren.js` neu byte-1:1 aus Sage (#1153, sha `e0644084…73c3`, enthält die Kontrast-Sicherung). Keine Einstellungen in dieser Seite, also bleibt der Knopf oben (`data-vor`). `installieren.js?v=23`, Cache `kimtool-point-v23`. ⚠ Am Tablet nicht gemessen.
+
+## ⬇ Installieren-Knopf im Such-Werkzeug (2026-10-18)
+
+`such-tool/` hat keine Kopfleiste und keine Einstellungen; der Knopf steht deshalb fest oben rechts (`data-fest`, Anker `#install-platz`). Eigene byte-gleiche Kopie `such-tool/assets/installieren.js` aus Sage (SHA-256 `e0644084…c3`), weil das Werkzeug eigenständig bleiben muss; im Vorrat, Cache `sbkim-such-tool-v16`. Als App verschwindet er. Gemessen im Browser: sichtbar, als App weg, Meldung lesbar, keine Installierbarkeits-Fehler, 360 px ohne Überlauf. ⚠ Am Tablet nicht gemessen.

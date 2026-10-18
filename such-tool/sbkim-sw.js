@@ -15,7 +15,7 @@
  */
 "use strict";
 
-var CACHE_VERSION = "sbkim-such-tool-v15";
+var CACHE_VERSION = "sbkim-such-tool-v16";
 
 
 /* ⚠ NUR EIGENE VORRAETE AUFRAEUMEN — `caches` gehoert dem URSPRUNG, nicht dem
@@ -40,6 +40,7 @@ var APP_SHELL = [
   "./modules/pruefer-mail.js",
   "./modules/21_spracheingabe.js",
   "./modules/22_such_widget.js",
+  "./assets/installieren.js",
 ];
 
 self.addEventListener("install", function (event) {
